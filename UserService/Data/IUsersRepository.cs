@@ -11,7 +11,6 @@ namespace UserService.Data
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<IEnumerable<User>> SearchUsersAsync(string query);
         Task AddUserAsync(User user);
-        Task UpdateUserAsync(User user);
         Task DeleteUserAsync(int id);
 
         Task ActivateUserAsync(int userId);
