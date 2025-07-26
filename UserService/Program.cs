@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using UserService.Data;
+using UserService.Profiles;
+using UserService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +9,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserRepository, UsersRepository>();
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.AddAutoMapper(typeof(UsersProfile));
+builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
 
 if (builder.Environment.IsDevelopment())
 {

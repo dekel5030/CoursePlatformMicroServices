@@ -31,7 +31,7 @@ namespace UserService.Data
             }
         }
 
-        public async Task AddUserAsync(User user)
+        public async Task<User> AddUserAsync(User user)
         {
             if (user == null)
             {
