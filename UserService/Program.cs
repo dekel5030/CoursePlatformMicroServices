@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserRepository, UsersRepository>();
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 if (builder.Environment.IsDevelopment())
 {
@@ -14,7 +15,11 @@ if (builder.Environment.IsDevelopment())
 }
 
 var app = builder.Build();
-await PrepDb.PopulateAsync(app);
+
+if (app.Environment.IsDevelopment())
+{
+    await PrepDb.PopulateAsync(app);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -22,8 +27,17 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.MapControllers();
+var supportedCultures = new[] { "en", "he" };
+
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture("he")
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+
+app.UseRequestLocalization(localizationOptions);
 app.UseHttpsRedirection();
+app.MapControllers();
 
 
 app.Run();

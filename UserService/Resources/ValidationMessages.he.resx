@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+
+  <!-- FullName -->
+  <data name="FullNameRequired" xml:space="preserve">
+    <value>יש להזין שם מלא.</value>
+  </data>
+  <data name="FullNameInvalidLength" xml:space="preserve">
+    <value>השם המלא צריך להכיל בין {0} ל־{1} תווים.</value>
+  </data>
+
+  <!-- Email -->
+  <data name="EmailRequired" xml:space="preserve">
+    <value>יש להזין אימייל.</value>
+  </data>
+  <data name="EmailInvalid" xml:space="preserve">
+    <value>פורמט האימייל אינו תקין.</value>
+  </data>
+
+  <!-- Password -->
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>יש להזין סיסמה.</value>
+  </data>
+  <data name="PasswordTooShort" xml:space="preserve">
+    <value>הסיסמה צריכה להכיל לפחות {0} תווים.</value>
+  </data>
+
+  <!-- ConfirmPassword -->
+  <data name="ConfirmPasswordRequired" xml:space="preserve">
+    <value>יש להזין אישור סיסמה.</value>
+  </data>
+  <data name="ConfirmPasswordDoesNotMatch" xml:space="preserve">
+    <value>אישור הסיסמה לא תואם לסיסמה.</value>
+  </data>
+
+  <!-- PhoneNumber -->
+  <data name="PhoneNumberInvalid" xml:space="preserve">
+    <value>יש להזין מספר טלפון תקני, לדוגמה +972XXXXXXXXX או 05XXXXXXXX.</value>
+  </data>
+
+  <!-- DateOfBirth -->
+  <data name="DateOfBirthMustBeInPast" xml:space="preserve">
+    <value>תאריך הלידה חייב להיות בעבר.</value>
+  </data>
+
+  <!-- Bio -->
+  <data name="BioMaxLength" xml:space="preserve">
+    <value>הביוגרפיה לא יכולה להכיל יותר מ־500 תווים.</value>
+  </data>
+</root>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+
+  <!-- FullName -->
+  <data name="FullNameRequired" xml:space="preserve">
+    <value>Full name is required.</value>
+  </data>
+  <data name="FullNameInvalidLength" xml:space="preserve">
+    <value>Full name must be between {0} and {1} characters long.</value>
+  </data>
+
+  <!-- Email -->
+  <data name="EmailRequired" xml:space="preserve">
+    <value>Email is required.</value>
+  </data>
+  <data name="EmailInvalid" xml:space="preserve">
+    <value>Invalid email format.</value>
+  </data>
+
+  <!-- Password -->
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Password is required.</value>
+  </data>
+  <data name="PasswordTooShort" xml:space="preserve">
+    <value>Password must be at least {0} characters long.</value>
+  </data>
+
+  <!-- ConfirmPassword -->
+  <data name="ConfirmPasswordRequired" xml:space="preserve">
+    <value>Confirm password is required.</value>
+  </data>
+  <data name="ConfirmPasswordDoesNotMatch" xml:space="preserve">
+    <value>Confirm password must match password.</value>
+  </data>
+
+  <!-- PhoneNumber -->
+  <data name="PhoneNumberInvalid" xml:space="preserve">
+    <value>Phone number must be in a valid format, e.g. +972XXXXXXXXX or 05XXXXXXXX.</value>
+  </data>
+
+  <!-- DateOfBirth -->
+  <data name="DateOfBirthMustBeInPast" xml:space="preserve">
+    <value>Date of birth must be in the past.</value>
+  </data>
+
+  <!-- Bio -->
+  <data name="BioMaxLength" xml:space="preserve">
+    <value>Bio must not exceed 500 characters.</value>
+  </data>
+</root>
