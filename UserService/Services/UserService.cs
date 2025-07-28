@@ -51,11 +51,19 @@ namespace UserService.Services
             return _mapper.Map<UserReadDto>(user);
         }
 
-        public Task<IEnumerable<UserReadDto>> GetPagedUsersAsync(int pageNumber, int pageSize)
+        public async Task<IEnumerable<UserReadDto>> GetPagedUsersAsync(int pageNumber, int pageSize)
         {
-            throw new NotImplementedException();
-        }
+            if (pageNumber <= 0 || pageSize <= 0)
+            {
+                throw new ArgumentOutOfRangeException("Page number and page size must be greater than zero.");
+            }
 
+            var skip = (pageNumber - 1) * pageSize;
+
+            var users = await _repository.GetPagedUsersAsync(skip, pageSize);
+
+            return _mapper.Map<IEnumerable<UserReadDto>>(users);
+        }
         public async Task<IEnumerable<UserReadDto>> SearchUsersAsync(string query)
         {
             var users = await _repository.SearchUsersAsync(query);

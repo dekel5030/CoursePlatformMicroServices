@@ -67,6 +67,15 @@ namespace UserService.Data
                                user.Email.Contains(query, StringComparison.OrdinalIgnoreCase))
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<User>> GetPagedUsersAsync(int skip, int take)
+        {
+            return await _context.Users
+                .OrderBy(u => u.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+        }
         
         public async Task<bool> SaveChangesAsync()
         {

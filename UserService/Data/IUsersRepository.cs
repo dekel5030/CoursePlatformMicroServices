@@ -10,6 +10,7 @@ namespace UserService.Data
         Task<User?> GetUserByEmailAsync(string email);
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<IEnumerable<User>> SearchUsersAsync(string query);
+        Task<IEnumerable<User>> GetPagedUsersAsync(int skip, int take);
         Task AddUserAsync(User user);
         Task DeleteUserAsync(int id);
         Task<bool> SaveChangesAsync();
