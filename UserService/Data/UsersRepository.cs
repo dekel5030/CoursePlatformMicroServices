@@ -11,25 +11,6 @@ namespace UserService.Data
         {
             _context = context;
         }
-        public async Task ActivateUserAsync(int userId)
-        {
-            var user = await GetUserByIdAsync(userId);
-
-            if (user != null)
-            {
-                user.IsActive = true;
-            }
-        }
-        
-        public async Task DeactivateUserAsync(int userId)
-        {
-            var user = await GetUserByIdAsync(userId);
-
-            if (user != null)
-            {
-                user.IsActive = false;
-            }
-        }
 
         public async Task AddUserAsync(User user)
         {
@@ -72,18 +53,6 @@ namespace UserService.Data
         public async Task<User?> GetUserByIdAsync(int id)
         {
             return await _context.Users.FindAsync(id);
-        }
-
-        public async Task<bool> IsEmailConfirmedAsync(int userId)
-        {
-            var user = await GetUserByIdAsync(userId);
-
-            if (user == null)
-            {
-                throw new KeyNotFoundException($"User with ID {userId} not found.");
-            }
-            
-            return user.EmailConfirmed;
         }
 
         public async Task<IEnumerable<User>> SearchUsersAsync(string query)

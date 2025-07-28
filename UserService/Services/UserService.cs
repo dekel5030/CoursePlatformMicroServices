@@ -22,20 +22,19 @@ namespace UserService.Services
 
         public async Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto)
         {
-            var user = _mapper.Map<User>(userCreateDto);
-
-            if (await _repository.EmailExistsAsync(user.Email))
+            if (await _repository.EmailExistsAsync(userCreateDto.Email))
             {
                 return Result<UserReadDto>.Failure(ErrorCode.DuplicateEmail);
             }
 
+            var user = _mapper.Map<User>(userCreateDto);
             await _repository.AddUserAsync(user);
             await _repository.SaveChangesAsync();
-            var userReadDto = _mapper.Map<UserReadDto>(user);
 
+            var userReadDto = _mapper.Map<UserReadDto>(user);
             return Result<UserReadDto>.Success(userReadDto);
         }
-
+            
         // === GET ===
 
         public async Task<UserReadDto?> GetUserByIdAsync(int id)

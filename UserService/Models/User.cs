@@ -9,7 +9,7 @@ namespace UserService.Models
 
         public required string Email { get; set; }
         public required string PasswordHash { get; set; }
-        public bool EmailConfirmed { get; internal set; }
+        public bool EmailConfirmed { get; private set; }
 
         public required string FullName { get; set; }
         public string? PhoneNumber { get; set; }
@@ -25,16 +25,5 @@ namespace UserService.Models
 
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
-
-
-        internal void SetPasswordHash(string hash)
-        {
-            if (string.IsNullOrWhiteSpace(hash))
-            {
-                throw new ArgumentException("Password hash cannot be null or empty.", nameof(hash));
-            }
-
-            PasswordHash = hash;
-        }
     }
 }

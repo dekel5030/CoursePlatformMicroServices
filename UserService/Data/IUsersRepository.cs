@@ -12,11 +12,6 @@ namespace UserService.Data
         Task<IEnumerable<User>> SearchUsersAsync(string query);
         Task AddUserAsync(User user);
         Task DeleteUserAsync(int id);
-
-        Task ActivateUserAsync(int userId);
-        Task DeactivateUserAsync(int userId);
-
-        Task<bool> IsEmailConfirmedAsync(int userId);
         Task<bool> SaveChangesAsync();
     }
 }
