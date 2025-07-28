@@ -8,7 +8,7 @@ namespace UserService.Models
         public int Id { get; private set; }
 
         public required string Email { get; set; }
-        public string PasswordHash { get; private set; }
+        public required string PasswordHash { get; set; }
         public bool EmailConfirmed { get; internal set; }
 
         public required string FullName { get; set; }
@@ -26,10 +26,6 @@ namespace UserService.Models
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
 
-        private User()
-        {
-            PasswordHash = string.Empty;
-        }
 
         internal void SetPasswordHash(string hash)
         {
