@@ -18,22 +18,29 @@ namespace UserService.Services
             _mapper = mapper;
         }
 
-        public async Task<UserReadDto?> GetUserByIdAsync(int id)
+        public async Task<Result<UserReadDto>> GetUserByIdAsync(int id)
         {
-            var user = await _repository.GetUserByIdAsync(id);
+            try
+            {
+                var user = await _repository.GetUserByIdAsync(id);
+                
+                if (user == null)
+                {
+                    return Result<UserReadDto>.Failure(ErrorCode.UserNotFound);
+                }
 
-            return _mapper.Map<UserReadDto>(user);
-        }
-
-        public Task ActivateUserAsync(int userId)
-        {
-            throw new NotImplementedException();
+                return Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"--> Getting user by ID failed: {ex.Message}");
+                return Result<UserReadDto>.Failure(ErrorCode.DatabaseError);
+            }
         }
 
         public async Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto)
         {
             var user = _mapper.Map<User>(userCreateDto);
-            user.SetPasswordHash(userCreateDto.Password);
 
             try
             {
@@ -44,7 +51,9 @@ namespace UserService.Services
 
                 await _repository.AddUserAsync(user);
                 await _repository.SaveChangesAsync();
-                return Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user));
+                var userReadDto = _mapper.Map<UserReadDto>(user);
+
+                return Result<UserReadDto>.Success(userReadDto);
             }
             catch (Exception ex)
             {
@@ -53,42 +62,72 @@ namespace UserService.Services
             }
         }
 
-        public Task DeactivateUserAsync(int userId)
+        public Task<Result<UserReadDto>> GetUserByEmailAsync(string email)
+        {
+            try
+            {
+                var user = _repository.GetUserByEmailAsync(email);
+                
+                if (user == null)
+                {
+                    return Task.FromResult(Result<UserReadDto>.Failure(ErrorCode.UserNotFound));
+                }
+
+                return Task.FromResult(Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user)));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"--> Getting user by email failed: {ex.Message}");
+                return Task.FromResult(Result<UserReadDto>.Failure(ErrorCode.DatabaseError));
+            }
+        }
+
+        public Task<Result<IEnumerable<UserReadDto>>> GetAllUsersAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteUserAsync(int id)
+        public Task<Result<IEnumerable<UserReadDto>>> SearchUsersAsync(string query)
+        {
+            try
+            {
+                var users = _repository.SearchUsersAsync(query);
+                var userDtos = _mapper.Map<IEnumerable<UserReadDto>>(users);
+                return Task.FromResult(Result<IEnumerable<UserReadDto>>.Success(userDtos));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"--> Searching users failed: {ex.Message}");
+                return Task.FromResult(Result<IEnumerable<UserReadDto>>.Failure(ErrorCode.DatabaseError));
+            }
+        }
+
+        public Task<Result<UserReadDto>> ActivateUserAsync(int userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> EmailExistsAsync(string email)
+        public Task<Result<UserReadDto>> DeactivateUserAsync(int userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<UserReadDto>> GetAllUsersAsync()
+        public Task<Result<UserReadDto>> DeleteUserAsync(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<UserReadDto?> GetUserByEmailAsync(string email)
+        public Task<Result<UserReadDto>> EmailExistsAsync(string email)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> IsEmailConfirmedAsync(int userId)
+        public Task<Result<UserReadDto>> UserExistsAsync(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<UserReadDto>> SearchUsersAsync(string query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> UserExistsAsync(int id)
+        public Task<Result<UserReadDto>> IsEmailConfirmedAsync(int userId)
         {
             throw new NotImplementedException();
         }

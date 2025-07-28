@@ -10,7 +10,6 @@ namespace UserService.Validators
     {
         public UserCreateDtoValidator(IStringLocalizer<ValidationMessages> localizer)
         {
-            var minPassLen = ValidationSettings.PasswordMinLength;
             var fullNameMinLen = ValidationSettings.FullNameMinLength;
             var fullNameMaxLen = ValidationSettings.FullNameMaxLength;
 
@@ -26,17 +25,9 @@ namespace UserService.Validators
                 .EmailAddress()
                 .WithMessage(localizer["EmailInvalid"]);
 
-            RuleFor(user => user.Password)
+            RuleFor(user => user.PasswordHash)
                 .NotEmpty()
-                .WithMessage(localizer["PasswordRequired"])
-                .MinimumLength(minPassLen)
-                .WithMessage(localizer["PasswordTooShort", minPassLen]);
-
-            RuleFor(user => user.ConfirmPassword)
-                .NotEmpty()
-                .WithMessage(localizer["ConfirmPasswordRequired"])
-                .Equal(user => user.Password)
-                .WithMessage(localizer["ConfirmPasswordDoesNotMatch"]);
+                .WithMessage(localizer["PasswordRequired"]);
         }
     }
 }

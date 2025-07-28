@@ -1,13 +1,10 @@
 using System.Globalization;
-using System.Resources;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
 using UserService.Common.Errors;
 using UserService.Data;
 using UserService.Profiles;
-using UserService.Resources;
 using UserService.Services;
 using UserService.Validators;
 

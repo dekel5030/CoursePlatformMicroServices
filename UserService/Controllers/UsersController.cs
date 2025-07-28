@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using UserService.Common.Errors;
 using UserService.Dtos;
-using UserService.Resources.ErrorMessages;
 using UserService.Services;
 
 namespace UserService.Controllers
@@ -25,14 +23,14 @@ namespace UserService.Controllers
         {
             Console.WriteLine($"--> Fetching user with ID: {id}");
 
-            var user = await _userService.GetUserByIdAsync(id);
+            var result = await _userService.GetUserByIdAsync(id);
 
-            if (user == null)
+            if (!result.IsSuccess)
             {
-                return NotFound();
+                return _errorMapper.ToActionResult(result);
             }
 
-            return Ok(user);
+            return Ok(result.Value);
         }
 
         [HttpPost]
