@@ -1,4 +1,5 @@
 using AutoMapper;
+using UserService.Common;
 using UserService.Data;
 using UserService.Dtos;
 using UserService.Models;
@@ -28,25 +29,27 @@ namespace UserService.Services
             throw new NotImplementedException();
         }
 
-        public async Task<UserReadDto?> CreateUserAsync(UserCreateDto userCreateDto)
+        public async Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto)
         {
             var user = _mapper.Map<User>(userCreateDto);
             user.SetPasswordHash(userCreateDto.Password);
 
             try
             {
+                if (await _repository.EmailExistsAsync(user.Email))
+                {
+                    return Result<UserReadDto>.Failure(ErrorCode.DuplicateEmail);
+                }
+
                 await _repository.AddUserAsync(user);
                 await _repository.SaveChangesAsync();
+                return Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user));
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Creating user failed: {ex.Message}");
-                return null;
+                Console.WriteLine($"--> Creating user failed: {ex.Message}");
+                return Result<UserReadDto>.Failure(ErrorCode.DatabaseError);
             }
-            
-            var userReadDto = _mapper.Map<UserReadDto>(user);
-
-            return userReadDto;
         }
 
         public Task DeactivateUserAsync(int userId)

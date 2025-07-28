@@ -1,3 +1,4 @@
+using UserService.Common;
 using UserService.Dtos;
 
 namespace UserService.Services
@@ -5,7 +6,7 @@ namespace UserService.Services
     public interface IUserService
     {
         // === Create & Add ===
-        Task<UserReadDto?> CreateUserAsync(UserCreateDto userCreateDto);
+        Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto);
 
         // === Read ===
         Task<UserReadDto?> GetUserByIdAsync(int id);

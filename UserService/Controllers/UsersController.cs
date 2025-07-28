@@ -1,8 +1,8 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using UserService.Data;
+using Microsoft.Extensions.Localization;
+using UserService.Common;
 using UserService.Dtos;
-using UserService.Models;
+using UserService.Resources.ErrorMessages;
 using UserService.Services;
 
 namespace UserService.Controllers
@@ -12,10 +12,12 @@ namespace UserService.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IStringLocalizer<ErrorMessages> _errorLocalizer;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, IStringLocalizer<ErrorMessages> errorLocalizer)
         {
             _userService = userService;
+            _errorLocalizer = errorLocalizer;
         }
 
         [HttpGet("{id}", Name = "GetUserById")]
@@ -36,14 +38,20 @@ namespace UserService.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] UserCreateDto userCreateDto)
         {
-            var createdUser = await _userService.CreateUserAsync(userCreateDto);
+            var result = await _userService.CreateUserAsync(userCreateDto);
 
-            if (createdUser == null)
+            if (!result.IsSuccess)
             {
-                return BadRequest("User creation failed");
+                var code = result.ErrorCode ?? ErrorCode.Unexpected;
+
+                string errorMessage = code.IsPublic()
+                    ? _errorLocalizer[code.ToString()]
+                    : _errorLocalizer[ErrorCode.Unexpected.ToString()];
+
+                return StatusCode(code.GetHttpStatusCode(), new { error = errorMessage });
             }
 
-            return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
+            return CreatedAtAction(nameof(GetUserById), new { id = result.Value!.Id }, result.Value);
         }
 
     }
