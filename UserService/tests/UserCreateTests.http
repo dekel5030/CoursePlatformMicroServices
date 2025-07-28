@@ -1,0 +1,61 @@
+### ❌ Test: Missing all required fields
+POST http://localhost:5125/api/users
+Content-Type: application/json
+
+{
+  "email": "",
+  "password": "",
+  "confirmPassword": "",
+  "fullName": ""
+}
+
+
+### ❌ Test: Invalid email and short password
+POST http://localhost:5125/api/users
+Content-Type: application/json
+
+{
+  "email": "invalid-email",
+  "password": "123",
+  "confirmPassword": "123",
+  "fullName": "Yo"
+}
+
+
+### ❌ Test: Password and ConfirmPassword mismatch
+POST http://localhost:5125/api/users
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "ValidPass123",
+  "confirmPassword": "WrongConfirm123",
+  "fullName": "Valid Name"
+}
+
+
+### ✅ Test: All fields valid
+POST http://localhost:5125/api/users
+Content-Type: application/json
+
+{
+  "email": "valid3@example.com",
+  "password": "ValidPass123!",
+  "confirmPassword": "ValidPass123!",
+  "fullName": "Valid User"
+}
+
+
+### ✅ Test: Optional fields included
+POST http://localhost:5125/api/users
+Content-Type: application/json
+
+{
+  "email": "optiona3@example.com",
+  "password": "StrongPassword1!",
+  "confirmPassword": "StrongPassword1!",
+  "fullName": "Optional Fields",
+  "bio": "Hello, I'm testing",
+  "phoneNumber": "0501234567",
+  "dateOfBirth": "1995-06-25"
+}

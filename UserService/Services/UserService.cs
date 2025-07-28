@@ -30,24 +30,21 @@ namespace UserService.Services
 
         public async Task<UserReadDto?> CreateUserAsync(UserCreateDto userCreateDto)
         {
-            if (userCreateDto == null)
-            {
-                throw new ArgumentNullException(nameof(userCreateDto));
-            }
             var user = _mapper.Map<User>(userCreateDto);
+            user.SetPasswordHash(userCreateDto.Password);
+
             try
             {
                 await _repository.AddUserAsync(user);
+                await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error checking email existence: {ex.Message}");
+                Console.WriteLine($"Creating user failed: {ex.Message}");
                 return null;
             }
             
             var userReadDto = _mapper.Map<UserReadDto>(user);
-
-            await _repository.SaveChangesAsync();
 
             return userReadDto;
         }

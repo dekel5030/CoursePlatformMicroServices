@@ -5,11 +5,11 @@ namespace UserService.Models
     public class User
     {
         [Key]
-        public int Id { get; set; }
+        public int Id { get; private set; }
 
         public required string Email { get; set; }
-        public required string PasswordHash { get; set; }
-        public bool EmailConfirmed { get; set; } = false;
+        public string PasswordHash { get; private set; }
+        public bool EmailConfirmed { get; internal set; }
 
         public required string FullName { get; set; }
         public string? PhoneNumber { get; set; }
@@ -20,10 +20,25 @@ namespace UserService.Models
         public string? ProfileImageMediumUrl { get; set; }
         public string? ProfileImageLargeUrl { get; set; }
 
-        public bool IsActive { get; set; } = true;
-        public string Role { get; set; } = "User";
+        public bool IsActive { get; internal set; }
+        public string? Role { get; internal set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; private set; }
+        public DateTime? UpdatedAt { get; private set; }
+
+        private User()
+        {
+            PasswordHash = string.Empty;
+        }
+
+        internal void SetPasswordHash(string hash)
+        {
+            if (string.IsNullOrWhiteSpace(hash))
+            {
+                throw new ArgumentException("Password hash cannot be null or empty.", nameof(hash));
+            }
+
+            PasswordHash = hash;
+        }
     }
 }
