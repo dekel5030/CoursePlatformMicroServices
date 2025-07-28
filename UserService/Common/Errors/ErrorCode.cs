@@ -1,4 +1,4 @@
-namespace UserService.Common
+namespace UserService.Common.Errors
 {
     public enum ErrorCode
     {

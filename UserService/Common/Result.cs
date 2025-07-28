@@ -1,3 +1,5 @@
+using UserService.Common.Errors;
+
 namespace UserService.Common
 {
     public record Result<T>

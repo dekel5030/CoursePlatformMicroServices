@@ -1,4 +1,5 @@
 using AutoMapper;
+using UserService.Common.Errors;
 using UserService.Common;
 using UserService.Data;
 using UserService.Dtos;

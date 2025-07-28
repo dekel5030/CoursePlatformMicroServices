@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using UserService.Common;
+using UserService.Common.Errors;
 using UserService.Dtos;
 using UserService.Resources.ErrorMessages;
 using UserService.Services;
@@ -12,12 +12,12 @@ namespace UserService.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IStringLocalizer<ErrorMessages> _errorLocalizer;
+        private readonly IApiErrorMapper _errorMapper;
 
-        public UsersController(IUserService userService, IStringLocalizer<ErrorMessages> errorLocalizer)
+        public UsersController(IUserService userService, IApiErrorMapper errorMapper)
         {
             _userService = userService;
-            _errorLocalizer = errorLocalizer;
+            _errorMapper = errorMapper;
         }
 
         [HttpGet("{id}", Name = "GetUserById")]
@@ -42,17 +42,10 @@ namespace UserService.Controllers
 
             if (!result.IsSuccess)
             {
-                var code = result.ErrorCode ?? ErrorCode.Unexpected;
-
-                string errorMessage = code.IsPublic()
-                    ? _errorLocalizer[code.ToString()]
-                    : _errorLocalizer[ErrorCode.Unexpected.ToString()];
-
-                return StatusCode(code.GetHttpStatusCode(), new { error = errorMessage });
+                return _errorMapper.ToActionResult(result);
             }
 
             return CreatedAtAction(nameof(GetUserById), new { id = result.Value!.Id }, result.Value);
         }
-
     }
 }

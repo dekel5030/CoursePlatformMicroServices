@@ -4,6 +4,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using UserService.Common.Errors;
 using UserService.Data;
 using UserService.Profiles;
 using UserService.Resources;
@@ -23,6 +24,8 @@ builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<UserCreateDtoValidator>();
+
+builder.Services.AddScoped<IApiErrorMapper, ApiErrorMapper>();
 
 if (builder.Environment.IsDevelopment())
 {
