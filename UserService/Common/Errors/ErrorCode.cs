@@ -6,7 +6,8 @@ namespace UserService.Common.Errors
         DatabaseError,
         UserNotFound,
         InvalidPassword,
-        Unexpected
+        Unexpected,
+        EmailNotConfirmed
     }
 
     public static class ErrorCodeExtensions
@@ -18,8 +19,8 @@ namespace UserService.Common.Errors
                 ErrorCode.DuplicateEmail => true,
                 ErrorCode.UserNotFound => true,
                 ErrorCode.InvalidPassword => true,
-                ErrorCode.DatabaseError => false,
-                ErrorCode.Unexpected => false,
+                ErrorCode.Unexpected => true,
+                ErrorCode.EmailNotConfirmed => true,
                 _ => false
             };
         }
@@ -33,6 +34,7 @@ namespace UserService.Common.Errors
                 ErrorCode.InvalidPassword => StatusCodes.Status400BadRequest,
                 ErrorCode.DatabaseError => StatusCodes.Status500InternalServerError,
                 ErrorCode.Unexpected => StatusCodes.Status500InternalServerError,
+                ErrorCode.EmailNotConfirmed => StatusCodes.Status403Forbidden,
                 _ => StatusCodes.Status500InternalServerError
             };
         }

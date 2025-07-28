@@ -9,21 +9,20 @@ namespace UserService.Services
         Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto);
 
         // === Read ===
-        Task<Result<UserReadDto>> GetUserByIdAsync(int id);
-        Task<Result<UserReadDto>> GetUserByEmailAsync(string email);
-        Task<Result<IEnumerable<UserReadDto>>> GetAllUsersAsync();
-        Task<Result<IEnumerable<UserReadDto>>> SearchUsersAsync(string query);
+        Task<UserReadDto?> GetUserByIdAsync(int userId);
+        Task<UserReadDto?> GetUserByEmailAsync(string email);
+        Task<IEnumerable<UserReadDto>> GetPagedUsersAsync(int pageNumber, int pageSize);
+        Task<IEnumerable<UserReadDto>> SearchUsersAsync(string query);
 
         // === Update ===
-        Task<Result<UserReadDto>> ActivateUserAsync(int userId);
-        Task<Result<UserReadDto>> DeactivateUserAsync(int userId);
+        Task<Result<UserReadDto>> SetUserActivationAsync(int userId, bool isActive);
 
         // === Delete ===
-        Task<Result<UserReadDto>> DeleteUserAsync(int id);
+        Task<Result<UserReadDto>> DeleteUserAsync(int userId);
 
         // === Validation ===
-        Task<Result<UserReadDto>> EmailExistsAsync(string email);
-        Task<Result<UserReadDto>> UserExistsAsync(int id);
-        Task<Result<UserReadDto>> IsEmailConfirmedAsync(int userId);
+        Task<bool> EmailExistsAsync(string email);
+        Task<bool> UserExistsAsync(int userId);
+        Task<bool> IsEmailConfirmedAsync(int userId);
     }
 }

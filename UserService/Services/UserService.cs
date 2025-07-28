@@ -17,119 +17,109 @@ namespace UserService.Services
             _repository = repository;
             _mapper = mapper;
         }
-
-        public async Task<Result<UserReadDto>> GetUserByIdAsync(int id)
-        {
-            try
-            {
-                var user = await _repository.GetUserByIdAsync(id);
-                
-                if (user == null)
-                {
-                    return Result<UserReadDto>.Failure(ErrorCode.UserNotFound);
-                }
-
-                return Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"--> Getting user by ID failed: {ex.Message}");
-                return Result<UserReadDto>.Failure(ErrorCode.DatabaseError);
-            }
-        }
+        
+        // === Create ===
 
         public async Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto)
         {
             var user = _mapper.Map<User>(userCreateDto);
 
-            try
+            if (await _repository.EmailExistsAsync(user.Email))
             {
-                if (await _repository.EmailExistsAsync(user.Email))
-                {
-                    return Result<UserReadDto>.Failure(ErrorCode.DuplicateEmail);
-                }
-
-                await _repository.AddUserAsync(user);
-                await _repository.SaveChangesAsync();
-                var userReadDto = _mapper.Map<UserReadDto>(user);
-
-                return Result<UserReadDto>.Success(userReadDto);
+                return Result<UserReadDto>.Failure(ErrorCode.DuplicateEmail);
             }
-            catch (Exception ex)
+
+            await _repository.AddUserAsync(user);
+            await _repository.SaveChangesAsync();
+            var userReadDto = _mapper.Map<UserReadDto>(user);
+
+            return Result<UserReadDto>.Success(userReadDto);
+        }
+
+        // === GET ===
+
+        public async Task<UserReadDto?> GetUserByIdAsync(int id)
+        {
+            var user = await _repository.GetUserByIdAsync(id);
+
+            return _mapper.Map<UserReadDto>(user);
+        }
+
+        public async Task<UserReadDto?> GetUserByEmailAsync(string email)
+        {
+            var user = await _repository.GetUserByEmailAsync(email);
+
+            return _mapper.Map<UserReadDto>(user);
+        }
+
+        public Task<IEnumerable<UserReadDto>> GetPagedUsersAsync(int pageNumber, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<UserReadDto>> SearchUsersAsync(string query)
+        {
+            var users = await _repository.SearchUsersAsync(query);
+            var userDtos = _mapper.Map<IEnumerable<UserReadDto>>(users);
+
+            return userDtos;
+        }
+
+        // === Update ===
+
+        public async Task<Result<UserReadDto>> SetUserActivationAsync(int userId, bool isActive)
+        {
+            var user = await _repository.GetUserByIdAsync(userId);
+
+            if (user == null)
             {
-                Console.WriteLine($"--> Creating user failed: {ex.Message}");
-                return Result<UserReadDto>.Failure(ErrorCode.DatabaseError);
+                return Result<UserReadDto>.Failure(ErrorCode.UserNotFound);
             }
+
+            user.IsActive = isActive;
+            await _repository.SaveChangesAsync();
+
+            return Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user));
         }
 
-        public Task<Result<UserReadDto>> GetUserByEmailAsync(string email)
+        // === Delete ===
+
+        public async Task<Result<UserReadDto>> DeleteUserAsync(int userId)
         {
-            try
+            var user = await _repository.GetUserByIdAsync(userId);
+
+            if (user == null)
             {
-                var user = _repository.GetUserByEmailAsync(email);
-                
-                if (user == null)
-                {
-                    return Task.FromResult(Result<UserReadDto>.Failure(ErrorCode.UserNotFound));
-                }
-
-                return Task.FromResult(Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user)));
+                return Result<UserReadDto>.Failure(ErrorCode.UserNotFound);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"--> Getting user by email failed: {ex.Message}");
-                return Task.FromResult(Result<UserReadDto>.Failure(ErrorCode.DatabaseError));
-            }
+
+            await _repository.DeleteUserAsync(userId);
+            await _repository.SaveChangesAsync();
+
+            return Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user));
         }
 
-        public Task<Result<IEnumerable<UserReadDto>>> GetAllUsersAsync()
+        // === Validation ===
+
+        public async Task<bool> EmailExistsAsync(string email)
         {
-            throw new NotImplementedException();
+            var exists = await _repository.EmailExistsAsync(email);
+
+            return exists;
         }
 
-        public Task<Result<IEnumerable<UserReadDto>>> SearchUsersAsync(string query)
+        public async Task<bool> UserExistsAsync(int id)
         {
-            try
-            {
-                var users = _repository.SearchUsersAsync(query);
-                var userDtos = _mapper.Map<IEnumerable<UserReadDto>>(users);
-                return Task.FromResult(Result<IEnumerable<UserReadDto>>.Success(userDtos));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"--> Searching users failed: {ex.Message}");
-                return Task.FromResult(Result<IEnumerable<UserReadDto>>.Failure(ErrorCode.DatabaseError));
-            }
+            var user = await _repository.GetUserByIdAsync(id);
+
+            return user != null;
         }
 
-        public Task<Result<UserReadDto>> ActivateUserAsync(int userId)
+        public async Task<bool> IsEmailConfirmedAsync(int userId)
         {
-            throw new NotImplementedException();
-        }
+            var user = await _repository.GetUserByIdAsync(userId);
 
-        public Task<Result<UserReadDto>> DeactivateUserAsync(int userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<UserReadDto>> DeleteUserAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<UserReadDto>> EmailExistsAsync(string email)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<UserReadDto>> UserExistsAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<UserReadDto>> IsEmailConfirmedAsync(int userId)
-        {
-            throw new NotImplementedException();
+            return user != null && user.EmailConfirmed;
         }
     }
 }

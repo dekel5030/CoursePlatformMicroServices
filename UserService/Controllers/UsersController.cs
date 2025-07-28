@@ -23,14 +23,14 @@ namespace UserService.Controllers
         {
             Console.WriteLine($"--> Fetching user with ID: {id}");
 
-            var result = await _userService.GetUserByIdAsync(id);
+            var user = await _userService.GetUserByIdAsync(id);
 
-            if (!result.IsSuccess)
+            if (user == null)
             {
-                return _errorMapper.ToActionResult(result);
+                return NotFound();
             }
 
-            return Ok(result.Value);
+            return Ok(user);
         }
 
         [HttpPost]
