@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Common.Errors;
 using UserService.Dtos;
@@ -18,21 +19,6 @@ namespace UserService.Controllers
             _errorMapper = errorMapper;
         }
 
-        [HttpGet("{id}", Name = "GetUserById")]
-        public async Task<IActionResult> GetUserById(int id)
-        {
-            Console.WriteLine($"--> Fetching user with ID: {id}");
-
-            var user = await _userService.GetUserByIdAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(user);
-        }
-
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] UserCreateDto userCreateDto)
         {
@@ -46,17 +32,40 @@ namespace UserService.Controllers
             return CreatedAtAction(nameof(GetUserById), new { id = result.Value!.Id }, result.Value);
         }
 
+        [HttpGet("{id}", Name = "GetUserById")]
+        public async Task<IActionResult> GetUserById([Range(1, int.MaxValue)] int id)
+        {
+            Console.WriteLine($"--> Fetching user with ID: {id}");
+
+            var user = await _userService.GetUserByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetUsersByQuery([FromQuery] UserSearchDto userSearchDto)
         {
-            var result = await _userService.GetUsersByQueryAsync(userSearchDto);
+            var users = await _userService.GetUsersByQueryAsync(userSearchDto);
+
+            return Ok(users);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUserById([Range(1, int.MaxValue)] int id)
+        {
+            var result = await _userService.DeleteUserAsync(id);
 
             if (!result.IsSuccess)
             {
                 return _errorMapper.ToActionResult(result);
             }
 
-            return Ok(result.Value);
+            return NoContent();
         }
     }
 }

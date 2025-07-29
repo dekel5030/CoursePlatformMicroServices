@@ -23,7 +23,7 @@ namespace UserService.Profiles
             CreateMap<UserCreateDto, User>()
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
+                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.PasswordHash));
 
             CreateMap<UserPatchDto, User>()
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))

@@ -44,39 +44,12 @@ namespace UserService.Services
             return _mapper.Map<UserReadDto>(user);
         }
 
-        public async Task<UserReadDto?> GetUserByEmailAsync(string email)
+        public async Task<IEnumerable<UserDetailsDto>> GetUsersByQueryAsync(UserSearchDto query)
         {
-            var user = await _repository.GetUserByEmailAsync(email);
-
-            return _mapper.Map<UserReadDto>(user);
-        }
-
-        public async Task<Result<IEnumerable<UserReadDto>>> GetPagedUsersAsync(int pageNumber, int pageSize)
-        {
-            if (pageNumber <= 0 || pageSize <= 0)
-            {
-                return Result<IEnumerable<UserReadDto>>.Failure(ErrorCode.InvalidPageNumberOrSize);
-            }
-
-            var skip = (pageNumber - 1) * pageSize;
-
-            var users = await _repository.GetPagedUsersAsync(skip, pageSize);
-            var usersReadDtos = _mapper.Map<IEnumerable<UserReadDto>>(users);
-
-            return Result<IEnumerable<UserReadDto>>.Success(usersReadDtos);
-        }
-
-        public async Task<Result<IEnumerable<UserDetailsDto>>> GetUsersByQueryAsync(UserSearchDto query)
-        {
-            if (query.PageNumber <= 0 || query.PageSize <= 0)
-            {
-                return Result<IEnumerable<UserDetailsDto>>.Failure(ErrorCode.InvalidPageNumberOrSize);
-            }
-
             var users = await _repository.SearchUsersAsync(query);
             var userDetailsDtos = _mapper.Map<IEnumerable<UserDetailsDto>>(users);
 
-            return Result<IEnumerable<UserDetailsDto>>.Success(userDetailsDtos);
+            return userDetailsDtos;
         }
 
         // === Update ===
@@ -111,29 +84,6 @@ namespace UserService.Services
             await _repository.SaveChangesAsync();
 
             return Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user));
-        }
-
-        // === Validation ===
-
-        public async Task<bool> EmailExistsAsync(string email)
-        {
-            var exists = await _repository.EmailExistsAsync(email);
-
-            return exists;
-        }
-
-        public async Task<bool> UserExistsAsync(int id)
-        {
-            var user = await _repository.GetUserByIdAsync(id);
-
-            return user != null;
-        }
-
-        public async Task<bool> IsEmailConfirmedAsync(int userId)
-        {
-            var user = await _repository.GetUserByIdAsync(userId);
-
-            return user != null && user.EmailConfirmed;
         }
     }
 }

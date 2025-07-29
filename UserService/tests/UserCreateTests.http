@@ -4,8 +4,7 @@ Content-Type: application/json
 
 {
   "email": "",
-  "password": "",
-  "confirmPassword": "",
+  "passwordHash": "",
   "fullName": ""
 }
 
@@ -16,8 +15,7 @@ Content-Type: application/json
 
 {
   "email": "invalid-email",
-  "password": "123",
-  "confirmPassword": "123",
+  "passwordHash": "",
   "fullName": "Yo"
 }
 
@@ -28,8 +26,7 @@ Content-Type: application/json
 
 {
   "email": "test@example.com",
-  "password": "ValidPass123",
-  "confirmPassword": "WrongConfirm123",
+  "passwordHash": "123",
   "fullName": "Valid Name"
 }
 

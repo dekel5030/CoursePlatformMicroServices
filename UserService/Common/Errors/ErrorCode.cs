@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
 namespace UserService.Common.Errors
 {
     public enum ErrorCode
@@ -8,7 +10,8 @@ namespace UserService.Common.Errors
         InvalidPassword,
         Unexpected,
         EmailNotConfirmed,
-        InvalidPageNumberOrSize
+        InvalidPageNumber,
+        InvalidPageSize
     }
 
     public static class ErrorCodeExtensions
@@ -22,7 +25,8 @@ namespace UserService.Common.Errors
                 ErrorCode.InvalidPassword => true,
                 ErrorCode.Unexpected => true,
                 ErrorCode.EmailNotConfirmed => true,
-                ErrorCode.InvalidPageNumberOrSize => true,
+                ErrorCode.InvalidPageNumber => true,
+                ErrorCode.InvalidPageSize => true,
                 _ => false
             };
         }
@@ -37,7 +41,8 @@ namespace UserService.Common.Errors
                 ErrorCode.DatabaseError => StatusCodes.Status500InternalServerError,
                 ErrorCode.Unexpected => StatusCodes.Status500InternalServerError,
                 ErrorCode.EmailNotConfirmed => StatusCodes.Status403Forbidden,
-                ErrorCode.InvalidPageNumberOrSize => StatusCodes.Status400BadRequest,
+                ErrorCode.InvalidPageNumber => StatusCodes.Status400BadRequest,
+                ErrorCode.InvalidPageSize => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
         }
