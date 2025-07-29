@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Common.Errors;
 using UserService.Dtos;
 using UserService.Services;
+using Common.Web.Extensions;
+using Microsoft.Extensions.Localization;
 
 namespace UserService.Controllers
 {
@@ -11,12 +12,12 @@ namespace UserService.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IApiErrorMapper _errorMapper;
+        private readonly IStringLocalizer _errorLocalzer;
 
-        public UsersController(IUserService userService, IApiErrorMapper errorMapper)
+        public UsersController(IUserService userService, IStringLocalizer errorLocalizer)
         {
             _userService = userService;
-            _errorMapper = errorMapper;
+            _errorLocalzer = errorLocalizer;
         }
 
         [HttpPost]
@@ -26,7 +27,7 @@ namespace UserService.Controllers
 
             if (!result.IsSuccess)
             {
-                return _errorMapper.ToActionResult(result);
+                return result.ToActionResult(_errorLocalzer);
             }
 
             return CreatedAtAction(nameof(GetUserById), new { id = result.Value!.Id }, result.Value);
