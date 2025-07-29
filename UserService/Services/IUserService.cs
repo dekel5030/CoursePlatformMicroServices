@@ -1,4 +1,4 @@
-using UserService.Common;
+using Common;
 using UserService.Dtos;
 
 namespace UserService.Services
@@ -14,6 +14,7 @@ namespace UserService.Services
 
         // === Update ===
         Task<Result<UserReadDto>> SetUserActivationAsync(int userId, bool isActive);
+        Task<Result<UserReadDto>> PatchUser(UserPatchDto userPatchDto);
 
         // === Delete ===
         Task<Result<UserReadDto>> DeleteUserAsync(int userId);

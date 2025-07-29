@@ -1,6 +1,6 @@
 using AutoMapper;
-using UserService.Common.Errors;
-using UserService.Common;
+using Common;
+using Common.Errors;
 using UserService.Data;
 using UserService.Dtos;
 using UserService.Models;
@@ -67,6 +67,11 @@ namespace UserService.Services
             await _repository.SaveChangesAsync();
 
             return Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user));
+        }
+
+        public Task<Result<UserReadDto>> PatchUser(UserPatchDto userPatchDto) 
+        {
+            throw new NotImplementedException();
         }
 
         // === Delete ===

@@ -64,6 +64,7 @@ namespace UserService.Data
                 .ApplySearchFilters(query);
 
             return await usersQuery
+                .OrderBy(u => u.Id) 
                 .Skip((query.PageNumber - 1) * query.PageSize)
                 .Take(query.PageSize)
                 .ToListAsync();

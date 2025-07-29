@@ -1,8 +1,7 @@
 using FluentValidation;
 using Microsoft.Extensions.Localization;
-using UserService.Common.Errors;
-using UserService.Resources;
-using UserService.Resources.ErrorMessages;
+using Common.Errors;
+using Common.Resources.ValidationMessages;
 
 namespace UserService.Dtos
 {

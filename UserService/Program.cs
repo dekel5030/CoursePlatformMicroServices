@@ -2,7 +2,7 @@ using System.Globalization;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using UserService.Common.Errors;
+using Common.Errors;
 using UserService.Data;
 using UserService.Profiles;
 using UserService.Services;
@@ -25,30 +25,20 @@ builder.Services.AddValidatorsFromAssemblyContaining<UserCreateDtoValidator>();
 builder.Services.AddScoped<IApiErrorMapper, ApiErrorMapper>();
 
 if (builder.Environment.IsDevelopment())
-{
     Console.WriteLine("--> Using Development Database");
-    var connectionString = builder.Configuration.GetConnectionString("UsersDb");
-    builder.Services.AddDbContext<UsersDbContext>(options =>
-        options.UseNpgsql(connectionString));
-}
 else
-{
     Console.WriteLine("--> Using Production Database");
-    builder.Services.AddDbContext<UsersDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
-}
+
+var connectionString = builder.Configuration.GetConnectionString("UsersDb");
+builder.Services.AddDbContext<UsersDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    await PrepDb.PopulateAsync(app);
-}
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
     app.MapOpenApi();
+    //await PrepDb.PopulateAsync(app);
 }
 
 var supportedCultures = new[] { "en", "he" };

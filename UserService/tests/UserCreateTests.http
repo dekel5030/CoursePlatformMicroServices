@@ -1,4 +1,16 @@
-### ❌ Test: Missing all required fields
+### ✅ Create valid user
+POST http://localhost:5125/api/users
+Content-Type: application/json
+
+{
+  "email": "validuser5@example.com",
+  "passwordHash": "hashedpassword123",
+  "fullName": "Valid User"
+}
+
+###
+
+### ❌ Create invalid user (missing all fields)
 POST http://localhost:5125/api/users
 Content-Type: application/json
 
@@ -8,51 +20,47 @@ Content-Type: application/json
   "fullName": ""
 }
 
+###
 
-### ❌ Test: Invalid email and short password
-POST http://localhost:5125/api/users
-Content-Type: application/json
+### ✅ Get user by valid ID
+GET http://localhost:5125/api/users/1
 
-{
-  "email": "invalid-email",
-  "passwordHash": "",
-  "fullName": "Yo"
-}
+###
 
+### ❌ Get user with invalid ID (negative)
+GET http://localhost:5125/api/users/-1
 
-### ❌ Test: Password and ConfirmPassword mismatch
-POST http://localhost:5125/api/users
-Content-Type: application/json
+###
 
-{
-  "email": "test@example.com",
-  "passwordHash": "123",
-  "fullName": "Valid Name"
-}
+### ❌ Get user by ID that does not exist
+GET http://localhost:5125/api/users/999999
 
+###
 
-### ✅ Test: All fields valid
-POST http://localhost:5125/api/users
-Content-Type: application/json
+### ✅ Get users by query with pagination
+GET http://localhost:5125/api/users?pageNumber=1&pageSize=10
 
-{
-  "email": "valid3@example.com",
-  "password": "ValidPass123!",
-  "confirmPassword": "ValidPass123!",
-  "fullName": "Valid User"
-}
+###
 
+### ❌ Get users with invalid page number (0)
+GET http://localhost:5125/api/users?pageNumber=0&pageSize=10
 
-### ✅ Test: Optional fields included
-POST http://localhost:5125/api/users
-Content-Type: application/json
+###
 
-{
-  "email": "optiona3@example.com",
-  "password": "StrongPassword1!",
-  "confirmPassword": "StrongPassword1!",
-  "fullName": "Optional Fields",
-  "bio": "Hello, I'm testing",
-  "phoneNumber": "0501234567",
-  "dateOfBirth": "1995-06-25"
-}
+### ❌ Get users with invalid page size (-1)
+GET http://localhost:5125/api/users?pageNumber=1&pageSize=-1
+
+###
+
+### ✅ Delete user by ID
+DELETE http://localhost:5125/api/users/1
+
+###
+
+### ❌ Delete user by invalid ID (negative)
+DELETE http://localhost:5125/api/users/-5
+
+###
+
+### ❌ Delete user that doesn't exist
+DELETE http://localhost:5125/api/users/999999

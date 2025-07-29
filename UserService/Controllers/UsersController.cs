@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using UserService.Common.Errors;
+using Common.Errors;
 using UserService.Dtos;
 using UserService.Services;
 
@@ -67,5 +67,7 @@ namespace UserService.Controllers
 
             return NoContent();
         }
+
+        
     }
 }

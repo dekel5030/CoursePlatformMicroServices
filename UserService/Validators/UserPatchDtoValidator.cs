@@ -1,7 +1,7 @@
+using Common.Resources.ValidationMessages;
 using FluentValidation;
 using Microsoft.Extensions.Localization;
 using UserService.Dtos;
-using UserService.Resources;
 using UserService.Settings;
 
 namespace UserService.Validators

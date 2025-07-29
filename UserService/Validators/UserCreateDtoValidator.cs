@@ -2,7 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Localization;
 using UserService.Dtos;
 using UserService.Settings;
-using UserService.Resources;
+using Common.Resources.ValidationMessages;
 
 namespace UserService.Validators
 {
