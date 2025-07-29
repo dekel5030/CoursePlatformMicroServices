@@ -45,5 +45,18 @@ namespace UserService.Controllers
 
             return CreatedAtAction(nameof(GetUserById), new { id = result.Value!.Id }, result.Value);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUsersByQuery([FromQuery] UserSearchDto userSearchDto)
+        {
+            var result = await _userService.GetUsersByQueryAsync(userSearchDto);
+
+            if (!result.IsSuccess)
+            {
+                return _errorMapper.ToActionResult(result);
+            }
+
+            return Ok(result.Value);
+        }
     }
 }

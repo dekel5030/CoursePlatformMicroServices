@@ -7,7 +7,8 @@ namespace UserService.Common.Errors
         UserNotFound,
         InvalidPassword,
         Unexpected,
-        EmailNotConfirmed
+        EmailNotConfirmed,
+        InvalidPageNumberOrSize
     }
 
     public static class ErrorCodeExtensions
@@ -21,6 +22,7 @@ namespace UserService.Common.Errors
                 ErrorCode.InvalidPassword => true,
                 ErrorCode.Unexpected => true,
                 ErrorCode.EmailNotConfirmed => true,
+                ErrorCode.InvalidPageNumberOrSize => true,
                 _ => false
             };
         }
@@ -35,6 +37,7 @@ namespace UserService.Common.Errors
                 ErrorCode.DatabaseError => StatusCodes.Status500InternalServerError,
                 ErrorCode.Unexpected => StatusCodes.Status500InternalServerError,
                 ErrorCode.EmailNotConfirmed => StatusCodes.Status403Forbidden,
+                ErrorCode.InvalidPageNumberOrSize => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
         }

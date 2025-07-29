@@ -5,14 +5,14 @@ namespace UserService.Services
 {
     public interface IUserService
     {
-        // === Create & Add ===
+        // === Create ===
         Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto);
 
         // === Read ===
         Task<UserReadDto?> GetUserByIdAsync(int userId);
         Task<UserReadDto?> GetUserByEmailAsync(string email);
-        Task<IEnumerable<UserReadDto>> GetPagedUsersAsync(int pageNumber, int pageSize);
-        Task<IEnumerable<UserReadDto>> SearchUsersAsync(string query);
+        Task<Result<IEnumerable<UserReadDto>>> GetPagedUsersAsync(int pageNumber, int pageSize);
+        Task<Result<IEnumerable<UserDetailsDto>>> GetUsersByQueryAsync(UserSearchDto query);
 
         // === Update ===
         Task<Result<UserReadDto>> SetUserActivationAsync(int userId, bool isActive);

@@ -137,4 +137,12 @@
     <value>An unexpected error occurred</value>
     <comment/>
   </data>
+  <data name="EmailNotConfirmed" xml:space="preserve">
+    <value>Email address has not been confirmed yet.</value>
+    <comment/>
+  </data>
+  <data name="InvalidPageNumberOrSize" xml:space="preserve">
+    <value>Page number and page size must be greater than zero.</value>
+    <comment/>
+  </data>
 </root>

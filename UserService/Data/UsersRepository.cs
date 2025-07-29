@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using UserService.Dtos;
+using UserService.Extentions;
 using UserService.Models;
 
 namespace UserService.Data
@@ -55,16 +57,15 @@ namespace UserService.Data
             return await _context.Users.FindAsync(id);
         }
 
-        public async Task<IEnumerable<User>> SearchUsersAsync(string query)
+        public async Task<IEnumerable<User>> SearchUsersAsync(UserSearchDto query)
         {
-            if (string.IsNullOrWhiteSpace(query) || query.Length < 2)
-            {
-                return Enumerable.Empty<User>();
-            }
+            var usersQuery = _context.Users
+                .AsQueryable()
+                .ApplySearchFilters(query);
 
-            return await _context.Users
-                .Where(user => user.FullName.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                               user.Email.Contains(query, StringComparison.OrdinalIgnoreCase))
+            return await usersQuery
+                .Skip((query.PageNumber - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
         }
 

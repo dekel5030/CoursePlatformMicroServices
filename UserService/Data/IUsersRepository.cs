@@ -1,3 +1,4 @@
+using UserService.Dtos;
 using UserService.Models;
 
 namespace UserService.Data
@@ -9,7 +10,7 @@ namespace UserService.Data
         Task<bool> UserExistsAsync(int id);
         Task<User?> GetUserByEmailAsync(string email);
         Task<IEnumerable<User>> GetAllUsersAsync();
-        Task<IEnumerable<User>> SearchUsersAsync(string query);
+        Task<IEnumerable<User>> SearchUsersAsync(UserSearchDto Query);
         Task<IEnumerable<User>> GetPagedUsersAsync(int skip, int take);
         Task AddUserAsync(User user);
         Task DeleteUserAsync(int id);

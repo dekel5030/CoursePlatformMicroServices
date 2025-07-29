@@ -137,4 +137,12 @@
     <value>אירעה שגיאה בלתי צפויה</value>
     <comment/>
   </data>
+  <data name="EmailNotConfirmed" xml:space="preserve">
+    <value>כתובת האימייל לא אושרה עדיין.</value>
+    <comment/>
+  </data>
+  <data name="InvalidPageNumberOrSize" xml:space="preserve">
+    <value>מספר העמוד וגודל העמוד חייבים להיות גדולים מאפס.</value>
+    <comment/>
+  </data>
 </root>

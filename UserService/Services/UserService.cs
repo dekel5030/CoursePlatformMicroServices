@@ -51,25 +51,32 @@ namespace UserService.Services
             return _mapper.Map<UserReadDto>(user);
         }
 
-        public async Task<IEnumerable<UserReadDto>> GetPagedUsersAsync(int pageNumber, int pageSize)
+        public async Task<Result<IEnumerable<UserReadDto>>> GetPagedUsersAsync(int pageNumber, int pageSize)
         {
             if (pageNumber <= 0 || pageSize <= 0)
             {
-                throw new ArgumentOutOfRangeException("Page number and page size must be greater than zero.");
+                return Result<IEnumerable<UserReadDto>>.Failure(ErrorCode.InvalidPageNumberOrSize);
             }
 
             var skip = (pageNumber - 1) * pageSize;
 
             var users = await _repository.GetPagedUsersAsync(skip, pageSize);
+            var usersReadDtos = _mapper.Map<IEnumerable<UserReadDto>>(users);
 
-            return _mapper.Map<IEnumerable<UserReadDto>>(users);
+            return Result<IEnumerable<UserReadDto>>.Success(usersReadDtos);
         }
-        public async Task<IEnumerable<UserReadDto>> SearchUsersAsync(string query)
-        {
-            var users = await _repository.SearchUsersAsync(query);
-            var userDtos = _mapper.Map<IEnumerable<UserReadDto>>(users);
 
-            return userDtos;
+        public async Task<Result<IEnumerable<UserDetailsDto>>> GetUsersByQueryAsync(UserSearchDto query)
+        {
+            if (query.PageNumber <= 0 || query.PageSize <= 0)
+            {
+                return Result<IEnumerable<UserDetailsDto>>.Failure(ErrorCode.InvalidPageNumberOrSize);
+            }
+
+            var users = await _repository.SearchUsersAsync(query);
+            var userDetailsDtos = _mapper.Map<IEnumerable<UserDetailsDto>>(users);
+
+            return Result<IEnumerable<UserDetailsDto>>.Success(userDetailsDtos);
         }
 
         // === Update ===
