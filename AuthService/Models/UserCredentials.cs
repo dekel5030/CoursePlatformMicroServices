@@ -11,16 +11,20 @@ public class UserCredentials
     public required string Email { get; set; }
 
     public required string PasswordHash { get; set; }
+    public UserRole Role { get; set; } = UserRole.User;
 
-    public required string PasswordSalt { get; set; }
-
-    public DateTime CreatedAt { get; private set; } 
-
-    public DateTime UpdatedAt { get; private set; }
+    public DateTime UpdatedAt { get; internal set; }
 
     public bool IsActive { get; set; } = true;
 
     public int FailedLoginAttempts { get; set; } = 0;
 
-    public DateTime? LockedUntil { get; set; } = null;
+    public DateTime? LockedUntil { get; set; } = null;    
+}
+
+public enum UserRole
+{
+    User,
+    Admin,
+    SuperAdmin
 }

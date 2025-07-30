@@ -10,6 +10,12 @@ public class AuthProfile : Profile
     {
         CreateMap<UserReadDto, UserCredentials>()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => UserRole.User));
+
+        CreateMap<TokenRequestDto, UserCredentials>()
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
     }
 }

@@ -1,6 +1,8 @@
+using AuthService.Dtos;
+
 namespace AuthService.Security;
 
 public interface ITokenService
 {
-    string GenerateToken(int userId, string email);
+    string GenerateToken(TokenRequestDto request);
 }

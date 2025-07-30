@@ -1,6 +1,5 @@
 using AuthService.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace AuthService.Data;
 
@@ -16,16 +15,30 @@ public class AuthDbContext : DbContext
             .IsUnique();
 
         modelBuilder.Entity<UserCredentials>()
-            .Property(u => u.CreatedAt)
-            .HasDefaultValueSql("NOW()") 
-            .ValueGeneratedOnAdd()
-            .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+            .HasIndex(u => u.Email)
+            .IsUnique();
 
         modelBuilder.Entity<UserCredentials>()
             .Property(u => u.UpdatedAt)
-            .HasDefaultValueSql("NOW()")
-            .Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
+            .HasDefaultValueSql("NOW()");
+
+        modelBuilder.Entity<UserCredentials>()
+            .Property(u => u.Role)
+            .HasConversion<string>();
 
         base.OnModelCreating(modelBuilder);
+    }
+    
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        foreach (var entry in ChangeTracker.Entries<UserCredentials>())
+        {
+            if (entry.State == EntityState.Modified && entry.Properties.Any(p => p.IsModified))
+            {
+                entry.Entity.UpdatedAt = DateTime.UtcNow;
+            }
+        }
+
+        return await base.SaveChangesAsync(cancellationToken);
     }
 }

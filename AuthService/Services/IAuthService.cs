@@ -3,7 +3,7 @@ using Common;
 
 namespace AuthService.Services;
 
-public interface IAuthServie
+public interface IAuthService
 {
     Task<Result<AuthResponseDto>> RegisterAsync(RegisterRequestDto registerRequestDto);
 }

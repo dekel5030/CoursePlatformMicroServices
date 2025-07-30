@@ -10,10 +10,10 @@ namespace AuthService.Controller;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthServie _authService;
+    private readonly IAuthService _authService;
     private readonly IStringLocalizer _errorLocalizer;
 
-    public AuthController(IAuthServie authServie, IStringLocalizer errorLocalizer)
+    public AuthController(IAuthService authServie, IStringLocalizer errorLocalizer)
     {
         _authService = authServie;
         _errorLocalizer = errorLocalizer;

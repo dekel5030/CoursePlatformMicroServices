@@ -23,6 +23,11 @@ public class AuthRepository : IAuthRepository
             userCred.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
     }
 
+    public Task<UserCredentials?> GetUserCredentialsByEmailAsync(string email)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();
