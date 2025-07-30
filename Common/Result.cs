@@ -2,7 +2,7 @@ using Common.Errors;
 
 namespace Common;
 
-public readonly record struct Result<T>
+public class Result<T>
 {
     public bool IsSuccess { get; }
     public Error? Error { get; }
@@ -15,6 +15,13 @@ public readonly record struct Result<T>
         Error = error;
     }
 
-    public static Result<T> Success(T? value) => new(true, value);
-    public static Result<T> Failure(Error error) => new(false, default, error);
+    public static Result<T> Success(T? value)
+    {
+        return new Result<T>(isSuccess: true, value: value);
+    }
+
+    public static Result<T> Failure(Error error)
+    {
+        return new Result<T>(isSuccess: false, value: default, error: error);
+    }
 }

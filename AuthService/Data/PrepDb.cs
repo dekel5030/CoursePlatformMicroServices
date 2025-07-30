@@ -31,9 +31,9 @@ public static class PrepDb
 
         var credentials = new List<UserCredentials>
         {
-            new UserCredentials { UserId = 1, PasswordHash = "123", PasswordSalt = "1" },
-            new UserCredentials { UserId = 2, PasswordHash = "312", PasswordSalt = "2" },
-            new UserCredentials { UserId = 3, PasswordHash = "123", PasswordSalt = "2" }
+            new UserCredentials { UserId = 1, PasswordHash = "123", Email = "test1@gmail.com", PasswordSalt = "1" },
+            new UserCredentials { UserId = 2, PasswordHash = "312", Email = "test2@gmail.com", PasswordSalt = "2" },
+            new UserCredentials { UserId = 3, PasswordHash = "123", Email = "test3@gmail.com", PasswordSalt = "2" }
         };
 
         await dbContext.UserCredentials.AddRangeAsync(credentials);
