@@ -2,7 +2,7 @@ using Common.Errors;
 
 namespace Common;
 
-public readonly record struct Result<T>
+public sealed class Result<T>
 {
     public bool IsSuccess { get; }
     public Error? Error { get; }
