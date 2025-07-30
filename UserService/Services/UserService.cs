@@ -24,7 +24,7 @@ namespace UserService.Services
         {
             if (await _repository.EmailExistsAsync(userCreateDto.Email))
             {
-                return Result<UserReadDto>.Failure(ErrorCode.DuplicateEmail);
+                return Result<UserReadDto>.Failure(Error.DuplicateEmail);
             }
 
             var user = _mapper.Map<User>(userCreateDto);
@@ -60,7 +60,7 @@ namespace UserService.Services
 
             if (user == null)
             {
-                return Result<UserReadDto>.Failure(ErrorCode.UserNotFound);
+                return Result<UserReadDto>.Failure(Error.UserNotFound);
             }
 
             user.IsActive = isActive;
@@ -82,7 +82,7 @@ namespace UserService.Services
 
             if (user == null)
             {
-                return Result<UserReadDto>.Failure(ErrorCode.UserNotFound);
+                return Result<UserReadDto>.Failure(Error.UserNotFound);
             }
 
             await _repository.DeleteUserAsync(userId);

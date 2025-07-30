@@ -63,7 +63,7 @@ namespace UserService.Controllers
 
             if (!result.IsSuccess)
             {
-                return _errorMapper.ToActionResult(result);
+                return result.ToActionResult(_errorLocalzer);
             }
 
             return NoContent();

@@ -3,7 +3,7 @@ POST http://localhost:5125/api/users
 Content-Type: application/json
 
 {
-  "email": "validuser5@example.com",
+  "email": "validuser6@example.com",
   "passwordHash": "hashedpassword123",
   "fullName": "Valid User"
 }

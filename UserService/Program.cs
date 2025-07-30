@@ -22,7 +22,6 @@ builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<UserCreateDtoValidator>();
 
-builder.Services.AddScoped<IApiErrorMapper, ApiErrorMapper>();
 
 if (builder.Environment.IsDevelopment())
     Console.WriteLine("--> Using Development Database");
