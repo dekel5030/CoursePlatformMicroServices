@@ -4,6 +4,7 @@ using UserService.Dtos;
 using UserService.Services;
 using Common.Web.Extensions;
 using Microsoft.Extensions.Localization;
+using Common.Resources.ErrorMessages;
 
 namespace UserService.Controllers
 {
@@ -14,7 +15,7 @@ namespace UserService.Controllers
         private readonly IUserService _userService;
         private readonly IStringLocalizer _errorLocalzer;
 
-        public UsersController(IUserService userService, IStringLocalizer errorLocalizer)
+        public UsersController(IUserService userService, IStringLocalizer<ErrorMessages> errorLocalizer)
         {
             _userService = userService;
             _errorLocalzer = errorLocalizer;
