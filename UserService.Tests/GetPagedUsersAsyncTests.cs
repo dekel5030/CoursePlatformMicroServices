@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentAssertions;
 using Moq;
-using UserService.Common.Errors;
 using UserService.Data;
 using UserService.Dtos;
 using UserService.Models;
 using UserService.Services;
 using Xunit;
+using Common.Errors;
 
 namespace UserService.Tests
 {
@@ -27,28 +27,29 @@ namespace UserService.Tests
         }
 
         [Fact]
-        public async Task Should_ReturnFailure_WhenPageNumberOrPageSizeIsInvalid()
+        public async Task Should_ReturnEmptyList_WhenNoUsersReturned()
         {
             // Arrange
-            int pageNumber = 0;
-            int pageSize = -5;
+            var query = new UserSearchDto { PageNumber = 1, PageSize = 10 };
+            var users = new List<User>();
+            var userDtos = new List<UserDetailsDto>();
+
+            _repositoryMock.Setup(r => r.SearchUsersAsync(query)).ReturnsAsync(users);
+            _mapperMock.Setup(m => m.Map<IEnumerable<UserDetailsDto>>(users)).Returns(userDtos);
 
             // Act
-            var result = await _userService.GetPagedUsersAsync(pageNumber, pageSize);
+            var result = await _userService.GetUsersByQueryAsync(query);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
-            result.ErrorCode.Should().Be(ErrorCode.InvalidPageNumberOrSize);
+            result.Should().NotBeNull();
+            result.Should().BeEmpty();
         }
 
         [Fact]
-        public async Task Should_ReturnPagedUsers_WhenValidInput()
+        public async Task Should_ReturnUsers_WhenValidInput()
         {
             // Arrange
-            int pageNumber = 2;
-            int pageSize = 3;
-            int skip = (pageNumber - 1) * pageSize;
-
+            var query = new UserSearchDto { PageNumber = 2, PageSize = 3 };
             var fakeUsers = new List<User>
             {
                 new User { FullName = "User One", Email = "test1@gmail.com", PasswordHash = "123"},
@@ -56,23 +57,23 @@ namespace UserService.Tests
                 new User { FullName = "User Three", Email = "test3@gmail.com", PasswordHash = "123"}
             };
 
-            var fakeUserDtos = fakeUsers.Select(u => new UserReadDto { Id = u.Id, FullName = u.FullName, Email = u.Email });
+            var fakeUserDtos = fakeUsers.Select(u => new UserDetailsDto { Id = u.Id, FullName = u.FullName, Email = u.Email });
 
             _repositoryMock
-                .Setup(r => r.GetPagedUsersAsync(skip, pageSize))
+                .Setup(r => r.SearchUsersAsync(query))
                 .ReturnsAsync(fakeUsers);
 
             _mapperMock
-                .Setup(m => m.Map<IEnumerable<UserReadDto>>(fakeUsers))
+                .Setup(m => m.Map<IEnumerable<UserDetailsDto>>(fakeUsers))
                 .Returns(fakeUserDtos);
 
             // Act
-            var result = await _userService.GetPagedUsersAsync(pageNumber, pageSize);
+            var result = await _userService.GetUsersByQueryAsync(query);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
-            result.Value.Should().HaveCount(3);
-            result.Value.Select(u => u.FullName).Should().Contain(new[] { "User One", "User Two", "User Three" });
+            result.Should().NotBeNull();
+            result.Should().HaveCount(3);
+            result.Select(u => u.FullName).Should().Contain(new[] { "User One", "User Two", "User Three" });
         }
     }
 }

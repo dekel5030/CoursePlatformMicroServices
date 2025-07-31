@@ -1,12 +1,11 @@
 using AutoMapper;
 using FluentAssertions;
 using Moq;
-using UserService.Common;
-using UserService.Common.Errors;
 using UserService.Data;
 using UserService.Dtos;
 using UserService.Models;
 using Xunit;
+using Common.Errors;
 
 namespace UserService.Tests
 {
@@ -24,28 +23,45 @@ namespace UserService.Tests
         }
 
         [Fact]
-        public async Task ShouldReturnFailure_WhenPageNumberIsZero()
+        public async Task ShouldReturnUsers_WhenQueryIsValid()
         {
             // Arrange
-            var query = new UserSearchDto { PageNumber = 0, PageSize = 10 };
+            var query = new UserSearchDto { PageNumber = 1, PageSize = 10 };
+            var users = new List<User>
+            {
+                new User { FullName = "Test User", Email = "test@gmail.com", PasswordHash = "123" }
+            };
+            var userDtos = new List<UserDetailsDto>
+            {
+                new UserDetailsDto { Id = 1, FullName = "Test User", Email = "test@gmail.com" }
+            };
+
+            _repositoryMock.Setup(r => r.SearchUsersAsync(query)).ReturnsAsync(users);
+            _mapperMock.Setup(m => m.Map<IEnumerable<UserDetailsDto>>(users)).Returns(userDtos);
 
             // Act
             var result = await _userService.GetUsersByQueryAsync(query);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
-            result.ErrorCode.Should().Be(ErrorCode.InvalidPageNumberOrSize);
+            result.Should().NotBeNull();
+            result.Should().HaveCount(1);
+            result.First().FullName.Should().Be("Test User");
         }
 
         [Fact]
-        public async Task ShouldReturnFailure_WhenPageSizeIsNegative()
+        public async Task ShouldReturnEmptyList_WhenNoUsersFound()
         {
-            var query = new UserSearchDto { PageNumber = 1, PageSize = -5 };
+            var query = new UserSearchDto { PageNumber = 1, PageSize = 10 };
+            var users = new List<User>();
+            var userDtos = new List<UserDetailsDto>();
+
+            _repositoryMock.Setup(r => r.SearchUsersAsync(query)).ReturnsAsync(users);
+            _mapperMock.Setup(m => m.Map<IEnumerable<UserDetailsDto>>(users)).Returns(userDtos);
 
             var result = await _userService.GetUsersByQueryAsync(query);
 
-            result.IsSuccess.Should().BeFalse();
-            result.ErrorCode.Should().Be(ErrorCode.InvalidPageNumberOrSize);
+            result.Should().NotBeNull();
+            result.Should().BeEmpty();
         }
 
         [Fact]
@@ -69,8 +85,7 @@ namespace UserService.Tests
             var result = await _userService.GetUsersByQueryAsync(query);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
-            result.Value.Should().BeEquivalentTo(userDtos);
+            result.Should().BeEquivalentTo(userDtos);
         }
 
         [Fact]

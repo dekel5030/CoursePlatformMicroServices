@@ -1,13 +1,12 @@
 using AutoMapper;
 using FluentAssertions;
 using Moq;
-using UserService.Common;
-using UserService.Common.Errors;
 using UserService.Data;
 using UserService.Dtos;
 using UserService.Models;
 using UserService.Services;
 using Xunit;
+using Common.Errors;
 
 namespace UserService.Tests
 {
@@ -29,14 +28,14 @@ namespace UserService.Tests
         {
             // Arrange
             int userId = 1;
-            _repositoryMock.Setup(r => r.GetUserByIdAsync(userId)).ReturnsAsync(null);
+            _repositoryMock.Setup(r => r.GetUserByIdAsync(userId)).ReturnsAsync((User)null!);
 
             // Act
             var result = await _userService.DeleteUserAsync(userId);
 
             // Assert
             result.IsSuccess.Should().BeFalse();
-            result.ErrorCode.Should().Be(ErrorCode.UserNotFound);
+            result.Error.Should().Be(Error.UserNotFound);
         }
 
         [Fact]
@@ -46,21 +45,20 @@ namespace UserService.Tests
             int userId = 1;
             var user = new User
             {
-                Id = userId,
                 Email = "test@example.com",
                 FullName = "Test User",
                 PasswordHash = "hashed"
             };
             var userReadDto = new UserReadDto
             {
-                Id = userId,
+                Id = 1, // userId will be mapped by AutoMapper from the actual user
                 Email = user.Email,
                 FullName = user.FullName
             };
 
             _repositoryMock.Setup(r => r.GetUserByIdAsync(userId)).ReturnsAsync(user);
             _repositoryMock.Setup(r => r.DeleteUserAsync(userId)).Returns(Task.CompletedTask);
-            _repositoryMock.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
+            _repositoryMock.Setup(r => r.SaveChangesAsync()).ReturnsAsync(true);
             _mapperMock.Setup(m => m.Map<UserReadDto>(user)).Returns(userReadDto);
 
             // Act

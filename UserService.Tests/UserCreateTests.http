@@ -3,7 +3,7 @@ POST http://localhost:5125/api/users
 Content-Type: application/json
 
 {
-  "email": "validuser6@example.com",
+  "email": "validuser10@example.com",
   "passwordHash": "hashedpassword123",
   "fullName": "Valid User"
 }
@@ -23,7 +23,7 @@ Content-Type: application/json
 ###
 
 ### ✅ Get user by valid ID
-GET http://localhost:5125/api/users/1
+GET http://localhost:5125/api/users/10
 
 ###
 

@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentAssertions;
 using Moq;
-using UserService.Common;
-using UserService.Common.Errors;
 using UserService.Data;
 using UserService.Dtos;
 using UserService.Models;
+using Xunit;
+using Common.Errors;
 
 namespace UserService.Tests
 {
@@ -35,7 +35,7 @@ namespace UserService.Tests
             var result = await _userService.SetUserActivationAsync(userId, true);
 
             // Then
-            result.ErrorCode.Should().Be(ErrorCode.UserNotFound);
+            result.Error.Should().Be(Error.UserNotFound);
             result.IsSuccess.Should().BeFalse();
             _repositoryMock.Verify(r => r.GetUserByIdAsync(userId), Times.Once);
             _repositoryMock.Verify(r => r.SaveChangesAsync(), Times.Never);

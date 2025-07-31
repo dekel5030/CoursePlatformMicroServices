@@ -1,10 +1,11 @@
 using AutoMapper;
 using FluentAssertions;
 using Moq;
-using UserService.Common.Errors;
 using UserService.Data;
 using UserService.Dtos;
 using UserService.Models;
+using Common.Errors;
+using Xunit;
 
 namespace UserService.Tests
 {
@@ -30,7 +31,7 @@ namespace UserService.Tests
             var result = await _userService.CreateUserAsync(userCreateDto);
 
             result.IsSuccess.Should().BeFalse();
-            result.ErrorCode.Should().Be(ErrorCode.DuplicateEmail);
+            result.Error.Should().Be(Error.DuplicateEmail);
             _repositoryMock.Verify(r => r.EmailExistsAsync(userCreateDto.Email), Times.Once);
             _repositoryMock.Verify(r => r.SaveChangesAsync(), Times.Never);
         }

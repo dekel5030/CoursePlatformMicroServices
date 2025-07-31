@@ -28,7 +28,7 @@ namespace UserService.Controllers
 
             if (!result.IsSuccess)
             {
-                return result.ToActionResult(_errorLocalzer);
+                return result.ToActionResult(_errorLocalzer, HttpContext.Request.Path);
             }
 
             return CreatedAtAction(nameof(GetUserById), new { id = result.Value!.Id }, result.Value);
@@ -69,7 +69,5 @@ namespace UserService.Controllers
 
             return NoContent();
         }
-
-        
     }
 }
