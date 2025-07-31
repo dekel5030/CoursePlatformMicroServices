@@ -44,12 +44,18 @@ namespace UserService.Services
             return _mapper.Map<UserReadDto>(user);
         }
 
-        public async Task<IEnumerable<UserDetailsDto>> GetUsersByQueryAsync(UserSearchDto query)
+        public async Task<PagedResponseDto<UserDetailsDto>> GetUsersByQueryAsync(UserSearchDto query)
         {
             var users = await _repository.SearchUsersAsync(query);
-            var userDetailsDtos = _mapper.Map<IEnumerable<UserDetailsDto>>(users);
+            var totalCount = await _repository.CountUsersAsync(query);
 
-            return userDetailsDtos;
+            return new PagedResponseDto<UserDetailsDto>
+            {
+                Items = _mapper.Map<IEnumerable<UserDetailsDto>>(users),
+                TotalCount = totalCount,
+                PageSize = query.PageSize,
+                PageNumber = query.PageNumber
+            };
         }
 
         // === Update ===

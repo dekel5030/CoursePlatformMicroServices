@@ -10,7 +10,7 @@ namespace UserService.Services
 
         // === Read ===
         Task<UserReadDto?> GetUserByIdAsync(int userId);
-        Task<IEnumerable<UserDetailsDto>> GetUsersByQueryAsync(UserSearchDto query);
+        Task<PagedResponseDto<UserDetailsDto>> GetUsersByQueryAsync(UserSearchDto query);
 
         // === Update ===
         Task<Result<UserReadDto>> SetUserActivationAsync(int userId, bool isActive);
