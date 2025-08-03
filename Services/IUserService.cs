@@ -9,8 +9,8 @@ namespace UserService.Services
         Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto);
 
         // === Read ===
-        Task<UserReadDto?> GetUserByIdAsync(int userId);
-        Task<PagedResponseDto<UserDetailsDto>> GetUsersByQueryAsync(UserSearchDto query);
+        Task<UserDetailsDto?> GetUserByIdAsync(int userId);
+        Task<PagedResponseDto<UserReadDto>> GetUsersByQueryAsync(UserSearchDto query);
 
         // === Update ===
         Task<Result<UserReadDto>> SetUserActivationAsync(int userId, bool isActive);

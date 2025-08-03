@@ -37,21 +37,21 @@ namespace UserService.Services
             
         // === GET ===
 
-        public async Task<UserReadDto?> GetUserByIdAsync(int id)
+        public async Task<UserDetailsDto?> GetUserByIdAsync(int id)
         {
             var user = await _repository.GetUserByIdAsync(id);
 
-            return _mapper.Map<UserReadDto>(user);
+            return _mapper.Map<UserDetailsDto>(user);
         }
 
-        public async Task<PagedResponseDto<UserDetailsDto>> GetUsersByQueryAsync(UserSearchDto query)
+        public async Task<PagedResponseDto<UserReadDto>> GetUsersByQueryAsync(UserSearchDto query)
         {
             var users = await _repository.SearchUsersAsync(query);
             var totalCount = await _repository.CountUsersAsync(query);
 
-            return new PagedResponseDto<UserDetailsDto>
+            return new PagedResponseDto<UserReadDto>
             {
-                Items = _mapper.Map<IEnumerable<UserDetailsDto>>(users),
+                Items = _mapper.Map<IEnumerable<UserReadDto>>(users),
                 TotalCount = totalCount,
                 PageSize = query.PageSize,
                 PageNumber = query.PageNumber
