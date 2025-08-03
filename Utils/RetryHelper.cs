@@ -1,0 +1,47 @@
+namespace Common.Utils;
+
+public static class RetryHelper
+{
+    public static async Task RetryAsync(Func<Task> action, int maxAttempts = 3)
+    {
+        await RetryAsync(async () =>
+        {
+            await action();
+            return true;
+        }, maxAttempts);
+    }
+
+    public static async Task<T> RetryAsync<T>(Func<Task<T>> func, int maxAttempts = 3, int initialDelay = 1000)
+    {
+        if (maxAttempts <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxAttempts), "Max attempts must be greater than zero.");
+        }
+
+        if (initialDelay < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(initialDelay), "Initial delay must be non-negative.");
+        }
+
+        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        {
+            try
+            {
+                return await func();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Attempt {attempt + 1} failed: {ex.Message}");
+                await Task.Delay(initialDelay);
+                initialDelay *= 2;
+
+                if (attempt == maxAttempts - 1)
+                {
+                    throw;
+                }
+            }
+        }
+
+        throw new InvalidOperationException("This should never be reached.");
+    }
+}
