@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using UserService.Dtos;
 using UserService.Services;
 using Common.Web.Extensions;
-using Microsoft.Extensions.Localization;
-using Common.Resources.ErrorMessages;
+using Common.Web.Errors;
 
 namespace UserService.Controllers
 {
@@ -13,12 +12,12 @@ namespace UserService.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IStringLocalizer _errorLocalzer;
+        private readonly ProblemDetailsFactory _problemDetailsFactory;
 
-        public UsersController(IUserService userService, IStringLocalizer<ErrorMessages> errorLocalizer)
+        public UsersController(IUserService userService, ProblemDetailsFactory problemDetailsFactory)
         {
             _userService = userService;
-            _errorLocalzer = errorLocalizer;
+            _problemDetailsFactory = problemDetailsFactory;
         }
 
         [HttpPost]
@@ -28,7 +27,7 @@ namespace UserService.Controllers
 
             if (!result.IsSuccess)
             {
-                return result.ToActionResult(_errorLocalzer, HttpContext.Request.Path);
+                return result.ToActionResult(_problemDetailsFactory, HttpContext.Request.Path);
             }
 
             return CreatedAtAction(nameof(GetUserById), new { id = result.Value!.Id }, result.Value);
@@ -38,7 +37,7 @@ namespace UserService.Controllers
         public async Task<IActionResult> GetUserById([Range(1, int.MaxValue)] int id)
         {
             Console.WriteLine($"--> Fetching user with ID: {id}");
-
+            
             var user = await _userService.GetUserByIdAsync(id);
 
             if (user == null)
@@ -64,7 +63,7 @@ namespace UserService.Controllers
 
             if (!result.IsSuccess)
             {
-                return result.ToActionResult(_errorLocalzer);
+                return result.ToActionResult(_problemDetailsFactory, HttpContext.Request.Path);
             }
 
             return NoContent();

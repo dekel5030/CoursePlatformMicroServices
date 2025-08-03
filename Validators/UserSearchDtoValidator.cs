@@ -9,8 +9,8 @@ namespace UserService.Dtos
     {
         public UserSearchDtoValidator(IStringLocalizer<ValidationMessages> localizer)
         {
-            var invalidPageNumMsg = localizer[ErrorCode.InvalidPageNumber.ToString()];
-            var invalidPageSizeMsg = localizer[ErrorCode.InvalidPageSize.ToString()];
+            var invalidPageNumMsg = localizer[Error.InvalidPageNumber.ToString()];
+            var invalidPageSizeMsg = localizer[Error.InvalidPageSize.ToString()];
 
             RuleFor(x => x.PageNumber).GreaterThan(0).WithMessage(invalidPageNumMsg);
             RuleFor(x => x.PageSize).GreaterThan(0).WithMessage(invalidPageSizeMsg);
