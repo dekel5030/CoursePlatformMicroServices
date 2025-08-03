@@ -2,6 +2,7 @@ using AuthService.Data;
 using AuthService.Security;
 using AuthService.Services;
 using AuthService.SyncDataServices.Http;
+using Common.Rollback;
 using Common.Web.Errors;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddHttpClient<IUserServiceDataClient, HttpUserServiceDataClient>();
 builder.Services.AddLocalization();
 builder.Services.AddScoped<ProblemDetailsFactory>();
+builder.Services.AddScoped<IRollbackManager, StackRollbackManager>();
 
 if (builder.Environment.IsDevelopment())
 {

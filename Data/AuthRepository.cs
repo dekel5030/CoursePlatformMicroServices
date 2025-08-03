@@ -1,4 +1,5 @@
 using AuthService.Models;
+using Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Data;
@@ -16,7 +17,12 @@ public class AuthRepository : IAuthRepository
     {
         await _dbContext.UserCredentials.AddAsync(credentials);
     }
-    
+
+    public Task<Result<UserCredentials>> DeleteUserCredentialsAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<UserCredentials?> GetUserCredentialsByEmailAsync(string email)
     {
         return await _dbContext.UserCredentials

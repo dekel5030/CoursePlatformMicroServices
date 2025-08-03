@@ -6,7 +6,9 @@ using AuthService.SyncDataServices.Http;
 using AutoMapper;
 using Common;
 using Common.Errors;
-using Microsoft.AspNetCore.Identity;
+using Common.Rollback;
+using Common.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace AuthService.Services;
 
@@ -17,56 +19,92 @@ public class AuthService : IAuthService
     private readonly IMapper _mapper;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
+    private readonly IRollbackManager _rollbackManager;
+    private readonly ILogger<AuthService> _logger;
 
     public AuthService(IAuthRepository repository,
                         IUserServiceDataClient usersClient,
                         IMapper mapper,
                         IPasswordHasher passwordHasher,
-                        ITokenService tokenService)
+                        ITokenService tokenService,
+                        IRollbackManager rollbackManager,
+                        ILogger<AuthService> logger)
     {
         _repository = repository;
         _usersClient = usersClient;
         _mapper = mapper;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
+        _rollbackManager = rollbackManager;
+        _logger = logger;
     }
 
+    /// <summary>
+    /// Registers a new user by creating credentials in both UserService and AuthService.
+    /// Uses distributed transaction pattern with rollback capabilities.
+    /// </summary>
+    /// <param name="registerRequestDto">The registration request containing user details</param>
+    /// <returns>Authentication response with token if successful, error result if failed</returns>
     public async Task<Result<AuthResponseDto>> RegisterAsync(RegisterRequestDto registerRequestDto)
     {
-        var existingCredentials = await _repository.GetUserCredentialsByEmailAsync(registerRequestDto.Email);
-
-        if (existingCredentials != null)
+        ArgumentNullException.ThrowIfNull(registerRequestDto);
+        
+        if (string.IsNullOrWhiteSpace(registerRequestDto.Email))
         {
-            Console.WriteLine($"--> User with email {registerRequestDto.Email} already exists on AuthService");
-            return Result<AuthResponseDto>.Failure(Error.DuplicateEmail);
+            return Result<AuthResponseDto>.Failure(Error.Unexpected);
         }
         
-        var userCreateDto = _mapper.Map<UserCreateDto>(registerRequestDto);
-        userCreateDto.PasswordHash = _passwordHasher.Hash(registerRequestDto.Password);
-        var result = await _usersClient.CreateUserAsync(userCreateDto);
-
-        if (!result.IsSuccess)
+        if (string.IsNullOrWhiteSpace(registerRequestDto.Password))
         {
-            Console.WriteLine($"--> UserService failed to create user for email {registerRequestDto.Email}: {result.Error}");
-            return Result<AuthResponseDto>.Failure(result.Error!);
+            return Result<AuthResponseDto>.Failure(Error.Unexpected);
         }
 
-        Console.WriteLine($"--> UserService successfully created user for email {registerRequestDto.Email}");
-        var userReadDto = result.Value;
-        var userCredentials = CreateUserCredentials(userReadDto!, registerRequestDto.Password);
+        if (await IsUserCredentialsExistsAsync(registerRequestDto.Email.ToLowerInvariant()))
+        {
+            _logger.LogInformation("User with email {Email} already exists on AuthService", registerRequestDto.Email);
+            return Result<AuthResponseDto>.Failure(Error.DuplicateEmail);
+        }
 
-        await _repository.AddUserCredentialsAsync(userCredentials);
-        await _repository.SaveChangesAsync();
-        Console.WriteLine($"--> User credentials for email {registerRequestDto.Email} saved successfully");
-        var authResponseDto = GenerateAuthResponseDto(userCredentials);
+        var userCreateDto = CreateUserCreateDto(registerRequestDto);
+        var userServiceResult = await CreateUserInUserServiceAsync(userCreateDto);
 
-        return Result<AuthResponseDto>.Success(authResponseDto);
+        if (!userServiceResult.IsSuccess)
+        {
+            return Result<AuthResponseDto>.Failure(userServiceResult.Error!);
+        }
+
+        _rollbackManager.Add(() => RetryHelper.RetryAsync(() => _usersClient.DeleteUserAsync(userServiceResult.Value!.Id)));
+        var userReadDto = userServiceResult.Value;
+        var userCredentials = CreateUserCredentials(userReadDto!, userCreateDto.PasswordHash);
+
+        return await TrySaveCredentialsAndRespondAsync(userCredentials, registerRequestDto.Email);
     }
-    
-    private UserCredentials CreateUserCredentials(UserReadDto userReadDto, string plainPassword)
+
+    private async Task SaveCredentialsAsync(UserCredentials credentials)
+    {
+        await RetryHelper.RetryAsync(() => _repository.AddUserCredentialsAsync(credentials));
+        await RetryHelper.RetryAsync(() => _repository.SaveChangesAsync());
+        _logger.LogInformation("User credentials for email {Email} saved successfully", credentials.Email);
+    }
+
+    private UserCreateDto CreateUserCreateDto(RegisterRequestDto registerRequestDto)
+    {
+        var userCreateDto = _mapper.Map<UserCreateDto>(registerRequestDto);
+        userCreateDto.Email = registerRequestDto.Email.ToLowerInvariant();
+        userCreateDto.PasswordHash = _passwordHasher.Hash(registerRequestDto.Password);
+        return userCreateDto;
+    }
+
+    private async Task<bool> IsUserCredentialsExistsAsync(string email)
+    {
+        var existingCredentials = await _repository.GetUserCredentialsByEmailAsync(email);
+        return existingCredentials != null;
+    }
+
+    private UserCredentials CreateUserCredentials(UserReadDto userReadDto, string hashedPassword)
     {
         var credentials = _mapper.Map<UserCredentials>(userReadDto);
-        credentials.PasswordHash = _passwordHasher.Hash(plainPassword);
+        credentials.PasswordHash = hashedPassword;
 
         return credentials;
     }
@@ -78,4 +116,38 @@ public class AuthService : IAuthService
 
         return authResponseDto;
     }
+
+    private async Task<Result<UserReadDto>> CreateUserInUserServiceAsync(UserCreateDto userCreateDto)
+    {
+        var result = await RetryHelper.RetryAsync(() => _usersClient.CreateUserAsync(userCreateDto));
+
+        if (result.IsSuccess)
+        {
+            _logger.LogInformation("UserService successfully created user for email {Email}", userCreateDto.Email);
+        }
+        else
+        {
+            _logger.LogError("UserService failed to create user for email {Email}: {Error}", userCreateDto.Email, result.Error);
+        }
+
+        return result;
+    }
+    
+    private async Task<Result<AuthResponseDto>> TrySaveCredentialsAndRespondAsync(UserCredentials credentials, string email)
+    {
+        try
+        {
+            await SaveCredentialsAsync(credentials);
+            _rollbackManager.Add(() => RetryHelper.RetryAsync(() => _repository.DeleteUserCredentialsAsync(credentials.Id)));
+            return Result<AuthResponseDto>.Success(GenerateAuthResponseDto(credentials));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error saving user credentials for email {Email}", email);
+            await _rollbackManager.ExecuteAllAsync();
+            await RetryHelper.RetryAsync(() => _repository.SaveChangesAsync());
+            return Result<AuthResponseDto>.Failure(Error.DatabaseError);
+        }
+    }
+
 }

@@ -53,4 +53,9 @@ public class HttpUserServiceDataClient : IUserServiceDataClient
 
         return result;
     }
+
+    public Task<Result<UserReadDto>> DeleteUserAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
 }
