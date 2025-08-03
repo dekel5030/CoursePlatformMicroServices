@@ -31,6 +31,26 @@ public class AuthDbContext : DbContext
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        NormalizeEmails();
+        UpdateTimestamps();
+
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void NormalizeEmails()
+    {
+        foreach (var entry in ChangeTracker.Entries<UserCredentials>())
+        {
+            if ((entry.State == EntityState.Added || entry.State == EntityState.Modified) &&
+                !string.IsNullOrWhiteSpace(entry.Entity.Email))
+            {
+                entry.Entity.Email = entry.Entity.Email.ToLowerInvariant();
+            }
+        }
+    }
+
+    private void UpdateTimestamps()
+    {
         foreach (var entry in ChangeTracker.Entries<UserCredentials>())
         {
             if (entry.State == EntityState.Modified && entry.Properties.Any(p => p.IsModified))
@@ -38,7 +58,5 @@ public class AuthDbContext : DbContext
                 entry.Entity.UpdatedAt = DateTime.UtcNow;
             }
         }
-
-        return await base.SaveChangesAsync(cancellationToken);
     }
 }

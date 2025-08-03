@@ -16,16 +16,11 @@ public class AuthRepository : IAuthRepository
     {
         await _dbContext.UserCredentials.AddAsync(credentials);
     }
-
-    public async Task<UserCredentials?> GetByEmailAsync(string email)
+    
+    public async Task<UserCredentials?> GetUserCredentialsByEmailAsync(string email)
     {
-        return await _dbContext.UserCredentials.FirstOrDefaultAsync(userCred =>
-            userCred.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
-    }
-
-    public Task<UserCredentials?> GetUserCredentialsByEmailAsync(string email)
-    {
-        throw new NotImplementedException();
+        return await _dbContext.UserCredentials
+            .FirstOrDefaultAsync(uc => uc.Email == email.ToLower());
     }
 
     public async Task SaveChangesAsync()

@@ -1,0 +1,10 @@
+### Register new user
+POST http://localhost:5273/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Dekel R",
+  "email": "dekel01@example.com",
+  "password": "StrongPass123!",
+  "PasswordConfirm": "StrongPass123!"
+}
