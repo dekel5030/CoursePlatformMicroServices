@@ -20,7 +20,8 @@ public class TokenService : ITokenService
         {
             new Claim(ClaimTypes.NameIdentifier, request.UserId.ToString()),
             new Claim(ClaimTypes.Email, request.Email),
-            new Claim(ClaimTypes.Role, request.Role.ToString())
+            new Claim(ClaimTypes.Role, request.Role.ToString()),
+            new Claim(ClaimTypes.Name, request.FullName ?? string.Empty)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(

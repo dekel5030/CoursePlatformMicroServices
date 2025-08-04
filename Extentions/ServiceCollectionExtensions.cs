@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions
             s.Address = new Uri(config["Grpc:UserServiceUrl"]!);
         });
         services.AddScoped<IGrpcUserServiceDataClient, GrpcUserServiceDataClient>();
+        services.AddHttpContextAccessor();
 
         return services;
     }

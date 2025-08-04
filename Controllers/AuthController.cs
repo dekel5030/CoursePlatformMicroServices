@@ -31,4 +31,30 @@ public class AuthController : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
+    {
+        var result = await _authService.LoginAsync(loginRequestDto);
+
+        if (!result.IsSuccess)
+        {
+            return result.ToActionResult(_problemDetailsFactory, HttpContext.Request.Path);
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("me")]
+    public IActionResult Me()
+    {
+        var result = _authService.GetCurrentUser();
+
+        if (!result.IsSuccess)
+        {
+            return result.ToActionResult(_problemDetailsFactory, HttpContext.Request.Path);
+        }
+
+        return Ok(result.Value);
+    }
 }

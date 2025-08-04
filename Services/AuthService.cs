@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using AuthService.Data;
 using AuthService.Dtos;
 using AuthService.Models;
@@ -19,6 +20,7 @@ public class AuthService : IAuthService
     private readonly ITokenService _tokenService;
     private readonly IRollbackManager _rollbackManager;
     private readonly ILogger<AuthService> _logger;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IGrpcUserServiceDataClient _usersClient;
 
     public AuthService(IAuthRepository repository,
@@ -27,7 +29,8 @@ public class AuthService : IAuthService
                         ITokenService tokenService,
                         IRollbackManager rollbackManager,
                         ILogger<AuthService> logger,
-                        IGrpcUserServiceDataClient usersClient)
+                        IGrpcUserServiceDataClient usersClient,
+                        IHttpContextAccessor httpContextAccessor)
     {
         _repository = repository;
         _usersClient = usersClient;
@@ -36,6 +39,7 @@ public class AuthService : IAuthService
         _tokenService = tokenService;
         _rollbackManager = rollbackManager;
         _logger = logger;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<Result<AuthResponseDto>> RegisterAsync(RegisterRequestDto registerRequestDto)
@@ -65,10 +69,54 @@ public class AuthService : IAuthService
         return await TrySaveCredentialsAndRespondAsync(userCredentials, registerRequestDto.Email);
     }
 
+    public async Task<Result<AuthResponseDto>> LoginAsync(LoginRequestDto loginRequestDto)
+    {
+        var userCredentials = await _repository.GetUserCredentialsByEmailAsync(loginRequestDto.Email);
+
+        if (userCredentials == null)
+        {
+            _logger.LogInformation("Login attempt with non-existing email: {Email}", loginRequestDto.Email);
+            return Result<AuthResponseDto>.Failure(Error.InvalidCredentials);
+        }
+
+        if (!_passwordHasher.VerifyPassword(loginRequestDto.Password, userCredentials.PasswordHash))
+        {
+            _logger.LogInformation("Login attempt with invalid password for email: {Email}", loginRequestDto.Email);
+            return Result<AuthResponseDto>.Failure(Error.InvalidCredentials);
+        }
+
+        return Result<AuthResponseDto>.Success(GenerateAuthResponseDto(userCredentials));
+    }
+
+    public Result<CurrentUserReadDto> GetCurrentUser()
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+        var userIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var email = user?.FindFirst(ClaimTypes.Email)?.Value;
+        var fullName = user?.FindFirst(ClaimTypes.Name)?.Value;
+        var role = user?.FindFirst(ClaimTypes.Role)?.Value;
+
+        if (userIdClaim is null || !int.TryParse(userIdClaim, out var userId))
+        {
+            _logger.LogInformation("GetCurrentUser called but no valid userId found in token.");
+            return Result<CurrentUserReadDto>.Failure(Error.UnAuthenticated);
+        }
+
+        var dto = new CurrentUserReadDto
+        {
+            UserId = userId,
+            Email = email!,
+            FullName = fullName,
+            Role = role
+        };
+
+        return Result<CurrentUserReadDto>.Success(dto);
+    }
+
     private UserCredentials CreateUserCredentials(UserReadDto userReadDto, string hashedPassword)
     {
         var credentials = _mapper.Map<UserCredentials>(userReadDto);
-        credentials.PasswordHash = hashedPassword; // השתמש בסיסמה המוצפנת כפי שהיא
+        credentials.PasswordHash = hashedPassword;
 
         return credentials;
     }
