@@ -5,6 +5,8 @@ using AuthService.SyncDataServices.Grpc;
 using AuthService.SyncDataServices.Http;
 using Common.Rollback;
 using Common.Web.Errors;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using static Common.Grpc.GrpcUserService;
 
@@ -30,6 +32,11 @@ public static class ServiceCollectionExtensions
         });
         services.AddScoped<IGrpcUserServiceDataClient, GrpcUserServiceDataClient>();
         services.AddHttpContextAccessor();
+
+        services
+            .AddFluentValidationAutoValidation()
+            .AddFluentValidationClientsideAdapters();
+        services.AddValidatorsFromAssemblyContaining<Program>();
 
         return services;
     }
