@@ -24,54 +24,38 @@ public class GrpcUserServiceDataClient : IGrpcUserServiceDataClient
     {
         var request = _mapper.Map<UserCreateRequest>(userCreateDto);
 
-        try
-        {
-            var response = await _client.CreateUserAsync(request);
-            var result = _mapper.Map<Result<UserReadDto>>(response);
+        var response = await _client.CreateUserAsync(request);
+        var result = _mapper.Map<Result<UserReadDto>>(response);
 
-            if (!result.IsSuccess)
-            {
-                _logger.LogError("Failed to create user in UserService. Email: {Email}, Error: {Error}", request.Email, result.Error);
-            }
-            else
-            {
-                _logger.LogInformation("User created successfully in UserService. ID: {Id}, Email: {Email}", result.Value!.Id, result.Value.Email);
-            }
-
-            return result;
-        }
-        catch (Exception ex)
+        if (!result.IsSuccess)
         {
-            _logger.LogError(ex, "Error creating user in UserService");
-            return Result<UserReadDto>.Failure(Error.Unexpected);
+            _logger.LogError("Failed to create user in UserService. Email: {Email}, Error: {Error}", request.Email, result.Error);
         }
+        else
+        {
+            _logger.LogInformation("User created successfully in UserService. ID: {Id}, Email: {Email}", result.Value!.Id, result.Value.Email);
+        }
+
+        return result;
     }
 
     public async Task<Result<bool>> DeleteUserAsync(int id)
     {
         var request = new UserDeleteRequest { Id = id };
 
-        try
-        {
-            var response = await _client.DeleteUserAsync(request);
-            var result = _mapper.Map<Result<bool>>(response);
+        var response = await _client.DeleteUserAsync(request);
+        var result = _mapper.Map<Result<bool>>(response);
 
-            if (!result.IsSuccess)
-            {
-                var error = _mapper.Map<Error>(result.Error);
-                _logger.LogError("Failed to delete user in UserService. ID: {Id}, Error: {Error}", id, error);
-            }
-            else
-            {
-                _logger.LogInformation("User with ID {Id} deleted successfully in UserService", id);
-            }
-
-            return result;
-        }
-        catch (Exception ex)
+        if (!result.IsSuccess)
         {
-            _logger.LogError(ex, "Error deleting user in UserService");
-            return Result<bool>.Failure(Error.Unexpected);
+            var error = _mapper.Map<Error>(result.Error);
+            _logger.LogError("Failed to delete user in UserService. ID: {Id}, Error: {Error}", id, error);
         }
+        else
+        {
+            _logger.LogInformation("User with ID {Id} deleted successfully in UserService", id);
+        }
+
+        return result;
     }
 }

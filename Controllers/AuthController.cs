@@ -1,10 +1,8 @@
 using AuthService.Dtos;
 using AuthService.Services;
-using Common.Resources.ErrorMessages;
 using Common.Web.Errors;
 using Common.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 
 namespace AuthService.Controller;
 
@@ -24,7 +22,7 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
     {
-        var result = await _authService.RegisterAsyncGrpc(registerRequestDto);
+        var result = await _authService.RegisterAsync(registerRequestDto);
 
         if (!result.IsSuccess)
         {
