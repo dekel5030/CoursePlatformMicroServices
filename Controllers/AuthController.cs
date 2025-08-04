@@ -24,7 +24,7 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
     {
-        var result = await _authService.RegisterAsync(registerRequestDto);
+        var result = await _authService.RegisterAsyncGrpc(registerRequestDto);
 
         if (!result.IsSuccess)
         {

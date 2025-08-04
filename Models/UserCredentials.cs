@@ -16,7 +16,7 @@ public class UserCredentials
     public DateTime UpdatedAt { get; internal set; }
 
     public bool IsActive { get; set; } = true;
-
+    public bool IsConfirmed { get; set; } = false;
     public int FailedLoginAttempts { get; set; } = 0;
 
     public DateTime? LockedUntil { get; set; } = null;    

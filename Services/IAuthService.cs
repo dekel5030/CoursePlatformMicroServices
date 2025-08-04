@@ -6,4 +6,6 @@ namespace AuthService.Services;
 public interface IAuthService
 {
     Task<Result<AuthResponseDto>> RegisterAsync(RegisterRequestDto registerRequestDto);
+
+    Task<Result<AuthResponseDto>> RegisterAsyncGrpc(RegisterRequestDto registerRequestDto);
 }

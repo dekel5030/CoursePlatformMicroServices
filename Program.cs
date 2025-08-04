@@ -1,10 +1,13 @@
 using AuthService.Data;
 using AuthService.Security;
 using AuthService.Services;
+using AuthService.SyncDataServices.Grpc;
 using AuthService.SyncDataServices.Http;
+using Common.Grpc;
 using Common.Rollback;
 using Common.Web.Errors;
 using Microsoft.EntityFrameworkCore;
+using static Common.Grpc.GrpcUserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,13 @@ builder.Services.AddHttpClient<IUserServiceDataClient, HttpUserServiceDataClient
 builder.Services.AddLocalization();
 builder.Services.AddScoped<ProblemDetailsFactory>();
 builder.Services.AddScoped<IRollbackManager, StackRollbackManager>();
+
+builder.Services.AddGrpcClient<GrpcUserServiceClient>(s =>
+{
+    s.Address = new Uri(builder.Configuration["Grpc:UserServiceUrl"]!);
+});
+builder.Services.AddScoped<IGrpcUserServiceDataClient, GrpcUserServiceDataClient>();
+
 
 if (builder.Environment.IsDevelopment())
 {
@@ -51,5 +61,4 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();
