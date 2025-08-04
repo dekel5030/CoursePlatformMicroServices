@@ -1,17 +1,19 @@
+using Microsoft.Extensions.Logging;
+
 namespace Common.Utils;
 
 public static class RetryHelper
 {
-    public static async Task RetryAsync(Func<Task> action, int maxAttempts = 3)
+    public static async Task RetryAsync(Func<Task> action, int maxAttempts = 3, int initialDelay = 1000, ILogger? logger = null)
     {
         await RetryAsync(async () =>
         {
             await action();
             return true;
-        }, maxAttempts);
+        }, maxAttempts, initialDelay, logger);
     }
 
-    public static async Task<T> RetryAsync<T>(Func<Task<T>> func, int maxAttempts = 3, int initialDelay = 1000)
+    public static async Task<T> RetryAsync<T>(Func<Task<T>> func, int maxAttempts = 3, int initialDelay = 1000, ILogger? logger = null)
     {
         if (maxAttempts <= 0)
         {
@@ -31,14 +33,14 @@ public static class RetryHelper
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Attempt {attempt + 1} failed: {ex.Message}");
-                await Task.Delay(initialDelay);
-                initialDelay *= 2;
-
+                logger?.LogWarning(ex, "Retry attempt {Attempt} failed.", attempt + 1);
                 if (attempt == maxAttempts - 1)
                 {
                     throw;
                 }
+
+                await Task.Delay(initialDelay);
+                initialDelay *= 2;
             }
         }
 
