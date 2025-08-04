@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using UserService.Data;
 using UserService.Profiles;
 using UserService.Services;
+using UserService.SyncDataServices.Grpc;
 using UserService.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,8 @@ builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<UserCreateDtoValidator>();
+
+builder.Services.AddGrpc();
 
 if (builder.Environment.IsDevelopment())
     Console.WriteLine("--> Using Development Database");
@@ -49,8 +52,8 @@ var localizationOptions = new RequestLocalizationOptions()
 
 app.UseHttpsRedirection();
 app.UseRequestLocalization(localizationOptions);
-//app.UseExceptionHandler();
 
 app.MapControllers();
+app.MapGrpcService<GrpcUserService>();
 app.Run();
 
