@@ -3,6 +3,7 @@ using AuthService.Security;
 using AuthService.Services;
 using AuthService.SyncDataServices.Grpc;
 using AuthService.SyncDataServices.Http;
+using AuthService.Validators;
 using Common.Rollback;
 using Common.Web.Errors;
 using FluentValidation;
@@ -37,6 +38,9 @@ public static class ServiceCollectionExtensions
             .AddFluentValidationAutoValidation()
             .AddFluentValidationClientsideAdapters();
         services.AddValidatorsFromAssemblyContaining<Program>();
+
+        services.Configure<ValidationSettings>(
+            config.GetSection("ValidationSettings"));
 
         return services;
     }
