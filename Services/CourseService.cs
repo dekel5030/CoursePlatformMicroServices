@@ -1,5 +1,3 @@
-using System.Reflection;
-using System.Threading.Tasks;
 using AutoMapper;
 using Common;
 using Common.Errors;
@@ -35,7 +33,7 @@ public class CourseService : ICourseService
     public async Task<Result<LessonReadDto>> AddLessonAsync(LessonCreateDto lessonCreateDto)
     {
         if (await _repository.CourseExistsAsync(lessonCreateDto.CourseId) == false)
-        {   
+        {
             return Result<LessonReadDto>.Failure(CourseErrors.CourseNotFound);
         }
 
@@ -119,8 +117,8 @@ public class CourseService : ICourseService
         {
             Items = _mapper.Map<List<CourseReadDto>>(courses),
             TotalCount = totalCount,
-            PageSize = query.PageSize,
-            PageNumber = query.PageNumber
+            PageSize = query.PageSize ?? 10,
+            PageNumber = query.PageNumber ?? 1
         };
     }
 

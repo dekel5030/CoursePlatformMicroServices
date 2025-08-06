@@ -12,5 +12,5 @@ public class Course : BaseEntity
 
     public decimal Price { get; set; } = 0.0m;
 
-    public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+    public ICollection<Lesson>? Lessons { get; set; } = new List<Lesson>();
 }

@@ -2,7 +2,6 @@ using CourseService.Models;
 using Microsoft.EntityFrameworkCore;
 using CourseService.Extentions;
 using CourseService.Dtos.Courses;
-using System.Threading.Tasks;
 using CourseService.Dtos.Lessons;
 
 namespace CourseService.Data.CoursesRepo;
@@ -48,8 +47,8 @@ public class CourseRepository : ICourseRepository
         var totalCount = await filteredQuery.CountAsync();
 
         var items = await filteredQuery
-            .Skip((query.PageNumber - 1) * query.PageSize)
-            .Take(query.PageSize)
+            .Skip(((query.PageNumber ?? 1) - 1) * (query.PageSize ?? 10))
+            .Take(query.PageSize ?? 10)
             .ToListAsync();
 
         return (items, totalCount);
