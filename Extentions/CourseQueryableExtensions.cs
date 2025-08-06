@@ -13,7 +13,6 @@ public static class CourseQueryableExtensions
         query = query.ApplyInstructorUserIdFilter(dto.InstructorUserId);
         query = query.ApplyIsPublishedFilter(dto.IsPublished);
         query = query.ApplyPriceFilter(dto.Price);
-        query = query.ApplyPagination(dto.PageNumber, dto.PageSize);
 
         return query;
     }
@@ -62,10 +61,5 @@ public static class CourseQueryableExtensions
             query = query.Where(c => c.Price == price.Value);
         }
         return query;
-    }
-
-    private static IQueryable<Course> ApplyPagination(this IQueryable<Course> query, int pageNumber, int pageSize)
-    {
-        return query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
     }
 }

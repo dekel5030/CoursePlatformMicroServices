@@ -2,6 +2,8 @@ using CourseService.Models;
 using Microsoft.EntityFrameworkCore;
 using CourseService.Extentions;
 using CourseService.Dtos.Courses;
+using System.Threading.Tasks;
+using CourseService.Dtos.Lessons;
 
 namespace CourseService.Data.CoursesRepo;
 
@@ -24,18 +26,38 @@ public class CourseRepository : ICourseRepository
         _dbContext.Courses.Remove(course);
     }
 
-    public async Task<Course?> GetCourseByIdAsync(int courseId)
+    public async Task<Course?> GetCourseByIdAsync(int courseId, bool includeLessons = false)
     {
-        return await _dbContext.Courses
-            .Include(c => c.Lessons)
-            .FirstOrDefaultAsync(c => c.Id == courseId);
+        if (includeLessons)
+        {
+            return await _dbContext.Courses
+                .Include(c => c.Lessons)
+                .FirstOrDefaultAsync(c => c.Id == courseId);
+        }
+        else
+        {
+            return await _dbContext.Courses.FindAsync(courseId);
+        }
     }
 
-    public async Task<IEnumerable<Course>> SearchCoursesAsync(CourseSearchDto query)
+    public async Task<(IEnumerable<Course> Courses, int TotalCount)> SearchCoursesAsync(CourseSearchDto query)
     {
-        var coursesQuery = _dbContext.Courses.AsQueryable();
+        var filteredQuery = _dbContext.Courses
+            .ApplySearchFilters(query);
 
-        return await coursesQuery.ApplySearchFilters(query).ToListAsync();
+        var totalCount = await filteredQuery.CountAsync();
+
+        var items = await filteredQuery
+            .Skip((query.PageNumber - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+    public async Task<bool> CourseExistsAsync(int courseId)
+    {
+        return await _dbContext.Courses.AnyAsync(c => c.Id == courseId);
     }
 
     public async Task<Lesson?> GetLessonByIdAsync(int lessonId)
@@ -43,12 +65,20 @@ public class CourseRepository : ICourseRepository
         return await _dbContext.Lessons.FindAsync(lessonId);
     }
 
-    public async Task<IEnumerable<Lesson>> GetLessonsByCourseIdAsync(int courseId)
+    public async Task<(IEnumerable<Lesson> Lessons, int TotalCount)> GetLessonsAsync(LessonSearchDto query)
     {
-        return await _dbContext.Lessons
-            .Where(l => l.CourseId == courseId)
+        var baseQuery = _dbContext.Lessons
+            .Where(l => l.CourseId == query.CourseId);
+
+        var totalCount = await baseQuery.CountAsync();
+
+        var lessons = await baseQuery
             .OrderBy(l => l.Order)
+            .Skip((query.PageNumber - 1) * query.PageSize)
+            .Take(query.PageSize)
             .ToListAsync();
+
+        return (lessons, totalCount);
     }
 
     public async Task AddLessonAsync(Lesson lesson)
@@ -59,6 +89,15 @@ public class CourseRepository : ICourseRepository
     public void DeleteLesson(Lesson lesson)
     {
         _dbContext.Lessons.Remove(lesson);
+    }
+
+    public async Task<int> GetLastLessonOrder(int courseId)
+    {
+        return await _dbContext.Lessons
+                        .Where(l => l.CourseId == courseId)
+                        .Select(l => l.Order)
+                        .DefaultIfEmpty(0)
+                        .MaxAsync();
     }
 
     public async Task<bool> SaveChangesAsync()
