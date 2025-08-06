@@ -12,8 +12,8 @@ public static class CourseEndpoints
 
         group.MapGet("/{courseId:int}", GetCourseById);
         group.MapGet("", SearchCourses);
-        group.MapPost("", AddCourse);
-        group.MapDelete("/{courseId:int}", DeleteCourse);
+        group.MapPost("", AddCourse).RequireAuthorization(policy => policy.RequireRole("Admin", "Instructor"));
+        group.MapDelete("/{courseId:int}", DeleteCourse).RequireAuthorization(policy => policy.RequireRole("Admin", "Instructor"));
 
         return app;
     }
@@ -35,9 +35,6 @@ public static class CourseEndpoints
 
     private static async Task<IResult> AddCourse([FromBody] CourseCreateDto course, ICourseService courseService, ICurrentUserService currentUser, ProblemDetailsFactory problemFactory)
     {
-        if (currentUser.Role != "Instructor")
-            return Results.Forbid();
-
         var result = await courseService.AddCourseAsync(course);
         return result.IsSuccess
             ? Results.Created($"/api/courses/{result.Value!.Id}", result.Value)

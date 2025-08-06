@@ -12,4 +12,8 @@ PrepDb.PrepPopulation(app);
 app.MapGet("/", () => "Hello World!");
 app.MapCourseEndpoints();
 
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.Run();
