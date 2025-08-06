@@ -1,4 +1,4 @@
-namespace CourseService.Dtos;
+namespace CourseService.Dtos.Lessons;
 
 public class LessonSearchDto
 {

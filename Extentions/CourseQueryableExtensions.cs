@@ -1,4 +1,4 @@
-using CourseService.Dtos;
+using CourseService.Dtos.Courses;
 using CourseService.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,45 +8,64 @@ public static class CourseQueryableExtensions
 {
     public static IQueryable<Course> ApplySearchFilters(this IQueryable<Course> query, CourseSearchDto dto)
     {
-        if (!string.IsNullOrWhiteSpace(dto.Title))
-        {
-            query = query.Where(c => EF.Functions.ILike(c.Title, $"%{dto.Title}%"));
-        }
-
-        if (!string.IsNullOrWhiteSpace(dto.Description))
-        {
-            query = query.Where(c => c.Description != null &&
-                                     EF.Functions.ILike(c.Description, $"%{dto.Description}%"));
-        }
-
-        if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
-        {
-            query = query.Where(c => c.ImageUrl != null &&
-                                     EF.Functions.ILike(c.ImageUrl, $"%{dto.ImageUrl}%"));
-        }
-
-        if (dto.InstructorUserId.HasValue)
-        {
-            query = query.Where(c => c.InstructorUserId == dto.InstructorUserId.Value);
-        }
-
-        if (dto.IsPublished.HasValue)
-        {
-            query = query.Where(c => c.IsPublished == dto.IsPublished.Value);
-        }
-
-        if (dto.Price.HasValue)
-        {
-            query = query.Where(c => c.Price == dto.Price.Value);
-        }
-
-        var pageNumber = dto.PageNumber;
-        var pageSize = dto.PageSize;
-
-        query = query
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize);
+        query = query.ApplyTitleFilter(dto.Title);
+        query = query.ApplyDescriptionFilter(dto.Description);
+        query = query.ApplyInstructorUserIdFilter(dto.InstructorUserId);
+        query = query.ApplyIsPublishedFilter(dto.IsPublished);
+        query = query.ApplyPriceFilter(dto.Price);
+        query = query.ApplyPagination(dto.PageNumber, dto.PageSize);
 
         return query;
+    }
+
+    private static IQueryable<Course> ApplyTitleFilter(this IQueryable<Course> query, string? title)
+    {
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            query = query.Where(c => EF.Functions.ILike(c.Title, $"%{title}%"));
+        }
+        return query;
+    }
+
+    private static IQueryable<Course> ApplyDescriptionFilter(this IQueryable<Course> query, string? description)
+    {
+        if (!string.IsNullOrWhiteSpace(description))
+        {
+            query = query.Where(c => c.Description != null &&
+                                     EF.Functions.ILike(c.Description, $"%{description}%"));
+        }
+        return query;
+    }
+
+    private static IQueryable<Course> ApplyInstructorUserIdFilter(this IQueryable<Course> query, int? instructorUserId)
+    {
+        if (instructorUserId.HasValue)
+        {
+            query = query.Where(c => c.InstructorUserId == instructorUserId.Value);
+        }
+        return query;
+    }
+
+    private static IQueryable<Course> ApplyIsPublishedFilter(this IQueryable<Course> query, bool? isPublished)
+    {
+        if (isPublished.HasValue)
+        {
+            query = query.Where(c => c.IsPublished == isPublished.Value);
+        }
+        return query;
+    }
+
+    private static IQueryable<Course> ApplyPriceFilter(this IQueryable<Course> query, decimal? price)
+    {
+        if (price.HasValue)
+        {
+            query = query.Where(c => c.Price == price.Value);
+        }
+        return query;
+    }
+
+    private static IQueryable<Course> ApplyPagination(this IQueryable<Course> query, int pageNumber, int pageSize)
+    {
+        return query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
     }
 }

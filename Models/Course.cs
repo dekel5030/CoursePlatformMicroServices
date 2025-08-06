@@ -10,7 +10,7 @@ public class Course : BaseEntity
 
     public bool IsPublished { get; set; } = false;
 
-    public double Price { get; set; } = 0.0;
+    public decimal Price { get; set; } = 0.0m;
 
     public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
 }

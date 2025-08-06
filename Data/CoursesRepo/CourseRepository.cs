@@ -1,7 +1,7 @@
-using CourseService.Dtos;
 using CourseService.Models;
 using Microsoft.EntityFrameworkCore;
 using CourseService.Extentions;
+using CourseService.Dtos.Courses;
 
 namespace CourseService.Data.CoursesRepo;
 
@@ -38,11 +38,6 @@ public class CourseRepository : ICourseRepository
         return await coursesQuery.ApplySearchFilters(query).ToListAsync();
     }
 
-    public void UpdateCourse(Course course)
-    {
-        _dbContext.Courses.Update(course);
-    }
-
     public async Task<Lesson?> GetLessonByIdAsync(int lessonId)
     {
         return await _dbContext.Lessons.FindAsync(lessonId);
@@ -59,11 +54,6 @@ public class CourseRepository : ICourseRepository
     public async Task AddLessonAsync(Lesson lesson)
     {
         await _dbContext.Lessons.AddAsync(lesson);
-    }
-
-    public void UpdateLesson(Lesson lesson)
-    {
-        _dbContext.Lessons.Update(lesson);
     }
 
     public void DeleteLesson(Lesson lesson)
