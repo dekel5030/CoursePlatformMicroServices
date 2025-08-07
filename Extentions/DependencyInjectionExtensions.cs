@@ -1,10 +1,12 @@
-using System.Text;
 using Common.Web.Errors;
 using CourseService.Data;
 using CourseService.Data.CoursesRepo;
+using CourseService.Security;
 using CourseService.Services;
+using CourseService.Settings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 
 namespace CourseService.Extentions;
 
@@ -12,8 +14,14 @@ public static class DependencyInjectionExtensions
 {
     public static IServiceCollection AddCourseServiceDependencies(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<CourseDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("CourseDb")));
+        // === Database Context ===
+        services.AddOptions<CourseDbSettings>()
+                .Bind(configuration.GetSection(CourseDbSettings.SectionName));
+        services.AddDbContext<CourseDbContext>((sp, options) =>
+        {
+            var dbSettings = sp.GetRequiredService<IOptions<CourseDbSettings>>().Value;
+            options.UseNpgsql(dbSettings.BuildConnectionString());
+        });
 
         
         services.AddScoped<ICourseRepository, CourseRepository>();
@@ -27,25 +35,12 @@ public static class DependencyInjectionExtensions
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-        services.AddAuthentication("Bearer")
-            .AddJwtBearer("Bearer", options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer = configuration["Jwt:Issuer"],
 
-                    ValidateAudience = true,
-                    ValidAudience = configuration["Jwt:Audience"],
-
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
-
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero 
-                };
-            });
+        // === Security ===
+        services.ConfigureOptions<JwtOptionsSetup>();
+        services.ConfigureOptions<JwtBearerOptionsSetup>();
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer();
 
         services.AddAuthorization();
         return services;
