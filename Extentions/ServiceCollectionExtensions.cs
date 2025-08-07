@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 namespace CourseService.Extentions;
 
-public static class DependencyInjectionExtensions
+public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddCourseServiceDependencies(this IServiceCollection services, IConfiguration configuration)
     {
