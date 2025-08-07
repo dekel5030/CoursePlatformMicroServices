@@ -1,6 +1,7 @@
 using AuthService.Dtos;
 using AuthService.Models;
 using AutoMapper;
+using Common.Auth;
 using Common.Grpc;
 
 namespace AuthService.Profiles;

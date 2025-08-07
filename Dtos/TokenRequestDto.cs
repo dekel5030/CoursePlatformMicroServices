@@ -1,4 +1,4 @@
-using AuthService.Models;
+using Common.Auth;
 
 namespace AuthService.Dtos;
 

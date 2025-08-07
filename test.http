@@ -4,9 +4,20 @@ Content-Type: application/json
 
 {
   "fullName": "Dekel R",
-  "email": "dekel01@example.com",
+  "email": "dekel0111@example.com",
   "password": "StrongPass123!",
   "confirmPassword": "StrongPass123!"
+}
+
+###
+
+### ✅ תקין – כל הדרישות מתקיימות
+POST http://localhost:5273/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "dekel0111@example.com",
+  "password": "StrongPass123!"
 }
 
 ###

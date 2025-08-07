@@ -8,7 +8,6 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddLocalization();
 builder.Services.AddAppServices(builder.Configuration);
-builder.Services.AddAppDbContext(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 

@@ -2,18 +2,21 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AuthService.Dtos;
+using AuthService.Settings;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AuthService.Security;
 
 public class TokenService : ITokenService
 {
-    private readonly IConfiguration _config;
+    private readonly JwtOptions _jwtOptions;
 
-    public TokenService(IConfiguration config)
+    public TokenService(IOptions<JwtOptions> jwtOptions)
     {
-        _config = config;
+        _jwtOptions = jwtOptions.Value;
     }
+    
     public string GenerateToken(TokenRequestDto request)
     {
         var claims = new[]
@@ -25,15 +28,15 @@ public class TokenService : ITokenService
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            _config["Jwt:Key"] ?? throw new InvalidOperationException("Missing Jwt:Key")));
+            _jwtOptions.Key));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
+            issuer: _jwtOptions.Issuer,
+            audience: _jwtOptions.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(1),
+            expires: DateTime.UtcNow.AddMinutes(_jwtOptions.ExpirationMinutes),
             signingCredentials: creds
         );
 

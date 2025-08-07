@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Common.Auth;
 
 namespace AuthService.Models;
 
@@ -20,11 +21,4 @@ public class UserCredentials
     public int FailedLoginAttempts { get; set; } = 0;
 
     public DateTime? LockedUntil { get; set; } = null;    
-}
-
-public enum UserRole
-{
-    User,
-    Admin,
-    SuperAdmin
 }

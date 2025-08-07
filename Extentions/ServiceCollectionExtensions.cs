@@ -1,6 +1,7 @@
 using AuthService.Data;
 using AuthService.Security;
 using AuthService.Services;
+using AuthService.Settings;
 using AuthService.SyncDataServices.Grpc;
 using AuthService.SyncDataServices.Http;
 using AuthService.Validators;
@@ -9,6 +10,7 @@ using Common.Web.Errors;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static Common.Grpc.GrpcUserService;
 
 namespace AuthService.Extensions;
@@ -17,13 +19,15 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration config)
     {
+        services.AddAppDbContext(config);
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
-        services.AddSingleton<ITokenService, TokenService>();
         services.AddScoped<IAuthService, Services.AuthService>();
         services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddScoped<IRollbackManager, StackRollbackManager>();
         services.AddScoped<ProblemDetailsFactory>();
+
+        services.AddJwtAuth(config);
 
         services.AddHttpClient<IUserServiceDataClient, HttpUserServiceDataClient>();
 
@@ -45,14 +49,26 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddAppDbContext(this IServiceCollection services, IConfiguration config, IWebHostEnvironment env)
+    private static IServiceCollection AddAppDbContext(this IServiceCollection services, IConfiguration config)
     {
-        if (env.IsDevelopment())
+        services.AddOptions<AuthDbSettings>().Bind(config.GetSection(AuthDbSettings.SectionName))
+            .ValidateDataAnnotations().ValidateOnStart();
+
+        services.AddDbContext<AuthDbContext>((sp, options) =>
         {
-            Console.WriteLine("--> using development database");
-            services.AddDbContext<AuthDbContext>(options =>
-                options.UseNpgsql(config.GetConnectionString("AuthDb")));
-        }
+            var settings = sp.GetRequiredService<IOptions<AuthDbSettings>>().Value;
+            options.UseNpgsql(settings.BuildConnectionString());
+        });
+
+        return services;
+    }
+
+    private static IServiceCollection AddJwtAuth(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddOptions<JwtOptions>().Bind(config.GetSection(JwtOptions.SectionName))
+            .ValidateDataAnnotations().ValidateOnStart();
+
+        services.AddSingleton<ITokenService, TokenService>();
 
         return services;
     }
