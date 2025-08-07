@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using AuthService.Dtos;
 using AuthService.Settings;
+using Common.Auth;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -16,16 +17,10 @@ public class TokenService : ITokenService
     {
         _jwtOptions = jwtOptions.Value;
     }
-    
+
     public string GenerateToken(TokenRequestDto request)
     {
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.NameIdentifier, request.UserId.ToString()),
-            new Claim(ClaimTypes.Email, request.Email),
-            new Claim(ClaimTypes.Role, request.Role.ToString()),
-            new Claim(ClaimTypes.Name, request.FullName ?? string.Empty)
-        };
+        var claims = GetClaims(request);
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
             _jwtOptions.Key));
@@ -41,5 +36,25 @@ public class TokenService : ITokenService
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+    
+    private static List<Claim> GetClaims(TokenRequestDto request)
+    {
+        var claims = new List<Claim>()
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, request.UserId.ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, request.Email),
+            new Claim(JwtRegisteredClaimNames.Name, request.FullName ?? string.Empty),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), 
+                ClaimValueTypes.Integer64)
+        };
+
+        var permissionClaims = request.Permissions
+            .Select(p => new Claim(CustomClaimNames.Permission, p));
+
+        claims.AddRange(permissionClaims);
+
+        return claims;
     }
 }
