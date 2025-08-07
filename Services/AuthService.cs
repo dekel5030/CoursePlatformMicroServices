@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using AuthService.Data;
+using AuthService.Data.Repositories.Interfaces;
 using AuthService.Dtos;
 using AuthService.Models;
 using AuthService.Security;
@@ -14,7 +14,7 @@ namespace AuthService.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly IAuthRepository _repository;
+    private readonly IUserCredentialsRepository _repository;
     private readonly IMapper _mapper;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
@@ -23,7 +23,7 @@ public class AuthService : IAuthService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IGrpcUserServiceDataClient _usersClient;
 
-    public AuthService(IAuthRepository repository,
+    public AuthService(IUserCredentialsRepository repository,
                         IMapper mapper,
                         IPasswordHasher passwordHasher,
                         ITokenService tokenService,

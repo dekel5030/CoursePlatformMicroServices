@@ -1,4 +1,5 @@
 using AuthService.Data;
+using AuthService.Data.Seed;
 using AuthService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);

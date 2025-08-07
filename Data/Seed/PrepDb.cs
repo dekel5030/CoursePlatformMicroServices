@@ -1,7 +1,8 @@
+using AuthService.Data.Context;
 using AuthService.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AuthService.Data;
+namespace AuthService.Data.Seed;
 
 public static class PrepDb
 {
@@ -29,14 +30,23 @@ public static class PrepDb
     {
         Console.WriteLine("--> Seeding data...");
 
-        var credentials = new List<UserCredentials>
+        var roles = new List<Role>
         {
-            new UserCredentials { UserId = 1, PasswordHash = "123", Email = "test1@gmail.com"},
-            new UserCredentials { UserId = 2, PasswordHash = "312", Email = "test2@gmail.com"},
-            new UserCredentials { UserId = 3, PasswordHash = "123", Email = "test3@gmail.com"}
+            new Role { Id = 1, Name = "Admin" },
+            new Role { Id = 2, Name = "Instructor" },
+            new Role { Id = 3, Name = "Student" }
         };
 
-        await dbContext.UserCredentials.AddRangeAsync(credentials);
+        var userRoles = new List<UserRole>
+        {
+            new UserRole { UserId = 1, RoleId = 1 }, 
+            new UserRole { UserId = 2, RoleId = 2 }, 
+            new UserRole { UserId = 3, RoleId = 3 } 
+        };
+
+        await dbContext.Roles.AddRangeAsync(roles);
+        await dbContext.UserRoles.AddRangeAsync(userRoles);
+        
         await dbContext.SaveChangesAsync();
     }
 }

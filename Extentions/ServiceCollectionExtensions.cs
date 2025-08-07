@@ -1,4 +1,7 @@
 using AuthService.Data;
+using AuthService.Data.Context;
+using AuthService.Data.Repositories.Implementations;
+using AuthService.Data.Repositories.Interfaces;
 using AuthService.Security;
 using AuthService.Services;
 using AuthService.Settings;
@@ -23,7 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
         services.AddScoped<IAuthService, Services.AuthService>();
-        services.AddScoped<IAuthRepository, AuthRepository>();
+        services.AddScoped<IUserCredentialsRepository, UserCredentialsRepository>();
         services.AddScoped<IRollbackManager, StackRollbackManager>();
         services.AddScoped<ProblemDetailsFactory>();
 

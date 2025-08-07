@@ -1,14 +1,16 @@
+using AuthService.Data.Context;
+using AuthService.Data.Repositories.Interfaces;
 using AuthService.Models;
 using Common;
 using Microsoft.EntityFrameworkCore;
 
-namespace AuthService.Data;
+namespace AuthService.Data.Repositories.Implementations;
 
-public class AuthRepository : IAuthRepository
+public class UserCredentialsRepository : IUserCredentialsRepository
 {
     private readonly AuthDbContext _dbContext;
 
-    public AuthRepository(AuthDbContext dbContext)
+    public UserCredentialsRepository(AuthDbContext dbContext)
     {
         _dbContext = dbContext;
     }
