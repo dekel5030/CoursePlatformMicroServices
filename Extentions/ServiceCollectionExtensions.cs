@@ -1,4 +1,3 @@
-using AuthService.Data;
 using AuthService.Data.Context;
 using AuthService.Data.Repositories.Implementations;
 using AuthService.Data.Repositories.Interfaces;
@@ -23,13 +22,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration config)
     {
         services.AddAppDbContext(config);
+        services.AddRepositories();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
         services.AddScoped<IAuthService, Services.AuthService>();
-        services.AddScoped<IUserCredentialsRepository, UserCredentialsRepository>();
         services.AddScoped<IRollbackManager, StackRollbackManager>();
         services.AddScoped<ProblemDetailsFactory>();
-
         services.AddJwtAuth(config);
 
         services.AddHttpClient<IUserServiceDataClient, HttpUserServiceDataClient>();
@@ -72,6 +70,17 @@ public static class ServiceCollectionExtensions
             .ValidateDataAnnotations().ValidateOnStart();
 
         services.AddSingleton<ITokenService, TokenService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<IUserCredentialsRepository, UserCredentialsRepository>();
+        services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
+        services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
 
         return services;
     }

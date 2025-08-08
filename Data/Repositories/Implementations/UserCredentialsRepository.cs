@@ -20,15 +20,28 @@ public class UserCredentialsRepository : IUserCredentialsRepository
         await _dbContext.UserCredentials.AddAsync(credentials);
     }
 
-    public Task<Result<UserCredentials>> DeleteUserCredentialsAsync(int id)
+    public void DeleteUserCredentialsAsync(UserCredentials credentials)
     {
-        throw new NotImplementedException();
+        _dbContext.UserCredentials.Remove(credentials);
     }
 
-    public async Task<UserCredentials?> GetUserCredentialsByEmailAsync(string email)
+    public async Task<UserCredentials?> GetUserCredentialsByEmailAsync(string email, bool includeAccessData = false)
     {
-        return await _dbContext.UserCredentials
-            .FirstOrDefaultAsync(uc => uc.Email == email.ToLower());
+        var query = _dbContext.UserCredentials.AsQueryable();
+
+        if (includeAccessData)
+        {
+            query = query
+                .Include(x => x.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                        .ThenInclude(r => r.RolePermissions)
+                            .ThenInclude(rp => rp.Permission)
+
+                .Include(x => x.UserPermissions)
+                    .ThenInclude(up => up.Permission);
+        }
+
+        return await query.FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task SaveChangesAsync()

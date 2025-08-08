@@ -24,15 +24,15 @@ public class RoleRepository : IRoleRepository
         return await _dbContext.Roles.ToListAsync();
     }
 
-    public async Task<Role?> GetByIdAsync(int id)
+    public async Task<Role?> GetRoleByIdAsync(int id)
     {
         return await _dbContext.Roles.FindAsync(id);
     }
 
-    public async Task<Role?> GetByNameAsync(string name)
+    public async Task<Role?> GetRoleByNameAsync(string name)
     {
         return await _dbContext.Roles
-            .FirstOrDefaultAsync(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefaultAsync(r => r.Name.ToLower() == name.ToLower());
     }
 
     public async Task SaveChangesAsync()

@@ -14,12 +14,15 @@ public class UserRoleRepository : IUserRoleRepository
         _dbContext = dbContext;
     }
 
-    public async Task AssignRoleAsync(int userId, int roleId)
+    public async Task AssignRoleAsync(int userId, string roleName)
     {
+        var role = await _dbContext.Roles
+            .FirstAsync(r => EF.Functions.ILike(r.Name, roleName));
+
         var userRole = new UserRole
         {
             UserId = userId,
-            RoleId = roleId
+            RoleId = role.Id
         };
 
         await _dbContext.UserRoles.AddAsync(userRole);

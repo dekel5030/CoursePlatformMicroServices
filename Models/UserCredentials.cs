@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Common.Auth;
 
 namespace AuthService.Models;
 
@@ -12,7 +11,7 @@ public class UserCredentials
     public required string Email { get; set; }
 
     public required string PasswordHash { get; set; }
-    //public UserRole Role { get; set; } = UserRole.User;
+
     public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     public ICollection<UserPermission> UserPermissions { get; set; } = new List<UserPermission>();
 
