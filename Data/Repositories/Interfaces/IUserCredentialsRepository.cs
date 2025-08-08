@@ -3,10 +3,10 @@ using Common;
 
 namespace AuthService.Data.Repositories.Interfaces;
 
-public interface IUserCredentialsRepository
+public interface IAuthUserRepository
 {
-    Task AddUserCredentialsAsync(UserCredentials credentials);
-    Task<UserCredentials?> GetUserCredentialsByEmailAsync(string email, bool includeAccessData = false);
-    void DeleteUserCredentialsAsync(UserCredentials credentials);
+    Task AddAuthUserAsync(AuthUser authUser);
+    Task<AuthUser?> GetAuthUserByEmailAsync(string email, bool includeAccessData = false);
+    void DeleteAuthUserAsync(AuthUser authUser);
     Task SaveChangesAsync();
 }

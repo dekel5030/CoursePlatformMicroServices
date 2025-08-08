@@ -4,9 +4,9 @@ Content-Type: application/json
 
 {
   "fullName": "Dekel R",
-  "email": "dekel3462@example.com",
-  "password": "StrongPass123!",
-  "confirmPassword": "StrongPass123!"
+  "email": "admin@admin1.com",
+  "password": "Administrator123!",
+  "confirmPassword": "Administrator123!"
 }
 
 ###
@@ -16,8 +16,8 @@ POST http://localhost:5273/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "dekel3462@example.com",
-  "password": "StrongPass123!"
+  "email": "admin@admin1.com",
+  "password": "Administrator123!"
 }
 
 ###

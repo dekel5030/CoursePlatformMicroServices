@@ -6,28 +6,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Data.Repositories.Implementations;
 
-public class UserCredentialsRepository : IUserCredentialsRepository
+public class AuthUserRepository : IAuthUserRepository
 {
     private readonly AuthDbContext _dbContext;
 
-    public UserCredentialsRepository(AuthDbContext dbContext)
+    public AuthUserRepository(AuthDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task AddUserCredentialsAsync(UserCredentials credentials)
+    public async Task AddAuthUserAsync(AuthUser authUser)
     {
-        await _dbContext.UserCredentials.AddAsync(credentials);
+        await _dbContext.AuthUser.AddAsync(authUser);
     }
 
-    public void DeleteUserCredentialsAsync(UserCredentials credentials)
+    public void DeleteAuthUserAsync(AuthUser authUser)
     {
-        _dbContext.UserCredentials.Remove(credentials);
+        _dbContext.AuthUser.Remove(authUser);
     }
 
-    public async Task<UserCredentials?> GetUserCredentialsByEmailAsync(string email, bool includeAccessData = false)
+    public async Task<AuthUser?> GetAuthUserByEmailAsync(string email, bool includeAccessData = false)
     {
-        var query = _dbContext.UserCredentials.AsQueryable();
+        var query = _dbContext.AuthUser.AsQueryable();
 
         if (includeAccessData)
         {

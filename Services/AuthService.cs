@@ -15,7 +15,7 @@ namespace AuthService.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly IUserCredentialsRepository _credentialsRepo;
+    private readonly IAuthUserRepository _authUserRepo;
     private readonly IMapper _mapper;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
@@ -28,7 +28,7 @@ public class AuthService : IAuthService
     private readonly IRoleRepository _roleRepository;
     private readonly IGrpcUserServiceDataClient _usersClient;
 
-    public AuthService(IUserCredentialsRepository credentialsRepo,
+    public AuthService(IAuthUserRepository authUserRepos,
                         IUserPermissionRepository userPermissionRepo,
                         IUserRoleRepository userRoleRepo,
                         IRolePermissionRepository rolePermissionRepo,
@@ -41,7 +41,7 @@ public class AuthService : IAuthService
                         IGrpcUserServiceDataClient usersClient,
                         IHttpContextAccessor httpContextAccessor)
     {
-        _credentialsRepo = credentialsRepo;
+        _authUserRepo = authUserRepos;
         _usersClient = usersClient;
         _mapper = mapper;
         _passwordHasher = passwordHasher;
@@ -57,7 +57,7 @@ public class AuthService : IAuthService
 
     public async Task<Result<AuthResponseDto>> RegisterAsync(RegisterRequestDto registerRequestDto)
     {
-        if (await _credentialsRepo.GetUserCredentialsByEmailAsync(registerRequestDto.Email) != null)
+        if (await _authUserRepo.GetAuthUserByEmailAsync(registerRequestDto.Email) != null)
         {
             _logger.LogInformation("Registration attempt with existing email: {Email}", registerRequestDto.Email);
             return Result<AuthResponseDto>.Failure(Error.DuplicateEmail);
@@ -74,28 +74,28 @@ public class AuthService : IAuthService
 
         _rollbackManager.Add(() => RetryHelper.RetryAsync(() => _usersClient.DeleteUserAsync(userServiceResult.Value!.Id)));
         var userReadDto = userServiceResult.Value;
-        var userCredentials = await CreateUserCredentials(userReadDto!, userCreateDto.PasswordHash);
+        var authUser = await CreateAuthUser(userReadDto!, userCreateDto.PasswordHash);
 
-        return await TrySaveCredentialsAndRespondAsync(userCredentials, registerRequestDto.Email);
+        return await TrySaveAuthUserAndRespondAsync(authUser, registerRequestDto.Email);
     }
 
     public async Task<Result<AuthResponseDto>> LoginAsync(LoginRequestDto loginRequestDto)
     {
-        var userCredentials = await _credentialsRepo.GetUserCredentialsByEmailAsync(loginRequestDto.Email, includeAccessData: true);
+        var authUser = await _authUserRepo.GetAuthUserByEmailAsync(loginRequestDto.Email, includeAccessData: true);
 
-        if (userCredentials == null)
+        if (authUser == null)
         {
             _logger.LogInformation("Login attempt with non-existing email: {Email}", loginRequestDto.Email);
             return Result<AuthResponseDto>.Failure(Error.InvalidCredentials);
         }
 
-        if (!_passwordHasher.VerifyPassword(loginRequestDto.Password, userCredentials.PasswordHash))
+        if (!_passwordHasher.VerifyPassword(loginRequestDto.Password, authUser.PasswordHash))
         {
             _logger.LogInformation("Login attempt with invalid password for email: {Email}", loginRequestDto.Email);
             return Result<AuthResponseDto>.Failure(Error.InvalidCredentials);
         }
 
-        return Result<AuthResponseDto>.Success(CreateAuthResponseDto(userCredentials));
+        return Result<AuthResponseDto>.Success(CreateAuthResponseDto(authUser));
     }
 
     public Result<CurrentUserReadDto> GetCurrentUser()
@@ -123,7 +123,7 @@ public class AuthService : IAuthService
         return Result<CurrentUserReadDto>.Success(dto);
     }
 
-    private async Task<UserCredentials> CreateUserCredentials(UserReadDto userReadDto, string hashedPassword)
+    private async Task<AuthUser> CreateAuthUser(UserReadDto userReadDto, string hashedPassword)
     {
         var role = await _roleRepository.GetRoleByNameAsync(RoleType.User.ToString());
 
@@ -134,32 +134,32 @@ public class AuthService : IAuthService
         }
 
         var userRole = new UserRole { RoleId = role!.Id };
-        var credentials = _mapper.Map<UserCredentials>(userReadDto);
-        credentials.PasswordHash = hashedPassword;
-        credentials.UserRoles = new List<UserRole>() { userRole };
+        var authUser = _mapper.Map<AuthUser>(userReadDto);
+        authUser.PasswordHash = hashedPassword;
+        authUser.UserRoles = new List<UserRole>() { userRole };
 
-        return credentials;
+        return authUser;
     }
 
-    private AuthResponseDto CreateAuthResponseDto(UserCredentials userCredentials)
+    private AuthResponseDto CreateAuthResponseDto(AuthUser authUser)
     {
-        var authResponseDto = _mapper.Map<AuthResponseDto>(userCredentials);
-        var tokenRequestDto = CreateTokenRequestDto(userCredentials);
+        var authResponseDto = _mapper.Map<AuthResponseDto>(authUser);
+        var tokenRequestDto = CreateTokenRequestDto(authUser);
 
         authResponseDto.Token = _tokenService.GenerateToken(tokenRequestDto);
 
         return authResponseDto;
     }
 
-    private TokenRequestDto CreateTokenRequestDto(UserCredentials userCredentials)
+    private TokenRequestDto CreateTokenRequestDto(AuthUser authUser)
     {
-        var tokenRequestDto = _mapper.Map<TokenRequestDto>(userCredentials);
-        tokenRequestDto.Permissions = GetAllPermissions(userCredentials);
+        var tokenRequestDto = _mapper.Map<TokenRequestDto>(authUser);
+        tokenRequestDto.Permissions = GetAllPermissions(authUser);
 
         return tokenRequestDto;
     }
 
-    private static ICollection<string> GetAllPermissions(UserCredentials user)
+    private static ICollection<string> GetAllPermissions(AuthUser user)
     {
         var fromRoles = user.UserRoles
             .SelectMany(ur => ur.Role.RolePermissions)
@@ -191,21 +191,21 @@ public class AuthService : IAuthService
         return result;
     }
 
-    private async Task<Result<AuthResponseDto>> TrySaveCredentialsAndRespondAsync(UserCredentials credentials, string email)
+    private async Task<Result<AuthResponseDto>> TrySaveAuthUserAndRespondAsync(AuthUser authUser, string email)
     {
         try
         {   
-            await RetryHelper.RetryAsync(() => _credentialsRepo.AddUserCredentialsAsync(credentials));
-            await RetryHelper.RetryAsync(() => _credentialsRepo.SaveChangesAsync());
-            _logger.LogInformation("User credentials for email {Email} saved successfully", credentials.Email);
+            await RetryHelper.RetryAsync(() => _authUserRepo.AddAuthUserAsync(authUser));
+            await RetryHelper.RetryAsync(() => _authUserRepo.SaveChangesAsync());
+            _logger.LogInformation("User authUser for email {Email} saved successfully", authUser.Email);
 
-            var fullCredentials = await RetryHelper
-            .RetryAsync(() => _credentialsRepo.GetUserCredentialsByEmailAsync(credentials.Email, includeAccessData: true));
-            return Result<AuthResponseDto>.Success(CreateAuthResponseDto(fullCredentials!));
+            var fullAuthUser = await RetryHelper
+            .RetryAsync(() => _authUserRepo.GetAuthUserByEmailAsync(authUser.Email, includeAccessData: true));
+            return Result<AuthResponseDto>.Success(CreateAuthResponseDto(fullAuthUser!));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error saving user credentials for email {Email}", email);
+            _logger.LogError(ex, "Error saving user authUser for email {Email}", email);
             await _rollbackManager.ExecuteAllAsync();
 
             return Result<AuthResponseDto>.Failure(Error.DatabaseError);

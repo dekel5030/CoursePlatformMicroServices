@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AuthService.Models;
 
-public class UserCredentials
+public class AuthUser
 {
     [Key]
     public int Id { get; private set; }

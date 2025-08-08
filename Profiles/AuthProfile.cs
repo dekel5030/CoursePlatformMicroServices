@@ -9,17 +9,17 @@ public class AuthProfile : Profile
 {
     public AuthProfile()
     {
-        CreateMap<UserReadDto, UserCredentials>()
+        CreateMap<UserReadDto, AuthUser>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
 
-        CreateMap<UserCredentials, TokenRequestDto>()
+        CreateMap<AuthUser, TokenRequestDto>()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.Permissions, opt => opt.Ignore());
 
-        CreateMap<UserCredentials, AuthResponseDto>()
+        CreateMap<AuthUser, AuthResponseDto>()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
 

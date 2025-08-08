@@ -7,8 +7,8 @@
 - Refactor the using of rollback to handle dadless son
 - Refactor services DI Validation settings
 - Implement Adding of Permissions, RolePermissions, Roles, and UserPermissions from admin panel
+- Maybe save permission claims in int format for efficency role id instead of role name
 - validators for admin dtos
 - Verify if cascade on deleting a Permission
 - Consider switching from per-permission claim model to role-based model
-- Register IAdminRoleService to DI
-- Add role mapping profile
+- Refactor AuthService

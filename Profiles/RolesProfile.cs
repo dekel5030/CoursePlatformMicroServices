@@ -9,6 +9,8 @@ public class RolesProfile : Profile
     public RolesProfile()
     {
         CreateMap<Role, RoleReadDto>();
-        CreateMap<RoleCreateDto, Role>();
+
+        CreateMap<RoleCreateDto, Role>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
     }
 }

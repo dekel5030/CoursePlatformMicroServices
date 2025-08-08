@@ -6,7 +6,7 @@ namespace AuthService.Data.Context;
 public class AuthDbContext : DbContext
 {
     public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options) { }
-    public DbSet<UserCredentials> UserCredentials { get; set; }
+    public DbSet<AuthUser> AuthUser { get; set; }
 
     public DbSet<Role> Roles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
@@ -36,7 +36,7 @@ public class AuthDbContext : DbContext
 
     private void ConfigureUserCredential(ModelBuilder modelBuilder)
     {
-        var user = modelBuilder.Entity<UserCredentials>();
+        var user = modelBuilder.Entity<AuthUser>();
 
         user.HasKey(u => u.Id);
 
@@ -122,7 +122,7 @@ public class AuthDbContext : DbContext
 
     private void NormalizeEmails()
     {
-        foreach (var entry in ChangeTracker.Entries<UserCredentials>())
+        foreach (var entry in ChangeTracker.Entries<AuthUser>())
         {
             if ((entry.State == EntityState.Added || entry.State == EntityState.Modified) &&
                 !string.IsNullOrWhiteSpace(entry.Entity.Email))
@@ -134,7 +134,7 @@ public class AuthDbContext : DbContext
 
     private void UpdateTimestamps()
     {
-        foreach (var entry in ChangeTracker.Entries<UserCredentials>())
+        foreach (var entry in ChangeTracker.Entries<AuthUser>())
         {
             if (entry.State == EntityState.Modified && entry.Properties.Any(p => p.IsModified))
             {

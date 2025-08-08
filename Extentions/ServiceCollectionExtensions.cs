@@ -1,7 +1,6 @@
 using AuthService.Data.Context;
 using AuthService.Data.Repositories.Implementations;
 using AuthService.Data.Repositories.Interfaces;
-using AuthService.Handlers;
 using AuthService.Security;
 using AuthService.Services;
 using AuthService.Services.Admin.Implementations;
@@ -15,7 +14,6 @@ using Common.Rollback;
 using Common.Web.Errors;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static Common.Grpc.GrpcUserService;
@@ -81,19 +79,18 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection AddPermissionAuthorization(this IServiceCollection services)
-    {
-        services.AddAuthorization();
-        services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
-        services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
-        services.AddScoped<IPermissionService, PermissionService>();
+    // private static IServiceCollection AddPermissionAuthorization(this IServiceCollection services)
+    // {
+    //     services.AddAuthorization();
+    //     services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+    //     services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
-        return services;
-    }
+    //     return services;
+    // }
 
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        services.AddScoped<IUserCredentialsRepository, UserCredentialsRepository>();
+        services.AddScoped<IAuthUserRepository, AuthUserRepository>();
         services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
         services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
         services.AddScoped<IUserRoleRepository, UserRoleRepository>();

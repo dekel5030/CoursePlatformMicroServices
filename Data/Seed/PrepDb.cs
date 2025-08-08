@@ -1,6 +1,8 @@
 using AuthService.Data.Context;
 using AuthService.Models;
+using Common.Auth;
 using Microsoft.EntityFrameworkCore;
+using UserRole = AuthService.Models.UserRole;
 
 namespace AuthService.Data.Seed;
 
@@ -41,32 +43,43 @@ public static class PrepDb
             new Role { Id = 3, Name = "User" }
         };
 
-        var permissions = new List<Permission>
+        var permissionNames = new List<string>();
+        foreach (var permissionName in Enum.GetValues<PermissionType>())
         {
-            new Permission { Id = 1, Name = "ViewCourses" },
-            new Permission { Id = 2, Name = "EnrollInCourses" },
-            new Permission { Id = 3, Name = "CommentOnLessons" }
-        };
+            permissionNames.Add(permissionName.ToString());
+        }
 
-        var rolePermissions = new List<RolePermission>
-        {
-            new RolePermission { RoleId = 3, PermissionId = 1 }, 
-            new RolePermission { RoleId = 3, PermissionId = 2 }, 
-            new RolePermission { RoleId = 3, PermissionId = 3 }  
-        };
+        var permissions = permissionNames.Select(name => new Permission
+            {
+                Name = name,
+            }).ToList();
+        
+        await dbContext.Permissions.AddRangeAsync(permissions);
+        await dbContext.SaveChangesAsync();
 
-        var userRoles = new List<UserRole>
+        permissions = await dbContext.Permissions.ToListAsync();
+
+        var rolePermissions = new List<RolePermission>();
+
+        foreach (var permission in permissions)
         {
-            new UserRole { UserId = 1, RoleId = 1 },
-            new UserRole { UserId = 2, RoleId = 2 },
-            new UserRole { UserId = 3, RoleId = 3 }
-        };
+            rolePermissions.Add(new RolePermission
+            {
+                RoleId = 1, // Admin role
+                PermissionId = permission.Id
+            });
+        }
+
 
         await dbContext.Roles.AddRangeAsync(roles);
-        await dbContext.Permissions.AddRangeAsync(permissions);
         await dbContext.RolePermissions.AddRangeAsync(rolePermissions);
-        await dbContext.UserRoles.AddRangeAsync(userRoles);
 
+        dbContext.UserRoles.AddRange(new List<UserRole>
+        {
+            new UserRole { UserId = 1, RoleId = 1 }, // Admin
+
+        });
+        
         await dbContext.SaveChangesAsync();
 
         Console.WriteLine("--> Seeding completed.");
