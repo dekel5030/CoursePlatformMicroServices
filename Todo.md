@@ -9,3 +9,6 @@
 - Implement Adding of Permissions, RolePermissions, Roles, and UserPermissions from admin panel
 - validators for admin dtos
 - Verify if cascade on deleting a Permission
+- Consider switching from per-permission claim model to role-based model
+- Register IAdminRoleService to DI
+- Add role mapping profile

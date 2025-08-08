@@ -1,5 +1,4 @@
 using AuthService.Dtos.Permissions;
-using AuthService.Models;
 using AuthService.Services.Admin.Interfaces;
 using Common.Auth;
 using Common.Auth.Attributes;
@@ -25,7 +24,7 @@ public class AdminPermissionsController : ControllerBase
     }
 
     [HttpGet]
-    [HasPermission(PermissionType.CommentOnLessons)]
+    [HasPermission(PermissionType.CanReadPermission)]
     public async Task<IActionResult> GetPermissions([FromQuery] PermissionSearchDto searchDto)
     {
         var result = await _permissionsService.SearchPermissionsAsync(searchDto);
@@ -53,6 +52,7 @@ public class AdminPermissionsController : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission(PermissionType.CanCreatePermission)]
     public async Task<IActionResult> CreatePermission([FromBody] PermissionCreateDto createDto)
     {
         var result = await _permissionsService.CreatePermissionAsync(createDto);
@@ -66,6 +66,7 @@ public class AdminPermissionsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [HasPermission(PermissionType.CanDeletePermission)]
     public async Task<IActionResult> DeletePermission(int id)
     {
         var result = await _permissionsService.DeletePermissionAsync(id);

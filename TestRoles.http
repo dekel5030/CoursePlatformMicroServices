@@ -1,0 +1,89 @@
+### 1. Create Role
+POST http://localhost:5273/api/admin/roles
+Content-Type: application/json
+
+{
+  "name": "SuperUser3"
+}
+
+###
+
+### 2. Create Duplicate Role (should fail)
+POST http://localhost:5273/api/admin/roles
+Content-Type: application/json
+
+{
+  "name": "Instructor"
+}
+
+###
+
+### 3. Get All Roles
+GET http://localhost:5273/api/admin/roles
+
+###
+
+### 4. Get Specific Role by ID (Assume ID 1 exists)
+GET http://localhost:5273/api/admin/roles/1
+
+###
+
+### 5. Get Role Not Found
+GET http://localhost:5273/api/admin/roles/9999
+
+###
+
+### 6. Delete Role by ID (Assume ID 1 exists)
+DELETE http://localhost:5273/api/admin/roles/1
+
+###
+
+### 7. Delete Role Not Found
+DELETE http://localhost:5273/api/admin/roles/9999
+
+###
+
+### 8. Assign Permissions to Role (Assume role ID 2 exists)
+POST http://localhost:5273/api/admin/roles/2/permissions
+Content-Type: application/json
+
+{
+  "permissions": ["EnrollInCourses", "TestPerm3ission"]
+}
+
+###
+
+### 9. Assign Permissions Again (idempotent — should succeed silently)
+POST http://localhost:5273/api/admin/roles/2/permissions
+Content-Type: application/json
+
+{
+  "permissions": ["EnrollInCourses"]
+}
+
+###
+
+### 10. Assign Permissions with One Invalid (should fail)
+POST http://localhost:5273/api/admin/roles/2/permissions
+Content-Type: application/json
+
+{
+  "permissions": ["CanCreate", "NonExistentPermission"]
+}
+
+###
+
+### 11. Get Role Permissions (Assume role ID 2 exists)
+GET http://localhost:5273/api/admin/roles/2/permissions
+
+###
+
+### 12. Remove Permission from Role (Assume permission ID 1)
+DELETE http://localhost:5273/api/admin/roles/2/permissions/4
+
+###
+
+### 13. Remove Non-Existing Permission (should succeed silently)
+DELETE http://localhost:5273/api/admin/roles/2/permissions/9999
+
+###

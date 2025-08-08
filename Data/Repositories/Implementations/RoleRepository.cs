@@ -35,6 +35,11 @@ public class RoleRepository : IRoleRepository
             .FirstOrDefaultAsync(r => r.Name.ToLower() == name.ToLower());
     }
 
+    public void Remove(Role role)
+    {
+        _dbContext.Roles.Remove(role);
+    }
+
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();

@@ -106,6 +106,7 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddAdminServices(this IServiceCollection services)
     {
         services.AddScoped<IAdminPermissionService, AdminPermissionService>();
+        services.AddScoped<IAdminRoleService, AdminRoleService>();
 
         return services;
     }
