@@ -8,4 +8,4 @@
 - Refactor services DI Validation settings
 - Implement Adding of Permissions, RolePermissions, Roles, and UserPermissions from admin panel
 - validators for admin dtos
-- implement search by query in GetPermissionsAsync method in permissionRepo
+- Verify if cascade on deleting a Permission

@@ -9,12 +9,12 @@ using Common.Errors;
 
 namespace AuthService.Services.Admin.Implementations;
 
-public class AdminPermissionsService : IAdminPermissionsService
+public class AdminPermissionService : IAdminPermissionService
 {
     private readonly IPermissionRepository _permissionRepository;
     private readonly IMapper _mapper;
 
-    public AdminPermissionsService(IPermissionRepository permissionRepository, IMapper mapper)
+    public AdminPermissionService(IPermissionRepository permissionRepository, IMapper mapper)
     {
         _permissionRepository = permissionRepository;
         _mapper = mapper;
@@ -22,6 +22,13 @@ public class AdminPermissionsService : IAdminPermissionsService
 
     public async Task<Result<PermissionReadDto>> CreatePermissionAsync(PermissionCreateDto createDto)
     {
+        var permissionExists = await _permissionRepository.GetPermissionByNameAsync(createDto.Name);
+
+        if (permissionExists != null)
+        {
+            return Result<PermissionReadDto>.Failure(AuthErrors.PermissionAlreadyExists);
+        }
+
         var permission = _mapper.Map<Permission>(createDto);
 
         await _permissionRepository.AddPermissionAsync(permission);
@@ -46,7 +53,7 @@ public class AdminPermissionsService : IAdminPermissionsService
         return Result<bool>.Success(true);
     }
 
-    public async Task<Result<PagedResponseDto<PermissionReadDto>>> GetPermissionsAsync(PermissionSearchDto query)
+    public async Task<Result<PagedResponseDto<PermissionReadDto>>> SearchPermissionsAsync(PermissionSearchDto query)
     {
         var permissions = await _permissionRepository.GetPermissionsAsync(query);
         var permissionDtos = _mapper.Map<IEnumerable<PermissionReadDto>>(permissions);

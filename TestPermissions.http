@@ -1,0 +1,22 @@
+### 1. Create new permission
+POST http://localhost:5273/api/admin/permissions
+Content-Type: application/json
+
+{
+  "name": "testPERmission"
+}
+
+### 2. Get all permissions
+GET http://localhost:5273/api/admin/permissions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MiIsImVtYWlsIjoiZGVrZWwzNDYyQGV4YW1wbGUuY29tIiwibmFtZSI6IiIsImp0aSI6IjdjZmM4ZTlhLTMxMGMtNGIxYy1hZTBlLTAxYzM2YzUxOTMyNyIsImlhdCI6MTc1NDY3MDkwOCwicGVybWlzc2lvbiI6WyJFbnJvbGxJbkNvdXJzZXMiLCJDb21tZW50T25MZXNzb25zIl0sImV4cCI6MTc1NDY3NDUwOCwiaXNzIjoiQ291cnNlUGxhdGZvcm1BdXRoIiwiYXVkIjoiQ291cnNlUGxhdGZvcm1Vc2VycyJ9.noSUCG6uHl-B8Qtd8jqWGu7H04RqF4i5bbHuCIFbqsE
+
+
+### 2. Get all permissions (via query string) ✅ preferred for GET
+GET http://localhost:5273/api/admin/permissions?name=cour&pageNumber=1&pageSize=10
+
+
+### 4. Get permission by ID
+GET http://localhost:5273/api/admin/permissions/2
+
+### 5. Delete permission by ID
+DELETE http://localhost:5273/api/admin/permissions/1

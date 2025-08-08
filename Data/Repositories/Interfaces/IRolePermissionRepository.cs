@@ -4,5 +4,5 @@ namespace AuthService.Data.Repositories.Interfaces;
 
 public interface IRolePermissionRepository
 {
-    Task<IEnumerable<Permission>> GetPermissionsForRoleAsync(int roleId);
+    Task<IEnumerable<Permission>> GetPermissionsAsync(int roleId);
 }

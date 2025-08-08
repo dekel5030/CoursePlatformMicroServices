@@ -1,4 +1,10 @@
 using AuthService.Dtos.Permissions;
+using AuthService.Models;
+using AuthService.Services.Admin.Interfaces;
+using Common.Auth;
+using Common.Auth.Attributes;
+using Common.Web.Errors;
+using Common.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Controllers.Admin;
@@ -7,29 +13,68 @@ namespace AuthService.Controllers.Admin;
 [Route("api/admin/permissions")]
 public class AdminPermissionsController : ControllerBase
 {
-    public AdminPermissionsController() : base() { }
+    private readonly IAdminPermissionService _permissionsService;
+    private readonly ProblemDetailsFactory _problemFactory;
+
+    public AdminPermissionsController(
+            IAdminPermissionService permissionsService,
+            ProblemDetailsFactory problemFactory) : base()
+    {
+        _permissionsService = permissionsService;
+        _problemFactory = problemFactory;
+    }
 
     [HttpGet]
-    public IActionResult GetPermissions()
+    [HasPermission(PermissionType.CommentOnLessons)]
+    public async Task<IActionResult> GetPermissions([FromQuery] PermissionSearchDto searchDto)
     {
-        throw new NotImplementedException("This method is not implemented yet.");
+        var result = await _permissionsService.SearchPermissionsAsync(searchDto);
+
+        if (!result.IsSuccess)
+        {
+            return result.ToActionResult(_problemFactory);
+        }
+
+        return Ok(result.Value);
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetPermission(int id)
+    [HasPermission(PermissionType.CanReadPermission)]
+    public async Task<IActionResult> GetPermission(int id)
     {
-        throw new NotImplementedException("This method is not implemented yet.");
+        var result = await _permissionsService.GetPermissionByIdAsync(id);
+
+        if (!result.IsSuccess)
+        {
+            return result.ToActionResult(_problemFactory);
+        }
+
+        return Ok(result.Value);
     }
 
     [HttpPost]
-    public IActionResult CreatePermission([FromBody] PermissionCreateDto createDto)
+    public async Task<IActionResult> CreatePermission([FromBody] PermissionCreateDto createDto)
     {
-        throw new NotImplementedException("This method is not implemented yet.");
+        var result = await _permissionsService.CreatePermissionAsync(createDto);
+
+        if (!result.IsSuccess)
+        {
+            return result.ToActionResult(_problemFactory);
+        }
+
+        return CreatedAtAction(nameof(GetPermission), new { id = result.Value!.Id }, result.Value);
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeletePermission(int id)
+    public async Task<IActionResult> DeletePermission(int id)
     {
-        throw new NotImplementedException("This method is not implemented yet.");
+        var result = await _permissionsService.DeletePermissionAsync(id);
+
+        if (!result.IsSuccess)
+        {
+            return result.ToActionResult(_problemFactory);
+        }
+
+        return NoContent();
     }
 }

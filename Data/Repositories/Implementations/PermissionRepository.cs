@@ -30,6 +30,12 @@ public class PermissionRepository : IPermissionRepository
         return await _dbContext.Permissions.FindAsync(id);
     }
 
+    public async Task<Permission?> GetPermissionByNameAsync(string name)
+    {
+        return await _dbContext.Permissions
+            .FirstOrDefaultAsync(p => EF.Functions.ILike(p.Name, name));
+    }
+
     public async Task<IEnumerable<Permission>> GetPermissionsAsync(PermissionSearchDto queryDto)
     {
         var query = _dbContext.Permissions.AsQueryable();
@@ -38,6 +44,9 @@ public class PermissionRepository : IPermissionRepository
         {
             query = query.Where(p => EF.Functions.ILike(p.Name, $"%{queryDto.Name}%"));
         }
+
+        query = query.Skip((queryDto.PageNumber - 1) * queryDto.PageSize)
+                     .Take(queryDto.PageSize);
 
         return await query.ToListAsync();
     }

@@ -13,6 +13,9 @@ public static class ApplicationBuilderExtensions
 
         app.UseRequestLocalization(localizationOptions);
 
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         return app;
     }
 }

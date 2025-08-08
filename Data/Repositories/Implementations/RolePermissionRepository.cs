@@ -14,7 +14,7 @@ public class RolePermissionRepository : IRolePermissionRepository
         _dbContext = dbContext;
     }
    
-    public async Task<IEnumerable<Permission>> GetPermissionsForRoleAsync(int roleId)
+    public async Task<IEnumerable<Permission>> GetPermissionsAsync(int roleId)
     {
         return await _dbContext.RolePermissions
             .Where(u => u.RoleId == roleId)

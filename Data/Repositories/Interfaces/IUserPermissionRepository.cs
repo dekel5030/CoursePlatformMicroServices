@@ -4,5 +4,5 @@ namespace AuthService.Data.Repositories.Interfaces;
 
 public interface IUserPermissionRepository
 {
-    Task<IEnumerable<Permission>> GetPermissionsForUserAsync(int userId);
+    Task<IEnumerable<Permission>> GetPermissionsAsync(int userId);
 }

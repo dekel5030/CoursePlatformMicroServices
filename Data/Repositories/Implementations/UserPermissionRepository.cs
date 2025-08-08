@@ -14,7 +14,7 @@ public class UserPermissionRepository : IUserPermissionRepository
         _dbContext = dbContext;
     }
    
-    public async Task<IEnumerable<Permission>> GetPermissionsForUserAsync(int userId)
+    public async Task<IEnumerable<Permission>> GetPermissionsAsync(int userId)
     {
         return await _dbContext.UserPermissions
             .Where(u => u.UserId == userId)

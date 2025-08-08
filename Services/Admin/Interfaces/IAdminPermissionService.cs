@@ -4,9 +4,9 @@ using Common;
 
 namespace AuthService.Services.Admin.Interfaces
 {
-    public interface IAdminPermissionsService
+    public interface IAdminPermissionService
     {
-        Task<Result<PagedResponseDto<PermissionReadDto>>> GetPermissionsAsync(PermissionSearchDto query);
+        Task<Result<PagedResponseDto<PermissionReadDto>>> SearchPermissionsAsync(PermissionSearchDto query);
         Task<Result<PermissionReadDto>> GetPermissionByIdAsync(int id);
         Task<Result<PermissionReadDto>> CreatePermissionAsync(PermissionCreateDto createDto);
         Task<Result<bool>> DeletePermissionAsync(int id);
