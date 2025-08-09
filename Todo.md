@@ -12,3 +12,4 @@
 - Verify if cascade on deleting a Permission
 - Consider switching from per-permission claim model to role-based model
 - Refactor AuthService
+- Examin if on assign roles and permission should return ok or created at
