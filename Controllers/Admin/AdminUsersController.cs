@@ -1,6 +1,7 @@
 using AuthService.Dtos.AuthUsers;
 using AuthService.Services.Admin.Interfaces;
 using Common.Web.Errors;
+using Common.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Controllers.Admin;
@@ -32,7 +33,7 @@ public class AdminUsersController : ControllerBase
 
         if (!result.IsSuccess)
         {
-            return result.ToActionDetails(_problemFactory);
+            return result.ToActionResult(_problemFactory);
         }
 
         return Ok(result.Value);
@@ -49,11 +50,11 @@ public class AdminUsersController : ControllerBase
     [HttpPost("{id:int}/permissions")]
     public async Task<IActionResult> AssignUserPermission(int id, [FromBody] UserAssignPermissionDto assignPermissionDto)
     {
-        var result = await _adminUserService.AddUserPermissionAsync(id, assignPermissionDto);
+        var result = await _adminUserService.AddPermissionAsync(id, assignPermissionDto);
 
         if (!result.IsSuccess)
         {
-            return result.ToActionDetails(_problemFactory);
+            return result.ToActionResult(_problemFactory);
         }
 
         return Ok();
@@ -62,11 +63,11 @@ public class AdminUsersController : ControllerBase
     [HttpDelete("{id:int}/permissions/{permissionId:int}")]
     public async Task<IActionResult> RemoveUserPermission(int id, int permissionId)
     {
-        var result = await _adminUserService.RemoveUserPermissionAsync(id, permissionId);
+        var result = await _adminUserService.RemovePermissionAsync(id, permissionId);
 
         if (!result.IsSuccess)
         {
-            return result.ToActionDetails(_problemFactory);
+            return result.ToActionResult(_problemFactory);
         }
 
         return NoContent();
@@ -83,11 +84,11 @@ public class AdminUsersController : ControllerBase
     [HttpPost("{id:int}/roles")]
     public async Task<IActionResult> AssignUserRole(int id, [FromBody] UserAssignRoleDto assignRoleDto)
     {
-        var result = await _adminUserService.AddUserRoleAsync(id, assignRoleDto);
+        var result = await _adminUserService.AddRoleAsync(id, assignRoleDto);
 
         if (!result.IsSuccess)
         {
-            return result.ToActionDetails(_problemFactory);
+            return result.ToActionResult(_problemFactory);
         }
 
         return NoContent();
@@ -96,11 +97,11 @@ public class AdminUsersController : ControllerBase
     [HttpDelete("{id:int}/roles/{roleId:int}")]
     public async Task<IActionResult> RemoveUserRole(int id, int roleId)
     {
-        var result = await _adminUserService.RemoveUserRoleAsync(id, roleId);
+        var result = await _adminUserService.RemoveRoleAsync(id, roleId);
 
         if (!result.IsSuccess)
         {
-            return result.ToActionDetails(_problemFactory);
+            return result.ToActionResult(_problemFactory);
         }
 
         return NoContent();
