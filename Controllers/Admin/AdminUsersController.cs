@@ -97,7 +97,7 @@ public class AdminUsersController : ControllerBase
     [HttpDelete("{id:int}/roles/{roleId:int}")]
     public async Task<IActionResult> RemoveUserRole(int id, int roleId)
     {
-        var result = await _adminUserService.RemoveRoleAsync(id, roleId);
+        var result = await _adminUserService.UnAssignRoleAsync(id, roleId);
 
         if (!result.IsSuccess)
         {

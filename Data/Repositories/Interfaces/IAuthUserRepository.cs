@@ -1,5 +1,4 @@
 using AuthService.Models;
-using Common;
 
 namespace AuthService.Data.Repositories.Interfaces;
 

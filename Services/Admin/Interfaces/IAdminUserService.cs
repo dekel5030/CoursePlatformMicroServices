@@ -14,10 +14,10 @@ public interface IAdminUserService
     Task<Result<bool>> RemoveUserAsync(int userId);
 
     Task<PagedResponseDto<RoleReadDto>> GetUserRolesAsync(int userId);
-    Task<Result<bool>> AddRoleAsync(int userId, UserAssignRoleDto assignRoleDto);
-    Task<Result<bool>> RemoveRoleAsync(int userId, int roleId);
+    Task<Result<bool>> AssignRoleAsync(int userId, int roleId);
+    Task<Result<bool>> UnAssignRoleAsync(int userId, int roleId);
 
     Task<PagedResponseDto<PermissionReadDto>> GetUserPermissionsAsync(int userId);
-    Task<Result<bool>> AddPermissionAsync(int userId, UserAssignPermissionDto assignPermissionDto);
+    Task<Result<bool>> AddPermissionAsync(int userId, int permissionId);
     Task<Result<bool>> RemovePermissionAsync(int userId, int permissionId);
 }
