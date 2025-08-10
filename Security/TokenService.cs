@@ -51,7 +51,7 @@ public class TokenService : ITokenService
         };
 
         var permissionClaims = request.Permissions
-            .Select(p => new Claim(CustomClaimNames.Permission, p));
+            .Select(p => new Claim(CustomClaimNames.Permission, p.Name));
 
         claims.AddRange(permissionClaims);
 

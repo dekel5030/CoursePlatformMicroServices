@@ -1,4 +1,5 @@
 using AuthService.Dtos;
+using AuthService.Dtos.AuthUsers;
 using AuthService.Models;
 using AutoMapper;
 using Common.Grpc;
@@ -9,7 +10,7 @@ public class AuthProfile : Profile
 {
     public AuthProfile()
     {
-        CreateMap<UserReadDto, AuthUser>()
+        CreateMap<UserServiceReadDto, AuthUser>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
@@ -28,9 +29,11 @@ public class AuthProfile : Profile
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
             .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.PasswordHash));
 
-        CreateMap<UserReadResponse, UserReadDto>()
+        CreateMap<UserReadResponse, UserServiceReadDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName));
+
+        CreateMap<AuthUser, AuthUserReadDto>();
     }
 }

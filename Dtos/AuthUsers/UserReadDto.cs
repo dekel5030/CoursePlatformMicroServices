@@ -2,7 +2,7 @@ using AuthService.Models;
 
 namespace AuthService.Dtos.AuthUsers;
 
-public class UserReadDto
+public class AuthUserReadDto
 {
     public int Id { get; set; }
 

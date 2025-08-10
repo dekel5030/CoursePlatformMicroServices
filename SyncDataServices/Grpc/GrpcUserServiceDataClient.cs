@@ -20,12 +20,12 @@ public class GrpcUserServiceDataClient : IGrpcUserServiceDataClient
         _logger = logger;
     }
 
-    public async Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto)
+    public async Task<Result<UserServiceReadDto>> CreateUserAsync(UserCreateDto userCreateDto)
     {
         var request = _mapper.Map<UserCreateRequest>(userCreateDto);
 
         var response = await _client.CreateUserAsync(request);
-        var result = _mapper.Map<Result<UserReadDto>>(response);
+        var result = _mapper.Map<Result<UserServiceReadDto>>(response);
 
         if (!result.IsSuccess)
         {

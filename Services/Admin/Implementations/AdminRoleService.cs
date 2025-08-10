@@ -1,3 +1,4 @@
+using AuthService.Data;
 using AuthService.Data.Repositories.Interfaces;
 using AuthService.Dtos;
 using AuthService.Dtos.Permissions;
@@ -11,26 +12,20 @@ namespace AuthService.Services.Admin.Interfaces;
 
 public class AdminRoleService : IAdminRoleService
 {
-    private readonly IRoleRepository _roleRepository;
-    private readonly IRolePermissionRepository _rolePermissionRepository;
-    private readonly IPermissionRepository _permissionRepository;
+    private readonly UnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
     public AdminRoleService(
-        IRoleRepository roleRepository,
-        IRolePermissionRepository rolePermissionRepository,
-        IPermissionRepository permissionRepository,
+        UnitOfWork unitOfWork,
         IMapper mapper)
     {
-        _roleRepository = roleRepository;
-        _rolePermissionRepository = rolePermissionRepository;
-        _permissionRepository = permissionRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
     public async Task<Result<RoleReadDto>> GetRoleByIdAsync(int id)
     {
-        var role = await _roleRepository.GetRoleByIdAsync(id);
+        var role = await _unitOfWork.RoleRepository.GetRoleByIdAsync(id);
 
         if (role == null)
         {
@@ -44,7 +39,7 @@ public class AdminRoleService : IAdminRoleService
 
     public async Task<PagedResponseDto<RoleReadDto>> GetAllRolesAsync()
     {
-        var roles = await _roleRepository.GetAllAsync();
+        var roles = await _unitOfWork.RoleRepository.GetAllAsync();
         var rolesCount = roles.Count();
 
         return new PagedResponseDto<RoleReadDto>
@@ -58,18 +53,18 @@ public class AdminRoleService : IAdminRoleService
 
     public async Task<Result<RoleReadDto>> CreateRoleAsync(RoleCreateDto createDto)
     {
-        var roleExists = await _roleRepository.GetRoleByNameAsync(createDto.Name);
+        var roleExists = await _unitOfWork.RoleRepository.ExistsByNameAsync(createDto.Name);
 
-        if (roleExists != null)
+        if (roleExists)
         {
             return Result<RoleReadDto>.Failure(AuthErrors.RoleAlreadyExists);
         }
 
         var role = _mapper.Map<Role>(createDto);
 
-        await _roleRepository.AddAsync(role);
-        await _roleRepository.SaveChangesAsync();
-        
+        await _unitOfWork.RoleRepository.AddRoleAsync(role);
+        await _unitOfWork.SaveChangesAsync();
+
         var roleDto = _mapper.Map<RoleReadDto>(role);
         
         return Result<RoleReadDto>.Success(roleDto);
@@ -77,73 +72,85 @@ public class AdminRoleService : IAdminRoleService
 
     public async Task<Result<bool>> DeleteRoleByIdAsync(int id)
     {
-        var role = await _roleRepository.GetRoleByIdAsync(id);
+        var role = await _unitOfWork.RoleRepository.GetRoleByIdAsync(id);
 
         if (role == null)
         {
             return Result<bool>.Failure(AuthErrors.RoleNotFound);
         }
 
-        _roleRepository.Remove(role);
+        await _unitOfWork.RoleRepository.RemoveRoleAsync(role);
 
-        await _roleRepository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<bool>.Success(true);
     }
 
     public async Task<PagedResponseDto<PermissionReadDto>> GetRolePermissionsAsync(int id)
     {
-        var permissions = await _rolePermissionRepository.GetPermissionsAsync(id);
-        var permissionsCount = permissions.Count();
+        var (permissions, TotalCount) = await _unitOfWork.RoleRepository.GetRolePermissionsAsync(id);
 
         return new PagedResponseDto<PermissionReadDto>
         {
             Items = _mapper.Map<IEnumerable<PermissionReadDto>>(permissions),
-            TotalCount = permissionsCount,
+            TotalCount = TotalCount,
             PageNumber = 1,
-            PageSize = permissionsCount
+            PageSize = TotalCount
         };
     }
 
     public async Task<Result<bool>> AssignPermissionsAsync(int roleId, RoleAssignPermissionsDto permissionsDto)
     {
-        var existing = await _rolePermissionRepository.GetPermissionsAsync(roleId);
-        var existingPermissionNames = existing.Select(p => p.Name)
+        var (existingPermissions, TotalCount) = await _unitOfWork.RoleRepository.GetRolePermissionsAsync(roleId);
+
+        var existingPermissionNames = existingPermissions.Select(p => p.Name)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         var newPermissions = permissionsDto.Permissions
             .Where(p => !existingPermissionNames.Contains(p))
             .ToList();
-        var newPermissionIds = new List<int>();
+
+        var rolePermissions = new List<RolePermission>();
 
         foreach (var name in newPermissions)
         {
-            var permission = await _permissionRepository.GetPermissionByNameAsync(name);
+            var permission = await _unitOfWork.PermissionRepository.GetPermissionByNameAsync(name);
+
             if (permission is null)
             {
                 return Result<bool>.Failure(AuthErrors.OneOrMorePermissionsNotFound);
             }
 
-            newPermissionIds.Add(permission.Id);
+            rolePermissions.Add(new RolePermission
+            {
+                RoleId = roleId,
+                PermissionId = permission.Id
+            });
         }
-        
-        await _rolePermissionRepository.AssignPermissionsAsync(roleId, newPermissionIds);
-        await _rolePermissionRepository.SaveChangesAsync();
-        
+
+        await _unitOfWork.RoleRepository.AddPermissionsAsync(rolePermissions.ToArray());
+        await _unitOfWork.SaveChangesAsync();
+
         return Result<bool>.Success(true);
     }
 
     public async Task<Result<bool>> RemovePermissionAsync(int roleId, int permissionId)
     {
-        var permission = await _permissionRepository.GetPermissionByIdAsync(permissionId);
+        var roleHasPermission = await _unitOfWork.RoleRepository.HasPermission(roleId, permissionId);
 
-        if (permission is null)
+        if (!roleHasPermission)
         {
             return Result<bool>.Failure(AuthErrors.PermissionNotFound);
         }
 
-        await _rolePermissionRepository.RemovePermissionAsync(roleId, permissionId);
-        await _rolePermissionRepository.SaveChangesAsync();
+        var rolePermission = new RolePermission
+        {
+            RoleId = roleId,
+            PermissionId = permissionId
+        };
+
+        await _unitOfWork.RoleRepository.RemovePermissionAsync(rolePermission);
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<bool>.Success(true);
     }

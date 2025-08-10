@@ -5,6 +5,6 @@ namespace AuthService.SyncDataServices.Grpc;
 
 public interface IGrpcUserServiceDataClient
 {
-    Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto);
+    Task<Result<UserServiceReadDto>> CreateUserAsync(UserCreateDto userCreateDto);
     Task<Result<bool>> DeleteUserAsync(int id);
 }

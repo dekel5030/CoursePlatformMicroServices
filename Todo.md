@@ -15,3 +15,5 @@
 - Examin if on assign roles and permission should return ok or created at
 - Register DI IAdminUserService
 - Add mapping profiles for IAadminUserService methods
+- Query Object Pattern
+- update tokenservice

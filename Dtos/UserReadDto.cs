@@ -1,6 +1,6 @@
 namespace AuthService.Dtos;
 
-public class UserReadDto
+public class UserServiceReadDto
 {
     public int Id { get; set; }
     public required string FullName { get; set; }

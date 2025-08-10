@@ -21,7 +21,7 @@ public class HttpUserServiceDataClient : IUserServiceDataClient
         _config = config;
     }
     
-    public async Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto)
+    public async Task<Result<UserServiceReadDto>> CreateUserAsync(UserCreateDto userCreateDto)
     {
         Console.WriteLine("--> Sending User Create Request to UserService...");
 
@@ -39,7 +39,7 @@ public class HttpUserServiceDataClient : IUserServiceDataClient
         var rawString = await response.Content.ReadAsStringAsync();
         Console.WriteLine("Raw Response: " + rawString);
 
-        var result = await response.ToResultAsync<UserReadDto>();
+        var result = await response.ToResultAsync<UserServiceReadDto>();
 
         // Testing
         var json = JsonSerializer.Serialize(result, new JsonSerializerOptions
@@ -54,7 +54,7 @@ public class HttpUserServiceDataClient : IUserServiceDataClient
         return result;
     }
 
-    public Task<Result<UserReadDto>> DeleteUserAsync(int id)
+    public Task<Result<UserServiceReadDto>> DeleteUserAsync(int id)
     {
         throw new NotImplementedException();
     }

@@ -1,6 +1,5 @@
 using AuthService.Data.Context;
 using AuthService.Data.Repositories.Interfaces;
-using AuthService.Dtos.Permissions;
 using AuthService.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,17 +13,7 @@ public class PermissionRepository : IPermissionRepository
     {
         _dbContext = dbContext;
     }
-
-    public async Task AddPermissionAsync(Permission permission)
-    {
-        await _dbContext.Permissions.AddAsync(permission);
-    }
-
-    public void DeletePermission(Permission permission)
-    {
-        _dbContext.Permissions.Remove(permission);
-    }
-
+    
     public async Task<Permission?> GetPermissionByIdAsync(int id)
     {
         return await _dbContext.Permissions.FindAsync(id);
@@ -36,23 +25,30 @@ public class PermissionRepository : IPermissionRepository
             .FirstOrDefaultAsync(p => EF.Functions.ILike(p.Name, name));
     }
 
-    public async Task<IEnumerable<Permission>> GetPermissionsAsync(PermissionSearchDto queryDto)
+    public async Task<(IEnumerable<Permission>, int TotalCount)> GetAllPermissionsAsync()
     {
-        var query = _dbContext.Permissions.AsQueryable();
-
-        if (!string.IsNullOrEmpty(queryDto.Name))
-        {
-            query = query.Where(p => EF.Functions.ILike(p.Name, $"%{queryDto.Name}%"));
-        }
-
-        query = query.Skip((queryDto.PageNumber - 1) * queryDto.PageSize)
-                     .Take(queryDto.PageSize);
-
-        return await query.ToListAsync();
+        var permissions = await _dbContext.Permissions.ToListAsync();
+        
+        return (permissions, permissions.Count);
     }
 
-    public async Task<bool> SaveChangesAsync()
+    public async Task AddPermissionAsync(Permission permission)
     {
-        return await _dbContext.SaveChangesAsync() > 0;
+        await _dbContext.Permissions.AddAsync(permission);
+    }
+
+    public void DeletePermission(Permission permission)
+    {
+        _dbContext.Permissions.Remove(permission);
+    }
+
+    public Task<bool> ExistsByIdAsync(int permissionId)
+    {
+        return _dbContext.Permissions.AnyAsync(p => p.Id == permissionId);
+    }
+
+    public Task<bool> ExistsByNameAsync(string permissionName)
+    {
+        return _dbContext.Permissions.AnyAsync(p => p.Name == permissionName);
     }
 }

@@ -21,12 +21,12 @@ public class GrpcProfile : Profile
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
             .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.PasswordHash));
 
-        CreateMap<Result_UserReadResponse, Result<UserReadDto>>()
+        CreateMap<Result_UserReadResponse, Result<UserServiceReadDto>>()
             .ForMember(dest => dest.IsSuccess, opt => opt.MapFrom(src => src.IsSuccess))
             .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Value))
             .ForMember(dest => dest.Error, opt => opt.MapFrom(src => src.Error));
 
-        CreateMap<UserReadResponse, UserReadDto>()
+        CreateMap<UserReadResponse, UserServiceReadDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName));

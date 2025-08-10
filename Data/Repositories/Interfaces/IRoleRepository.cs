@@ -4,10 +4,22 @@ namespace AuthService.Data.Repositories.Interfaces;
 
 public interface IRoleRepository
 {
+    Task<Role?> GetRoleByIdAsync(int roleId);
     Task<Role?> GetRoleByNameAsync(string name);
-    Task<Role?> GetRoleByIdAsync(int id);
     Task<IEnumerable<Role>> GetAllAsync();
-    Task AddAsync(Role role);
-    void Remove(Role role);
-    Task SaveChangesAsync();
+
+    Task<Role?> GetRoleWithAccessDataByIdAsync(int roleId);
+    Task<Role?> GetRoleWithAccessDataByNameAsync(string name);
+
+    Task AddRoleAsync(Role role);
+    Task RemoveRoleAsync(Role role);
+
+    Task<(IEnumerable<Permission> Permissions, int TotalCount)> GetRolePermissionsAsync(int roleId);
+
+    Task AddPermissionsAsync(params RolePermission[] rolePermissions);
+    Task RemovePermissionAsync(RolePermission rolePermission);
+
+    Task<bool> ExistsByIdAsync(int roleId);
+    Task<bool> ExistsByNameAsync(string roleName);
+    Task<bool> HasPermission(int roleId, int permissionId);
 }

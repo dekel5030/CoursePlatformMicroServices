@@ -1,62 +1,51 @@
-using AuthService.Data.Repositories.Interfaces;
+using AuthService.Data;
 using AuthService.Dtos;
 using AuthService.Dtos.AuthUsers;
 using AuthService.Dtos.Permissions;
 using AuthService.Dtos.Roles;
+using AuthService.Models;
 using AuthService.Services.Admin.Interfaces;
 using AutoMapper;
 using Common;
 using Common.Errors;
-using UserReadDto = AuthService.Dtos.AuthUsers.UserReadDto;
+using AuthUserReadDto = AuthService.Dtos.AuthUsers.AuthUserReadDto;
 
 namespace AuthService.Services.Admin.Implementations;
 
 public class AdminUserService : IAdminUserService
 {
-    private readonly IUserRoleRepository _userRoleRepository;
-    private readonly IUserPermissionRepository _userPermissionRepository;
-    private readonly IRoleRepository _roleRepository;
+    private readonly UnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly IPermissionRepository _permissionRepository;
-    private readonly IAuthUserRepository _userRepository;
 
     public AdminUserService(
-        IPermissionRepository permissionRepository,
-        IAuthUserRepository userRepository,
-        IUserRoleRepository userRoleRepository,
-        IUserPermissionRepository userPermissionRepository,
-        IRoleRepository roleRepository,
+        UnitOfWork unitOfWork,
         IMapper mapper)
     {
-        _permissionRepository = permissionRepository;
-        _userRepository = userRepository;
-        _userRoleRepository = userRoleRepository;
-        _userPermissionRepository = userPermissionRepository;
-        _roleRepository = roleRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
-    public async Task<Result<UserReadDto>> GetUserByIdAsync(int userId)
+    public async Task<Result<AuthUserReadDto>> GetUserByIdAsync(int userId)
     {
-        var user = await _userRepository.GetAuthUserByIdAsync(userId);
+        var user = await _unitOfWork.AuthUserRepository.GetUserByIdAsync(userId);
 
         if (user == null)
         {
-            return Result<UserReadDto>.Failure(AuthErrors.UserNotFound);
+            return Result<AuthUserReadDto>.Failure(AuthErrors.UserNotFound);
         }
 
-        var userReadDto = _mapper.Map<UserReadDto>(user);
+        var userReadDto = _mapper.Map<AuthUserReadDto>(user);
 
-        return Result<UserReadDto>.Success(userReadDto);
+        return Result<AuthUserReadDto>.Success(userReadDto);
     }
 
-    public async Task<PagedResponseDto<UserReadDto>> SearchUsersAsync(UserSearchDto query)
+    public async Task<PagedResponseDto<AuthUserReadDto>> SearchUsersAsync(UserSearch query)
     {
-        var (users, totalCount) = await _userRepository.SearchUsersAsync(query);
+        var (users, totalCount) = await _unitOfWork.AuthUserRepository.SearchUsersAsync(query);
 
-        return new PagedResponseDto<UserReadDto>
+        return new PagedResponseDto<AuthUserReadDto>
         {
-            Items = _mapper.Map<List<UserReadDto>>(users),
+            Items = _mapper.Map<List<AuthUserReadDto>>(users),
             TotalCount = totalCount,
             PageNumber = query.PageNumber,
             PageSize = query.PageSize
@@ -65,22 +54,22 @@ public class AdminUserService : IAdminUserService
 
     public async Task<Result<bool>> RemoveUserAsync(int userId)
     {
-        var user = await _userRepository.ExistsByIdAsync(userId);
+        var user = await _unitOfWork.AuthUserRepository.GetUserByIdAsync(userId);
 
-        if (!user)
+        if (user == null)
         {
             return Result<bool>.Failure(AuthErrors.UserNotFound);
         }
 
-        await _userRepository.RemoveUserAsync(userId);
-        await _userRepository.SaveChangesAsync();
+        await _unitOfWork.AuthUserRepository.RemoveUserAsync(user);
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<bool>.Success(true);
     }
 
     public async Task<PagedResponseDto<PermissionReadDto>> GetUserPermissionsAsync(int userId)
     {
-        var (permissions, totalCount) = await _userPermissionRepository.GetUserPermissionsAsync(userId);
+        var (permissions, totalCount) = await _unitOfWork.AuthUserRepository.GetUserPermissionsAsync(userId);
 
         return new PagedResponseDto<PermissionReadDto>
         {
@@ -93,44 +82,56 @@ public class AdminUserService : IAdminUserService
 
     public async Task<Result<bool>> AddPermissionAsync(int userId, int permissionId)
     {
-        var userExists = await _userRepository.ExistsByIdAsync(userId);
+        var userExists = await _unitOfWork.AuthUserRepository.ExistsByIdAsync(userId);
 
         if (!userExists)
         {
             return Result<bool>.Failure(AuthErrors.UserNotFound);
         }
 
-        var permissionExists = await _permissionRepository.ExistsByIdAsync(permissionId);
+        var permissionExists = await _unitOfWork.PermissionRepository.ExistsByIdAsync(permissionId);
 
         if (!permissionExists)
         {
             return Result<bool>.Failure(AuthErrors.PermissionNotFound);
         }
 
-        await _userPermissionRepository.AddPermissionAsync(userId, permissionId);
-        await _userPermissionRepository.SaveChangesAsync();
+        var userPermission = new UserPermission
+        {
+            UserId = userId,
+            PermissionId = permissionId
+        };
+
+        await _unitOfWork.AuthUserRepository.AddPermissionAsync(userPermission);
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<bool>.Success(true);
     }
 
     public async Task<Result<bool>> RemovePermissionAsync(int userId, int permissionId)
     {
-        var userExists = await _userRepository.ExistsByIdAsync(userId);
+        var userExists = await _unitOfWork.AuthUserRepository.ExistsByIdAsync(userId);
 
         if (!userExists)
         {
             return Result<bool>.Failure(AuthErrors.UserNotFound);
         }
 
-        var permissionExists = await _userPermissionRepository.ExistsByIdAsync(userId, permissionId);
+        var permissionExists = await _unitOfWork.AuthUserRepository.HasPermissionAsync(userId, permissionId);
 
         if (!permissionExists)
         {
             return Result<bool>.Failure(AuthErrors.PermissionNotFound);
         }
 
-        await _userPermissionRepository.RemovePermissionAsync(userId, permissionId);
-        await _userPermissionRepository.SaveChangesAsync();
+        var userPermission = new UserPermission
+        {
+            UserId = userId,
+            PermissionId = permissionId
+        };
+
+        await _unitOfWork.AuthUserRepository.RemovePermissionAsync(userPermission);
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<bool>.Success(true);
     }
@@ -138,7 +139,7 @@ public class AdminUserService : IAdminUserService
 
     public async Task<PagedResponseDto<RoleReadDto>> GetUserRolesAsync(int userId)
     {
-        var (roles, totalCount) = await _userRoleRepository.GetUserRolesAsync(userId);
+        var (roles, totalCount) = await _unitOfWork.AuthUserRepository.GetUserRolesAsync(userId);
 
         return new PagedResponseDto<RoleReadDto>
         {
@@ -151,44 +152,56 @@ public class AdminUserService : IAdminUserService
 
     public async Task<Result<bool>> AssignRoleAsync(int userId, int roleId)
     {
-        var userExists = await _userRepository.ExistsByIdAsync(userId);
+        var userExists = await _unitOfWork.AuthUserRepository.ExistsByIdAsync(userId);
 
         if (!userExists)
         {
             return Result<bool>.Failure(AuthErrors.UserNotFound);
         }
 
-        var roleExists = await _roleRepository.ExistsByIdAsync(roleId);
+        var roleExists = await _unitOfWork.RoleRepository.ExistsByIdAsync(roleId);
 
         if (!roleExists)
         {
             return Result<bool>.Failure(AuthErrors.RoleNotFound);
         }
 
-        await _userRoleRepository.AssignRoleAsync(userId, roleId);
-        await _userRoleRepository.SaveChangesAsync();
+        var userRole = new UserRole
+        {
+            UserId = userId,
+            RoleId = roleId
+        };
+
+        await _unitOfWork.AuthUserRepository.AssignRoleAsync(userRole);
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<bool>.Success(true);
     }
 
-    public async Task<Result<bool>> UnAssignRoleAsync(int userId, int roleId)
+    public async Task<Result<bool>> UnassignRoleAsync(int userId, int roleId)
     {
-        var userExists = await _userRepository.ExistsByIdAsync(userId);
+        var userExists = await _unitOfWork.AuthUserRepository.ExistsByIdAsync(userId);
 
         if (!userExists)
         {
             return Result<bool>.Failure(AuthErrors.UserNotFound);
         }
 
-        var roleExists = await _roleRepository.ExistsByIdAsync(roleId);
+        var roleExists = await _unitOfWork.RoleRepository.ExistsByIdAsync(roleId);
 
         if (!roleExists)
         {
             return Result<bool>.Failure(AuthErrors.RoleNotFound);
         }
 
-        await _userRoleRepository.UnAssignRoleAsync(userId, roleId);
-        await _userRoleRepository.SaveChangesAsync();
+        var userRole = new UserRole
+        {
+            UserId = userId,
+            RoleId = roleId
+        };
+
+        await _unitOfWork.AuthUserRepository.UnassignRoleAsync(userRole);
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<bool>.Success(true);
     }

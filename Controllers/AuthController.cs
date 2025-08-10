@@ -44,17 +44,4 @@ public class AuthController : ControllerBase
 
         return Ok(result.Value);
     }
-
-    [HttpGet("me")]
-    public IActionResult Me()
-    {
-        var result = _authService.GetCurrentUser();
-
-        if (!result.IsSuccess)
-        {
-            return result.ToActionResult(_problemDetailsFactory, HttpContext.Request.Path);
-        }
-
-        return Ok(result.Value);
-    }
 }

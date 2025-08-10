@@ -5,6 +5,6 @@ namespace AuthService.SyncDataServices.Http;
 
 public interface IUserServiceDataClient
 {
-    Task<Result<UserReadDto>> CreateUserAsync(UserCreateDto userCreateDto);
-    Task<Result<UserReadDto>> DeleteUserAsync(int id);
+    Task<Result<UserServiceReadDto>> CreateUserAsync(UserCreateDto userCreateDto);
+    Task<Result<UserServiceReadDto>> DeleteUserAsync(int id);
 }

@@ -1,3 +1,4 @@
+using AuthService.Data;
 using AuthService.Data.Context;
 using AuthService.Data.Repositories.Implementations;
 using AuthService.Data.Repositories.Interfaces;
@@ -79,21 +80,10 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    // private static IServiceCollection AddPermissionAuthorization(this IServiceCollection services)
-    // {
-    //     services.AddAuthorization();
-    //     services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
-    //     services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
-
-    //     return services;
-    // }
-
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
+        services.AddScoped<UnitOfWork>();
         services.AddScoped<IAuthUserRepository, AuthUserRepository>();
-        services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
-        services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
-        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPermissionRepository, PermissionRepository>();
 
@@ -104,6 +94,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IAdminPermissionService, AdminPermissionService>();
         services.AddScoped<IAdminRoleService, AdminRoleService>();
+        services.AddScoped<IAdminUserService, AdminUserService>();
 
         return services;
     }

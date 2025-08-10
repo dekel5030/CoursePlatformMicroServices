@@ -1,6 +1,4 @@
-using System.Security.Claims;
-using System.Threading.Tasks;
-using AuthService.Data.Repositories.Interfaces;
+using AuthService.Data;
 using AuthService.Dtos;
 using AuthService.Models;
 using AuthService.Security;
@@ -10,54 +8,40 @@ using Common;
 using Common.Errors;
 using Common.Rollback;
 using Common.Utils;
+using UserRoleType = Common.Auth.UserRole;
 
 namespace AuthService.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly IAuthUserRepository _authUserRepo;
     private readonly IMapper _mapper;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
     private readonly IRollbackManager _rollbackManager;
     private readonly ILogger<AuthService> _logger;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IUserPermissionRepository _userPermissionRepo;
-    private readonly IRolePermissionRepository _rolePermissionRepo;
-    private readonly IUserRoleRepository _userRoleRepo;
-    private readonly IRoleRepository _roleRepository;
+    private readonly UnitOfWork _unitOfWork;
     private readonly IGrpcUserServiceDataClient _usersClient;
 
-    public AuthService(IAuthUserRepository authUserRepos,
-                        IUserPermissionRepository userPermissionRepo,
-                        IUserRoleRepository userRoleRepo,
-                        IRolePermissionRepository rolePermissionRepo,
-                        IRoleRepository roleRepository,
-                        IMapper mapper,
+    public AuthService( IMapper mapper,
                         IPasswordHasher passwordHasher,
                         ITokenService tokenService,
                         IRollbackManager rollbackManager,
                         ILogger<AuthService> logger,
                         IGrpcUserServiceDataClient usersClient,
-                        IHttpContextAccessor httpContextAccessor)
+                        UnitOfWork unitOfWork)
     {
-        _authUserRepo = authUserRepos;
         _usersClient = usersClient;
         _mapper = mapper;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
         _rollbackManager = rollbackManager;
         _logger = logger;
-        _httpContextAccessor = httpContextAccessor;
-        _userPermissionRepo = userPermissionRepo;
-        _rolePermissionRepo = rolePermissionRepo;
-        _userRoleRepo = userRoleRepo;
-        _roleRepository = roleRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<AuthResponseDto>> RegisterAsync(RegisterRequestDto registerRequestDto)
     {
-        if (await _authUserRepo.GetAuthUserByEmailAsync(registerRequestDto.Email) != null)
+        if (await _unitOfWork.AuthUserRepository.GetUserByEmailAsync(registerRequestDto.Email) != null)
         {
             _logger.LogInformation("Registration attempt with existing email: {Email}", registerRequestDto.Email);
             return Result<AuthResponseDto>.Failure(Error.DuplicateEmail);
@@ -81,7 +65,7 @@ public class AuthService : IAuthService
 
     public async Task<Result<AuthResponseDto>> LoginAsync(LoginRequestDto loginRequestDto)
     {
-        var authUser = await _authUserRepo.GetAuthUserByEmailAsync(loginRequestDto.Email, includeAccessData: true);
+        var authUser = await _unitOfWork.AuthUserRepository.GetUserWithAccessDataByEmailAsync(loginRequestDto.Email);
 
         if (authUser == null)
         {
@@ -98,39 +82,14 @@ public class AuthService : IAuthService
         return Result<AuthResponseDto>.Success(CreateAuthResponseDto(authUser));
     }
 
-    public Result<CurrentUserReadDto> GetCurrentUser()
+    private async Task<AuthUser> CreateAuthUser(UserServiceReadDto userReadDto, string hashedPassword)
     {
-        var user = _httpContextAccessor.HttpContext?.User;
-        var userIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var email = user?.FindFirst(ClaimTypes.Email)?.Value;
-        var fullName = user?.FindFirst(ClaimTypes.Name)?.Value;
-        var role = user?.FindFirst(ClaimTypes.Role)?.Value;
-
-        if (userIdClaim is null || !int.TryParse(userIdClaim, out var userId))
-        {
-            _logger.LogInformation("GetCurrentUser called but no valid userId found in token.");
-            return Result<CurrentUserReadDto>.Failure(Error.UnAuthenticated);
-        }
-
-        var dto = new CurrentUserReadDto
-        {
-            UserId = userId,
-            Email = email!,
-            FullName = fullName,
-            Role = role
-        };
-
-        return Result<CurrentUserReadDto>.Success(dto);
-    }
-
-    private async Task<AuthUser> CreateAuthUser(UserReadDto userReadDto, string hashedPassword)
-    {
-        var role = await _roleRepository.GetRoleByNameAsync(RoleType.User.ToString());
+        var role = await _unitOfWork.RoleRepository.GetRoleByNameAsync(UserRoleType.User.ToString());
 
         if (role is null)
         {
-            _logger.LogInformation("Role not found: {Role}", RoleType.User);
-            throw new InvalidOperationException($"Default role '{RoleType.User}' was not found in the database.");
+            _logger.LogInformation("Role not found: {Role}", UserRoleType.User);
+            throw new InvalidOperationException($"Default role '{UserRoleType.User}' was not found in the database.");
         }
 
         var userRole = new UserRole { RoleId = role!.Id };
@@ -154,27 +113,29 @@ public class AuthService : IAuthService
     private TokenRequestDto CreateTokenRequestDto(AuthUser authUser)
     {
         var tokenRequestDto = _mapper.Map<TokenRequestDto>(authUser);
-        tokenRequestDto.Permissions = GetAllPermissions(authUser);
 
+        var allPermissions = new HashSet<Permission>();
+        
+        foreach (var userRole in authUser.UserRoles)
+        {
+            var role = userRole.Role;
+
+            foreach (var rolePermission in role.RolePermissions)
+            {
+                allPermissions.Add(rolePermission.Permission);
+            }
+        }
+
+        foreach (var userPermission in authUser.UserPermissions)
+        {
+            allPermissions.Add(userPermission.Permission);
+        }
+
+        tokenRequestDto.Permissions = allPermissions;
         return tokenRequestDto;
     }
 
-    private static ICollection<string> GetAllPermissions(AuthUser user)
-    {
-        var fromRoles = user.UserRoles
-            .SelectMany(ur => ur.Role.RolePermissions)
-            .Select(rp => rp.Permission.Name);
-
-        var userSpecific = user.UserPermissions
-            .Select(up => up.Permission.Name);
-
-        return fromRoles
-            .Union(userSpecific)
-            .Distinct()
-            .ToList();
-    }
-
-    private async Task<Result<UserReadDto>> CreateUserInUserServiceAsync(UserCreateDto userCreateDto)
+    private async Task<Result<UserServiceReadDto>> CreateUserInUserServiceAsync(UserCreateDto userCreateDto)
     {
         var result = await RetryHelper
                             .RetryAsync(() => _usersClient.CreateUserAsync(userCreateDto), logger: _logger);
@@ -195,12 +156,12 @@ public class AuthService : IAuthService
     {
         try
         {   
-            await RetryHelper.RetryAsync(() => _authUserRepo.AddAuthUserAsync(authUser));
-            await RetryHelper.RetryAsync(() => _authUserRepo.SaveChangesAsync());
+            await RetryHelper.RetryAsync(() => _unitOfWork.AuthUserRepository.AddUserAsync(authUser));
+            await RetryHelper.RetryAsync(() => _unitOfWork.SaveChangesAsync());
             _logger.LogInformation("User authUser for email {Email} saved successfully", authUser.Email);
 
             var fullAuthUser = await RetryHelper
-            .RetryAsync(() => _authUserRepo.GetAuthUserByEmailAsync(authUser.Email, includeAccessData: true));
+            .RetryAsync(() => _unitOfWork.AuthUserRepository.GetUserWithAccessDataByEmailAsync(authUser.Email));
             return Result<AuthResponseDto>.Success(CreateAuthResponseDto(fullAuthUser!));
         }
         catch (Exception ex)
@@ -211,13 +172,4 @@ public class AuthService : IAuthService
             return Result<AuthResponseDto>.Failure(Error.DatabaseError);
         }
     }
-
-    private enum RoleType
-    {
-        Admin,
-        Instructor,
-        User,
-        Guest
-    }
 }
-

@@ -3,19 +3,19 @@ using AuthService.Dtos.AuthUsers;
 using AuthService.Dtos.Permissions;
 using AuthService.Dtos.Roles;
 using Common;
-using UserReadDto = AuthService.Dtos.AuthUsers.UserReadDto;
+using AuthUserReadDto = AuthService.Dtos.AuthUsers.AuthUserReadDto;
 
 namespace AuthService.Services.Admin.Interfaces;
 
 public interface IAdminUserService
 {
-    Task<Result<UserReadDto>> GetUserByIdAsync(int userId);
-    Task<PagedResponseDto<UserReadDto>> SearchUsersAsync(UserSearchDto query);
+    Task<Result<AuthUserReadDto>> GetUserByIdAsync(int userId);
+    Task<PagedResponseDto<AuthUserReadDto>> SearchUsersAsync(UserSearch query);
     Task<Result<bool>> RemoveUserAsync(int userId);
 
     Task<PagedResponseDto<RoleReadDto>> GetUserRolesAsync(int userId);
     Task<Result<bool>> AssignRoleAsync(int userId, int roleId);
-    Task<Result<bool>> UnAssignRoleAsync(int userId, int roleId);
+    Task<Result<bool>> UnassignRoleAsync(int userId, int roleId);
 
     Task<PagedResponseDto<PermissionReadDto>> GetUserPermissionsAsync(int userId);
     Task<Result<bool>> AddPermissionAsync(int userId, int permissionId);

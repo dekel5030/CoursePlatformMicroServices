@@ -20,7 +20,7 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> SearchUsers([FromQuery] UserSearchDto query)
+    public async Task<IActionResult> SearchUsers([FromQuery] UserSearch query)
     {
         var users = await _adminUserService.SearchUsersAsync(query);
         return Ok(users);
@@ -47,10 +47,10 @@ public class AdminUsersController : ControllerBase
         return Ok(permissions);
     }
 
-    [HttpPost("{id:int}/permissions")]
-    public async Task<IActionResult> AssignUserPermission(int id, [FromBody] UserAssignPermissionDto assignPermissionDto)
+    [HttpPost("{id:int}/permissions/{permissionId:int}")]
+    public async Task<IActionResult> AssignUserPermission(int id, int permissionId)
     {
-        var result = await _adminUserService.AddPermissionAsync(id, assignPermissionDto);
+        var result = await _adminUserService.AddPermissionAsync(id, permissionId);
 
         if (!result.IsSuccess)
         {
@@ -81,10 +81,10 @@ public class AdminUsersController : ControllerBase
         return Ok(roles);
     }
 
-    [HttpPost("{id:int}/roles")]
-    public async Task<IActionResult> AssignUserRole(int id, [FromBody] UserAssignRoleDto assignRoleDto)
+    [HttpPost("{id:int}/roles/{roleId:int}")]
+    public async Task<IActionResult> AssignUserRole(int id, int roleId)
     {
-        var result = await _adminUserService.AddRoleAsync(id, assignRoleDto);
+        var result = await _adminUserService.AssignRoleAsync(id, roleId);
 
         if (!result.IsSuccess)
         {
@@ -97,7 +97,7 @@ public class AdminUsersController : ControllerBase
     [HttpDelete("{id:int}/roles/{roleId:int}")]
     public async Task<IActionResult> RemoveUserRole(int id, int roleId)
     {
-        var result = await _adminUserService.UnAssignRoleAsync(id, roleId);
+        var result = await _adminUserService.UnassignRoleAsync(id, roleId);
 
         if (!result.IsSuccess)
         {
