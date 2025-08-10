@@ -1,6 +1,4 @@
 using AuthService.Dtos;
-using AuthService.Dtos.AuthUsers;
-using AuthService.Models;
 using AutoMapper;
 
 namespace AuthService.Profiles;

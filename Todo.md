@@ -17,3 +17,4 @@
 - Add mapping profiles for IAadminUserService methods
 - Query Object Pattern
 - update tokenservice
+- Add swagger
