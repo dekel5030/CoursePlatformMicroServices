@@ -18,9 +18,8 @@ public static class CourseEndpoints
         return app;
     }
 
-    private static async Task<IResult> GetCourseById(int courseId, ICourseService courseService, ICurrentUserService currentUser, ProblemDetailsFactory problemFactory)
+    private static async Task<IResult> GetCourseById(int courseId, ICourseService courseService, ProblemDetailsFactory problemFactory)
     {
-        var userId = currentUser.UserId;
         var result = await courseService.GetCourseByIdAsync(courseId, true);
         return result.IsSuccess
             ? Results.Ok(result.Value)
@@ -33,7 +32,7 @@ public static class CourseEndpoints
         return Results.Ok(result);
     }
 
-    private static async Task<IResult> AddCourse([FromBody] CourseCreateDto course, ICourseService courseService, ICurrentUserService currentUser, ProblemDetailsFactory problemFactory)
+    private static async Task<IResult> AddCourse([FromBody] CourseCreateDto course, ICourseService courseService, ProblemDetailsFactory problemFactory)
     {
         var result = await courseService.AddCourseAsync(course);
         return result.IsSuccess

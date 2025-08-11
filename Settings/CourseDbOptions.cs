@@ -1,6 +1,6 @@
 namespace CourseService.Settings;
 
-public class CourseDbSettings
+public class CourseDbOptions
 {
     public const string SectionName = "CourseDb";
 

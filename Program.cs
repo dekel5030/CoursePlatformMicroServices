@@ -1,3 +1,4 @@
+using Common.Web.Swagger;
 using CourseService.Data;
 using CourseService.Extentions;
 
@@ -15,5 +16,7 @@ app.MapCourseEndpoints();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseAppSwagger();
 
 app.Run();
