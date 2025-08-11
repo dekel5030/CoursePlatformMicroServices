@@ -1,3 +1,5 @@
+using Common.Web.Swagger;
+
 namespace AuthService.Extensions;
 
 public static class ApplicationBuilderExtensions
@@ -15,6 +17,9 @@ public static class ApplicationBuilderExtensions
 
         app.UseAuthentication();
         app.UseAuthorization();
+
+
+        app.UseAppSwagger();
 
         return app;
     }

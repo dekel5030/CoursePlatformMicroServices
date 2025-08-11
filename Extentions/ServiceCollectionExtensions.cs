@@ -10,6 +10,7 @@ using AuthService.Settings;
 using AuthService.SyncDataServices.Grpc;
 using AuthService.SyncDataServices.Http;
 using AuthService.Validators;
+using Common;
 using Common.Auth.Extentions;
 using Common.Rollback;
 using Common.Web.Errors;
@@ -18,7 +19,6 @@ using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static Common.Grpc.GrpcUserService;
-
 namespace AuthService.Extensions;
 
 public static class ServiceCollectionExtensions
@@ -55,6 +55,8 @@ public static class ServiceCollectionExtensions
 
         services.Configure<ValidationSettings>(
             config.GetSection("ValidationSettings"));
+
+        services.AddAppSwagger();
 
         return services;
     }

@@ -9,4 +9,3 @@
 - validators for admin dtos
 - Consider switching from per-permission claim model to role-based model
 - Query Object Pattern
-- Add swagger

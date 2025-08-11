@@ -16,7 +16,7 @@ public class AuthDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        ConfigureUserCredential(modelBuilder);
+        ConfigureAuthUser(modelBuilder);
         ConfigurePermission(modelBuilder);
         ConfigureRole(modelBuilder);
         ConfigureRolePermission(modelBuilder);
@@ -34,7 +34,7 @@ public class AuthDbContext : DbContext
         return await base.SaveChangesAsync(cancellationToken);
     }
 
-    private void ConfigureUserCredential(ModelBuilder modelBuilder)
+    private void ConfigureAuthUser(ModelBuilder modelBuilder)
     {
         var user = modelBuilder.Entity<AuthUser>();
 
