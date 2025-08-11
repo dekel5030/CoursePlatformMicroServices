@@ -4,6 +4,7 @@ using UserService.Dtos;
 using UserService.Services;
 using Common.Web.Extensions;
 using Common.Web.Errors;
+using Common.Auth.Attributes;
 
 namespace UserService.Controllers
 {
@@ -37,7 +38,7 @@ namespace UserService.Controllers
         public async Task<IActionResult> GetUserById([Range(1, int.MaxValue)] int id)
         {
             Console.WriteLine($"--> Fetching user with ID: {id}");
-            
+
             var user = await _userService.GetUserByIdAsync(id);
 
             if (user == null)

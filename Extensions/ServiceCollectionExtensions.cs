@@ -8,6 +8,8 @@ using UserService.Services;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using UserService.Validators;
+using Common;
+using Common.Auth.Extentions;
 
 namespace UserService.Extensions;
 
@@ -30,13 +32,19 @@ public static class ServiceCollectionExtensions
 
         services.AddValidation();
 
+        services.AddAppSwagger();
+
+        services.AddJwtAuthentication(configuration);
+        services.AddPermissionAuthorization();
         return services;
     }
 
     private static IServiceCollection AddUsersDbContext(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions<UsersDbOptions>()
-                .Bind(configuration.GetSection(UsersDbOptions.SectionName));
+                .Bind(configuration.GetSection(UsersDbOptions.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
         services.AddDbContext<UsersDbContext>((sp, options) =>
         {
