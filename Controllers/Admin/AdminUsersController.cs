@@ -23,7 +23,7 @@ public class AdminUsersController : ControllerBase
 
     [HttpGet]
     [HasPermission(PermissionType.CanReadAuthUser)]
-    public async Task<IActionResult> SearchUsers([FromQuery] UserSearch query)
+    public async Task<IActionResult> SearchUsers([FromQuery] UserSearchDto query)
     {
         var users = await _adminUserService.SearchUsersAsync(query);
         return Ok(users);

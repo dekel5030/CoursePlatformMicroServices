@@ -7,7 +7,7 @@ public interface IAuthUserRepository
 {
     Task<AuthUser?> GetUserByIdAsync(int userId);
     Task<AuthUser?> GetUserByEmailAsync(string email);
-    Task<(IEnumerable<AuthUser> users, int totalCount)> SearchUsersAsync(UserSearch query);
+    Task<(IEnumerable<AuthUser> users, int totalCount)> SearchUsersAsync(UserSearchDto query);
 
     Task<AuthUser?> GetUserWithAccessDataByIdAsync(int userId);
     Task<AuthUser?> GetUserWithAccessDataByEmailAsync(string email);

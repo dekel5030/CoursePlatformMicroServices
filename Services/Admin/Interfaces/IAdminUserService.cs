@@ -10,7 +10,7 @@ namespace AuthService.Services.Admin.Interfaces;
 public interface IAdminUserService
 {
     Task<Result<AuthUserReadDto>> GetUserByIdAsync(int userId);
-    Task<PagedResponseDto<AuthUserReadDto>> SearchUsersAsync(UserSearch query);
+    Task<PagedResponseDto<AuthUserReadDto>> SearchUsersAsync(UserSearchDto query);
     Task<Result<bool>> RemoveUserAsync(int userId);
 
     Task<PagedResponseDto<RoleReadDto>> GetUserRolesAsync(int userId);

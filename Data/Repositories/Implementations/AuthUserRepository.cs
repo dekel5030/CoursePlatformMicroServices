@@ -25,7 +25,7 @@ public class AuthUserRepository : IAuthUserRepository
         return await _dbContext.AuthUser.FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public async Task<(IEnumerable<AuthUser> users, int totalCount)> SearchUsersAsync(UserSearch query)
+    public async Task<(IEnumerable<AuthUser> users, int totalCount)> SearchUsersAsync(UserSearchDto query)
     {
         var userQuery = _dbContext.AuthUser.AsQueryable();
 

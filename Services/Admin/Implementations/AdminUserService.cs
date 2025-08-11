@@ -39,7 +39,7 @@ public class AdminUserService : IAdminUserService
         return Result<AuthUserReadDto>.Success(userReadDto);
     }
 
-    public async Task<PagedResponseDto<AuthUserReadDto>> SearchUsersAsync(UserSearch query)
+    public async Task<PagedResponseDto<AuthUserReadDto>> SearchUsersAsync(UserSearchDto query)
     {
         var (users, totalCount) = await _unitOfWork.AuthUserRepository.SearchUsersAsync(query);
 

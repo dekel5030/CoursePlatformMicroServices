@@ -1,6 +1,6 @@
 namespace AuthService.Dtos.AuthUsers;
 
-public class UserSearch
+public class UserSearchDto
 {
     public int? Id { get; set; }
 
