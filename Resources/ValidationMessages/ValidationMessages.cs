@@ -21,5 +21,11 @@ namespace Common.Resources.ValidationMessages
         public const string FullNameRequired = "FullNameRequired";
         public const string FullNameTooLong = "FullNameTooLong";
 
+        public const string PageNumberGreaterThanZero = "PageNumberGreaterThanZero";
+        public const string PageSizeGreaterThanZero = "PageSizeGreaterThanZero";
+
+        public const string PermissionNameRequired = "PermissionNameRequired";
+
+        public const string RoleNameRequired = "RoleNameRequired";
     }
 }

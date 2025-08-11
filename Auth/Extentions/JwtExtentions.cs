@@ -10,8 +10,12 @@ public static class JwtExtensions
 {
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration config)
     {
-        services.ConfigureOptions<JwtOptionsSetup>();
-        services.AddSingleton<IValidateOptions<JwtOptions>, JwtOptionsValidation>();
+        services
+            .AddOptions<JwtOptions>()
+            .BindConfiguration(JwtOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services.ConfigureOptions<JwtBearerOptionsSetup>();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -10,5 +10,10 @@ public enum PermissionType
     CanReadRole,
     CanCreateRole,
     CanUpdateRole,
-    CanDeleteRole
+    CanDeleteRole,
+    CanReadAuthUser,
+    CanUpdateAuthUser,
+    CanCreateCourse,
+    CanUpdateCourse,
+    CanDeleteCourse
 }

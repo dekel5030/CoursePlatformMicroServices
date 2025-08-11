@@ -8,4 +8,6 @@ public static partial class AuthErrors
     public static readonly Error OneOrMorePermissionsNotFound = new("OneOrMorePermissionsNotFound", 404);
     public static readonly Error RoleNotFound = new("RoleNotFound", 404);
     public static readonly Error RoleAlreadyExists = new("RoleAlreadyExists", 409);
+    public static readonly Error UserNotFound = new("UserNotFound", 404);
+    
 }
