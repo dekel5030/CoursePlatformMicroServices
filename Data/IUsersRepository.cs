@@ -5,15 +5,15 @@ namespace UserService.Data
 {
     public interface IUserRepository
     {
-        Task<bool> EmailExistsAsync(string email);
         Task<User?> GetUserByIdAsync(int id);
-        Task<bool> UserExistsAsync(int id);
         Task<User?> GetUserByEmailAsync(string email);
-        Task<IEnumerable<User>> GetAllUsersAsync();
         Task<IEnumerable<User>> SearchUsersAsync(UserSearchDto Query);
+        Task<IEnumerable<User>> GetAllUsersAsync();
         Task AddUserAsync(User user);
         Task DeleteUserAsync(int id);
-        Task<bool> SaveChangesAsync();
+        Task<bool> EmailExistsAsync(string email);
+        Task<bool> UserExistsAsync(int id);
         Task<int> CountUsersAsync(UserSearchDto query);
+        Task<bool> SaveChangesAsync();
     }
 }

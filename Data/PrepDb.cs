@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using UserService.Models;
 
 namespace UserService.Data
@@ -9,6 +10,8 @@ namespace UserService.Data
             using (var serviceScope = applicationBuilder.ApplicationServices.CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<UsersDbContext>();
+
+                await context.Database.MigrateAsync();
 
                 if (!context.Users.Any())
                 {

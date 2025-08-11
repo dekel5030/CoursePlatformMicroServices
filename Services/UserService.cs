@@ -69,7 +69,6 @@ namespace UserService.Services
                 return Result<UserReadDto>.Failure(Error.UserNotFound);
             }
 
-            user.IsActive = isActive;
             await _repository.SaveChangesAsync();
 
             return Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user));

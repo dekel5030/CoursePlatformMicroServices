@@ -1,7 +1,7 @@
 using FluentValidation;
 using Microsoft.Extensions.Localization;
 using UserService.Dtos;
-using UserService.Settings;
+using UserService.Options;
 using Common.Resources.ValidationMessages;
 
 namespace UserService.Validators
@@ -10,8 +10,8 @@ namespace UserService.Validators
     {
         public UserCreateDtoValidator(IStringLocalizer<ValidationMessages> localizer)
         {
-            var fullNameMinLen = ValidationSettings.FullNameMinLength;
-            var fullNameMaxLen = ValidationSettings.FullNameMaxLength;
+            var fullNameMinLen = ValidationOptions.FullNameMinLength;
+            var fullNameMaxLen = ValidationOptions.FullNameMaxLength;
 
             RuleFor(user => user.FullName)
                 .NotEmpty()

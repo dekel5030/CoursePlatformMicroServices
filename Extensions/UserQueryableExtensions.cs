@@ -1,7 +1,7 @@
 using UserService.Dtos;
 using UserService.Models;
 
-namespace UserService.Extentions
+namespace UserService.Extensions
 {
     public static class UserQueryableExtensions
     {
@@ -12,15 +12,6 @@ namespace UserService.Extentions
 
             if (!string.IsNullOrWhiteSpace(dto.FullName))
                 query = query.Where(u => u.FullName.Contains(dto.FullName));
-
-            if (!string.IsNullOrWhiteSpace(dto.Role))
-                query = query.Where(u => u.Role == dto.Role);
-
-            if (dto.IsActive.HasValue)
-                query = query.Where(u => u.IsActive == dto.IsActive);
-
-            if (dto.EmailConfirmed.HasValue)
-                query = query.Where(u => u.EmailConfirmed == dto.EmailConfirmed);
 
             if (dto.CreatedAtFrom.HasValue)
                 query = query.Where(u => u.CreatedAt >= dto.CreatedAtFrom);

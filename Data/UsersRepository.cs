@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UserService.Dtos;
-using UserService.Extentions;
+using UserService.Extensions;
 using UserService.Models;
 
 namespace UserService.Data

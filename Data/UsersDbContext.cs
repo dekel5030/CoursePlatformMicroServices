@@ -21,16 +21,12 @@ namespace UserService.Data
 
             modelBuilder.Entity<User>()
                 .Property(u => u.FullName)
-                .HasMaxLength(Settings.ValidationSettings.FullNameMaxLength)
+                .HasMaxLength(Options.ValidationOptions.FullNameMaxLength)
                 .IsRequired();
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Email)
                 .HasMaxLength(255)
-                .IsRequired();
-
-            modelBuilder.Entity<User>()
-                .Property(u => u.PasswordHash)
                 .IsRequired();
 
             modelBuilder.Entity<User>()
@@ -44,17 +40,6 @@ namespace UserService.Data
                 .HasDefaultValueSql("NOW()")
                 .Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
 
-            modelBuilder.Entity<User>()
-                .Property(u => u.Role)
-                .HasDefaultValue("User");
-
-            modelBuilder.Entity<User>()
-                .Property(u => u.EmailConfirmed)
-                .HasDefaultValue(false);
-
-            modelBuilder.Entity<User>()
-                .Property(u => u.IsActive)
-                .HasDefaultValue(true);
 
             base.OnModelCreating(modelBuilder);
         }
