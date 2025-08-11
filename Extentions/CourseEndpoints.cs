@@ -1,6 +1,8 @@
+using Common.Auth;
 using Common.Web.Errors;
 using Common.Web.Extensions;
 using CourseService.Dtos.Courses;
+using CourseService.Extentions;
 using CourseService.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +14,8 @@ public static class CourseEndpoints
 
         group.MapGet("/{courseId:int}", GetCourseById);
         group.MapGet("", SearchCourses);
-        group.MapPost("", AddCourse).RequireAuthorization(policy => policy.RequireRole("Admin", "Instructor"));
-        group.MapDelete("/{courseId:int}", DeleteCourse).RequireAuthorization(policy => policy.RequireRole("Admin", "Instructor"));
+        group.MapPost("", AddCourse).RequirePermission(PermissionType.CanCreateCourse);
+        group.MapDelete("/{courseId:int}", DeleteCourse).RequirePermission(PermissionType.CanDeleteCourse);
 
         return app;
     }
