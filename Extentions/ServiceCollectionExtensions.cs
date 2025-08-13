@@ -1,5 +1,6 @@
 using EnrollmentService.Data;
 using EnrollmentService.Options;
+using EnrollmentService.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -10,6 +11,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddEnrollmentDependencies(this IServiceCollection services)
     {
         services.AddEnrollmentDbContext();
+        services.AddScoped<IEnrollmentService, Services.EnrollmentService>();
 
         return services;
     }
