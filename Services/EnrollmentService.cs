@@ -16,7 +16,9 @@ public class EnrollmentService : IEnrollmentService
         _mapper = mapper;
     }
 
-    public async Task<Result<EnrollmentReadDto>> GetEnrollmentByIdAsync(int id)
+    public async Task<Result<EnrollmentReadDto>> GetEnrollmentByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default)
     {
         Enrollment? enrollment = await _enrollmentRepo.GetByIdAsync(id);
 
@@ -30,7 +32,9 @@ public class EnrollmentService : IEnrollmentService
         return Result<EnrollmentReadDto>.Success(enrollmentReadDto);
     }
 
-    public async Task<PagedResponseDto<EnrollmentReadDto>> SearchEnrollmentsAsync(EnrollmentSearchDto searchDto)
+    public async Task<PagedResponseDto<EnrollmentReadDto>> SearchEnrollmentsAsync(
+        EnrollmentSearchDto searchDto,
+        CancellationToken cancellationToken = default)
     {
         (IEnumerable<Enrollment> enrollments, int totalCount) = await _enrollmentRepo.SearchEnrollmentsAsync(searchDto);
 
@@ -45,14 +49,16 @@ public class EnrollmentService : IEnrollmentService
         };
     }
 
-    public async Task<Result<EnrollmentReadDto>> CreateEnrollmentAsync(EnrollmentCreateDto CreateDto)
+    public async Task<Result<EnrollmentReadDto>> CreateEnrollmentAsync(
+        EnrollmentCreateDto createDto,
+        CancellationToken cancellationToken = default)
     {
-        if (await _enrollmentRepo.Exists(CreateDto.CourseId, CreateDto.UserId))
+        if (await _enrollmentRepo.Exists(createDto.CourseId, createDto.UserId))
         {
             return Result<EnrollmentReadDto>.Failure(Error.EnrollmentAlreadyExists);
         }
 
-        var enrollment = _mapper.Map<Enrollment>(CreateDto);
+        var enrollment = _mapper.Map<Enrollment>(createDto);
 
         await _enrollmentRepo.AddAsync(enrollment);
         await _enrollmentRepo.SaveChangesAsync();
@@ -61,7 +67,9 @@ public class EnrollmentService : IEnrollmentService
         return Result<EnrollmentReadDto>.Success(enrollmentReadDto);
     }
 
-    public async Task<Result<bool>> DeleteEnrollmentAsync(int id)
+    public async Task<Result<bool>> DeleteEnrollmentAsync(
+        int id,
+        CancellationToken cancellationToken = default)
     {
         Enrollment? enrollment = await _enrollmentRepo.GetByIdAsync(id);
 
