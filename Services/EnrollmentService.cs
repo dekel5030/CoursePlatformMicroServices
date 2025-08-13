@@ -62,7 +62,7 @@ public class EnrollmentService : IEnrollmentService
         EnrollmentCreateDto createDto,
         CancellationToken ct = default)
     {
-        if (await _enrollmentRepo.Exists(createDto.CourseId, createDto.UserId, ct))
+        if (await _enrollmentRepo.ExistsAsync(createDto.CourseId, createDto.UserId, ct))
         {
             _logger.LogWarning("Enrollment already exists for CourseId: {CourseId}, UserId: {UserId}.", createDto.CourseId, createDto.UserId);
             return Result<EnrollmentReadDto>.Failure(EnrollmentErrors.EnrollmentAlreadyExists);

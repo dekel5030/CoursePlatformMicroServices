@@ -1,11 +1,15 @@
+using EnrollmentService.Data.Queries.Interfaces;
 using EnrollmentService.Dtos;
 using EnrollmentService.Models;
 
-namespace EnrollmentService.Data.Queries;
+namespace EnrollmentService.Data.Queries.Implementations;
 
-public sealed class EnrollmentQuery : IQueryObject<Enrollment>
+public sealed class EnrollmentQuery : IQueryObject<Enrollment>, IPageableQuery<Enrollment>, ISortableQuery<Enrollment>
 {
     private readonly EnrollmentSearchDto _dto;
+
+    public int PageNumber => _dto.PageNumber;
+    public int PageSize => _dto.PageSize;
 
     public EnrollmentQuery(EnrollmentSearchDto dto)
     {
@@ -26,6 +30,18 @@ public sealed class EnrollmentQuery : IQueryObject<Enrollment>
         q = ApplyDefaultSorting(q);
 
         return q;
+    }
+
+    public IQueryable<Enrollment> ApplyPagination(IOrderedQueryable<Enrollment> query)
+    {
+        return query
+            .Skip((PageNumber - 1) * PageSize)
+            .Take(PageSize);
+    }
+
+    public IOrderedQueryable<Enrollment> ApplySorting(IQueryable<Enrollment> query)
+    {
+        throw new NotImplementedException();
     }
 
     private IQueryable<Enrollment> FilterById(IQueryable<Enrollment> query)
@@ -102,4 +118,5 @@ public sealed class EnrollmentQuery : IQueryObject<Enrollment>
     {
         return q.OrderByDescending(e => e.EnrolledAt);
     }
+
 }

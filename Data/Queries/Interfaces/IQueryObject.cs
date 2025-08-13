@@ -1,4 +1,4 @@
-namespace EnrollmentService.Data.Queries;
+namespace EnrollmentService.Data.Queries.Interfaces;
 
 public interface IQueryObject<T>
 {
