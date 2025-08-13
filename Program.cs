@@ -5,4 +5,6 @@ builder.Services.AddEnrollmentDependencies();
 
 var app = builder.Build();
 
+app.MapEnrollmentEndpoints();
+
 app.Run();

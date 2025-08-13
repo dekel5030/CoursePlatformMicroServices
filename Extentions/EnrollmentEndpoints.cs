@@ -30,7 +30,8 @@ public static class EnrollmentEndpoints
     private static async Task<IResult> GetEnrollmentById(
         int id,
         IEnrollmentService enrollmentService,
-        ProblemDetailsFactory problemFactory)
+        ProblemDetailsFactory problemFactory,
+        CancellationToken ct = default)
     {
         var result = await enrollmentService.GetEnrollmentByIdAsync(id);
 
@@ -42,7 +43,10 @@ public static class EnrollmentEndpoints
         return Results.Ok(result.Value);
     }
 
-    private static async Task<IResult> SearchEnrollments(EnrollmentSearchDto searchDto, IEnrollmentService enrollmentService)
+    private static async Task<IResult> SearchEnrollments(
+        EnrollmentSearchDto searchDto,
+        IEnrollmentService enrollmentService,
+        CancellationToken ct = default)
     {
         var response = await enrollmentService.SearchEnrollmentsAsync(searchDto);
 
