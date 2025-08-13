@@ -20,26 +20,28 @@ public class EnrollmentRepository : IEnrollmentRepository
             .FirstOrDefaultAsync(e => e.Id == id, ct);
     }
 
-    public async Task<(IReadOnlyList<Enrollment> enrollments, int totalCount)>
-        SearchEnrollmentsAsync(IQueryObject<Enrollment> query, CancellationToken ct = default)
+    public async Task<(IReadOnlyList<Enrollment> enrollments, int totalCount)> SearchEnrollmentsAsync(
+        IQueryObject<Enrollment> query, CancellationToken ct = default)
     {
-        var baseQuery = _dbContext.Enrollments.AsNoTracking();
-        var filtered  = query.Apply(baseQuery);
+        IQueryable<Enrollment> baseQuery = _dbContext.Enrollments.AsNoTracking();
 
-        var ordered = (query is ISortableQuery<Enrollment> sortable)
-            ? sortable.ApplySorting(filtered)
-            : filtered.OrderBy(e => e.Id);
+        IQueryable<Enrollment> filtered = query.Apply(baseQuery);
 
-        var paged = (query is IPageableQuery<Enrollment> pageable)
-            ? pageable.ApplyPagination(ordered)
-            : ordered;
+        int totalCount = await filtered.CountAsync(ct);
 
-        var countTask = filtered.CountAsync(ct);
-        var itemsTask = paged.ToListAsync(ct);
+        IOrderedQueryable<Enrollment> ordered =
+            (query is ISortableQuery<Enrollment> sortable)
+                ? sortable.ApplySorting(filtered)
+                : filtered.OrderBy(e => e.Id);
 
-        await Task.WhenAll(countTask, itemsTask);
+        IQueryable<Enrollment> paged =
+            (query is IPageableQuery<Enrollment> pageable)
+                ? pageable.ApplyPagination(ordered)
+                : ordered;
 
-        return (itemsTask.Result, countTask.Result);
+        var items = await paged.ToListAsync(ct);
+
+        return (items, totalCount);
     }
 
     public Task AddAsync(Enrollment enrollment, CancellationToken ct = default)
