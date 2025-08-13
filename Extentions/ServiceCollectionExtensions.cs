@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddEnrollmentDbContext();
         services.AddScoped<IEnrollmentService, Services.EnrollmentService>();
-
+        //services.AddAutoMapper(typeof(Program));
         return services;
     }
 

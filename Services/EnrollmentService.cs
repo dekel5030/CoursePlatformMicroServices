@@ -1,8 +1,9 @@
+using AutoMapper;
 using Common;
 using Common.Errors;
+using EnrollmentService.Data;
 using EnrollmentService.Dtos;
 using EnrollmentService.Models;
-using Microsoft.Extensions.Logging;
 
 namespace EnrollmentService.Services;
 
@@ -31,7 +32,7 @@ public class EnrollmentService : IEnrollmentService
         if (enrollment is null)
         {
             _logger.LogInformation("Enrollment {EnrollmentId} not found.", id);
-            return Result<EnrollmentReadDto>.Failure(Error.EnrollmentNotFound);
+            return Result<EnrollmentReadDto>.Failure(EnrollmentErrors.EnrollmentNotFound);
         }
 
         var enrollmentReadDto = _mapper.Map<EnrollmentReadDto>(enrollment);
@@ -64,7 +65,7 @@ public class EnrollmentService : IEnrollmentService
         if (await _enrollmentRepo.Exists(createDto.CourseId, createDto.UserId, ct))
         {
             _logger.LogWarning("Enrollment already exists for CourseId: {CourseId}, UserId: {UserId}.", createDto.CourseId, createDto.UserId);
-            return Result<EnrollmentReadDto>.Failure(Error.EnrollmentAlreadyExists);
+            return Result<EnrollmentReadDto>.Failure(EnrollmentErrors.EnrollmentAlreadyExists);
         }
 
         var enrollment = _mapper.Map<Enrollment>(createDto);
@@ -85,7 +86,7 @@ public class EnrollmentService : IEnrollmentService
         if (enrollment is null)
         {
             _logger.LogInformation("Enrollment {EnrollmentId} not found for deletion.", id);
-            return Result<bool>.Failure(Error.EnrollmentNotFound);
+            return Result<bool>.Failure(EnrollmentErrors.EnrollmentNotFound);
         }
 
         _enrollmentRepo.Remove(enrollment);

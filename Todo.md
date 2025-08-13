@@ -4,3 +4,5 @@
 - Exception middlewere
 - CQRS
 - Check how to use Cancelation tokens in minimal controller
+- Add Validators
+- Add Profiles
