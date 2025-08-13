@@ -12,7 +12,7 @@ public class Enrollment
 
     public EnrollmentStatus Status { get; set; } = EnrollmentStatus.Pending;
 
-    public DateTime EnrolledAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public DateTime EnrolledAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
     public DateTime? ExpiresAt { get; set; }
 }
