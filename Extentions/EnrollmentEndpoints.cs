@@ -33,7 +33,7 @@ public static class EnrollmentEndpoints
         ProblemDetailsFactory problemFactory,
         CancellationToken ct = default)
     {
-        var result = await enrollmentService.GetEnrollmentByIdAsync(id);
+        var result = await enrollmentService.GetEnrollmentByIdAsync(id, ct);
 
         if (!result.IsSuccess)
         {
@@ -48,7 +48,7 @@ public static class EnrollmentEndpoints
         IEnrollmentService enrollmentService,
         CancellationToken ct = default)
     {
-        var response = await enrollmentService.SearchEnrollmentsAsync(searchDto);
+        var response = await enrollmentService.SearchEnrollmentsAsync(searchDto, ct);
 
         return Results.Ok(response);
     }
@@ -56,9 +56,10 @@ public static class EnrollmentEndpoints
     private static async Task<IResult> CreateEnrollment(
         EnrollmentCreateDto enrollmentCreateDto,
         IEnrollmentService enrollmentService,
-        ProblemDetailsFactory problemFactory)
+        ProblemDetailsFactory problemFactory,
+        CancellationToken ct = default)
     {
-        var result = await enrollmentService.CreateEnrollmentAsync(enrollmentCreateDto);
+        var result = await enrollmentService.CreateEnrollmentAsync(enrollmentCreateDto, ct);
 
         if (!result.IsSuccess)
         {
@@ -74,9 +75,10 @@ public static class EnrollmentEndpoints
     private static async Task<IResult> DeleteEnrollment(
         int id,
         IEnrollmentService enrollmentService,
-        ProblemDetailsFactory problemFactory)
+        ProblemDetailsFactory problemFactory,
+        CancellationToken ct = default)
     {
-        var result = await enrollmentService.DeleteEnrollmentAsync(id);
+        var result = await enrollmentService.DeleteEnrollmentAsync(id, ct);
 
         if (!result.IsSuccess)
         {
