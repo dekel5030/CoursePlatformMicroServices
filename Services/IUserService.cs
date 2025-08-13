@@ -13,7 +13,6 @@ namespace UserService.Services
         Task<PagedResponseDto<UserReadDto>> GetUsersByQueryAsync(UserSearchDto query);
 
         // === Update ===
-        Task<Result<UserReadDto>> SetUserActivationAsync(int userId, bool isActive);
         Task<Result<UserReadDto>> PatchUser(UserPatchDto userPatchDto);
 
         // === Delete ===

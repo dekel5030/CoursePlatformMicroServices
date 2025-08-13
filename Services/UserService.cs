@@ -58,22 +58,7 @@ namespace UserService.Services
             };
         }
 
-        // === Update ===
-
-        public async Task<Result<UserReadDto>> SetUserActivationAsync(int userId, bool isActive)
-        {
-            var user = await _repository.GetUserByIdAsync(userId);
-
-            if (user == null)
-            {
-                return Result<UserReadDto>.Failure(Error.UserNotFound);
-            }
-
-            await _repository.SaveChangesAsync();
-
-            return Result<UserReadDto>.Success(_mapper.Map<UserReadDto>(user));
-        }
-
+        // === Update ===W
         public Task<Result<UserReadDto>> PatchUser(UserPatchDto userPatchDto) 
         {
             throw new NotImplementedException();

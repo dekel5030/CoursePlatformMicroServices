@@ -24,8 +24,6 @@ namespace UserService.Profiles
                 .ForMember(dest => dest.Bio, opt => opt.MapFrom(src => src.Bio))
                 .ForAllMembers(dest => dest.Condition((src, dest, srcMember) => srcMember != null));
 
-            CreateMap<ChangePasswordDto, User>();
-
             CreateMap<ChangeEmailDto, User>()
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.NewEmail));
 

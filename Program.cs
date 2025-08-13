@@ -1,4 +1,4 @@
-using Common.Grpc;
+
 using UserService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,10 +9,14 @@ builder.Services.AddUserServiceDependencies(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
 
 app.UseUserServiceDependencies();
-app.MapUserServiceEndpoints();
+app.UseHttpsRedirection();
+app.MapControllers();
 
 app.Run();
 
