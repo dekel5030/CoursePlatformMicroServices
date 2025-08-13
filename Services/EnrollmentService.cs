@@ -2,6 +2,7 @@ using AutoMapper;
 using Common;
 using Common.Errors;
 using EnrollmentService.Data;
+using EnrollmentService.Data.Queries.Implementations;
 using EnrollmentService.Dtos;
 using EnrollmentService.Models;
 
@@ -44,8 +45,10 @@ public class EnrollmentService : IEnrollmentService
         EnrollmentSearchDto searchDto,
         CancellationToken ct = default)
     {
+        var query = new EnrollmentQuery(searchDto);
+        
         (IEnumerable<Enrollment> enrollments, int totalCount) =
-            await _enrollmentRepo.SearchEnrollmentsAsync(searchDto, ct);
+            await _enrollmentRepo.SearchEnrollmentsAsync(query, ct);
 
         var enrollmentReadDtos = _mapper.Map<IEnumerable<EnrollmentReadDto>>(enrollments);
 

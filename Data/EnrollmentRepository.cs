@@ -13,11 +13,9 @@ public class EnrollmentRepository : IEnrollmentRepository
         _dbContext = dbContext;
     }
 
-    public Task<Enrollment?> GetByIdAsync(int id, CancellationToken ct = default)
+    public async Task<Enrollment?> GetByIdAsync(int id, CancellationToken ct = default)
     {
-        return _dbContext.Enrollments
-            .AsNoTracking()
-            .FirstOrDefaultAsync(e => e.Id == id, ct);
+        return await _dbContext.Enrollments.FindAsync(id, ct);
     }
 
     public async Task<(IReadOnlyList<Enrollment> enrollments, int totalCount)> SearchEnrollmentsAsync(
