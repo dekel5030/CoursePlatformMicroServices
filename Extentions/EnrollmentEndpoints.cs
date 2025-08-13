@@ -1,6 +1,7 @@
 using Common.Auth;
 using Common.Auth.Extentions;
 using Common.Web.Errors;
+using EnrollmentService.Dtos;
 using EnrollmentService.Services;
 
 namespace EnrollmentService.Extensions;
@@ -62,7 +63,7 @@ public static class EnrollmentEndpoints
 
         return Results.CreatedAtRoute(
             "GetEnrollmentById",
-            new { id = result.Value.Id },
+            new { id = result.Value!.Id },
             result.Value);
     }
 
