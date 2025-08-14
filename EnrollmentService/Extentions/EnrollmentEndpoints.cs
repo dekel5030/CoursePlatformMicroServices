@@ -19,10 +19,10 @@ public static class EnrollmentEndpoints
     {
         var group = routes.MapGroup("/api/admin/enrollments").RequirePermission(PermissionType.CanModifyEnrollment);
 
-        group.MapGet("/{id}", GetEnrollmentById).WithName("GetEnrollmentById");;
+        group.MapGet("/{id:int}", GetEnrollmentById).WithName("GetEnrollmentById");
         group.MapGet("/", SearchEnrollments);
         group.MapPost("/", CreateEnrollment);
-        group.MapDelete("/{id}", DeleteEnrollment);
+        group.MapDelete("/{id:int}", DeleteEnrollment);
 
         return routes;
     }
