@@ -1,13 +1,16 @@
 using Common.Resources.ValidationMessages;
 using EnrollmentService.Dtos;
+using EnrollmentService.Options;
 using FluentValidation;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 
 namespace EnrollmentService.Validators;
 
 public class EnrollmentSearchDtoValidator : AbstractValidator<EnrollmentSearchDto>
 {
-    public EnrollmentSearchDtoValidator(IStringLocalizer<ValidationMessages> localizer)
+    public EnrollmentSearchDtoValidator(
+        IStringLocalizer<ValidationMessages> localizer, IOptions<PaginationOptions> paginationOptions)
     {
         RuleFor(x => x.Status)
             .IsInEnum().When(x => x.Status.HasValue)
@@ -20,8 +23,8 @@ public class EnrollmentSearchDtoValidator : AbstractValidator<EnrollmentSearchDt
         RuleFor(x => x.PageSize)
             .GreaterThanOrEqualTo(1)
             .WithMessage(localizer[ValidationMessages.PageSizeGreaterThanZero])
-            .LessThanOrEqualTo(100)
-            .WithMessage(localizer[ValidationMessages.PageSizeLessThanOrEqualTo100]);
+            .LessThanOrEqualTo(paginationOptions.Value.MaxPageSize)
+            .WithMessage(localizer[ValidationMessages.PageSizeLessThanOrEqualTo, paginationOptions.Value.MaxPageSize]);
 
         RuleFor(x => x.Id).GreaterThan(0).When(x => x.Id.HasValue)
             .WithMessage(localizer[ValidationMessages.EnrollmentIdGreaterThanZero]);

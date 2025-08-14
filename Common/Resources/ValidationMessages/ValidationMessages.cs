@@ -33,7 +33,7 @@ namespace Common.Resources.ValidationMessages
         public const string UserIdRequired = "UserIdRequired";
         public const string InvalidEnrollmentStatus = "InvalidEnrollmentStatus";
         public const string ExpirationMustBeInFuture = "ExpirationMustBeInFuture";
-        public const string PageSizeLessThanOrEqualTo100 = "PageSizeLessThanOrEqualTo100";
+        public const string PageSizeLessThanOrEqualTo = "PageSizeLessThanOrEqualTo";
         public const string EnrollmentIdGreaterThanZero = "EnrollmentIdGreaterThanZero";
         public const string CourseIdGreaterThanZero = "CourseIdGreaterThanZero";
         public const string UserIdGreaterThanZero = "UserIdGreaterThanZero";

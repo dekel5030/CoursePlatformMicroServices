@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddEnrollmentDependencies(this IServiceCollection services)
     {
+        services.SetupOptions();
         services.AddEnrollmentDbContext();
         services.AddScoped<IEnrollmentService, Services.EnrollmentService>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
@@ -31,6 +32,16 @@ public static class ServiceCollectionExtensions
 
             options.UseNpgsql(dbOptions.BuildConnectionString());
         });
+
+        return services;
+    }
+
+    private static IServiceCollection SetupOptions(this IServiceCollection services)
+    {
+        services.AddOptions<PaginationOptions>()
+            .BindConfiguration(PaginationOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         return services;
     }
