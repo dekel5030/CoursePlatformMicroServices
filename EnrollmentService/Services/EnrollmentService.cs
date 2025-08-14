@@ -17,7 +17,6 @@ public class EnrollmentService : IEnrollmentService
     private readonly IMapper _mapper;
     private readonly PaginationOptions _paginationOptions;
     private readonly IEnrollmentEventPublisher _publisher;
-
     private readonly ILogger<EnrollmentService> _logger;
 
     public EnrollmentService(
