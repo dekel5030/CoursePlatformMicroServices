@@ -1,5 +1,6 @@
 using EnrollmentService.Data;
 using EnrollmentService.Options;
+using EnrollmentService.Profiles;
 using EnrollmentService.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -13,7 +14,7 @@ public static class ServiceCollectionExtensions
         services.AddEnrollmentDbContext();
         services.AddScoped<IEnrollmentService, Services.EnrollmentService>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
-        //services.AddAutoMapper(typeof(Program));
+        services.AddAutoMapper(cfg => { }, typeof(EnrollmentProfile).Assembly);
         return services;
     }
 
