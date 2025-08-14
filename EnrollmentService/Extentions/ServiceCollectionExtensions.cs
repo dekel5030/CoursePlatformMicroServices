@@ -1,4 +1,9 @@
+using Common;
+using Common.Messaging.Extensions;
+using Common.Messaging.Options;
+using Common.Web.Errors;
 using EnrollmentService.Data;
+using EnrollmentService.Messaging.Publishers;
 using EnrollmentService.Options;
 using EnrollmentService.Profiles;
 using EnrollmentService.Services;
@@ -15,7 +20,15 @@ public static class ServiceCollectionExtensions
         services.AddEnrollmentDbContext();
         services.AddScoped<IEnrollmentService, Services.EnrollmentService>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+        services.AddLocalization();
+        services.AddSingleton<ProblemDetailsFactory>();
         services.AddAutoMapper(cfg => { }, typeof(EnrollmentProfile).Assembly);
+
+        services.AddAppMessaging();
+        services.AddScoped<IEnrollmentEventPublisher, EnrollmentEventPublisher>();
+
+        services.AddAppSwagger();
+
         return services;
     }
 
@@ -43,6 +56,23 @@ public static class ServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        return services;
+    }
+
+    private static IServiceCollection AddAppMessaging(this IServiceCollection services)
+    {
+        services.AddOptions<RabbitMqOptions>()
+            .BindConfiguration(RabbitMqOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddOptions<MassTransitOptions>()
+            .BindConfiguration(MassTransitOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddMassTransitRabbitMq();
+        
         return services;
     }
 }
