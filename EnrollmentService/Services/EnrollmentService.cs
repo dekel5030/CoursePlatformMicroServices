@@ -4,6 +4,7 @@ using Common.Errors;
 using EnrollmentService.Data;
 using EnrollmentService.Data.Queries.Implementations;
 using EnrollmentService.Dtos;
+using EnrollmentService.Messaging.Publishers;
 using EnrollmentService.Models;
 using EnrollmentService.Options;
 using Microsoft.Extensions.Options;
@@ -15,17 +16,20 @@ public class EnrollmentService : IEnrollmentService
     private readonly IEnrollmentRepository _enrollmentRepo;
     private readonly IMapper _mapper;
     private readonly PaginationOptions _paginationOptions;
+    private readonly IEnrollmentEventPublisher _publisher;
     private readonly ILogger<EnrollmentService> _logger;
 
     public EnrollmentService(
         IEnrollmentRepository enrollmentRepository,
         IMapper mapper,
         IOptions<PaginationOptions> paginationOptions,
+        IEnrollmentEventPublisher publisher,
         ILogger<EnrollmentService> logger)
     {
         _enrollmentRepo = enrollmentRepository;
         _mapper = mapper;
         _paginationOptions = paginationOptions.Value;
+        _publisher = publisher;
         _logger = logger;
     }
 
@@ -42,7 +46,7 @@ public class EnrollmentService : IEnrollmentService
         }
 
         var enrollmentReadDto = _mapper.Map<EnrollmentReadDto>(enrollment);
-
+        
         return Result<EnrollmentReadDto>.Success(enrollmentReadDto);
     }
 
@@ -81,6 +85,9 @@ public class EnrollmentService : IEnrollmentService
         await _enrollmentRepo.AddAsync(enrollment, ct);
         await _enrollmentRepo.SaveChangesAsync(ct);
 
+        await _publisher.PublishEnrollmentCreatedAsync(
+            enrollment.Id, enrollment.UserId, enrollment.CourseId, correlationId: Guid.NewGuid());
+         
         var enrollmentReadDto = _mapper.Map<EnrollmentReadDto>(enrollment);
         return Result<EnrollmentReadDto>.Success(enrollmentReadDto);
     }
