@@ -1,0 +1,70 @@
+## Build results
+bin/
+obj/
+out/
+
+## Rider
+.idea/
+*.sln.iml
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## ASP.NET Core secrets
+**/appsettings.*.json
+secrets.json
+
+## User-specific files
+*.rsuser
+*.sln.docstates
+
+## Logs
+*.log
+
+## DotCover
+*.dotCover
+
+## NCrunch
+*.ncrunch*
+*.nunit.xml
+
+## VS Code
+.vscode/
+
+## Packages
+*.nupkg
+*.snupkg
+*.nuspec
+packages/
+*.symbols.nupkg
+
+## Entity Framework
+Migrations/
+
+## Publish output
+publish/
+
+## Test Results
+TestResults/
+*.coverage
+*.coveragexml
+
+## Others
+_ReSharper*/
+*.sdf
+*.dbmdl
+*.bak
+*.orig
+*.cache
+*.pdb
+*.mdb
+*.tmp
+*.swp
+
+## macOS/Linux artifacts
+.DS_Store
+*.sw

@@ -1,0 +1,119 @@
+using AuthService.Data;
+using AuthService.Data.Context;
+using AuthService.Data.Repositories.Implementations;
+using AuthService.Data.Repositories.Interfaces;
+using AuthService.Security;
+using AuthService.Services;
+using AuthService.Services.Admin.Implementations;
+using AuthService.Services.Admin.Interfaces;
+using AuthService.Settings;
+using AuthService.SyncDataServices.Grpc;
+using AuthService.SyncDataServices.Http;
+using AuthService.Validators;
+using Common;
+using Common.Auth.Extentions;
+using Common.Rollback;
+using Common.Web.Errors;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using static Common.Grpc.GrpcUserService;
+namespace AuthService.Extensions;
+
+public static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddAuthDbContext(config);
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        services.AddJwtAuthentication(config);
+        services.AddJwtTokenGeneration();
+        services.AddPermissionAuthorization();
+
+        services.AddRepositories();
+        services.AddAdminServices();
+
+        services.AddScoped<IAuthService, Services.AuthService>();
+        services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+        services.AddScoped<IRollbackManager, StackRollbackManager>();
+        services.AddScoped<ProblemDetailsFactory>();
+
+        services.AddSyncClients(config);
+
+        services
+            .AddFluentValidationAutoValidation()
+            .AddFluentValidationClientsideAdapters();
+        services.AddValidatorsFromAssemblyContaining<Program>();
+
+        services.AddValidationOptions(config);
+
+        services.AddAppSwagger();
+
+        return services;
+    }
+
+    private static IServiceCollection AddAuthDbContext(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddOptions<AuthDbSettings>().Bind(config.GetSection(AuthDbSettings.SectionName))
+            .ValidateDataAnnotations().ValidateOnStart();
+
+        services.AddDbContext<AuthDbContext>((sp, options) =>
+        {
+            var settings = sp.GetRequiredService<IOptions<AuthDbSettings>>().Value;
+            options.UseNpgsql(settings.BuildConnectionString());
+        });
+
+        return services;
+    }
+
+    private static IServiceCollection AddJwtTokenGeneration(this IServiceCollection services)
+    {
+        services.AddSingleton<ITokenService, TokenService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<UnitOfWork>();
+        services.AddScoped<IAuthUserRepository, AuthUserRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IPermissionRepository, PermissionRepository>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddAdminServices(this IServiceCollection services)
+    {
+        services.AddScoped<IAdminPermissionService, AdminPermissionService>();
+        services.AddScoped<IAdminRoleService, AdminRoleService>();
+        services.AddScoped<IAdminUserService, AdminUserService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddSyncClients(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddHttpClient<IUserServiceDataClient, HttpUserServiceDataClient>();
+        services.AddGrpcClient<GrpcUserServiceClient>(s =>
+        {
+            s.Address = new Uri(config["Grpc:UserServiceUrl"]!);
+        });
+        services.AddScoped<IGrpcUserServiceDataClient, GrpcUserServiceDataClient>();
+
+        services.AddHttpContextAccessor();
+
+        return services;
+    }
+
+    private static IServiceCollection AddValidationOptions(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddOptions<ValidationSettings>()
+            .Bind(config.GetSection(ValidationSettings.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        return services;
+    }
+}

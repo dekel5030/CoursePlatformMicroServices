@@ -1,0 +1,33 @@
+### Get course by id (replace {id} with actual course id)
+GET http://localhost:5198/api/courses/1
+Accept: application/json
+
+###
+
+### Search courses with query parameters (optional)
+GET http://localhost:5198/api/courses?Title=c&IsPublished=true&PageNumber=1&PageSize=5
+Accept: application/json
+
+###
+
+### Add a new course (must be Instructor role)
+POST http://localhost:5198/api/courses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQ1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiZGVrZWwwMTExQGV4YW1wbGUuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW4iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiIiwiZXhwIjoxNzU0NTU1MDI1LCJpc3MiOiJDb3Vyc2VQbGF0Zm9ybUF1dGgiLCJhdWQiOiJDb3Vyc2VQbGF0Zm9ybVVzZXJzIn0.eL6Ijl3s-WSuTx6iYrlrtc2aMpNmt8mrweMnTm3CuYo
+
+{
+  "title": "New Course Title",
+  "description": "Description of the new course",
+  "imageUrl": "http://example.com/image.png",
+  "instructorUserId": 123,
+  "isPublished": false,
+  "price": 99.99
+}
+
+###
+
+### Delete a course by id (replace {id} with actual course id)
+DELETE http://localhost:5198/api/courses/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
