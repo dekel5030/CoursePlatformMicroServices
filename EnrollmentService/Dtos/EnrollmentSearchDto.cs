@@ -15,6 +15,6 @@ public sealed record class EnrollmentSearchDto
     public DateTime? UpdatedAt { get; init; }
     public DateTime? ExpiresAt { get; init; }
 
-    public int PageNumber { get; init; } = 1;
-    public int PageSize { get; init; } = 10;
+    public int? PageNumber { get; init; }
+    public int? PageSize { get; init; }
 }

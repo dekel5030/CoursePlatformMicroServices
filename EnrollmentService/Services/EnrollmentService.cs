@@ -5,6 +5,8 @@ using EnrollmentService.Data;
 using EnrollmentService.Data.Queries.Implementations;
 using EnrollmentService.Dtos;
 using EnrollmentService.Models;
+using EnrollmentService.Options;
+using Microsoft.Extensions.Options;
 
 namespace EnrollmentService.Services;
 
@@ -12,15 +14,18 @@ public class EnrollmentService : IEnrollmentService
 {
     private readonly IEnrollmentRepository _enrollmentRepo;
     private readonly IMapper _mapper;
+    private readonly PaginationOptions _paginationOptions;
     private readonly ILogger<EnrollmentService> _logger;
 
     public EnrollmentService(
         IEnrollmentRepository enrollmentRepository,
         IMapper mapper,
+        IOptions<PaginationOptions> paginationOptions,
         ILogger<EnrollmentService> logger)
     {
         _enrollmentRepo = enrollmentRepository;
         _mapper = mapper;
+        _paginationOptions = paginationOptions.Value;
         _logger = logger;
     }
 
@@ -45,8 +50,8 @@ public class EnrollmentService : IEnrollmentService
         EnrollmentSearchDto searchDto,
         CancellationToken ct = default)
     {
-        var query = new EnrollmentQuery(searchDto);
-        
+        EnrollmentQuery query = EnrollmentQuery.FromDto(searchDto, _paginationOptions);
+
         (IEnumerable<Enrollment> enrollments, int totalCount) =
             await _enrollmentRepo.SearchEnrollmentsAsync(query, ct);
 
@@ -56,8 +61,8 @@ public class EnrollmentService : IEnrollmentService
         {
             Items = enrollmentReadDtos,
             TotalCount = totalCount,
-            PageSize = searchDto.PageSize,
-            PageNumber = searchDto.PageNumber
+            PageSize = query.PageSize,
+            PageNumber = query.PageNumber
         };
     }
 
