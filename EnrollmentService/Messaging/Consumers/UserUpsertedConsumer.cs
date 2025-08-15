@@ -32,8 +32,7 @@ public class UserUpsertedConsumer : IConsumer<UserUpsertedV1>
 
             _dbContext.KnownUsers.Add(user);
         }
-
-        if (message.Version > user.Version)
+        else if (message.Version > user.Version)
         {
             user.Version = message.Version;
             user.IsActive = true;
