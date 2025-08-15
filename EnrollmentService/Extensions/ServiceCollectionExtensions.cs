@@ -3,10 +3,12 @@ using Common.Messaging.Extensions;
 using Common.Messaging.Options;
 using Common.Web.Errors;
 using EnrollmentService.Data;
+using EnrollmentService.Messaging.Consumers;
 using EnrollmentService.Messaging.Publishers;
 using EnrollmentService.Options;
 using EnrollmentService.Profiles;
 using EnrollmentService.Services;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -23,9 +25,9 @@ public static class ServiceCollectionExtensions
         services.AddLocalization();
         services.AddSingleton<ProblemDetailsFactory>();
         services.AddAutoMapper(cfg => { }, typeof(EnrollmentProfile).Assembly);
+        services.AddScoped<IEnrollmentEventPublisher, EnrollmentEventPublisher>();
 
         services.AddAppMessaging();
-        services.AddScoped<IEnrollmentEventPublisher, EnrollmentEventPublisher>();
 
         services.AddAppSwagger();
 
@@ -71,7 +73,23 @@ public static class ServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddMassTransitRabbitMq();
+        services.AddMassTransitRabbitMq(reg =>
+        {
+            reg.AddConsumer<CourseUpsertedConsumer>((context, config) =>
+            {
+                config.UseInMemoryOutbox(context);
+            });
+
+            reg.AddConsumer<CourseRemovedConsumer>((context, config) =>
+            {
+                config.UseInMemoryOutbox(context);
+            });
+
+            reg.AddConsumer<UserUpsertedConsumer>((context, config) =>
+            {
+                config.UseInMemoryOutbox(context);
+            });
+        });
         
         return services;
     }
