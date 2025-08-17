@@ -19,9 +19,11 @@ public class CourseDbContext : DbContext
     {
         ConfigureCourse(modelBuilder);
         ConfigureLesson(modelBuilder);
-
-        modelBuilder.Entity<Enrollment>()
-            .HasKey(e => new { e.UserId, e.CourseId });
+        modelBuilder.Entity<Enrollment>(enrollment =>
+        {
+            enrollment.HasKey(e => e.EnrollmentId);
+            enrollment.HasIndex(e => new { e.UserId, e.CourseId }).IsUnique();
+        });
 
         base.OnModelCreating(modelBuilder);
     }
