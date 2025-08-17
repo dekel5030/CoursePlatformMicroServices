@@ -3,8 +3,10 @@ using Common;
 using Common.Errors;
 using CourseService.Data.CoursesRepo;
 using CourseService.Dtos;
+using CourseService.Dtos.CourseEvents;
 using CourseService.Dtos.Courses;
 using CourseService.Dtos.Lessons;
+using CourseService.Messaging.Publisher;
 using CourseService.Models;
 
 namespace CourseService.Services;
@@ -13,11 +15,13 @@ public class CourseService : ICourseService
 {
     private readonly ICourseRepository _repository;
     private readonly IMapper _mapper;
+    private readonly ICourseEventPublisher _publisher;
 
-    public CourseService(ICourseRepository repository, IMapper mapper)
+    public CourseService(ICourseRepository repository, IMapper mapper, ICourseEventPublisher publisher)
     {
         _repository = repository;
         _mapper = mapper;
+        _publisher = publisher;
     }
 
     public async Task<Result<CourseReadDto>> AddCourseAsync(CourseCreateDto courseCreateDto)
@@ -26,6 +30,11 @@ public class CourseService : ICourseService
 
         await _repository.AddCourseAsync(course);
         await _repository.SaveChangesAsync();
+        await _publisher.PublishCourseUpsertedEvent(new CourseUpsertedEventDto
+        {
+            CourseId = course.Id,
+            IsPublished = course.IsPublished
+        }, Guid.NewGuid().ToString());
 
         return Result<CourseReadDto>.Success(_mapper.Map<CourseReadDto>(course));
     }
@@ -55,6 +64,7 @@ public class CourseService : ICourseService
 
         _repository.DeleteCourse(course);
         await _repository.SaveChangesAsync();
+        await _publisher.PublishCourseRemovedEvent(course.Id, Guid.NewGuid().ToString());
 
         return Result<CourseReadDto>.Success(_mapper.Map<CourseReadDto>(course));
     }
