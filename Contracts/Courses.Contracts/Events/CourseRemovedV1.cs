@@ -6,4 +6,8 @@ public sealed record CourseRemovedV1(
     int CourseId,
     long Version,
     DateTime UpdatedAtUtc
-);
+)
+{
+    public const string EventType = "CourseRemoved";
+    public const int Version = 1;
+};
