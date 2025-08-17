@@ -1,10 +1,11 @@
 namespace Enrollments.Contracts.Events;
 
 public sealed record EnrollmentCreatedV1(
-    Guid MessageId,
-    Guid CorrelationId,
     int EnrollmentId,
     int UserId,
-    int CourseId,
-    DateTime EnrolledAtUtc
-);
+    int CourseId
+)
+{
+    public const string EventType = "EnrollmentCreated";
+    public const int Version = 1;
+};
