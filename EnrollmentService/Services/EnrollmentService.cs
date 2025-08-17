@@ -8,6 +8,7 @@ using EnrollmentService.Messaging.Publishers;
 using EnrollmentService.Models;
 using EnrollmentService.Options;
 using Microsoft.Extensions.Options;
+using static EnrollmentService.Messaging.Publishers.EnrollmentEventPublisher;
 
 namespace EnrollmentService.Services;
 
@@ -86,7 +87,7 @@ public class EnrollmentService : IEnrollmentService
         await _enrollmentRepo.SaveChangesAsync(ct);
 
         await _publisher.PublishEnrollmentCreatedAsync(
-            enrollment.Id, enrollment.UserId, enrollment.CourseId, correlationId: Guid.NewGuid());
+            enrollment.Id, enrollment.UserId, enrollment.CourseId, correlationId: Guid.NewGuid().ToString(), ct);
          
         var enrollmentReadDto = _mapper.Map<EnrollmentReadDto>(enrollment);
         return Result<EnrollmentReadDto>.Success(enrollmentReadDto);
@@ -106,6 +107,15 @@ public class EnrollmentService : IEnrollmentService
 
         _enrollmentRepo.Remove(enrollment);
         await _enrollmentRepo.SaveChangesAsync(ct);
+
+        await _publisher.PublishEnrollmentCancelledAsync(
+            enrollment.Id,
+            enrollment.UserId,
+            enrollment.CourseId,
+            correlationId: Guid.NewGuid().ToString(),
+            CancellationReasons.Deleted,
+            ct
+        );
 
         return Result<bool>.Success(true);
     }
