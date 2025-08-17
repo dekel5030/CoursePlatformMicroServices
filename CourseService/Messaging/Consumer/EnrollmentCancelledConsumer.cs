@@ -7,18 +7,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CourseService.Messaging.Consumer;
 
-public class EnrollmentUpsertedConsumer : IConsumer<EventEnvelope<EnrollmentCreatedV1>>
+public class EnrollmentCancelledConsumer : IConsumer<EventEnvelope<EnrollmentCancelledV1>>
 {
     private readonly CourseDbContext _dbContext;
     
-    public EnrollmentUpsertedConsumer(CourseDbContext dbContext)
+    public EnrollmentCancelledConsumer(CourseDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task Consume(ConsumeContext<EventEnvelope<EnrollmentCreatedV1>> context)
+    public async Task Consume(ConsumeContext<EventEnvelope<EnrollmentCancelledV1>> context)
     {
-        EventEnvelope<EnrollmentCreatedV1> message = context.Message;
+        EventEnvelope<EnrollmentCancelledV1> message = context.Message;
         CancellationToken ct = context.CancellationToken;
 
         Enrollment? enrollment = await _dbContext.Enrollments
@@ -32,14 +32,14 @@ public class EnrollmentUpsertedConsumer : IConsumer<EventEnvelope<EnrollmentCrea
                 CourseId = message.Payload.CourseId,
                 UserId = message.Payload.UserId,
                 UpdatedAt = message.OccurredAtUtc,
-                IsActive = true
+                IsActive = false
             };
 
             await _dbContext.Enrollments.AddAsync(enrollment, ct);
         }
         else if (enrollment.UpdatedAt < message.OccurredAtUtc)
         {
-            enrollment.IsActive = true;
+            enrollment.IsActive = false;
             enrollment.UpdatedAt = message.OccurredAtUtc;
         }
         else
