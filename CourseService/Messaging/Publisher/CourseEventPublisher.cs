@@ -34,7 +34,7 @@ public class CourseEventPublisher : ICourseEventPublisher
     {
         var message = new CourseUpsertedV1
         (
-            CourseId: course.Id,
+            CourseId: course.CourseId,
             IsPublished: course.IsPublished
         );
 
