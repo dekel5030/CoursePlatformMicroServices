@@ -1,3 +1,4 @@
+using Common.Messaging.EventEnvelope;
 using EnrollmentService.Data;
 using EnrollmentService.Models;
 using MassTransit;
@@ -5,7 +6,7 @@ using Users.Contracts.Events;
 
 namespace EnrollmentService.Messaging.Consumers;
 
-public class UserUpsertedConsumer : IConsumer<UserUpsertedV1>
+public class UserUpsertedConsumer : IConsumer<EventEnvelope<UserUpsertedV1>>
 {
     private readonly EnrollmentDbContext _dbContext;
 
@@ -14,9 +15,10 @@ public class UserUpsertedConsumer : IConsumer<UserUpsertedV1>
         _dbContext = dbContext;
     }
 
-    public async Task Consume(ConsumeContext<UserUpsertedV1> context)
+    public async Task Consume(ConsumeContext<EventEnvelope<UserUpsertedV1>> context)
     {
-        UserUpsertedV1 message = context.Message;
+        EventEnvelope<UserUpsertedV1> envelope = context.Message;
+        UserUpsertedV1 message = envelope.Payload;
 
         KnownUser? user = await _dbContext.KnownUsers.FindAsync(message.UserId);
 
@@ -25,16 +27,14 @@ public class UserUpsertedConsumer : IConsumer<UserUpsertedV1>
             user = new KnownUser
             {
                 UserId = message.UserId,
-                Version = message.Version,
                 IsActive = true,
                 UpdatedAtUtc = message.UpdatedAtUtc
             };
 
             _dbContext.KnownUsers.Add(user);
         }
-        else if (message.Version > user.Version)
+        else if (envelope.OccurredAtUtc > user.UpdatedAtUtc)
         {
-            user.Version = message.Version;
             user.IsActive = true;
             user.UpdatedAtUtc = message.UpdatedAtUtc;
         }

@@ -1,3 +1,4 @@
+using Common.Messaging.EventEnvelope;
 using Courses.Contracts.Events;
 using EnrollmentService.Data;
 using EnrollmentService.Models;
@@ -5,7 +6,7 @@ using MassTransit;
 
 namespace EnrollmentService.Messaging.Consumers;
 
-public class CourseUpsertedConsumer : IConsumer<CourseUpsertedV1>
+public class CourseUpsertedConsumer : IConsumer<EventEnvelope<CourseUpsertedV1>>
 {
     private readonly EnrollmentDbContext _dbContext;
 
@@ -14,9 +15,10 @@ public class CourseUpsertedConsumer : IConsumer<CourseUpsertedV1>
         _dbContext = dbContext;
     }
 
-    public async Task Consume(ConsumeContext<CourseUpsertedV1> context)
+    public async Task Consume(ConsumeContext<EventEnvelope<CourseUpsertedV1>> context)
     {
-        CourseUpsertedV1 message = context.Message;
+        EventEnvelope<CourseUpsertedV1> envelope = context.Message;
+        CourseUpsertedV1 message = envelope.Payload;
 
         KnownCourse? course = await _dbContext.KnownCourses.FindAsync(message.CourseId);
 
@@ -25,18 +27,16 @@ public class CourseUpsertedConsumer : IConsumer<CourseUpsertedV1>
             course = new KnownCourse
             {
                 CourseId = message.CourseId,
-                Version = message.Version,
                 IsAvailable = true,
-                UpdatedAtUtc = message.UpdatedAtUtc
+                UpdatedAtUtc = envelope.OccurredAtUtc
             };
 
             _dbContext.KnownCourses.Add(course);
         }
-        else if (message.Version > course.Version)
+        else if (envelope.OccurredAtUtc > course.UpdatedAtUtc)
         {
-            course.Version = message.Version;
             course.IsAvailable = true;
-            course.UpdatedAtUtc = message.UpdatedAtUtc;
+            course.UpdatedAtUtc = envelope.OccurredAtUtc;
         }
 
         await _dbContext.SaveChangesAsync();
