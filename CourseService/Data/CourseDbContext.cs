@@ -13,11 +13,16 @@ public class CourseDbContext : DbContext
 
     public DbSet<Course> Courses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
+    public DbSet<Enrollment> Enrollments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureCourse(modelBuilder);
         ConfigureLesson(modelBuilder);
+
+        modelBuilder.Entity<Enrollment>()
+            .HasKey(e => new { e.UserId, e.CourseId });
+
         base.OnModelCreating(modelBuilder);
     }
 

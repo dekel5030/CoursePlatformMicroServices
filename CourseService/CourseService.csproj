@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
     <ProjectReference Include="..\Contracts\Courses.Contracts\Courses.Contracts.csproj" />
+    <ProjectReference Include="..\Contracts\Enrollments.Contracts\Enrollments.Contracts.csproj" />
     <ProjectReference Include="..\src\Common.Messaging\Common.Messaging.csproj" />
   </ItemGroup>
 </Project>
