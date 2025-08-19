@@ -1,11 +1,11 @@
 namespace Enrollments.Contracts.Events;
 
-public sealed record EnrollmentCreatedV1(
+public sealed record EnrollmentUpsertedV1(
     int EnrollmentId,
     int UserId,
-    int CourseId
+    int CourseId,
+    bool IsActive
 )
 {
-    public const string EventType = "EnrollmentCreated";
     public const int Version = 1;
 };

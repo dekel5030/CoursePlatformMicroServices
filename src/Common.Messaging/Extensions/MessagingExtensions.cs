@@ -9,25 +9,38 @@ public static class MessagingExtensions
 {
     public static IServiceCollection AddMassTransitRabbitMq(
         this IServiceCollection services,
-        Action<IBusRegistrationConfigurator>? registerConsumers = null)
+        Action<IBusRegistrationConfigurator> registerConsumers,
+        Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>? perServiceConfigure = null)
     {
-        services.AddMassTransit(reg =>
+        services.AddMassTransit(x =>
         {
-            registerConsumers?.Invoke(reg);
+            x.SetKebabCaseEndpointNameFormatter();
 
-            reg.UsingRabbitMq((context, bus) =>
+            registerConsumers(x);
+
+            x.UsingRabbitMq((ctx, cfg) =>
             {
-                var rabbitOpt = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
-                var massTransitOpt = context.GetRequiredService<IOptions<MassTransitOptions>>().Value;
+                var rabbit = ctx.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
+                var mt     = ctx.GetRequiredService<IOptions<MassTransitOptions>>().Value;
 
-                ConfigureRabbitHost(bus, rabbitOpt);
-                ApplyPolicies(bus, massTransitOpt);
+                cfg.Host(rabbit.CreateUri(), h =>
+                {
+                    h.Username(rabbit.User);
+                    h.Password(rabbit.Password);
+                    if (rabbit.UseSsl) h.UseSsl(_ => { });
+                });
 
-                if (massTransitOpt.PrefetchCount is ushort prefetch)
-                    bus.PrefetchCount = prefetch;
+                cfg.UseMessageRetry(r => r.Incremental(
+                    mt.RetryCount,
+                    TimeSpan.FromSeconds(mt.RetryInitialSeconds),
+                    TimeSpan.FromSeconds(mt.RetryIncrementSeconds)));
 
-                if (massTransitOpt.UseKebabCaseEndpoints)
-                    bus.ConfigureEndpoints(context);
+                if (mt.PrefetchCount is ushort prefetch)
+                    cfg.PrefetchCount = prefetch;
+
+                perServiceConfigure?.Invoke(ctx, cfg);
+
+                cfg.ConfigureEndpoints(ctx);
             });
         });
 
