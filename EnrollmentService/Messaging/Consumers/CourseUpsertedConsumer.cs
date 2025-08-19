@@ -1,44 +1,21 @@
 using Common.Messaging.EventEnvelope;
 using Courses.Contracts.Events;
-using EnrollmentService.Data;
-using EnrollmentService.Models;
+using EnrollmentService.Services.EnrollmentMessageHandler;
 using MassTransit;
 
 namespace EnrollmentService.Messaging.Consumers;
 
 public class CourseUpsertedConsumer : IConsumer<EventEnvelope<CourseUpsertedV1>>
 {
-    private readonly EnrollmentDbContext _dbContext;
+    private readonly IEnvelopeHandler<CourseUpsertedV1> _handler;
 
-    public CourseUpsertedConsumer(EnrollmentDbContext dbContext)
+    public CourseUpsertedConsumer(IEnvelopeHandler<CourseUpsertedV1> handler)
     {
-        _dbContext = dbContext;
+        _handler = handler;
     }
-
-    public async Task Consume(ConsumeContext<EventEnvelope<CourseUpsertedV1>> context)
+    
+    public Task Consume(ConsumeContext<EventEnvelope<CourseUpsertedV1>> context)
     {
-        EventEnvelope<CourseUpsertedV1> envelope = context.Message;
-        CourseUpsertedV1 message = envelope.Payload;
-
-        KnownCourse? course = await _dbContext.KnownCourses.FindAsync(message.CourseId);
-
-        if (course is null)
-        {
-            course = new KnownCourse
-            {
-                CourseId = message.CourseId,
-                IsAvailable = true,
-                UpdatedAtUtc = envelope.OccurredAtUtc
-            };
-
-            _dbContext.KnownCourses.Add(course);
-        }
-        else if (envelope.OccurredAtUtc > course.UpdatedAtUtc)
-        {
-            course.IsAvailable = true;
-            course.UpdatedAtUtc = envelope.OccurredAtUtc;
-        }
-
-        await _dbContext.SaveChangesAsync();
+        return _handler.HandleAsync(context.Message, context.CancellationToken);
     }
 }

@@ -7,6 +7,5 @@ public sealed record EnrollmentCancelledV1(
     string ReasonCode
 )
 {
-    public const string EventType = "EnrollmentCancelled";
     public const int Version = 1;
 };

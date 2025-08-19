@@ -1,12 +1,10 @@
-using static EnrollmentService.Messaging.Publishers.EnrollmentEventPublisher;
+using Common.Messaging.EventEnvelope;
+using Enrollments.Contracts.Events;
 
 namespace EnrollmentService.Messaging.Publishers;
 
 public interface IEnrollmentEventPublisher
 {
-    Task PublishEnrollmentCreatedAsync(
-        int enrollmentId, int userId, int courseId, string correlationId, CancellationToken ct = default);
-    Task PublishEnrollmentCancelledAsync(
-        int enrollmentId, int userId, int courseId, string correlationId,
-        CancellationReasons reason, CancellationToken ct = default);
+    Task PublishEnrollmentUpsertedAsync(
+        EventEnvelope<EnrollmentUpsertedV1> envelope, CancellationToken ct = default);
 }

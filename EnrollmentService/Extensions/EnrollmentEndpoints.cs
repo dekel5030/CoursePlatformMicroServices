@@ -1,5 +1,6 @@
 using Common.Auth;
 using Common.Auth.Extentions;
+using Common.Messaging.EventEnvelope;
 using Common.Web.Errors;
 using EnrollmentService.Dtos;
 using EnrollmentService.Services;
