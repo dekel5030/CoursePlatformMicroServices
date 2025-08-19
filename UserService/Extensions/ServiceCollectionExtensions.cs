@@ -10,6 +10,9 @@ using FluentValidation;
 using UserService.Validators;
 using Common;
 using Common.Auth.Extentions;
+using Common.Messaging.Options;
+using Common.Messaging.Extensions;
+using UserService.Messaging.Publishers;
 
 namespace UserService.Extensions;
 
@@ -32,6 +35,8 @@ public static class ServiceCollectionExtensions
 
         services.AddValidation();
 
+        services.AddMessageQueue();
+
         services.AddAppSwagger();
 
         services.AddJwtAuthentication(configuration);
@@ -49,6 +54,7 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<UsersDbContext>((sp, options) =>
         {
             var dbSettings = sp.GetRequiredService<IOptions<UsersDbOptions>>().Value;
+            Console.WriteLine($"Connecting to database {dbSettings.BuildConnectionString()}...");
             options.UseNpgsql(dbSettings.BuildConnectionString());
         });
 
@@ -66,11 +72,26 @@ public static class ServiceCollectionExtensions
     {
         services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<UserCreateDtoValidator>();
-        
+
         return services;
     }
-}
 
-internal interface IUsersRepository
-{
+    private static IServiceCollection AddMessageQueue(this IServiceCollection services)
+    {
+        services.AddOptions<RabbitMqOptions>()
+                .BindConfiguration(RabbitMqOptions.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+        services.AddOptions<MassTransitOptions>()
+                .BindConfiguration(MassTransitOptions.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+        services.AddMassTransitRabbitMq(cfg => { });
+
+        services.AddScoped<IUserEventPublisher, UserEventPublisher>();
+
+        return services;
+    }
 }

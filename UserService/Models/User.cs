@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using Common.Messaging.EventEnvelope;
 
 namespace UserService.Models
 {
-    public class User
+    public class User : IVersionedEntity
     {
         [Key]
         public int Id { get; private set; }
@@ -18,5 +19,7 @@ namespace UserService.Models
 
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
+        public long AggregateVersion { get; set; }
+        public DateTimeOffset UpdatedAtUtc { get; set; }
     }
 }
