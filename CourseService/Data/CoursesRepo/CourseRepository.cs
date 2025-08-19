@@ -98,9 +98,4 @@ public class CourseRepository : ICourseRepository
                         .DefaultIfEmpty(0)
                         .MaxAsync();
     }
-
-    public async Task<bool> SaveChangesAsync()
-    {
-        return await _dbContext.SaveChangesAsync() > 0;
-    }
 }

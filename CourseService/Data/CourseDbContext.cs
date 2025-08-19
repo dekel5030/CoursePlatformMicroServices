@@ -6,10 +6,7 @@ namespace CourseService.Data;
 public class CourseDbContext : DbContext
 {
     public CourseDbContext(DbContextOptions<CourseDbContext> options)
-        : base(options)
-    {
-
-    }
+        : base(options) {}
 
     public DbSet<Course> Courses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
@@ -19,6 +16,7 @@ public class CourseDbContext : DbContext
     {
         ConfigureCourse(modelBuilder);
         ConfigureLesson(modelBuilder);
+
         modelBuilder.Entity<Enrollment>(enrollment =>
         {
             enrollment.HasKey(e => e.EnrollmentId);
@@ -124,6 +122,18 @@ public class CourseDbContext : DbContext
             if (entry.State == EntityState.Modified)
             {
                 entry.Entity.UpdatedAt = DateTime.UtcNow;
+            }
+        }
+
+        foreach (var e in ChangeTracker.Entries<Enrollment>())
+        {
+            if (e.State == EntityState.Added)
+            {
+                e.Entity.AggregateVersion = 0;
+            }
+            else if (e.State == EntityState.Modified)
+            {
+                e.Entity.AggregateVersion++;
             }
         }
 

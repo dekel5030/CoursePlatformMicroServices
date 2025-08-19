@@ -1,7 +1,10 @@
 using AutoMapper;
 using Common;
 using Common.Errors;
+using Common.Messaging.EventEnvelope;
+using Courses.Contracts.Events;
 using CourseService.Data.CoursesRepo;
+using CourseService.Data.UnitOfWork;
 using CourseService.Dtos;
 using CourseService.Dtos.CourseEvents;
 using CourseService.Dtos.Courses;
@@ -16,12 +19,16 @@ public class CourseService : ICourseService
     private readonly ICourseRepository _repository;
     private readonly IMapper _mapper;
     private readonly ICourseEventPublisher _publisher;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly string _producer = "CourseService";
 
-    public CourseService(ICourseRepository repository, IMapper mapper, ICourseEventPublisher publisher)
+    public CourseService(
+        ICourseRepository repository, IUnitOfWork unitOfWork, IMapper mapper, ICourseEventPublisher publisher)
     {
         _repository = repository;
         _mapper = mapper;
         _publisher = publisher;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<CourseReadDto>> AddCourseAsync(CourseCreateDto courseCreateDto)
@@ -29,12 +36,8 @@ public class CourseService : ICourseService
         var course = CreateCourse(courseCreateDto);
 
         await _repository.AddCourseAsync(course);
-        await _repository.SaveChangesAsync();
-        await _publisher.PublishCourseUpsertedEvent(new CourseUpsertedEventDto
-        {
-            CourseId = course.Id,
-            IsPublished = course.IsPublished
-        }, Guid.NewGuid().ToString());
+        await _unitOfWork.SaveChangesAsync();
+        await PublishCourseUpsertedEvent(course, true);
 
         return Result<CourseReadDto>.Success(_mapper.Map<CourseReadDto>(course));
     }
@@ -48,7 +51,7 @@ public class CourseService : ICourseService
 
         var lesson = await CreateLesson(lessonCreateDto);
         await _repository.AddLessonAsync(lesson);
-        await _repository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<LessonReadDto>.Success(_mapper.Map<LessonReadDto>(lesson));
     }
@@ -63,8 +66,8 @@ public class CourseService : ICourseService
         }
 
         _repository.DeleteCourse(course);
-        await _repository.SaveChangesAsync();
-        await _publisher.PublishCourseRemovedEvent(course.Id, Guid.NewGuid().ToString());
+        await _unitOfWork.SaveChangesAsync();
+        await PublishCourseUpsertedEvent(course, false);
 
         return Result<CourseReadDto>.Success(_mapper.Map<CourseReadDto>(course));
     }
@@ -79,7 +82,7 @@ public class CourseService : ICourseService
         }
 
         _repository.DeleteLesson(lesson);
-        await _repository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<LessonReadDto>.Success(_mapper.Map<LessonReadDto>(lesson));
     }
@@ -148,5 +151,29 @@ public class CourseService : ICourseService
         lesson.Order = await _repository.GetLastLessonOrder(lessonCreateDto.CourseId) + 1;
 
         return lesson;
+    }
+
+    private Task PublishCourseUpsertedEvent(
+        Course course, bool isPublished, string? correlationId = null,
+        string? eventId = null, CancellationToken ct = default)
+    {
+        CourseUpsertedV1 payload = new CourseUpsertedV1
+        (
+            CourseId: course.Id,
+            IsPublished: isPublished
+        );
+
+        EventEnvelope<CourseUpsertedV1> envelope =
+            EventEnvelope<CourseUpsertedV1>
+                .Create(producer: _producer,
+                        aggregateId: course.Id.ToString(),
+                        aggregateVersion: course.AggregateVersion,
+                        payload: payload,
+                        contractVersion: CourseUpsertedV1.Version.ToString(),
+                        correlationId: correlationId,
+                        eventId: eventId
+                );
+
+        return _publisher.PublishCourseUpsertedEvent(envelope, ct: ct);
     }
 }

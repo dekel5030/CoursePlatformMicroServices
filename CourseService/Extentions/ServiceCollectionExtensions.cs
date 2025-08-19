@@ -5,10 +5,14 @@ using Common.Messaging.Options;
 using Common.Web.Errors;
 using CourseService.Data;
 using CourseService.Data.CoursesRepo;
+using CourseService.Data.EnrollmentsRepo;
+using CourseService.Data.UnitOfWork;
 using CourseService.Messaging.Consumer;
 using CourseService.Messaging.Publisher;
 using CourseService.Services;
+using CourseService.Services.Handlers;
 using CourseService.Settings;
+using Enrollments.Contracts.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -18,10 +22,9 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddCourseServiceDependencies(this IServiceCollection services, IConfiguration configuration)
     {
-        AddCourseDbContext(services, configuration);
-
-        services.AddScoped<ICourseRepository, CourseRepository>();
-        services.AddScoped<ICourseService, Services.CourseService>();
+        services.AddCourseDbContext(configuration);
+        services.AddRepositories();
+        services.AddBusinessServices();
 
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -36,6 +39,23 @@ public static class ServiceCollectionExtensions
         services.AddMessageQueue();
 
         services.AddAppSwagger();
+
+        return services;
+    }
+
+    private static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<IEnrollmentsRepo, EnrollmentsRepo>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddBusinessServices(this IServiceCollection services)
+    {
+        services.AddScoped<ICourseService, Services.CourseService>();
+        services.AddScoped<IEnvelopeHandler<EnrollmentUpsertedV1>, EnrollmentUpsertedHandler>();
 
         return services;
     }
@@ -68,7 +88,6 @@ public static class ServiceCollectionExtensions
         services.AddMassTransitRabbitMq(cfg =>
         {
             cfg.AddConsumer<EnrollmentUpsertedConsumer>();
-            cfg.AddConsumer<EnrollmentCancelledConsumer>();
         });
 
         services.AddScoped<ICourseEventPublisher, CourseEventPublisher>();

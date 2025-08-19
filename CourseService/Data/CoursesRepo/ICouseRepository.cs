@@ -17,6 +17,4 @@ public interface ICourseRepository
     Task AddLessonAsync(Lesson lesson);
     void DeleteLesson(Lesson lesson);
     Task<int> GetLastLessonOrder(int courseId);
-
-    Task<bool> SaveChangesAsync();
 }
