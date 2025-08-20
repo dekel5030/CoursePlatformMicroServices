@@ -268,3 +268,47 @@ dotnet_style_qualification_for_field = false:silent
 dotnet_style_qualification_for_property = false:silent
 dotnet_style_qualification_for_method = false:silent
 dotnet_style_qualification_for_event = false:silent
+root = true
+
+[*.cs]
+
+# áøéøú îçãì: camelCase ìôøîèøéí åîùúðéí î÷åîééí
+dotnet_naming_rule.parameters_should_be_camel_case.severity = warning
+dotnet_naming_rule.parameters_should_be_camel_case.symbols = parameters
+dotnet_naming_rule.parameters_should_be_camel_case.style = camel_case_style
+
+dotnet_naming_symbols.parameters.applicable_kinds = parameter
+dotnet_naming_symbols.parameters.applicable_accessibilities = *
+dotnet_naming_symbols.parameters.required_modifiers = *
+
+dotnet_naming_rule.locals_should_be_camel_case.severity = warning
+dotnet_naming_rule.locals_should_be_camel_case.symbols = locals
+dotnet_naming_rule.locals_should_be_camel_case.style = camel_case_style
+
+dotnet_naming_symbols.locals.applicable_kinds = local
+dotnet_naming_symbols.locals.applicable_accessibilities = *
+dotnet_naming_symbols.locals.required_modifiers = *
+
+# PascalCase ìÎProperties, Methods, Classes
+dotnet_naming_rule.members_should_be_pascal_case.severity = warning
+dotnet_naming_rule.members_should_be_pascal_case.symbols = members
+dotnet_naming_rule.members_should_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.members.applicable_kinds = property,method,class,interface,struct,enum
+dotnet_naming_symbols.members.applicable_accessibilities = *
+dotnet_naming_symbols.members.required_modifiers = *
+
+# _camelCase ìùãåú ôøèééí
+dotnet_naming_rule.private_fields_should_be__camel_case.severity = warning
+dotnet_naming_rule.private_fields_should_be__camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be__camel_case.style = prefix_underscore_camel_case_style
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields.required_modifiers = *
+
+# Styles
+dotnet_naming_style.camel_case_style.capitalization = camel_case
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+dotnet_naming_style.prefix_underscore_camel_case_style.capitalization = camel_case
+dotnet_naming_style.prefix_underscore_camel_case_style.required_prefix = _
