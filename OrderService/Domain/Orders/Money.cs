@@ -14,5 +14,15 @@ public class Money
         Currency = currency;
     }
 
+    public static Money Zero()
+    {
+        return new Money(0m, "ILS");
+    }
+
     public override string ToString() => $"{Amount} {Currency}";
+
+    internal Money Multiply(decimal quantity)
+    {
+        throw new NotImplementedException();
+    }
 }
