@@ -1,4 +1,5 @@
-﻿using Application.Abstractions;
+using Application.Abstractions.Messaging;
+
 using Application.Orders.Queries.Dtos;
 using Domain.Orders;
 
