@@ -21,7 +21,7 @@ public class Order : Entity
     {
         var order = new Order { CustomerId = customerId, TotalPrice = Money.Zero() };
 
-        order.Raise(new OrderCreated(order.Id, customerId));
+        order.Raise(new OrderDraftOpened(order.Id, customerId));
         return Result.Success(order);
     }
 
@@ -34,6 +34,16 @@ public class Order : Entity
         Raise(new LineItemAdded(Id, item.Id, item.Quantity, item.UnitPrice));
 
         return Result.Success();
+    }
+
+    public Result<Order> Submit()
+    {
+        if (_items.Count == 0)
+            return Result.Failure<Order>(OrderErrors.OrderIsEmpty);
+
+        Raise(new OrderSubmitted(Id, CustomerId));
+
+        return Result.Success(this);
     }
 
     private void RecalculateTotal()

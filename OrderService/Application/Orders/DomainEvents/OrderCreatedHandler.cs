@@ -3,9 +3,9 @@ using Domain.Orders.Events;
 
 namespace Application.Orders.DomainEvents;
 
-public sealed class OrderCreatedHandler : IDomainEventHandler<OrderCreated>
+public sealed class OrderCreatedHandler : IDomainEventHandler<OrderDraftOpened>
 {
-    public Task Handle(OrderCreated domainEvent, CancellationToken cancellationToken)
+    public Task Handle(OrderDraftOpened domainEvent, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
