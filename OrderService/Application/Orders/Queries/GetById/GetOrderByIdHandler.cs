@@ -1,30 +1,48 @@
+using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-
 using Application.Orders.Queries.Dtos;
-using Domain.Orders;
+using Domain.Orders.Errors;
+using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace Application.Orders.Queries.GetById;
 
 public sealed class GetOrderByIdHandler
-    : IQueryHandler<GetOrderByIdQuery, OrderReadDto?>
+    : IQueryHandler<GetOrderByIdQuery, OrderReadDto>
 {
-    private readonly IOrderRepository _orders;
+    private readonly IApplicationDbContext _dbContext;
 
-    public GetOrderByIdHandler(IOrderRepository orders) => _orders = orders;
-
-    public async Task<OrderReadDto?> Handle(GetOrderByIdQuery q, CancellationToken cancellationToken = default)
+    public GetOrderByIdHandler(IApplicationDbContext dbContext)
     {
-        Order? order = await _orders.GetByIdAsync(q.OrderId, cancellationToken);
+        _dbContext = dbContext;
+    }
 
-        if (order is null) return null;
+    public async Task<Result<OrderReadDto>> Handle(GetOrderByIdQuery query, CancellationToken cancellationToken)
+    {
+        var orderReadDto = await _dbContext.Orders
+            .AsNoTracking()
+            .Where(o => o.Id == query.OrderId)
+            .Select(o => new OrderReadDto(
+                o.Id,
+                o.CustomerId,
+                o.TotalPrice,
+                o.Lines.Select(li => new LineItemReadDto(
+                    li.Id,
+                    li.ProductId,
+                    li.Quantity,
+                    li.Sku,
+                    li.Name,
+                    li.UnitPrice,
+                    li.TotalPrice
+                )).ToList()
+            ))
+            .FirstOrDefaultAsync(cancellationToken);
 
-        string currency = order.Lines.FirstOrDefault()?.UnitPrice.Currency ?? "ILS";
-        Money totalAmount = order.Price;
+        if (orderReadDto is null)
+        {
+            return Result.Failure<OrderReadDto>(OrderErrors.NotFound);
+        }
 
-        List<LineItemReadDto> lines = order.Lines
-            .Select(l => new LineItemReadDto(l.ProductId, l.Quantity, l.Name, l.UnitPrice, l.TotalPrice))
-            .ToList();
-
-        return new OrderReadDto(order.Id, order.customerId, currency, totalAmount, lines);
+        return Result.Success(orderReadDto);
     }
 }

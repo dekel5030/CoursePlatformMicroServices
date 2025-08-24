@@ -1,3 +1,3 @@
 ﻿namespace SharedKernel.Orders;
 
-public record struct LineItemId(Guid value);
+public record struct LineItemId(Guid Value);

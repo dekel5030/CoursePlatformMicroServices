@@ -1,35 +1,47 @@
-﻿using SharedKernel.Customers;
+﻿using Domain.Orders.Errors;
+using Domain.Orders.Events;
+using SharedKernel;
+using SharedKernel.Customers;
 using SharedKernel.Orders;
 
 namespace Domain.Orders;
 
-public class Order
+public class Order : Entity
 {
-    private readonly HashSet<LineItem> _orderItems = new HashSet<LineItem>();
+    private readonly HashSet<LineItem> _items = new();
 
-    public OrderId Id { get; private set; }
-    public CustomerId customerId { get; private set; }
-    public Money Price { get; private set; } = Money.Zero();
-    public IReadOnlyList<LineItem> Lines => _orderItems.ToList().AsReadOnly();
+    private Order() {}
 
-    private Order() { }
+    public OrderId Id { get; private set; } = new(Guid.NewGuid());
+    public CustomerId CustomerId { get; private set; }
+    public Money TotalPrice { get; private set; } = Money.Zero();
+    public IReadOnlyCollection<LineItem> Lines => _items;
 
-    public static Order Create(CustomerId customerId)
+    public static Result<Order> Create(CustomerId customerId)
     {
-        return new Order()
-        {
-            Id = new OrderId(Guid.NewGuid()),
-            customerId = customerId
-        };
+        var order = new Order { CustomerId = customerId, TotalPrice = Money.Zero() };
+
+        order.Raise(new OrderCreated(order.Id, customerId));
+        return Result.Success(order);
     }
 
-    public void Add(LineItem orderItem)
+    public Result AddLine(LineItem item)
     {
-        if (orderItem == null)
-        {
-            throw new ArgumentNullException(nameof(orderItem), "Order item cannot be null");
-        }
+        if (item is null) return Result.Failure(LineItemErrors.InvalidName);
 
-        _orderItems.Add(orderItem);
+        _items.Add(item);
+        RecalculateTotal();
+        Raise(new LineItemAdded(Id, item.Id, item.Quantity, item.UnitPrice));
+
+        return Result.Success();
+    }
+
+    private void RecalculateTotal()
+    {
+        if (_items.Count == 0) { TotalPrice = Money.Zero(TotalPrice.Currency); return; }
+        var sum = _items
+            .Select(i => i.TotalPrice)
+            .Aggregate(Money.Zero(_items.First().UnitPrice.Currency), (acc, m) => acc + m);
+        TotalPrice = sum;
     }
 }
