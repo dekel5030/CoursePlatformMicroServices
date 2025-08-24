@@ -55,7 +55,6 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
             Result<LineItem> lineItemResult = LineItem.Create(
                 new ProductId(itemDto.Id),
                 itemDto.Quantity,
-                new Sku(itemDto.Id.ToString()),
                 "name",
                 Money.Zero());
 
@@ -69,8 +68,13 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
 
         await _dbContext.Orders.AddAsync(order, cancellationToken);
         await _dbContext.SaveChangesAsync();
-        order.Submit();
-        
+        Result<Order> submitResult = order.Submit();
+
+        if (submitResult.IsFailure)
+        {
+            return Result.Failure<Guid>(submitResult.Error!);
+        }
+
         return Result.Success(order.Id.Value);
     }
 }

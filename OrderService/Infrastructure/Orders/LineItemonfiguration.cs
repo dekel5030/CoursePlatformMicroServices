@@ -32,10 +32,6 @@ internal sealed class LineItemConfiguration : IEntityTypeConfiguration<LineItem>
         b.Property(x => x.Quantity).HasPrecision(18, 2).IsRequired();
         b.Property(x => x.Name).HasMaxLength(256).IsRequired();
 
-        b.OwnsOne(x => x.Sku, s =>
-        {
-            s.Property(p => p.Value).HasColumnName("Sku").HasMaxLength(64).IsRequired();
-        });
 
         b.OwnsOne(x => x.UnitPrice, m =>
         {

@@ -10,7 +10,6 @@ public class LineItem
     public LineItemId Id { get; private set; }
     public ProductId ProductId { get; set; }
     public decimal Quantity { get; private set; }
-    public Sku Sku { get; private set; } = null!;
     public string Name { get; private set; } = null!;
     public Money UnitPrice { get; private set; } = null!;
     public Money TotalPrice => UnitPrice.Multiply(Quantity);
@@ -20,7 +19,6 @@ public class LineItem
     public static Result<LineItem> Create(
         ProductId productId,
         decimal quantity,
-        Sku sku,
         string name,
         Money unitPrice)
     {
@@ -33,7 +31,6 @@ public class LineItem
             Id = new LineItemId(Guid.NewGuid()),
             ProductId = productId,
             Quantity = quantity,
-            Sku = sku,
             Name = name,
             UnitPrice = unitPrice
         };

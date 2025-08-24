@@ -29,7 +29,6 @@ public sealed class GetOrderByIdHandler
                 o.Lines.Select(li => new LineItemReadDto(
                     li.ProductId.Value,
                     li.Quantity,
-                    li.Sku,
                     li.Name,
                     li.UnitPrice,
                     li.TotalPrice
