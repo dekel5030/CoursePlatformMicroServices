@@ -1,4 +1,6 @@
-﻿using SharedKernel.Orders;
+﻿using Domain.Orders.Errors;
+using SharedKernel;
+using SharedKernel.Orders;
 using SharedKernel.Products;
 
 namespace Domain.Orders;
@@ -15,19 +17,18 @@ public class LineItem
 
     private LineItem() { }
 
-    public static LineItem? Create(
+    public Result<LineItem> Create(
         ProductId productId,
         decimal quantity,
         Sku sku,
         string name,
         Money unitPrice)
     {
-        if (quantity <= 0 || unitPrice.Amount < 0 || string.IsNullOrWhiteSpace(name))
-        {
-            return null;
-        }
+        if (quantity <= 0) return Result.Failure<LineItem>(LineItemErrors.InvalidQuantity);
+        if (string.IsNullOrWhiteSpace(name)) return Result.Failure<LineItem>(LineItemErrors.InvalidName);
+        if (unitPrice.Amount < 0) return Result.Failure<LineItem>(LineItemErrors.InvalidPrice);
 
-        return new LineItem()
+        var item = new LineItem()
         {
             Id = new LineItemId(Guid.NewGuid()),
             ProductId = productId,
@@ -36,5 +37,7 @@ public class LineItem
             Name = name,
             UnitPrice = unitPrice
         };
+
+        return Result.Success(item);
     }
 }

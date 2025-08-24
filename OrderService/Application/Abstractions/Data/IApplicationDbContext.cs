@@ -1,5 +1,4 @@
 ﻿using Domain.Orders;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Abstractions.Data;
