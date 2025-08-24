@@ -23,12 +23,11 @@ public sealed class GetOrderByIdHandler
             .AsNoTracking()
             .Where(o => o.Id == query.OrderId)
             .Select(o => new OrderReadDto(
-                o.Id,
-                o.CustomerId,
+                o.Id.Value,
+                o.CustomerId.Value,
                 o.TotalPrice,
                 o.Lines.Select(li => new LineItemReadDto(
-                    li.Id,
-                    li.ProductId,
+                    li.ProductId.Value,
                     li.Quantity,
                     li.Sku,
                     li.Name,

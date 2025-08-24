@@ -4,4 +4,4 @@ using SharedKernel.Orders;
 
 namespace Domain.Orders.Events;
 
-public sealed record OrderCreated(OrderId OrderId, CustomerId CustomerId) : IDomainEvent;
+public sealed record OrderDraftOpened(OrderId OrderId, CustomerId CustomerId) : IDomainEvent;

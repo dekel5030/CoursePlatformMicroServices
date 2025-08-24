@@ -17,7 +17,7 @@ public class LineItem
 
     private LineItem() { }
 
-    public Result<LineItem> Create(
+    public static Result<LineItem> Create(
         ProductId productId,
         decimal quantity,
         Sku sku,

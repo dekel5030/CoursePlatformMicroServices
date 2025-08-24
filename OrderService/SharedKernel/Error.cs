@@ -34,8 +34,6 @@ public record Error
     public static Error Conflict(string code, string description) =>
         new(code, description, ErrorType.Conflict);
 
-    public static Error Validation(string v1, string v2)
-    {
-        throw new NotImplementedException();
-    }
+    public static Error Validation(string code, string description) =>
+        new(code, description, ErrorType.Validation);
 }

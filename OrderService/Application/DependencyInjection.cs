@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
+using Application.Orders.Commands.SubmitOrder;
 using Application.Orders.DomainEvents;
 using Application.Orders.Queries.Dtos;
 using Application.Orders.Queries.GetById;
@@ -13,6 +14,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddQueryHandlers();
+        services.AddCommandHandlers();
         services.AddDomainEventHandlers();
 
         return services;
@@ -25,9 +27,16 @@ public static class DependencyInjection
         return services;
     }
 
+    private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
+    {
+        services.AddScoped<ICommandHandler<SubmitOrderCommand, Guid>, SubmitOrderCommandHandler>();
+
+        return services;
+    }
+
     private static IServiceCollection AddDomainEventHandlers(this IServiceCollection services)
     {
-        services.AddScoped<IDomainEventHandler<OrderCreated>, OrderCreatedHandler>();
+        services.AddScoped<IDomainEventHandler<OrderDraftOpened>, OrderCreatedHandler>();
 
         return services;
     }

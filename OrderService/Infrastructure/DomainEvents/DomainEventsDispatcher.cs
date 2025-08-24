@@ -71,7 +71,7 @@ using SharedKernel;
 namespace Infrastructure.DomainEvents;
 
 internal sealed class DomainEventsDispatcher(
-    IDomainEventHandler<OrderCreated> orderCreatedHandler//,
+    IDomainEventHandler<OrderDraftOpened> orderDraftOpenedHandler//,
     //IDomainEventHandler<LineItemAdded> lineItemAddedHandler
 ) : IDomainEventsDispatcher
 {
@@ -81,8 +81,8 @@ internal sealed class DomainEventsDispatcher(
         {
             switch (e)
             {
-                case OrderCreated oc:
-                    await orderCreatedHandler.Handle(oc, ct);
+                case OrderDraftOpened oc:
+                    await orderDraftOpenedHandler.Handle(oc, ct);
                     break;
 
                 case LineItemAdded li:
