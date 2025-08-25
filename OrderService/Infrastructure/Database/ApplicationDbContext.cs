@@ -32,19 +32,18 @@ public sealed class ApplicationDbContext(
 
     private async Task PublishDomainEventsAsync(CancellationToken cancellationToken = default)
     {
-        var domainEvents = ChangeTracker
-            .Entries<Entity>()
-            .Select(entry => entry.Entity)
-            .SelectMany(entity =>
-            {
-                IReadOnlyList<IDomainEvent> domainEvents = entity.DomainEvents;
-
-                entity.ClearDomainEvents();
-
-                return domainEvents;
-            })
+        var domainEntities = ChangeTracker.Entries()
+            .Select(e => e.Entity)
+            .OfType<Entity>()
+            .Where(e => e.DomainEvents.Count > 0)
             .ToList();
 
-        await domainEventsDispatcher.DispatchAsync(domainEvents, cancellationToken);
+        var events = domainEntities
+            .SelectMany(e => e.DomainEvents.ToList())
+            .ToList();
+
+        domainEntities.ForEach(e => e.ClearDomainEvents());
+
+        await domainEventsDispatcher.DispatchAsync(events, cancellationToken);
     }
 }
