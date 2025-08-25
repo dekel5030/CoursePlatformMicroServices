@@ -1,6 +1,4 @@
 ﻿using Application.Abstractions.Messaging;
-using Domain.Orders;
-using SharedKernel;
 
 namespace Application.Orders.Commands.SubmitOrder;
 

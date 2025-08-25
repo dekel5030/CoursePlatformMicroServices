@@ -4,7 +4,6 @@ using Application.Orders.DomainEvents;
 using Application.Orders.Queries.Dtos;
 using Application.Orders.Queries.GetById;
 using Domain.Orders.Events;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -36,7 +35,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddDomainEventHandlers(this IServiceCollection services)
     {
-        services.AddScoped<IDomainEventHandler<OrderDraftOpened>, OrderCreatedHandler>();
+        services.AddScoped<IDomainEventHandler<OrderSubmitted>, OrderSubmittedHandler>();
 
         return services;
     }

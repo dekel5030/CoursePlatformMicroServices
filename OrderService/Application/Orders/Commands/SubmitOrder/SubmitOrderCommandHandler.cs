@@ -67,8 +67,8 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
         }
 
         await _dbContext.Orders.AddAsync(order, cancellationToken);
-        await _dbContext.SaveChangesAsync();
         Result<Order> submitResult = order.Submit();
+        await _dbContext.SaveChangesAsync();
 
         if (submitResult.IsFailure)
         {
