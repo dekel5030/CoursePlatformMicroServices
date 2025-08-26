@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Domain.Orders;
 using Infrastructure.DomainEvents;
+using Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -14,6 +15,8 @@ public sealed class ApplicationDbContext(
     public DbSet<Order> Orders { get; set; }
 
     public DbSet<LineItem> LineItems { get; set; }
+
+    public DbSet<OutboxMessage> OutboxMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

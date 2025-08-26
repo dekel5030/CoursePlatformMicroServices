@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
+using Infrastructure.Interceptors;
 using Infrastructure.Options;
 using Infrastructure.Time;
 using Microsoft.EntityFrameworkCore;
@@ -39,9 +40,11 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddSingleton<ConvertDomainEventToOutboxMessageInterceptor>();
 
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
+            var interceptor = serviceProvider.GetRequiredService<ConvertDomainEventToOutboxMessageInterceptor>();
             var dbOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<DatabaseOptions>>().Value;
             var connectionString = dbOptions.BuildConnectionString();
 
@@ -52,6 +55,7 @@ public static class DependencyInjection
                         HistoryRepository.DefaultTableName,
                         Schemas.Default);
                 })
+                .AddInterceptors(interceptor)
                 .UseSnakeCaseNamingConvention();
         });
 
