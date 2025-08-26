@@ -1,4 +1,5 @@
 ﻿using Domain.Orders.Errors;
+using Kernel;
 using SharedKernel;
 using SharedKernel.Orders;
 using SharedKernel.Products;

@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
 using FluentValidation;
+using Kernel;
 using SharedKernel;
 
 namespace Application.Common.Decorators.ValidationDecorator;

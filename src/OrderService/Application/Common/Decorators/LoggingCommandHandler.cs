@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
+using Kernel;
 using Microsoft.Extensions.Logging;
-using SharedKernel;
 
 namespace Application.Common.Decorators;
 

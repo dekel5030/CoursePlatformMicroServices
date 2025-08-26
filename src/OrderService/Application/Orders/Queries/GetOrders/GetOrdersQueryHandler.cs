@@ -1,8 +1,8 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Orders.Queries.Dtos;
+using Kernel;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 
 namespace Application.Orders.Queries.GetOrders;
 

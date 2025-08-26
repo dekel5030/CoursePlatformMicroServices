@@ -1,5 +1,6 @@
 ﻿using Domain.Orders.Errors;
 using Domain.Orders.Events;
+using Kernel;
 using SharedKernel;
 using SharedKernel.Customers;
 using SharedKernel.Orders;

@@ -1,4 +1,4 @@
-﻿using SharedKernel;
+﻿using Kernel;
 
 namespace Web.Api.Extensions;
 

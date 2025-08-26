@@ -1,6 +1,4 @@
-﻿using SharedKernel;
-
-namespace Application.Abstractions.Messaging;
+﻿namespace Application.Abstractions.Messaging;
 
 public interface IHandler<TRequest, TResponse>
 {

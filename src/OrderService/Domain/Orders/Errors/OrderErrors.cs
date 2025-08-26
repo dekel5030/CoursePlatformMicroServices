@@ -1,4 +1,4 @@
-﻿using SharedKernel;
+﻿using Kernel;
 
 namespace Domain.Orders.Errors;
 
