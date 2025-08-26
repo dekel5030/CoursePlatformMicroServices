@@ -58,16 +58,30 @@ services:
     container_name: enrollmentservice-db
     restart: always
     environment:
-      POSTGRES_USER: ${enrollmentservice_DB_USER}
-      POSTGRES_PASSWORD: ${enrollmentservice_DB_PASSWORD}
-      POSTGRES_DB: ${enrollmentservice_DB_NAME}
+      POSTGRES_USER: ${ENROLLMENTSERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${ENROLLMENTSERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${ENROLLMENTSERVICE_DB_NAME}
     ports:
-      - "${enrollmentservice_DB_PORT}:5432"
+      - "${ENROLLMENTSERVICE_DB_PORT}:5432"
     volumes:
       - enrollmentservice-data:/var/lib/postgresql/data
+
+  orderservice-db-srv:
+    image: postgres:16
+    container_name: orderservice-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${ORDERSERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${ORDERSERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${ORDERSERVICE_DB_NAME}
+    ports:
+      - "${ORDERSERVICE_DB_PORT}:5432"
+    volumes:
+      - orderservice-data:/var/lib/postgresql/data
 
 volumes:
   userservice-data:
   authservice-data:
   courseservice-data:
   enrollmentservice-data:
+  orderservice-data:
