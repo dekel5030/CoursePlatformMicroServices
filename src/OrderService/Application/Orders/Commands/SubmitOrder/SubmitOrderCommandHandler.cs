@@ -2,6 +2,7 @@
 using Application.Abstractions.Messaging;
 using Domain.Orders;
 using Domain.Orders.Errors;
+using Kernel;
 using SharedKernel;
 using SharedKernel.Customers;
 using SharedKernel.Products;

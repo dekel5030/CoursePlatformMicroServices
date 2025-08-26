@@ -2,8 +2,8 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Orders.Queries.Dtos;
 using Domain.Orders.Errors;
+using Kernel;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 
 namespace Application.Orders.Queries.GetById;
 
