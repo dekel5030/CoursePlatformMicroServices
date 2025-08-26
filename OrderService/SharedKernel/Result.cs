@@ -4,11 +4,10 @@ namespace SharedKernel;
 
 public class Result
 {
-    [MemberNotNullWhen(false, nameof(Error))]
+    [MemberNotNullWhen(false, nameof(Error)), MemberNotNullWhen(true, nameof(Error))]
     public bool IsSuccess { get; }
 
     public bool IsFailure => !IsSuccess;
-
     public Error? Error { get; }
 
     private protected Result(bool isSuccess, Error? error)
@@ -51,9 +50,6 @@ public sealed class Result<TValue> : Result
     public TValue Value => IsSuccess
         ? _value!
         : throw new InvalidOperationException("The value of a failure result can't be accessed.");
-
-    //public static implicit operator Result<TValue>(TValue? value) =>
-    //    value is not null ? Success(value) : Failure(Error.NullValue);
 
     public static Result<TValue> Success(TValue value) =>
         new(value, true, null);
