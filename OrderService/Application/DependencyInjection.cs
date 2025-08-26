@@ -3,7 +3,9 @@ using Application.Orders.Commands.SubmitOrder;
 using Application.Orders.DomainEvents;
 using Application.Orders.Queries.Dtos;
 using Application.Orders.Queries.GetById;
+using Application.Orders.Queries.GetOrders;
 using Domain.Orders.Events;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -15,13 +17,15 @@ public static class DependencyInjection
         services.AddQueryHandlers();
         services.AddCommandHandlers();
         services.AddDomainEventHandlers();
+        //services.AddValidators();
 
         return services;
     }
 
     private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
     {
-        services.AddScoped<IQueryHandler<GetOrderByIdQuery, OrderReadDto>, GetOrderByIdHandler>();
+        services.AddScoped<IQueryHandler<GetOrderByIdQuery, OrderReadDto>, GetOrderByIdQueryHandler>();
+        services.AddScoped<IQueryHandler<GetOrdersQuery, PagedResponse<OrderReadDto>>, GetOrdersQueryHandler>();
 
         return services;
     }
@@ -39,4 +43,12 @@ public static class DependencyInjection
 
         return services;
     }
+
+    private static IServiceCollection AddValidators(this IServiceCollection services)
+    {
+        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+
+        return services;
+    }
+
 }

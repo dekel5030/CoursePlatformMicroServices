@@ -2,7 +2,7 @@
 
 public sealed record ValidationError : Error
 {
-    public ValidationError(Error[] errors)
+    public ValidationError(IEnumerable<Error> errors)
         : base(
             "Validation.General",
             "One or more validation errors occurred",
@@ -11,8 +11,5 @@ public sealed record ValidationError : Error
         Errors = errors;
     }
 
-    public Error[] Errors { get; }
-
-    public static ValidationError FromResults(IEnumerable<Result> results) =>
-        new(results.Where(r => r.IsFailure).Select(r => r.Error).ToArray());
+    public IEnumerable<Error> Errors { get; }
 }

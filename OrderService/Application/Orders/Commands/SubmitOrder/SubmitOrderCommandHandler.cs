@@ -78,4 +78,3 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
         return Result.Success(order.Id.Value);
     }
 }
-

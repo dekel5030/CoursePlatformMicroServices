@@ -7,12 +7,12 @@ using SharedKernel;
 
 namespace Application.Orders.Queries.GetById;
 
-public sealed class GetOrderByIdHandler
+public sealed class GetOrderByIdQueryHandler
     : IQueryHandler<GetOrderByIdQuery, OrderReadDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
-    public GetOrderByIdHandler(IApplicationDbContext dbContext)
+    public GetOrderByIdQueryHandler(IApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }
