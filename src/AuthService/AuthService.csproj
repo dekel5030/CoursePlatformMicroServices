@@ -24,11 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
+    <ProjectReference Include="..\..\Common.Web\Common.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\Common\GrpcContracts\user_service.proto" GrpcServices="Client" />
+    <Protobuf Include="..\..\Common\GrpcContracts\user_service.proto" GrpcServices="Client" />
   </ItemGroup>
 
   <PropertyGroup>

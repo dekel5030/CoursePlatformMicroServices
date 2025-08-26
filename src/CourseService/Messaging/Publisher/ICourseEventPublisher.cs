@@ -1,6 +1,5 @@
 using Common.Messaging.EventEnvelope;
 using Courses.Contracts.Events;
-using CourseService.Dtos.CourseEvents;
 
 namespace CourseService.Messaging.Publisher;
 
