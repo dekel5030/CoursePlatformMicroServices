@@ -7,8 +7,8 @@ namespace Infrastructure.DomainEvents;
 
 internal sealed class DomainEventsDispatcher(IServiceProvider serviceProvider) : IDomainEventsDispatcher
 {
-    private static readonly ConcurrentDictionary<Type, Type> HandlerTypeDictionary = new();
-    private static readonly ConcurrentDictionary<Type, Type> WrapperTypeDictionary = new();
+    private static readonly ConcurrentDictionary<Type, Type> _handlerTypeDictionary = new();
+    private static readonly ConcurrentDictionary<Type, Type> _wrapperTypeDictionary = new();
 
     public async Task DispatchAsync(
         IEnumerable<IDomainEvent> domainEvents,
@@ -19,7 +19,7 @@ internal sealed class DomainEventsDispatcher(IServiceProvider serviceProvider) :
             using IServiceScope scope = serviceProvider.CreateScope();
 
             Type domainEventType = domainEvent.GetType();
-            Type handlerType = HandlerTypeDictionary.GetOrAdd(
+            Type handlerType = _handlerTypeDictionary.GetOrAdd(
                 domainEventType,
                 et => typeof(IDomainEventHandler<>).MakeGenericType(et));
 
@@ -45,7 +45,7 @@ internal sealed class DomainEventsDispatcher(IServiceProvider serviceProvider) :
 
         public static HandlerWrapper Create(object handler, Type domainEventType)
         {
-            Type wrapperType = WrapperTypeDictionary.GetOrAdd(
+            Type wrapperType = _wrapperTypeDictionary.GetOrAdd(
                 domainEventType,
                 et => typeof(HandlerWrapper<>).MakeGenericType(et));
 

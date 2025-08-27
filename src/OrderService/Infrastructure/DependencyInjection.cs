@@ -1,8 +1,10 @@
 ﻿using Application.Abstractions.Data;
+using Application.Abstractions.Messaging;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
-using Infrastructure.Interceptors;
 using Infrastructure.Options;
+using Infrastructure.Outbox;
+using Infrastructure.Publishers;
 using Infrastructure.Time;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -35,16 +37,16 @@ public static class DependencyInjection
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSingleton<DomainEventDispatcherInterceptor>();
+        services.AddSingleton<InsertOutboxMessagesInterceptor>();
+
         services.AddOptions<DatabaseOptions>()
             .BindConfiguration(DatabaseOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddSingleton<ConvertDomainEventToOutboxMessageInterceptor>();
-
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
-            var interceptor = serviceProvider.GetRequiredService<ConvertDomainEventToOutboxMessageInterceptor>();
             var dbOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<DatabaseOptions>>().Value;
             var connectionString = dbOptions.BuildConnectionString();
 
@@ -55,11 +57,17 @@ public static class DependencyInjection
                         HistoryRepository.DefaultTableName,
                         Schemas.Default);
                 })
-                .AddInterceptors(interceptor)
+                .AddInterceptors(serviceProvider.GetRequiredService<DomainEventDispatcherInterceptor>())
+                .AddInterceptors(serviceProvider.GetRequiredService<InsertOutboxMessagesInterceptor>())
                 .UseSnakeCaseNamingConvention();
         });
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
+
+        services.AddHostedService<OutboxBackgroundService>();
+        services.AddScoped<OutboxProcessor>();
+
+        services.AddSingleton<IPublisher, ConsolePublisher>();
 
         return services;
     }
