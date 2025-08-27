@@ -26,7 +26,6 @@ public sealed class ApplicationDbContext(
     }
 }
 
-
 internal sealed class DomainEventDispatcherInterceptor : SaveChangesInterceptor
 {
     private readonly IDomainEventsDispatcher _dispatcher;
@@ -62,7 +61,7 @@ internal sealed class DomainEventDispatcherInterceptor : SaveChangesInterceptor
 
         foreach (Entity entity in entities)
         {
-            //entity.ClearDomainEvents();
+            entity.ClearDomainEvents();
         }
 
         await _dispatcher.DispatchAsync(domainEvents, cancellationToken);
@@ -93,8 +92,7 @@ internal sealed class InsertOutboxMessagesInterceptor : SaveChangesInterceptor
         IEnumerable<IDomainEvent> domainEvents = dbContext.ChangeTracker.Entries<Entity>()
             .Select(entry => entry.Entity)
             .SelectMany(entity => entity.DomainEvents);
-        var first = domainEvents.First();
-        var json = JsonSerializer.Serialize(first);
+
         List<OutboxMessage> outboxMessages = domainEvents
             .Select(domainEvent => new OutboxMessage { 
                 Id = Guid.NewGuid(), 
