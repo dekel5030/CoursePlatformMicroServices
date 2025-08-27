@@ -10,4 +10,3 @@ public class ConsolePublisher : IPublisher
         return Task.CompletedTask;
     }
 }
-

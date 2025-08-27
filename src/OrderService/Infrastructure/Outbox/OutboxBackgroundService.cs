@@ -33,7 +33,6 @@ internal class OutboxBackgroundService: BackgroundService
                 var processed = await processor.Execute(stoppingToken);
                 _logger.LogInformation("Processed {Count} outbox messages", processed);
 
-                // מחכה כמה שניות עד הסיבוב הבא
                 await Task.Delay(TimeSpan.FromSeconds(_processorFrequencyInSeconds), stoppingToken);
             }
         }
@@ -50,6 +49,4 @@ internal class OutboxBackgroundService: BackgroundService
             _logger.LogInformation("OutboxBackgroundService finished");
         }
     }
-
 }
-
