@@ -26,6 +26,7 @@ public sealed class ApplicationDbContext(
     }
 }
 
+
 internal sealed class DomainEventDispatcherInterceptor : SaveChangesInterceptor
 {
     private readonly IDomainEventsDispatcher _dispatcher;
