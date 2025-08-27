@@ -2,7 +2,6 @@
 using Application.Abstractions.Messaging;
 using Application.Orders.Commands.SubmitOrder;
 using Kernel;
-using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
