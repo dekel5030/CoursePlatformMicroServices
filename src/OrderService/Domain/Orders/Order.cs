@@ -1,9 +1,9 @@
 ﻿using Domain.Orders.Errors;
 using Domain.Orders.Events;
+using Domain.Orders.Primitives;
+using Domain.Users;
 using Kernel;
 using SharedKernel;
-using SharedKernel.Customers;
-using SharedKernel.Orders;
 
 namespace Domain.Orders;
 
@@ -14,11 +14,11 @@ public class Order : Entity
     private Order() {}
 
     public OrderId Id { get; private set; } = new(Guid.NewGuid());
-    public CustomerId CustomerId { get; private set; }
+    public UserId CustomerId { get; private set; }
     public Money TotalPrice { get; private set; } = Money.Zero();
     public IReadOnlyCollection<LineItem> Lines => _items;
 
-    public static Result<Order> Create(CustomerId customerId)
+    public static Result<Order> Create(UserId customerId)
     {
         var order = new Order { CustomerId = customerId, TotalPrice = Money.Zero() };
 

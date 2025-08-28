@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Data;
+using Domain.Abstractions;
 using Domain.Orders;
 using Infrastructure.DomainEvents;
 using Infrastructure.Outbox;

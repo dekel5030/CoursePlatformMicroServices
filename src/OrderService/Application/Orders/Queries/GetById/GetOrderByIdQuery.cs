@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.Orders.Queries.Dtos;
+using Domain.Orders.Primitives;
 using SharedKernel;
-using SharedKernel.Orders;
 
 namespace Application.Orders.Queries.GetById;
 

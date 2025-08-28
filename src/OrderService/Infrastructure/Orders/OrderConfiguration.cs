@@ -18,7 +18,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasConversion(v => v.Value, v => new OrderId(v));
 
         b.Property(x => x.CustomerId)
-            .HasConversion(v => v.Value, v => new CustomerId(v));
+            .HasConversion(v => v.Value, v => new UserId(v));
 
         b.OwnsOne(x => x.TotalPrice, m =>
         {
