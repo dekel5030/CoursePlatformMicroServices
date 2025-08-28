@@ -1,7 +1,7 @@
-﻿using SharedKernel;
-using SharedKernel.Customers;
-using SharedKernel.Orders;
+﻿using Domain.Orders.Primitives;
+using Domain.Users;
+using SharedKernel;
 
 namespace Domain.Orders.Events;
 
-public sealed record OrderDraftOpened(OrderId OrderId, CustomerId CustomerId) : IDomainEvent;
+public sealed record OrderDraftOpened(OrderId OrderId, UserId CustomerId) : IDomainEvent;

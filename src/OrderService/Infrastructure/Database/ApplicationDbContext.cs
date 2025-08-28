@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Data;
+using Domain.Abstractions;
 using Domain.Orders;
 using Infrastructure.DomainEvents;
 using Infrastructure.Outbox;
@@ -25,7 +26,6 @@ public sealed class ApplicationDbContext(
         modelBuilder.HasDefaultSchema(Schemas.Default);
     }
 }
-
 
 internal sealed class DomainEventDispatcherInterceptor : SaveChangesInterceptor
 {

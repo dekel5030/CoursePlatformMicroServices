@@ -6,12 +6,19 @@ using Infrastructure.Options;
 using Infrastructure.Outbox;
 using Infrastructure.Publishers;
 using Infrastructure.Time;
+using MassTransit;
+using MassTransit.RabbitMqTransport;
+using MassTransit.RabbitMqTransport.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using RabbitMQ.Client;
 using SharedKernel;
+using System.Net.Security;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Infrastructure;
 
@@ -23,9 +30,11 @@ public static class DependencyInjection
         services
             .AddServices()
             .AddDatabase(configuration)
+            .AddMassTransitInternal()
             .AddHealthChecksInternal(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal();
+    
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -90,6 +99,34 @@ public static class DependencyInjection
 
     private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
     {
+        return services;
+    }
+
+    private static IServiceCollection AddMassTransitInternal(this IServiceCollection services)
+    {
+        services.AddOptions<RabbitMqOptions>()
+            .BindConfiguration(RabbitMqOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddMassTransit(config =>
+        {
+            config.AddConsumers(typeof(DependencyInjection).Assembly);
+
+            config.UsingRabbitMq((context, busConfig) =>
+            {
+                RabbitMqOptions options = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
+
+                busConfig.Host(options.Host, options.VirtualHost, host =>
+                {
+                    host.Username(options.Username);
+                    host.Password(options.Password);
+                });
+
+                busConfig.ConfigureEndpoints(context);
+            });
+        });
+
         return services;
     }
 }
