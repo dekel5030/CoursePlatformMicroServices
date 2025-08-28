@@ -1,4 +1,4 @@
-namespace Common.Messaging.EventEnvelope;
+namespace Messaging.EventEnvelope;
 
 public sealed record EventEnvelope<T>
 (
