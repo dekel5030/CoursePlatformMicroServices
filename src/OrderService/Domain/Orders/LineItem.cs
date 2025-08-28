@@ -1,7 +1,7 @@
 ﻿using Domain.Orders.Errors;
+using Domain.Orders.Primitives;
 using Kernel;
 using SharedKernel;
-using SharedKernel.Orders;
 using SharedKernel.Products;
 
 namespace Domain.Orders;

@@ -1,4 +1,5 @@
 ﻿using Domain.Orders;
+using Domain.Orders.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SharedKernel.Orders;
