@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Common.Messaging.Options;
+namespace Messaging.Options;
 
 public sealed class RabbitMqOptions
 {
@@ -25,7 +25,7 @@ public sealed class RabbitMqOptions
     {
         var vhost = string.IsNullOrWhiteSpace(VirtualHost)
             ? "/"
-            : (VirtualHost.StartsWith("/") ? VirtualHost : "/" + VirtualHost);
+            : VirtualHost.StartsWith("/") ? VirtualHost : "/" + VirtualHost;
 
         var scheme = UseSsl ? "amqps" : "amqp";
 

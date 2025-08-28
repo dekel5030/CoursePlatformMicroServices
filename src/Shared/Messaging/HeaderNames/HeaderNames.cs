@@ -1,4 +1,4 @@
-namespace Common.Messaging;
+namespace Messaging.HeaderNames;
 
 public static class HeaderNames
 {
