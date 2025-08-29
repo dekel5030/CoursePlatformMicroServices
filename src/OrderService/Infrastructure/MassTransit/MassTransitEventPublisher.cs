@@ -1,20 +1,26 @@
-﻿using Application.Orders.DomainEvents;
+﻿using Application.Abstractions.Messaging;
 using MassTransit;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.MassTransit;
 
 internal sealed class MassTransitEventPublisher : IEventPublisher
 {
     private readonly IPublishEndpoint _publishEndpoint;
+    private readonly ILogger<MassTransitEventPublisher> _logger;
 
-    public MassTransitEventPublisher(IPublishEndpoint publishEndpoint)
+    public MassTransitEventPublisher(
+        IPublishEndpoint publishEndpoint, 
+        ILogger<MassTransitEventPublisher> logger)
     {
         _publishEndpoint = publishEndpoint;
+        _logger = logger;
     }
 
     public Task Publish<T>(T message, CancellationToken cancellationToken = default) 
         where T : notnull
     {
+        _logger.LogInformation("Publishing message of type {MessageType}: {Message}", message.GetType(), message);
         return _publishEndpoint.Publish(message, cancellationToken);
     }
 }

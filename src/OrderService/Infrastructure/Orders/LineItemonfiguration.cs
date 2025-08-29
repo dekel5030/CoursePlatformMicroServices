@@ -2,7 +2,6 @@
 using Domain.Orders.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SharedKernel.Orders;
 using SharedKernel.Products;
 
 namespace Infrastructure.Orders;

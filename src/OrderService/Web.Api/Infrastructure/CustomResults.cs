@@ -1,5 +1,4 @@
 ﻿using Kernel;
-using SharedKernel;
 
 namespace Web.Api.Infrastructure;
 
