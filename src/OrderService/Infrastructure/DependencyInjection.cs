@@ -2,23 +2,17 @@
 using Application.Abstractions.Messaging;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
+using Infrastructure.MassTransit;
 using Infrastructure.Options;
-using Infrastructure.Outbox;
-using Infrastructure.Publishers;
 using Infrastructure.Time;
+using Infrastructure.VersionedEntity;
 using MassTransit;
-using MassTransit.RabbitMqTransport;
-using MassTransit.RabbitMqTransport.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using RabbitMQ.Client;
 using SharedKernel;
-using System.Net.Security;
-using System.Security.Authentication;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Infrastructure;
 
@@ -47,7 +41,6 @@ public static class DependencyInjection
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<DomainEventDispatcherInterceptor>();
-        services.AddSingleton<InsertOutboxMessagesInterceptor>();
 
         services.AddOptions<DatabaseOptions>()
             .BindConfiguration(DatabaseOptions.SectionName)
@@ -67,16 +60,11 @@ public static class DependencyInjection
                         Schemas.Default);
                 })
                 .AddInterceptors(serviceProvider.GetRequiredService<DomainEventDispatcherInterceptor>())
-                .AddInterceptors(serviceProvider.GetRequiredService<InsertOutboxMessagesInterceptor>())
+                .AddInterceptors(new VersionedEntityInterceptor())
                 .UseSnakeCaseNamingConvention();
         });
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
-
-        services.AddHostedService<OutboxBackgroundService>();
-        services.AddScoped<OutboxProcessor>();
-
-        services.AddSingleton<IPublisher, ConsolePublisher>();
 
         return services;
     }
@@ -113,6 +101,17 @@ public static class DependencyInjection
         {
             config.AddConsumers(typeof(DependencyInjection).Assembly);
 
+            config.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
+            {
+                o.UsePostgres();
+                o.UseBusOutbox();
+            });
+
+            config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
+            {
+                endpointCfg.UseEntityFrameworkOutbox<ApplicationDbContext>(ctx);
+            });
+
             config.UsingRabbitMq((context, busConfig) =>
             {
                 RabbitMqOptions options = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
@@ -126,6 +125,8 @@ public static class DependencyInjection
                 busConfig.ConfigureEndpoints(context);
             });
         });
+
+        services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
 
         return services;
     }
