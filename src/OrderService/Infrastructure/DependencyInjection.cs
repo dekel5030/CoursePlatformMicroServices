@@ -34,13 +34,12 @@ public static class DependencyInjection
     {
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
         services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
-
         return services;
     }
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<DomainEventDispatcherInterceptor>();
+        services.AddScoped<DomainEventDispatcherInterceptor>();
 
         services.AddOptions<DatabaseOptions>()
             .BindConfiguration(DatabaseOptions.SectionName)
@@ -59,8 +58,8 @@ public static class DependencyInjection
                         HistoryRepository.DefaultTableName,
                         Schemas.Default);
                 })
-                .AddInterceptors(serviceProvider.GetRequiredService<DomainEventDispatcherInterceptor>())
                 .AddInterceptors(new VersionedEntityInterceptor())
+                .AddInterceptors(serviceProvider.GetRequiredService<DomainEventDispatcherInterceptor>())
                 .UseSnakeCaseNamingConvention();
         });
 
@@ -105,6 +104,7 @@ public static class DependencyInjection
             {
                 o.UsePostgres();
                 o.UseBusOutbox();
+                o.QueryDelay = TimeSpan.FromSeconds(30);
             });
 
             config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
