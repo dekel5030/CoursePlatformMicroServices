@@ -19,7 +19,6 @@ public sealed class OrderSubmittedDomainEventHandler : IDomainEventHandler<Order
     {
         // Map from domain event to ingetration event and save to outbox table
         await _publisher.Publish(@event, cancellationToken);
-        await _dbContext.SaveChangesAsync();
     }
 }
  
