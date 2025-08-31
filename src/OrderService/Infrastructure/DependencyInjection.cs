@@ -2,10 +2,11 @@
 using Application.Abstractions.Messaging;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
+using Infrastructure.MassTransit;
 using Infrastructure.Options;
-using Infrastructure.Outbox;
-using Infrastructure.Publishers;
 using Infrastructure.Time;
+using Infrastructure.VersionedEntity;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -23,9 +24,11 @@ public static class DependencyInjection
         services
             .AddServices()
             .AddDatabase(configuration)
+            .AddMassTransitInternal()
             .AddHealthChecksInternal(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal();
+    
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -38,7 +41,6 @@ public static class DependencyInjection
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<DomainEventDispatcherInterceptor>();
-        services.AddSingleton<InsertOutboxMessagesInterceptor>();
 
         services.AddOptions<DatabaseOptions>()
             .BindConfiguration(DatabaseOptions.SectionName)
@@ -58,16 +60,11 @@ public static class DependencyInjection
                         Schemas.Default);
                 })
                 .AddInterceptors(serviceProvider.GetRequiredService<DomainEventDispatcherInterceptor>())
-                .AddInterceptors(serviceProvider.GetRequiredService<InsertOutboxMessagesInterceptor>())
+                .AddInterceptors(new VersionedEntityInterceptor())
                 .UseSnakeCaseNamingConvention();
         });
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
-
-        services.AddHostedService<OutboxBackgroundService>();
-        services.AddScoped<OutboxProcessor>();
-
-        services.AddSingleton<IPublisher, ConsolePublisher>();
 
         return services;
     }
@@ -90,6 +87,47 @@ public static class DependencyInjection
 
     private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
     {
+        return services;
+    }
+
+    private static IServiceCollection AddMassTransitInternal(this IServiceCollection services)
+    {
+        services.AddOptions<RabbitMqOptions>()
+            .BindConfiguration(RabbitMqOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddMassTransit(config =>
+        {
+            config.AddConsumers(typeof(DependencyInjection).Assembly);
+
+            config.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
+            {
+                o.UsePostgres();
+                o.UseBusOutbox();
+            });
+
+            config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
+            {
+                endpointCfg.UseEntityFrameworkOutbox<ApplicationDbContext>(ctx);
+            });
+
+            config.UsingRabbitMq((context, busConfig) =>
+            {
+                RabbitMqOptions options = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
+
+                busConfig.Host(options.Host, options.VirtualHost, host =>
+                {
+                    host.Username(options.Username);
+                    host.Password(options.Password);
+                });
+
+                busConfig.ConfigureEndpoints(context);
+            });
+        });
+
+        services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
+
         return services;
     }
 }

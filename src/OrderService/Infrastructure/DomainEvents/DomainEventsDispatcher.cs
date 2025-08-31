@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Application.Abstractions.Messaging;
+using Domain.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using SharedKernel;
 

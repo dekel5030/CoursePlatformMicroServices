@@ -1,9 +1,9 @@
-using Common.Messaging.Options;
 using MassTransit;
+using Messaging.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Common.Messaging.Extensions;
+namespace Messaging.Extensions;
 
 public static class MessagingExtensions
 {

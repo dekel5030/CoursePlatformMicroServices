@@ -1,5 +1,5 @@
-﻿using SharedKernel.Orders;
-using SharedKernel;
+﻿using SharedKernel;
+using Domain.Orders.Primitives;
 
 namespace Domain.Orders.Events;
 

@@ -1,4 +1,5 @@
-﻿using SharedKernel;
+﻿using Domain.Abstractions;
+using SharedKernel;
 
 namespace Infrastructure.DomainEvents;
 
