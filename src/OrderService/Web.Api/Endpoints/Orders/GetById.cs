@@ -1,8 +1,8 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.Orders.Queries.Dtos;
 using Application.Orders.Queries.GetById;
+using Domain.Orders.Primitives;
 using Kernel;
-using SharedKernel.Orders;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 

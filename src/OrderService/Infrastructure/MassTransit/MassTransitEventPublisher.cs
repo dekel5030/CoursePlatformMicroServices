@@ -17,10 +17,10 @@ internal sealed class MassTransitEventPublisher : IEventPublisher
         _logger = logger;
     }
 
-    public Task Publish<T>(T message, CancellationToken cancellationToken = default) 
+    public async Task Publish<T>(T message, CancellationToken cancellationToken = default) 
         where T : notnull
     {
         _logger.LogInformation("Publishing message of type {MessageType}: {Message}", message.GetType(), message);
-        return _publishEndpoint.Publish(message, cancellationToken);
+        await _publishEndpoint.Publish(message, cancellationToken);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using Application.Abstractions.Messaging;
-using Domain.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using SharedKernel;
 
@@ -25,6 +24,7 @@ internal sealed class DomainEventsDispatcher(IServiceProvider serviceProvider) :
                 et => typeof(IDomainEventHandler<>).MakeGenericType(et));
 
             IEnumerable<object?> handlers = scope.ServiceProvider.GetServices(handlerType);
+            //IEnumerable<object?> handlers = serviceProvider.GetServices(handlerType);
 
             foreach (object? handler in handlers)
             {

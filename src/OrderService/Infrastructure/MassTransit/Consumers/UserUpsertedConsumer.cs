@@ -1,7 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.Users.IntegrationEvents.UserUpserted;
-using Infrastructure.Database;
-using Kernel;
 using MassTransit;
 using Messaging.EventEnvelope;
 using Users.Contracts.Events;
@@ -35,4 +33,3 @@ internal sealed class UserUpsertedConsumer : IConsumer<EventEnvelope<UserUpserte
         return Task.CompletedTask;
     }
 }
-

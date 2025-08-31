@@ -6,19 +6,20 @@ namespace Application.Orders.DomainEvents;
 
 public sealed class OrderSubmittedDomainEventHandler : IDomainEventHandler<OrderSubmitted>
 {
-    private readonly IApplicationDbContext _dbContext;
     private readonly IEventPublisher _publisher;
+    private readonly IApplicationDbContext _dbContext;
 
-    public OrderSubmittedDomainEventHandler(IApplicationDbContext dbContext, IEventPublisher publisher)
+    public OrderSubmittedDomainEventHandler(IEventPublisher publisher, IApplicationDbContext dbContext)
     {
-        _dbContext = dbContext;
         _publisher = publisher;
+        _dbContext = dbContext;
     }
 
-    public Task Handle(OrderSubmitted @event, CancellationToken cancellationToken = default)
+    public async Task Handle(OrderSubmitted @event, CancellationToken cancellationToken = default)
     {
         // Map from domain event to ingetration event and save to outbox table
-        _publisher.Publish(@event, cancellationToken);
-        return Task.CompletedTask;
+        await _publisher.Publish(@event, cancellationToken);
+        await _dbContext.SaveChangesAsync();
     }
 }
+ 

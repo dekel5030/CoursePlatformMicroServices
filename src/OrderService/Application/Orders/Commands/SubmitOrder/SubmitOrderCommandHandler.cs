@@ -2,20 +2,26 @@
 using Application.Abstractions.Messaging;
 using Domain.Orders;
 using Domain.Orders.Errors;
+using Domain.Orders.Events;
+using Domain.Orders.Primitives;
+using Domain.Users;
 using Kernel;
 using SharedKernel;
-using SharedKernel.Customers;
 using SharedKernel.Products;
 
 namespace Application.Orders.Commands.SubmitOrder;
 
+public record PingV1(Guid Id);
+
 public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderCommand, Guid>
 {
     private readonly IApplicationDbContext _dbContext;
+    private readonly IEventPublisher _publisher;
 
-    public SubmitOrderCommandHandler(IApplicationDbContext dbContext)
+    public SubmitOrderCommandHandler(IApplicationDbContext dbContext, IEventPublisher publisher)
     {
         _dbContext = dbContext;
+        _publisher = publisher;
     }
 
     public async Task<Result<Guid>> Handle(SubmitOrderCommand command, CancellationToken cancellationToken)
@@ -69,6 +75,7 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
 
         await _dbContext.Orders.AddAsync(order, cancellationToken);
         Result<Order> submitResult = order.Submit();
+
         await _dbContext.SaveChangesAsync();
 
         if (submitResult.IsFailure)
