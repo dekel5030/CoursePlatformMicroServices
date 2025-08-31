@@ -5,7 +5,6 @@ using Infrastructure.DomainEvents;
 using Infrastructure.MassTransit;
 using Infrastructure.Options;
 using Infrastructure.Time;
-using Infrastructure.VersionedEntity;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -33,14 +32,12 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
-        services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
+        services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
         return services;
     }
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<DomainEventDispatcherInterceptor>();
-
         services.AddOptions<DatabaseOptions>()
             .BindConfiguration(DatabaseOptions.SectionName)
             .ValidateDataAnnotations()
@@ -58,8 +55,6 @@ public static class DependencyInjection
                         HistoryRepository.DefaultTableName,
                         Schemas.Default);
                 })
-                .AddInterceptors(new VersionedEntityInterceptor())
-                .AddInterceptors(serviceProvider.GetRequiredService<DomainEventDispatcherInterceptor>())
                 .UseSnakeCaseNamingConvention();
         });
 
