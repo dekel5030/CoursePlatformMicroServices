@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Domain.Orders;
+using Domain.Users;
 using Infrastructure.DomainEvents;
 using Infrastructure.VersionedEntity;
 using MassTransit;
@@ -17,6 +18,7 @@ public sealed class ApplicationDbContext(
     public DbSet<Order> Orders { get; set; }
 
     public DbSet<LineItem> LineItems { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

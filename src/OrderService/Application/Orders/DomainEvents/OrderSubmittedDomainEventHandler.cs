@@ -21,4 +21,3 @@ public sealed class OrderSubmittedDomainEventHandler : IDomainEventHandler<Order
         await _publisher.Publish(@event, cancellationToken);
     }
 }
- 
