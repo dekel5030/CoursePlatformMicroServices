@@ -1,4 +1,5 @@
 ﻿using Domain.Orders;
+using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Abstractions.Data;
@@ -7,6 +8,7 @@ public interface IApplicationDbContext
 {
     DbSet<Order> Orders { get; }
     DbSet<LineItem> LineItems { get; }
-  
+    DbSet<User> Users { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

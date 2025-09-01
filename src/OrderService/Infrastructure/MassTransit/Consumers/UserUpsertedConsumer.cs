@@ -2,21 +2,20 @@
 using Application.Users.IntegrationEvents.UserUpserted;
 using MassTransit;
 using Messaging.EventEnvelope;
+using Microsoft.Extensions.Logging;
 using Users.Contracts.Events;
 
 namespace Infrastructure.MassTransit.Consumers;
 
-internal sealed class UserUpsertedConsumer : IConsumer<EventEnvelope<UserUpsertedV1>>
+internal sealed class UserUpsertedConsumer(
+    IIntegrationEventHandler<UserUpsertedIntegrationEvent> handler,
+    ILogger<UserUpsertedConsumer> logger) 
+        : IConsumer<EventEnvelope<UserUpsertedV1>>
 {
-    private readonly IIntegrationEventHandler<UserUpsertedIntegrationEvent> _handler;
-
-    public UserUpsertedConsumer(IIntegrationEventHandler<UserUpsertedIntegrationEvent> handler)
-    {
-        _handler = handler;
-    }
-
     public Task Consume(ConsumeContext<EventEnvelope<UserUpsertedV1>> context)
     {
+        logger.LogInformation("Received UserUpsertedV1 event for UserId: {UserId}", context.Message.Payload.UserId);
+
         EventEnvelope<UserUpsertedV1> message = context.Message;
 
         var @event = new UserUpsertedIntegrationEvent(
@@ -28,8 +27,6 @@ internal sealed class UserUpsertedConsumer : IConsumer<EventEnvelope<UserUpserte
             OccurredAt: message.OccurredAtUtc
         );
 
-        _handler.Handle(@event);
-
-        return Task.CompletedTask;
+        return handler.Handle(@event, context.CancellationToken);
     }
 }
