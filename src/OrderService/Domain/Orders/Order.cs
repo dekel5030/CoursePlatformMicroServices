@@ -15,6 +15,7 @@ public class Order : Entity
 
     public OrderId Id { get; private set; } = new(Guid.NewGuid());
     public UserId CustomerId { get; private set; }
+    public OrderStatus Status { get; private set; }
     public Money TotalPrice { get; private set; } = Money.Zero();
     public IReadOnlyCollection<LineItem> Lines => _items;
 
@@ -42,7 +43,9 @@ public class Order : Entity
         if (_items.Count == 0)
             return Result.Failure<Order>(OrderErrors.OrderIsEmpty);
 
-        Raise(new OrderSubmitted(Id, CustomerId));
+        Status = OrderStatus.Submitted;
+
+        Raise(new OrderSubmittedDomainEvent(Id, CustomerId, Status));
 
         return Result.Success(this);
     }

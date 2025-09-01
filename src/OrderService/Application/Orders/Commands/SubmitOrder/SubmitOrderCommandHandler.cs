@@ -16,12 +16,10 @@ public record PingV1(Guid Id);
 public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderCommand, Guid>
 {
     private readonly IApplicationDbContext _dbContext;
-    private readonly IEventPublisher _publisher;
 
-    public SubmitOrderCommandHandler(IApplicationDbContext dbContext, IEventPublisher publisher)
+    public SubmitOrderCommandHandler(IApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
-        _publisher = publisher;
     }
 
     public async Task<Result<Guid>> Handle(SubmitOrderCommand command, CancellationToken cancellationToken)

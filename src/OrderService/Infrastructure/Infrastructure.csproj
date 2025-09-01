@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Contracts\Users.Contracts\Users.Contracts.csproj" />
-    <ProjectReference Include="..\..\Shared\Messaging\Messaging.csproj" />
     <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
 
