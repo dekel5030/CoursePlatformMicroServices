@@ -32,7 +32,7 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
         //    return Result.Failure(OrderErrors.CustomerNotFound);
         //}
 
-        Result<Order> result = Order.Create(new UserId(dto.CustomerId));
+        Result<Order> result = Order.Create(new UserId(dto.UserId));
 
         if (result.IsFailure)
         {
