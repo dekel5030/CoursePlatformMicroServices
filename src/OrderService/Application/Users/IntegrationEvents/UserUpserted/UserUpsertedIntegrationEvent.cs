@@ -7,5 +7,4 @@ public sealed record UserUpsertedIntegrationEvent(
     string Email,
     string Fullname,
     bool IsActive,
-    long AggregateVersion,
-    DateTimeOffset OccurredAt) : IIntegrationEvent;
+    long AggregateVersion) : IIntegrationEvent;

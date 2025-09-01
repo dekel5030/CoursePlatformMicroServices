@@ -1,5 +1,4 @@
 ﻿using Kernel;
-using SharedKernel;
 
 namespace Application.Abstractions.Messaging;
 

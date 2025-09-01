@@ -39,7 +39,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddDomainEventHandlers(this IServiceCollection services)
     {
-        services.AddScoped<IDomainEventHandler<OrderSubmitted>, OrderSubmittedDomainEventHandler>();
+        services.AddScoped<IDomainEventHandler<OrderSubmittedDomainEvent>, OrderSubmittedDomainEventHandler>();
 
         return services;
     }
