@@ -1,7 +1,7 @@
 ﻿using Domain.Orders.Errors;
 using Domain.Orders.Events;
 using Domain.Orders.Primitives;
-using Domain.Users;
+using Domain.Users.Primitives;
 using Kernel;
 using SharedKernel;
 
@@ -14,16 +14,16 @@ public class Order : Entity
     private Order() {}
 
     public OrderId Id { get; private set; } = new(Guid.CreateVersion7());
-    public UserId CustomerId { get; private set; }
+    public ExternalUserId ExternalUserId { get; private set; }
     public OrderStatus Status { get; private set; }
     public Money TotalPrice { get; private set; } = Money.Zero();
     public IReadOnlyCollection<LineItem> Lines => _items;
 
-    public static Result<Order> Create(UserId customerId)
+    public static Result<Order> Create(ExternalUserId externalUserId)
     {
-        var order = new Order { CustomerId = customerId, TotalPrice = Money.Zero() };
+        var order = new Order { ExternalUserId = externalUserId, TotalPrice = Money.Zero() };
 
-        order.Raise(new OrderDraftOpened(order.Id, customerId));
+        order.Raise(new OrderDraftOpened(order.Id, externalUserId));
         return Result.Success(order);
     }
 
@@ -45,7 +45,7 @@ public class Order : Entity
 
         Status = OrderStatus.Submitted;
 
-        Raise(new OrderSubmittedDomainEvent(Id, CustomerId, Status));
+        Raise(new OrderSubmittedDomainEvent(Id, ExternalUserId, Status));
 
         return Result.Success(this);
     }

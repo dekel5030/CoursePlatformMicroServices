@@ -1,3 +1,3 @@
-﻿namespace Domain.Users;
+﻿namespace Domain.Users.Primitives;
 
 public record struct UserId(Guid Value);

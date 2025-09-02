@@ -24,7 +24,7 @@ public sealed class GetOrderByIdQueryHandler
             .Where(o => o.Id == query.OrderId)
             .Select(o => new OrderReadDto(
                 o.Id.Value,
-                o.CustomerId.Value,
+                o.ExternalUserId.Value,
                 o.TotalPrice,
                 o.Lines.Select(li => new LineItemReadDto(
                     li.ProductId.Value,

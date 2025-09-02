@@ -1,6 +1,6 @@
 ﻿using Domain.Orders;
 using Domain.Orders.Primitives;
-using Domain.Users;
+using Domain.Users.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,8 +17,8 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(x => x.Id)
             .HasConversion(v => v.Value, v => new OrderId(v));
 
-        builder.Property(x => x.CustomerId)
-            .HasConversion(v => v.Value, v => new UserId(v));
+        builder.Property(x => x.ExternalUserId)
+            .HasConversion(v => v.Value, v => new ExternalUserId(v));
 
         builder.OwnsOne(x => x.TotalPrice, m =>
         {

@@ -5,7 +5,10 @@ using Domain.Orders.Errors;
 using Domain.Orders.Events;
 using Domain.Orders.Primitives;
 using Domain.Users;
+using Domain.Users.Errors;
+using Domain.Users.Primitives;
 using Kernel;
+using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 using SharedKernel.Products;
 
@@ -23,12 +26,14 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
     public async Task<Result<OrderId>> Handle(SubmitOrderCommand command, CancellationToken cancellationToken)
     {
         SubmitOrderDto dto = command.Dto;
-        //if (await _dbContext.Customers.FindAsync(dto.CustomerId, cancellationToken) is null)
-        //{
-        //    return Result.Failure(OrderErrors.CustomerNotFound);
-        //}
+        var externalUserId = new ExternalUserId(dto.ExternalUserId);
 
-        Result<Order> result = Order.Create(new UserId(dto.UserId));
+        if (await _dbContext.Users.AnyAsync(user => user.ExternalUserId == externalUserId, cancellationToken) == false)
+        {
+            return Result.Failure<OrderId>(UserErrors.NotFound);
+        }
+
+        Result<Order> result = Order.Create(externalUserId);
 
         if (result.IsFailure)
         {
@@ -47,14 +52,6 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
             //    return Result.Failure(ProductErrors.ProductNotFound);
             //}
 
-            //Resukt<LineItem> lineItemResult = LineItem.Create(
-            //    product.Id,
-            //    quantity,
-            //    new Sku(product.Id),
-            //    product.Name,
-            //    product.Price);
-
-
             Result<LineItem> lineItemResult = LineItem.Create(
                 new ProductId(itemDto.Id),
                 itemDto.Quantity,
@@ -72,12 +69,14 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
         await _dbContext.Orders.AddAsync(order, cancellationToken);
         Result<Order> submitResult = order.Submit();
 
-        await _dbContext.SaveChangesAsync();
 
         if (submitResult.IsFailure)
         {
             return Result.Failure<OrderId>(submitResult.Error!);
         }
+
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success(order.Id);
     }
