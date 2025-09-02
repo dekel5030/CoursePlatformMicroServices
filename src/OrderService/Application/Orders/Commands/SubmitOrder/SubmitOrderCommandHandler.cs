@@ -11,9 +11,7 @@ using SharedKernel.Products;
 
 namespace Application.Orders.Commands.SubmitOrder;
 
-public record PingV1(Guid Id);
-
-public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderCommand, Guid>
+public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderCommand, OrderId>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -22,7 +20,7 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
         _dbContext = dbContext;
     }
 
-    public async Task<Result<Guid>> Handle(SubmitOrderCommand command, CancellationToken cancellationToken)
+    public async Task<Result<OrderId>> Handle(SubmitOrderCommand command, CancellationToken cancellationToken)
     {
         SubmitOrderDto dto = command.Dto;
         //if (await _dbContext.Customers.FindAsync(dto.CustomerId, cancellationToken) is null)
@@ -34,7 +32,7 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
 
         if (result.IsFailure)
         {
-            return Result.Failure<Guid>(result.Error!);
+            return Result.Failure<OrderId>(result.Error!);
         }
 
         Order order = result.Value;
@@ -65,7 +63,7 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
 
             if (lineItemResult.IsFailure)
             {
-                return Result.Failure<Guid>(lineItemResult.Error!);
+                return Result.Failure<OrderId>(lineItemResult.Error!);
             }
 
             order.AddLine(lineItemResult.Value);
@@ -78,9 +76,9 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
 
         if (submitResult.IsFailure)
         {
-            return Result.Failure<Guid>(submitResult.Error!);
+            return Result.Failure<OrderId>(submitResult.Error!);
         }
 
-        return Result.Success(order.Id.Value);
+        return Result.Success(order.Id);
     }
 }
