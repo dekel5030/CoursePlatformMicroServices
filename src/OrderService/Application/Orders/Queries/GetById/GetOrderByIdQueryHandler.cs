@@ -27,7 +27,7 @@ public sealed class GetOrderByIdQueryHandler
                 o.ExternalUserId.Value,
                 o.TotalPrice,
                 o.Lines.Select(li => new LineItemReadDto(
-                    li.ProductId.Value,
+                    li.ExternalProductId.Value,
                     li.Quantity,
                     li.Name,
                     li.UnitPrice,

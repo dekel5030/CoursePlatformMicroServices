@@ -38,6 +38,20 @@ public class Order : Entity
         return Result.Success();
     }
 
+    public Result AddLines(IEnumerable<LineItem> items)
+    {
+        if (items is null || !items.Any()) return Result.Failure(LineItemErrors.InvalidName);
+
+        foreach (var item in items)
+        {
+            _items.Add(item);
+            Raise(new LineItemAdded(Id, item.Id, item.Quantity, item.UnitPrice));
+        }
+
+        RecalculateTotal();
+        return Result.Success();
+    }
+
     public Result<Order> Submit()
     {
         if (_items.Count == 0)
