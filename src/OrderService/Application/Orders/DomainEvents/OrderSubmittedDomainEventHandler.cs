@@ -1,23 +1,25 @@
-﻿using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
+﻿using Application.Abstractions.Messaging;
 using Domain.Orders.Events;
+using Orders.Contracts;
 
 namespace Application.Orders.DomainEvents;
 
-public sealed class OrderSubmittedDomainEventHandler : IDomainEventHandler<OrderSubmitted>
+public sealed class OrderSubmittedDomainEventHandler : IDomainEventHandler<OrderSubmittedDomainEvent>
 {
     private readonly IEventPublisher _publisher;
-    private readonly IApplicationDbContext _dbContext;
 
-    public OrderSubmittedDomainEventHandler(IEventPublisher publisher, IApplicationDbContext dbContext)
+    public OrderSubmittedDomainEventHandler(IEventPublisher publisher)
     {
         _publisher = publisher;
-        _dbContext = dbContext;
     }
 
-    public async Task Handle(OrderSubmitted @event, CancellationToken cancellationToken = default)
+    public async Task Handle(OrderSubmittedDomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
-        // Map from domain event to ingetration event and save to outbox table
-        await _publisher.Publish(@event, cancellationToken);
+        OrderSubmitted contract = OrderSubmitted.Create(
+            domainEvent.Id.Value.ToString(),
+            domainEvent.UserId.Value.ToString(),
+            domainEvent.Status.ToString());
+
+        await _publisher.Publish(contract, cancellationToken);
     }
 }
