@@ -1,0 +1,27 @@
+﻿using SharedKernel;
+
+namespace Domain.Products;
+
+public sealed class Product
+{
+    public ProductId Id { get; set; }
+    public ExternalProductId ExternalId { get; set; }
+    public string Name { get; set; } = null!;
+    public Money Price { get; set; } = Money.Zero();
+
+    private Product() { }
+
+    public static Product Create(
+        ExternalProductId externalId,
+        string name,
+        Money price)
+    {
+        return new Product
+        {
+            Id = new ProductId(Guid.CreateVersion7()),
+            ExternalId = externalId,
+            Name = name,
+            Price = price
+        };
+    }
+}

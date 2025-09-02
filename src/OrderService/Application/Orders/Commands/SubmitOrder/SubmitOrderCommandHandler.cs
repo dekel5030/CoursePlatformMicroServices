@@ -4,7 +4,7 @@ using Domain.Orders;
 using Domain.Orders.Errors;
 using Domain.Orders.Events;
 using Domain.Orders.Primitives;
-using Domain.Users;
+using Domain.Products;
 using Domain.Users.Errors;
 using Domain.Users.Primitives;
 using Kernel;
@@ -28,19 +28,16 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
         SubmitOrderDto dto = command.Dto;
         var externalUserId = new ExternalUserId(dto.ExternalUserId);
 
-        if (await _dbContext.Users.AnyAsync(user => user.ExternalUserId == externalUserId, cancellationToken) == false)
+        bool userExists = await _dbContext.Users
+            .AsNoTracking()
+            .AnyAsync(user => user.ExternalUserId == externalUserId, cancellationToken);
+
+        if (!userExists)
         {
             return Result.Failure<OrderId>(UserErrors.NotFound);
         }
 
-        Result<Order> result = Order.Create(externalUserId);
-
-        if (result.IsFailure)
-        {
-            return Result.Failure<OrderId>(result.Error!);
-        }
-
-        Order order = result.Value;
+        Order order = Order.Create(externalUserId);
 
         foreach (SubmitOrderItemDto itemDto in dto.Products)
         {
@@ -74,7 +71,6 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
         {
             return Result.Failure<OrderId>(submitResult.Error!);
         }
-
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
