@@ -1,5 +1,4 @@
-﻿
-using Application.Abstractions.Messaging;
+﻿using Application.Abstractions.Messaging;
 using Application.Orders.Commands.SubmitOrder;
 using Domain.Orders.Primitives;
 using Kernel;

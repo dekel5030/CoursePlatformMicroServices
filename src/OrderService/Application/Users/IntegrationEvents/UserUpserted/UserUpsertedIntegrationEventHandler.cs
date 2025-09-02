@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Users;
+using Domain.Users.Primitives;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.IntegrationEvents.UserUpserted;
@@ -12,13 +13,15 @@ public sealed class UserUpsertedIntegrationEventHandler(IApplicationDbContext db
         UserUpsertedIntegrationEvent request, 
         CancellationToken cancellationToken = default)
     {
+        ExternalUserId externalUserId = new ExternalUserId(request.UserId);
+
         User? user = await dbContext.Users
-            .SingleOrDefaultAsync(u => u.ExternalUserId == request.UserId, cancellationToken);
+            .SingleOrDefaultAsync(u => u.ExternalUserId == externalUserId, cancellationToken);
 
         if (user is null)
         {
             user = User.Create(
-                externalUserId: request.UserId,
+                externalUserId: externalUserId,
                 email: request.Email,
                 fullname: request.Fullname,
                 isActive: request.IsActive);

@@ -2,4 +2,4 @@
 
 namespace Application.Orders.Queries.Dtos;
 
-public record OrderReadDto(Guid Id, Guid UserId, Money Total, List<LineItemReadDto> Lines);
+public record OrderReadDto(Guid OrderId, string ExternalUserId, Money Total, List<LineItemReadDto> Lines);

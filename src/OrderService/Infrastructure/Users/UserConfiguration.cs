@@ -1,4 +1,5 @@
 ﻿using Domain.Users;
+using Domain.Users.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,6 +13,9 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(user => user.Id)
             .HasConversion(userId => userId.Value, value => new UserId(value));
+
+        builder.Property(user => user.ExternalUserId)
+            .HasConversion(externalUserId => externalUserId.Value, value => new ExternalUserId(value));
 
         builder.HasIndex(user => user.ExternalUserId).IsUnique();
     }
