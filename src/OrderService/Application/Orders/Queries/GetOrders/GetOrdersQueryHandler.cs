@@ -33,7 +33,7 @@ public sealed class GetOrdersQueryHandler
             .Take(pageSize)
             .Select(o => new OrderReadDto(
                 o.Id.Value,
-                o.CustomerId.Value,
+                o.ExternalUserId.Value,
                 o.TotalPrice,
                 o.Lines.Select(li => new LineItemReadDto(
                     li.ProductId.Value,

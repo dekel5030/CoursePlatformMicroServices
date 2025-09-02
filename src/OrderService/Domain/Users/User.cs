@@ -1,16 +1,18 @@
-﻿namespace Domain.Users;
+﻿using Domain.Users.Primitives;
+
+namespace Domain.Users;
 
 public sealed class User
 {
     public UserId Id { get; set; }
-    public string ExternalUserId { get; set; } = string.Empty;
+    public ExternalUserId ExternalUserId { get; set; }
     public string Email { get; set; } = string.Empty;
     public string Fullname { get; set; } = string.Empty;
     public bool IsActive { get; set; }
 
     private User() { }
 
-    public static User Create(string externalUserId, string email, string fullname, bool isActive)
+    public static User Create(ExternalUserId externalUserId, string email, string fullname, bool isActive)
     {
         return new User
         {
