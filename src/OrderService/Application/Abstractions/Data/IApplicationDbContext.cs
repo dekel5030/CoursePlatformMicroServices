@@ -1,4 +1,5 @@
 ﻿using Domain.Orders;
+using Domain.Products;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ public interface IApplicationDbContext
     DbSet<Order> Orders { get; }
     DbSet<LineItem> LineItems { get; }
     DbSet<User> Users { get; }
+    DbSet<Product> Products { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -4,6 +4,8 @@ using Application.Orders.DomainEvents;
 using Application.Orders.Queries.Dtos;
 using Application.Orders.Queries.GetById;
 using Application.Orders.Queries.GetOrders;
+using Application.Products.IntegrationEvents.ProductPublished;
+using Application.Users.IntegrationEvents.UserUpserted;
 using Domain.Orders.Events;
 using Domain.Orders.Primitives;
 using FluentValidation;
@@ -18,6 +20,7 @@ public static class DependencyInjection
         services.AddQueryHandlers();
         services.AddCommandHandlers();
         services.AddDomainEventHandlers();
+        services.AddIntegrataionEventHandlers();
         //services.AddValidators();
 
         return services;
@@ -41,6 +44,17 @@ public static class DependencyInjection
     private static IServiceCollection AddDomainEventHandlers(this IServiceCollection services)
     {
         services.AddScoped<IDomainEventHandler<OrderSubmittedDomainEvent>, OrderSubmittedDomainEventHandler>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddIntegrataionEventHandlers(this IServiceCollection services)
+    {
+        services.AddScoped<IIntegrationEventHandler<ProductPublishedIntegrationEvent>, 
+            ProductPublishedIntegrationEventHandler>();
+
+        services.AddScoped<IIntegrationEventHandler<UserUpsertedIntegrationEvent>,
+            UserUpsertedIntegrationEventHandler>();
 
         return services;
     }

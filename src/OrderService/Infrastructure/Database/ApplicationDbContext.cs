@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Domain.Orders;
+using Domain.Products;
 using Domain.Users;
 using Infrastructure.DomainEvents;
 using Infrastructure.VersionedEntity;
@@ -16,9 +17,9 @@ public sealed class ApplicationDbContext(
     : DbContext(options), IApplicationDbContext
 {
     public DbSet<Order> Orders { get; set; }
-
     public DbSet<LineItem> LineItems { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Product> Products { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
