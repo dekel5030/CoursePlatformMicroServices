@@ -18,7 +18,7 @@ internal sealed class LineItemConfiguration : IEntityTypeConfiguration<LineItem>
             .HasConversion(v => v.Value, v => new LineItemId(v))
             .ValueGeneratedNever();
 
-        b.Property(x => x.ProductId)
+        b.Property(x => x.ExternalProductId)
             .HasConversion(v => v.Value, v => new ProductId(v));
 
         b.Property<OrderId>("OrderId")

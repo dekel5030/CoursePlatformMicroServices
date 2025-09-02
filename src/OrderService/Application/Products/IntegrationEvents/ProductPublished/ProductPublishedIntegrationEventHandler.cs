@@ -3,6 +3,7 @@ using Application.Abstractions.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Domain.Products;
 using SharedKernel;
+using Domain.Products.Primitives;
 
 namespace Application.Products.IntegrationEvents.ProductPublished;
 
