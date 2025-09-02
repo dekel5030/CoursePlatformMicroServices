@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel", "SharedKerne
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{39902340-628F-4577-8EE8-64F7ACA4B942}"
 	ProjectSection(SolutionItems) = preProject
-		ToDo.md = ToDo.md
+		todo.md = todo.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9CF06619-7383-473D-BF5A-00392C73249A}"

@@ -6,4 +6,3 @@ public sealed record SubmitOrderDto
     public Guid OrderId { get; set; }
     public IReadOnlyList<SubmitOrderItemDto> Products { get; set; } = [];
 }
-

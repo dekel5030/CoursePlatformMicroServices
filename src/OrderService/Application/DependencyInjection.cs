@@ -5,6 +5,7 @@ using Application.Orders.Queries.Dtos;
 using Application.Orders.Queries.GetById;
 using Application.Orders.Queries.GetOrders;
 using Domain.Orders.Events;
+using Domain.Orders.Primitives;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,7 +33,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
     {
-        services.AddScoped<ICommandHandler<SubmitOrderCommand, Guid>, SubmitOrderCommandHandler>();
+        services.AddScoped<ICommandHandler<SubmitOrderCommand, OrderId>, SubmitOrderCommandHandler>();
 
         return services;
     }
@@ -50,5 +51,4 @@ public static class DependencyInjection
 
         return services;
     }
-
 }

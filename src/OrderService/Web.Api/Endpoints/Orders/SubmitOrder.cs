@@ -1,6 +1,7 @@
 ﻿
 using Application.Abstractions.Messaging;
 using Application.Orders.Commands.SubmitOrder;
+using Domain.Orders.Primitives;
 using Kernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
@@ -13,16 +14,16 @@ public class SubmitOrder : IEndpoint
     {
         app.MapPost("api/orders", async (
             SubmitOrderDto dto,
-            ICommandHandler<SubmitOrderCommand, Guid> handler,
+            ICommandHandler<SubmitOrderCommand, OrderId> handler,
             CancellationToken cancellationToken) =>
         {
-            Result<Guid> result = await handler.Handle(new SubmitOrderCommand(dto), cancellationToken);
+            Result<OrderId> result = await handler.Handle(new SubmitOrderCommand(dto), cancellationToken);
 
             return result.Match(
                 id => Results.CreatedAtRoute(
                     routeName: "GetOrderById",
-                    routeValues: new { id },
-                    value: new { id }
+                    routeValues: new { id = id.Value },
+                    value: new { id = id.Value }
                 ),
                 CustomResults.Problem
             );

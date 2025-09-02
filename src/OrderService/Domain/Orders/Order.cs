@@ -13,7 +13,7 @@ public class Order : Entity
 
     private Order() {}
 
-    public OrderId Id { get; private set; } = new(Guid.NewGuid());
+    public OrderId Id { get; private set; } = new(Guid.CreateVersion7());
     public UserId CustomerId { get; private set; }
     public OrderStatus Status { get; private set; }
     public Money TotalPrice { get; private set; } = Money.Zero();

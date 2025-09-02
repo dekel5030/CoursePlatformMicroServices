@@ -31,7 +31,7 @@ public class LineItem
 
         var item = new LineItem()
         {
-            Id = new LineItemId(Guid.NewGuid()),
+            Id = new LineItemId(Guid.CreateVersion7()),
             ProductId = productId,
             Quantity = quantity,
             Name = name,
