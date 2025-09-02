@@ -1,8 +1,8 @@
 ﻿using Domain.Orders.Errors;
 using Domain.Orders.Primitives;
+using Domain.Products;
 using Kernel;
 using SharedKernel;
-using SharedKernel.Products;
 
 namespace Domain.Orders;
 

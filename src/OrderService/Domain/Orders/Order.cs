@@ -19,12 +19,12 @@ public class Order : Entity
     public Money TotalPrice { get; private set; } = Money.Zero();
     public IReadOnlyCollection<LineItem> Lines => _items;
 
-    public static Result<Order> Create(ExternalUserId externalUserId)
+    public static Order Create(ExternalUserId externalUserId)
     {
         var order = new Order { ExternalUserId = externalUserId, TotalPrice = Money.Zero() };
 
         order.Raise(new OrderDraftOpened(order.Id, externalUserId));
-        return Result.Success(order);
+        return order;
     }
 
     public Result AddLine(LineItem item)
