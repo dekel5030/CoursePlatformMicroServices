@@ -1,6 +1,6 @@
 ﻿using Domain.Orders.Errors;
 using Domain.Orders.Primitives;
-using Domain.Products;
+using Domain.Products.Primitives;
 using Kernel;
 using SharedKernel;
 
@@ -9,7 +9,7 @@ namespace Domain.Orders;
 public class LineItem
 {
     public LineItemId Id { get; private set; }
-    public ProductId ProductId { get; set; }
+    public ExternalProductId ExternalProductId { get; set; }
     public decimal Quantity { get; private set; }
     public string Name { get; private set; } = null!;
     public Money UnitPrice { get; private set; } = null!;
@@ -18,7 +18,7 @@ public class LineItem
     private LineItem() { }
 
     public static Result<LineItem> Create(
-        ProductId productId,
+        ExternalProductId externalProductId,
         decimal quantity,
         string name,
         Money unitPrice)
@@ -32,7 +32,7 @@ public class LineItem
         var item = new LineItem()
         {
             Id = new LineItemId(Guid.CreateVersion7()),
-            ProductId = productId,
+            ExternalProductId = externalProductId,
             Quantity = quantity,
             Name = name,
             UnitPrice = unitPrice

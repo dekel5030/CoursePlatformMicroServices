@@ -1,4 +1,5 @@
-﻿using SharedKernel;
+﻿using Domain.Products.Primitives;
+using SharedKernel;
 
 namespace Domain.Products;
 
