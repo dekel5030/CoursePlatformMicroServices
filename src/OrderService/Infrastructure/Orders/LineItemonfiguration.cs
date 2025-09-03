@@ -1,6 +1,7 @@
 ﻿using Domain.Orders;
 using Domain.Orders.Primitives;
 using Domain.Products;
+using Domain.Products.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,7 +20,7 @@ internal sealed class LineItemConfiguration : IEntityTypeConfiguration<LineItem>
             .ValueGeneratedNever();
 
         b.Property(x => x.ExternalProductId)
-            .HasConversion(v => v.Value, v => new ProductId(v));
+            .HasConversion(v => v.Value, v => new ExternalProductId(v));
 
         b.Property<OrderId>("OrderId")
             .HasConversion(v => v.Value, v => new OrderId(v));

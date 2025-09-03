@@ -4,7 +4,7 @@ using SharedKernel.Products;
 namespace Application.Orders.Queries.Dtos;
 
 public record LineItemReadDto(
-    Guid ProductId,
+    string ExternalProductId,
     decimal Quantity,
     string Name, 
     Money UnitPrice, 

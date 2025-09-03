@@ -25,7 +25,7 @@ public class LineItem
     {
         if (quantity <= 0) return Result.Failure<LineItem>(LineItemErrors.InvalidQuantity);
 
-        if (string.IsNullOrWhiteSpace(name)) return Result.Failure<LineItem>(LineItemErrors.InvalidName);
+        if (string.IsNullOrWhiteSpace(name)) return Result.Failure<LineItem>(LineItemErrors.IsNull);
 
         if (unitPrice.Amount < 0) return Result.Failure<LineItem>(LineItemErrors.InvalidPrice);
 

@@ -21,7 +21,7 @@ public class Order : Entity
 
     public static Order Create(ExternalUserId externalUserId)
     {
-        var order = new Order { ExternalUserId = externalUserId, TotalPrice = Money.Zero() };
+        var order = new Order { ExternalUserId = externalUserId, TotalPrice = Money.Zero(), Status = OrderStatus.Draft };
 
         order.Raise(new OrderDraftOpened(order.Id, externalUserId));
         return order;
@@ -29,7 +29,7 @@ public class Order : Entity
 
     public Result AddLine(LineItem item)
     {
-        if (item is null) return Result.Failure(LineItemErrors.InvalidName);
+        if (item is null) return Result.Failure(LineItemErrors.IsNull);
 
         _items.Add(item);
         RecalculateTotal();
@@ -40,7 +40,7 @@ public class Order : Entity
 
     public Result AddLines(IEnumerable<LineItem> items)
     {
-        if (items is null || !items.Any()) return Result.Failure(LineItemErrors.InvalidName);
+        if (items is null || !items.Any()) return Result.Failure(LineItemErrors.IsNull);
 
         foreach (var item in items)
         {
@@ -54,6 +54,9 @@ public class Order : Entity
 
     public Result<Order> Submit()
     {
+        if (Status != OrderStatus.Draft)
+            return Result.Failure<Order>(OrderErrors.AlreadySubmitted);
+
         if (_items.Count == 0)
             return Result.Failure<Order>(OrderErrors.OrderIsEmpty);
 

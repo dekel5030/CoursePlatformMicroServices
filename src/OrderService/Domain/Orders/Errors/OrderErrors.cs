@@ -9,4 +9,7 @@ public static class OrderErrors
 
     public static readonly Error OrderIsEmpty =
         Error.Validation("Orders.Order.Empty", "Order cannot be submitted because it is empty");
+
+    public static readonly Error AlreadySubmitted =
+        Error.Conflict("Orders.Order.AlreadySubmitted", "Order has already been submitted");
 }
