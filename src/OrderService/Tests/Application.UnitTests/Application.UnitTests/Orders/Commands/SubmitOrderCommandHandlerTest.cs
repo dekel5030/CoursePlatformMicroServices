@@ -14,7 +14,7 @@ using SharedKernel;
 using Domain.Orders.Errors;
 using Moq.EntityFrameworkCore;
 
-namespace Application.UnitTests;
+namespace Application.UnitTests.Orders.Commands;
 
 public class SubmitOrderCommandHandlerTest
 {
