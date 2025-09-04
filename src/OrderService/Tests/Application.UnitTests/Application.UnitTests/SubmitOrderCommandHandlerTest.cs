@@ -35,7 +35,7 @@ public class SubmitOrderCommandHandlerTest
     public async Task Handle_ShouldReturnFailure_WhenUserDoesNotExist()
     {
         // Arrange
-        var products = new List<SubmitOrderItemDto>();
+        var products = new List<ProductDto>();
         var dto = new SubmitOrderDto(_user1.ExternalUserId.Value, products);
         var command = new SubmitOrderCommand(dto);
 
@@ -53,7 +53,7 @@ public class SubmitOrderCommandHandlerTest
     public async Task Handle_ShouldReturnFailure_WhenProductNotFound()
     {
         // Arrange
-        var products = new List<SubmitOrderItemDto>() { new SubmitOrderItemDto(_product1.ExternalId.Value, 1)};
+        var products = new List<ProductDto>() { new ProductDto(_product1.ExternalId.Value, 1)};
         var dto = new SubmitOrderDto(_user1.ExternalUserId.Value, products);
         var command = new SubmitOrderCommand(dto);
 
@@ -73,8 +73,8 @@ public class SubmitOrderCommandHandlerTest
     {
         // Arrange
         decimal invalidQty = -1;
-        var products = new List<SubmitOrderItemDto>() {
-                    new SubmitOrderItemDto(_product1.ExternalId.Value, invalidQty)};
+        var products = new List<ProductDto>() {
+                    new ProductDto(_product1.ExternalId.Value, invalidQty)};
         var dto = new SubmitOrderDto(_user1.ExternalUserId.Value, products);
         var command = new SubmitOrderCommand(dto);
 
@@ -93,7 +93,7 @@ public class SubmitOrderCommandHandlerTest
     public async Task Handle_ShouldReturnFailure_WhenOrderSubmitFailsOnEmptyOrder()
     {
         // Arrange
-        var products = new List<SubmitOrderItemDto>();
+        var products = new List<ProductDto>();
         var dto = new SubmitOrderDto(_user1.ExternalUserId.Value, products);
         var command = new SubmitOrderCommand(dto);
 
@@ -116,7 +116,7 @@ public class SubmitOrderCommandHandlerTest
     public async Task Handle_ShouldReturnSuccess_WhenAllValid()
     {
         // Arrange
-        var products = new List<SubmitOrderItemDto>() { new SubmitOrderItemDto(_product1.ExternalId.Value, 1) };
+        var products = new List<ProductDto>() { new ProductDto(_product1.ExternalId.Value, 1) };
         var dto = new SubmitOrderDto(_user1.ExternalUserId.Value, products);
         var command = new SubmitOrderCommand(dto);
 
