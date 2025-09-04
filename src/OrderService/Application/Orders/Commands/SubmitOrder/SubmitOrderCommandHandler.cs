@@ -60,10 +60,10 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
     }
 
     private async Task<Result<Dictionary<ExternalProductId, Product>>> GetProducts(
-        IReadOnlyList<SubmitOrderItemDto> items,
+        IReadOnlyList<ProductDto> items,
         CancellationToken cancellationToken)
     {
-        var externalProductIds = items.Select(p => new ExternalProductId(p.Id)).ToList();
+        var externalProductIds = items.Select(p => new ExternalProductId(p.ExternalId)).ToList();
 
         var products = await _dbContext.Products
             .AsNoTracking()
@@ -78,14 +78,14 @@ public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderComma
     }
 
     private Result<List<LineItem>> CreateLineItems(
-        IReadOnlyList<SubmitOrderItemDto> items,
+        IReadOnlyList<ProductDto> items,
         Dictionary<ExternalProductId, Product> productsById)
     {
         var lineItems = new List<LineItem>();
 
         foreach (var itemDto in items)
         {
-            var externalProductId = new ExternalProductId(itemDto.Id);
+            var externalProductId = new ExternalProductId(itemDto.ExternalId);
 
             if (!productsById.TryGetValue(externalProductId, out var product))
                 return Result.Failure<List<LineItem>>(ProductErrors.NotFound);
