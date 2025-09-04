@@ -28,7 +28,7 @@ public sealed class GetOrdersQueryHandler
         int pageSize = Math.Clamp(pageParams.PageSize ?? 10, 1, 100);
 
         var items = await baseQuery
-            .OrderByDescending(o => o.Id)
+            .OrderByDescending(o => o.Id.Value)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(o => new OrderReadDto(
