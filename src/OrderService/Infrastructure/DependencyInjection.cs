@@ -3,7 +3,6 @@ using Application.Abstractions.Messaging;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.MassTransit;
-using Infrastructure.Options;
 using Infrastructure.Time;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +22,7 @@ public static class DependencyInjection
         services
             .AddServices()
             .AddDatabase(configuration)
-            .AddMassTransitInternal()
+            .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal();
@@ -38,15 +37,9 @@ public static class DependencyInjection
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<DatabaseOptions>()
-            .BindConfiguration(DatabaseOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
-            var dbOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<DatabaseOptions>>().Value;
-            var connectionString = dbOptions.BuildConnectionString();
+            string connectionString = configuration.GetConnectionString("Database")!;
 
             options
                 .UseNpgsql(connectionString, npgsqlOptions =>
@@ -84,13 +77,8 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddMassTransitInternal(this IServiceCollection services)
+    private static IServiceCollection AddMassTransitInternal(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<RabbitMqOptions>()
-            .BindConfiguration(RabbitMqOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
         services.AddMassTransit(config =>
         {
             config.AddConsumers(typeof(DependencyInjection).Assembly);
@@ -109,14 +97,9 @@ public static class DependencyInjection
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                RabbitMqOptions options = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
+                string connectionString = configuration.GetConnectionString("RabbitMQ")!;
 
-                busConfig.Host(options.Host, options.VirtualHost, host =>
-                {
-                    host.Username(options.Username);
-                    host.Password(options.Password);
-                });
-
+                busConfig.Host(new Uri(connectionString!), h => { });
                 busConfig.ConfigureEndpoints(context);
             });
         });
