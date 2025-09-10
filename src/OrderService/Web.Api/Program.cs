@@ -23,3 +23,5 @@ app.MapGet("/", () => "OK");
 app.MapEndpoints();
 
 app.Run();
+
+public partial class Program { }
