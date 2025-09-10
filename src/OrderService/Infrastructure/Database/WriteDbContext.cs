@@ -11,8 +11,8 @@ using SharedKernel.VersionedEntity;
 
 namespace Infrastructure.Database;
 
-public sealed class ApplicationDbContext(
-    DbContextOptions<ApplicationDbContext> options,
+public sealed class WriteDbContext(
+    DbContextOptions<WriteDbContext> options,
     IDomainEventsDispatcher dispatcher)
     : DbContext(options), IApplicationDbContext
 {
@@ -25,7 +25,7 @@ public sealed class ApplicationDbContext(
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(WriteDbContext).Assembly);
         modelBuilder.HasDefaultSchema(Schemas.Default);
 
         modelBuilder.AddTransactionalOutboxEntities();
