@@ -37,7 +37,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
+        services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
             string connectionString = configuration.GetConnectionString("Database")!;
 
@@ -51,7 +51,7 @@ public static class DependencyInjection
                 .UseSnakeCaseNamingConvention();
         });
 
-        services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
 
         return services;
     }
@@ -83,7 +83,7 @@ public static class DependencyInjection
         {
             config.AddConsumers(typeof(DependencyInjection).Assembly);
 
-            config.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
+            config.AddEntityFrameworkOutbox<WriteDbContext>(o =>
             {
                 o.UsePostgres();
                 o.UseBusOutbox();
@@ -92,7 +92,7 @@ public static class DependencyInjection
 
             config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
             {
-                endpointCfg.UseEntityFrameworkOutbox<ApplicationDbContext>(ctx);
+                endpointCfg.UseEntityFrameworkOutbox<WriteDbContext>(ctx);
             });
 
             config.UsingRabbitMq((context, busConfig) =>
