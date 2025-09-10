@@ -42,7 +42,7 @@ public class SubmitOrderTests : IntegrationTestsBase
     private async Task SeedData()
     {
         using var scope = Factory.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
 
         await dbContext.Users.AddAsync(_user);
         await dbContext.Products.AddRangeAsync(_product1, _product2);
@@ -71,7 +71,7 @@ public class SubmitOrderTests : IntegrationTestsBase
         var orderId = new OrderId(created!.Id);
 
         using var scope = Factory.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
         Order? order = await dbContext.Orders
             .Include(o => o.Lines)
             .FirstOrDefaultAsync(o => o.Id == orderId);
@@ -107,7 +107,7 @@ public class SubmitOrderTests : IntegrationTestsBase
         var orderId = new OrderId(created!.Id);
 
         using var scope = Factory.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
 
         // Assert
         var outboxMessage = await dbContext.Set<OutboxMessage>()
@@ -144,7 +144,7 @@ public class SubmitOrderTests : IntegrationTestsBase
         var orderId = new OrderId(created!.Id);
 
         using var scope = Factory.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
 
         var insertedMessage = await dbContext.Set<OutboxMessage>()
             .OrderByDescending(m => m.SentTime)
