@@ -54,7 +54,7 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
         Client = Factory.CreateClient();
 
         using var scope = Factory.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
         await dbContext.Database.MigrateAsync();
     }
 
