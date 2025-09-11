@@ -1,14 +1,16 @@
 ﻿using Domain.Users.Primitives;
+using Kernel;
 
 namespace Domain.Users;
 
-public sealed class User
+public sealed class User : IVersionedEntity
 {
     public UserId Id { get; set; }
     public ExternalUserId ExternalUserId { get; set; }
     public string Email { get; set; } = string.Empty;
     public string Fullname { get; set; } = string.Empty;
     public bool IsActive { get; set; }
+    public long EntityVersion { get; private set; }
 
     private User() { }
 

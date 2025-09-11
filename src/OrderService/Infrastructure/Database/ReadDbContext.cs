@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
 
-internal class ReadDbContext : DbContext, IReadDbContext
+internal class ReadDbContext : DbContext, IReadDbContext, IApplicationDbContext
 {
     public ReadDbContext(DbContextOptions<ReadDbContext> options) : base(options)
     {

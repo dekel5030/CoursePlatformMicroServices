@@ -1,14 +1,16 @@
 ﻿using Domain.Products.Primitives;
+using Kernel;
 using SharedKernel;
 
 namespace Domain.Products;
 
-public sealed class Product
+public sealed class Product : IVersionedEntity
 {
     public ProductId Id { get; set; }
     public ExternalProductId ExternalId { get; set; }
     public string Name { get; set; } = null!;
     public Money Price { get; set; } = Money.Zero();
+    public long EntityVersion { get; private set; }
 
     private Product() { }
 

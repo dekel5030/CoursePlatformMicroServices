@@ -16,12 +16,15 @@ namespace Infrastructure;
 
 public static class DependencyInjection
 {
+    private static readonly string _readDatabaseSectionName = "ReadDatabase";
+    private static readonly string _writeDatabaseSectionName = "WriteDatabase";
+
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration) =>
         services
             .AddServices()
-            .AddDatabase(configuration)
+            .AddDatabases(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
             .AddAuthenticationInternal(configuration)
@@ -35,11 +38,39 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddDatabases(this IServiceCollection services, IConfiguration configuration)
+    {
+        return services
+            .AddReadDatabase(configuration)
+            .AddWriteDatabase(configuration);
+    }
+
+    private static IServiceCollection AddReadDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
+        {
+            string connectionString = configuration.GetConnectionString(_readDatabaseSectionName)!;
+
+            options
+                .UseNpgsql(connectionString, npgsqlOptions =>
+                {
+                    npgsqlOptions.MigrationsHistoryTable(
+                        HistoryRepository.DefaultTableName,
+                        Schemas.Default);
+                })
+                .UseSnakeCaseNamingConvention();
+        });
+
+        services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ReadDbContext>());
+
+        return services;
+    }
+
+    private static IServiceCollection AddWriteDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString("Database")!;
+            string connectionString = configuration.GetConnectionString(_writeDatabaseSectionName)!;
 
             options
                 .UseNpgsql(connectionString, npgsqlOptions =>
