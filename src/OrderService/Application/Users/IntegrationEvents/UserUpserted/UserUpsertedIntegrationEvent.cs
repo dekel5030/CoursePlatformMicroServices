@@ -7,4 +7,4 @@ public sealed record UserUpsertedIntegrationEvent(
     string Email,
     string Fullname,
     bool IsActive,
-    long AggregateVersion) : IIntegrationEvent;
+    long EntityVersion) : IIntegrationEvent;

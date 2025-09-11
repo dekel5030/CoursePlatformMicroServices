@@ -6,4 +6,5 @@ public record ProductPublishedIntegrationEvent(
     string ExternalId, 
     string Name, 
     decimal Price, 
-    string Currency) : IIntegrationEvent;
+    string Currency, 
+    int AggregateVersion) : IIntegrationEvent;

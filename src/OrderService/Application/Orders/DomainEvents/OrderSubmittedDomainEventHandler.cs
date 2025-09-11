@@ -15,9 +15,9 @@ public sealed class OrderSubmittedDomainEventHandler : IDomainEventHandler<Order
 
     public async Task Handle(OrderSubmittedDomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
-        OrderSubmitted contract = OrderSubmitted.Create(
+        OrderSubmitted contract = new OrderSubmitted(
             domainEvent.Id.Value.ToString(),
-            domainEvent.UserId.Value.ToString(),
+            domainEvent.EntityVersion,
             domainEvent.Status.ToString());
 
         await _publisher.Publish(contract, cancellationToken);

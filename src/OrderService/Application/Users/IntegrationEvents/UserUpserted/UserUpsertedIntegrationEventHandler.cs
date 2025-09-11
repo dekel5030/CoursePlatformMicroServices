@@ -28,16 +28,12 @@ public sealed class UserUpsertedIntegrationEventHandler(IApplicationDbContext db
 
             await dbContext.Users.AddAsync(user, cancellationToken);
         }
-        else // if (user.Version < request.AggregateVersion)
+        else
         {
             user.Fullname = request.Fullname;
             user.Email = request.Email;
             user.IsActive = request.IsActive;
         }
-        //else
-        //{
-        //    return;
-        //}
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }

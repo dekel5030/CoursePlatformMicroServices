@@ -7,21 +7,28 @@ using SharedKernel;
 
 namespace Domain.Orders;
 
-public class Order : Entity
+public class Order : Entity, IVersionedEntity
 {
     private readonly HashSet<LineItem> _items = new();
 
     private Order() {}
 
-    public OrderId Id { get; private set; } = new(Guid.CreateVersion7());
+    public OrderId Id { get; private set; }
     public ExternalUserId ExternalUserId { get; private set; }
     public OrderStatus Status { get; private set; }
-    public Money TotalPrice { get; private set; } = Money.Zero();
+    public Money TotalPrice { get; private set; } = null!;
+    public long EntityVersion { get; private set; }
     public IReadOnlyCollection<LineItem> Lines => _items;
 
     public static Order Create(ExternalUserId externalUserId)
     {
-        var order = new Order { ExternalUserId = externalUserId, TotalPrice = Money.Zero(), Status = OrderStatus.Draft };
+        var order = new Order {
+            Id = new OrderId(Guid.CreateVersion7()),
+            ExternalUserId = externalUserId, 
+            TotalPrice = Money.Zero(), 
+            Status = OrderStatus.Draft, 
+            EntityVersion = 1
+        };
 
         order.Raise(new OrderDraftOpened(order.Id, externalUserId));
         return order;
@@ -62,7 +69,7 @@ public class Order : Entity
 
         Status = OrderStatus.Submitted;
 
-        Raise(new OrderSubmittedDomainEvent(Id, ExternalUserId, Status));
+        Raise(new OrderSubmittedDomainEvent(Id, EntityVersion, Status));
 
         return Result.Success(this);
     }
