@@ -3,11 +3,10 @@ using Domain.Orders;
 using Domain.Products;
 using Domain.Users;
 using Infrastructure.DomainEvents;
-using Infrastructure.VersionedEntity;
+using Kernel;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
-using SharedKernel.VersionedEntity;
 
 namespace Infrastructure.Database;
 
@@ -29,13 +28,21 @@ public sealed class WriteDbContext(
         modelBuilder.HasDefaultSchema(Schemas.Default);
 
         modelBuilder.AddTransactionalOutboxEntities();
-        modelBuilder.AddShadowVersion();
+        AssignConcurrencyToken(modelBuilder);
     }
 
+    /// <summary>
+    /// First , it updates the version of all versioned entities.
+    /// then it dispatches all domain events.
+    /// and finally, it saves changes to the database.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        await DispatchDomainEvents(this, cancellationToken);
         UpdateVersionedEntities();
+
+        await DispatchDomainEvents(this, cancellationToken);
 
         return await base.SaveChangesAsync(cancellationToken);
     }
@@ -61,24 +68,33 @@ public sealed class WriteDbContext(
 
     private void UpdateVersionedEntities()
     {
-        const string VersionFieldName = "Version";
-
         foreach (var versionedEntity in ChangeTracker.Entries<IVersionedEntity>())
         {
-            var property = versionedEntity.Property(VersionFieldName);
+            var property = versionedEntity.Property(entity => entity.EntityVersion);
 
             switch (versionedEntity.State)
             {
                 case EntityState.Added:
-                    if (property.CurrentValue is null)
-                        property.CurrentValue = 1L;
+                    property.CurrentValue = 1L;
                     break;
 
                 case EntityState.Modified:
-                    var original = property.OriginalValue as long? ?? 0L;
+                    var original = property.OriginalValue;
                     property.CurrentValue = original + 1L;
                     break;
             }
+        }
+    }
+
+    private void AssignConcurrencyToken(ModelBuilder modelBuilder)
+    {
+        foreach (var et in modelBuilder.Model.GetEntityTypes()
+             .Where(t => typeof(IVersionedEntity).IsAssignableFrom(t.ClrType)))
+        {
+            modelBuilder.Entity(et.ClrType)
+                .Property<long>(nameof(IVersionedEntity.EntityVersion))
+                .IsConcurrencyToken()
+                .HasColumnName("entity_version");
         }
     }
 }
