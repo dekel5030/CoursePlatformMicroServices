@@ -28,15 +28,15 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
             .WithDatabase("ordersdb")
             .WithUsername("postgres")
             .WithPassword("postgres")
-            .WithPortBinding(7777, 5432)
+            //.WithPortBinding(7777, 5432)
             .Build();
 
         _rabbitMq = new RabbitMqBuilder()
             .WithImage("rabbitmq:3-management")
             .WithUsername("guest")
             .WithPassword("guest")
-            .WithPortBinding(5673, 5672)
-            .WithPortBinding(15673, 15672)
+            //.WithPortBinding(5673, 5672)
+            //.WithPortBinding(15673, 15672)
             .Build();
     }
     public async Task InitializeAsync()
@@ -82,9 +82,9 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
 
     public void PrintDebugInfo()
     {
-        Debug.WriteLine($"Host: {_rabbitMq.Hostname}");
-        Debug.WriteLine($"Port: {_rabbitMq.GetMappedPublicPort(5672)}");
-        Debug.WriteLine($"UI:   {_rabbitMq.Hostname}:{_rabbitMq.GetMappedPublicPort(15672)}");
-        Debug.WriteLine($"db: {_postgres.GetConnectionString()}");
+        //Debug.WriteLine($"Host: {_rabbitMq.Hostname}");
+        //Debug.WriteLine($"Port: {_rabbitMq.GetMappedPublicPort(5672)}");
+        //Debug.WriteLine($"UI:   {_rabbitMq.Hostname}:{_rabbitMq.GetMappedPublicPort(15672)}");
+        //Debug.WriteLine($"db: {_postgres.GetConnectionString()}");
     }
 }
