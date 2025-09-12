@@ -9,7 +9,7 @@ using Users.Contracts.Events;
 
 namespace Infrastructure.MassTransit.Consumers;
 
-internal sealed class UserUpsertedConsumer(
+public sealed class UserUpsertedConsumer(
     IIntegrationEventHandler<UserUpsertedIntegrationEvent> handler,
     ReadDbContext dbContext,
     ILogger<UserUpsertedConsumer> logger) 

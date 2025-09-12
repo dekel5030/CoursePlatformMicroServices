@@ -9,10 +9,8 @@ using Infrastructure.Database;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using RabbitMQ.Client;
 using SharedKernel;
 using System.Net.Http.Json;
-using System.Text;
 using Xunit;
 
 namespace OrderService.IntegrationTests;

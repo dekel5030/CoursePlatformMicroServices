@@ -15,13 +15,13 @@ namespace Application.UnitTests.Orders.Queries;
 
 public class GetOrderByIdQueryHandlerTest
 {
-    private readonly Mock<IApplicationDbContext> _dbContextMock;
+    private readonly Mock<IWriteDbContext> _dbContextMock;
     private readonly GetOrderByIdQueryHandler _handler;
     private readonly Order _order;
 
     public GetOrderByIdQueryHandlerTest()
     {
-        _dbContextMock = new Mock<IApplicationDbContext>();
+        _dbContextMock = new Mock<IWriteDbContext>();
         _handler = new GetOrderByIdQueryHandler(_dbContextMock.Object);
 
         var externalUserId = new ExternalUserId("user-1");

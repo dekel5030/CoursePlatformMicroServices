@@ -18,14 +18,14 @@ namespace Application.UnitTests.Orders.Commands;
 
 public class SubmitOrderCommandHandlerTest
 {
-    private readonly Mock<IApplicationDbContext> _dbContextMock;
+    private readonly Mock<IWriteDbContext> _dbContextMock;
     private readonly SubmitOrderCommandHandler _handler;
     private readonly User _user1;
     private readonly Product _product1;
 
     public SubmitOrderCommandHandlerTest()
     {
-        _dbContextMock = new Mock<IApplicationDbContext>();
+        _dbContextMock = new Mock<IWriteDbContext>();
         _handler = new SubmitOrderCommandHandler(_dbContextMock.Object);
         _user1 = User.Create(new ExternalUserId("user-1"), "user@email.com", "Israel Israeli", true);
         _product1 = Product.Create(new ExternalProductId("prod-1"), "Product 1", new Money(10, "ILS"));

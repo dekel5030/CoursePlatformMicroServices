@@ -89,7 +89,7 @@ public class ArchitectureTests
         var result = Types
             .InAssembly(assembly)
             .That().ImplementInterface(typeof(IDomainEventHandler<>))
-            .ShouldNot().HaveDependencyOn(typeof(IApplicationDbContext).Namespace)
+            .ShouldNot().HaveDependencyOn(typeof(IWriteDbContext).Namespace)
             .GetResult();
 
         // Assert

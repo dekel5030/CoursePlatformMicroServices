@@ -14,9 +14,9 @@ namespace Application.Orders.Commands.SubmitOrder;
 
 public sealed class SubmitOrderCommandHandler : ICommandHandler<SubmitOrderCommand, OrderId>
 {
-    private readonly IApplicationDbContext _dbContext;
+    private readonly IWriteDbContext _dbContext;
 
-    public SubmitOrderCommandHandler(IApplicationDbContext dbContext)
+    public SubmitOrderCommandHandler(IWriteDbContext dbContext)
     {
         _dbContext = dbContext;
     }

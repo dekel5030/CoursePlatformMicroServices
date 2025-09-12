@@ -20,10 +20,10 @@ public class OrderSubmittedDomainEventHandlerTests
         var handler = new OrderSubmittedDomainEventHandler(publisherMock.Object);
 
         var orderId = new OrderId(Guid.NewGuid());
-        var userId = new ExternalUserId("user-123");
+        long version = 1L;
         var status = OrderStatus.Submitted;
 
-        var domainEvent = new OrderSubmittedDomainEvent(orderId, userId, status);
+        var domainEvent = new OrderSubmittedDomainEvent(orderId, version, status);
 
         // Act
         await handler.Handle(domainEvent, default);
@@ -32,7 +32,7 @@ public class OrderSubmittedDomainEventHandlerTests
         publisherMock.Verify(p => p.Publish(
             It.Is<OrderSubmitted>(ie =>
                 ie.OrderId == orderId.Value.ToString() &&
-                ie.UserId == userId.Value &&
+                ie.EntityVersion == version &&
                 ie.Status == status.ToString()
             ),
             It.IsAny<CancellationToken>()),

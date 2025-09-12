@@ -9,9 +9,9 @@ namespace Application.Products.IntegrationEvents.ProductPublished;
 
 public class ProductPublishedIntegrationEventHandler : IIntegrationEventHandler<ProductPublishedIntegrationEvent>
 {
-    private readonly IApplicationDbContext _dbContext;
+    private readonly IWriteDbContext _dbContext;
 
-    public ProductPublishedIntegrationEventHandler(IApplicationDbContext dbContext)
+    public ProductPublishedIntegrationEventHandler(IWriteDbContext dbContext)
     {
         _dbContext = dbContext;
     }

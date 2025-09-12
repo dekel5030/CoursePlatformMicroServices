@@ -13,7 +13,7 @@ namespace Infrastructure.Database;
 public sealed class WriteDbContext(
     DbContextOptions<WriteDbContext> options,
     IDomainEventsDispatcher dispatcher)
-    : DbContext(options), IApplicationDbContext
+    : DbContext(options), IWriteDbContext
 {
     public DbSet<Order> Orders { get; set; }
     public DbSet<LineItem> LineItems { get; set; }

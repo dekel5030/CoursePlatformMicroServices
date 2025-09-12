@@ -10,9 +10,9 @@ namespace Application.Orders.Queries.GetById;
 public sealed class GetOrderByIdQueryHandler
     : IQueryHandler<GetOrderByIdQuery, OrderReadDto>
 {
-    private readonly IApplicationDbContext _dbContext;
+    private readonly IWriteDbContext _dbContext;
 
-    public GetOrderByIdQueryHandler(IApplicationDbContext dbContext)
+    public GetOrderByIdQueryHandler(IWriteDbContext dbContext)
     {
         _dbContext = dbContext;
     }

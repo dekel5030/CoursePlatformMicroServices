@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Abstractions.Data;
 
-public interface IApplicationDbContext
+public interface IWriteDbContext
 {
     DbSet<Order> Orders { get; }
     DbSet<LineItem> LineItems { get; }
