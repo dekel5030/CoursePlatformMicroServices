@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.IntegrationEvents.UserUpserted;
 
-public sealed class UserUpsertedIntegrationEventHandler(IApplicationDbContext dbContext)
+public sealed class UserUpsertedIntegrationEventHandler(IWriteDbContext dbContext)
     : IIntegrationEventHandler<UserUpsertedIntegrationEvent>
 {
     public async Task Handle(

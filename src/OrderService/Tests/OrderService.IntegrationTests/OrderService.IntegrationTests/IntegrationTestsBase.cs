@@ -1,11 +1,15 @@
-﻿using Infrastructure.Database;
+﻿using DotNet.Testcontainers.Builders;
+using Infrastructure.Database;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace OrderService.IntegrationTests;
 
@@ -14,22 +18,26 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
     private readonly PostgreSqlContainer _postgres;
     private readonly RabbitMqContainer _rabbitMq;
 
-    protected WebApplicationFactory<Program> Factory { get; private set; }= null!;
+    protected WebApplicationFactory<Program> Factory { get; private set; } = null!;
     protected HttpClient Client { get; private set; } = null!;
+    protected IBusControl ExternalBus { get; private set; } = null!;
 
     protected IntegrationTestsBase()
     {
         _postgres = new PostgreSqlBuilder()
             .WithDatabase("ordersdb")
             .WithUsername("postgres")
-            .WithPassword("yourpassword")
+            .WithPassword("postgres")
+            .WithPortBinding(7777, 5432)
             .Build();
 
         _rabbitMq = new RabbitMqBuilder()
+            .WithImage("rabbitmq:3-management")
             .WithUsername("guest")
             .WithPassword("guest")
+            .WithPortBinding(5673, 5672)
+            .WithPortBinding(15673, 15672)
             .Build();
-
     }
     public async Task InitializeAsync()
     {
@@ -43,7 +51,8 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
                 {
                     var dict = new Dictionary<string, string?>
                     {
-                        ["ConnectionStrings:Database"] = _postgres.GetConnectionString(),
+                        ["ConnectionStrings:WriteDatabase"] = _postgres.GetConnectionString(),
+                        ["ConnectionStrings:ReadDatabase"] = _postgres.GetConnectionString(),
                         ["ConnectionStrings:RabbitMq"] = _rabbitMq.GetConnectionString(),
                     };
 
@@ -53,14 +62,29 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
 
         Client = Factory.CreateClient();
 
+        ExternalBus = Bus.Factory.CreateUsingRabbitMq(cfg =>
+        {
+            cfg.Host(_rabbitMq.GetConnectionString());
+        });
+        await ExternalBus.StartAsync();
+
         using var scope = Factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
         await dbContext.Database.MigrateAsync();
+        PrintDebugInfo();
     }
 
     public async Task DisposeAsync()
     {
         await _postgres.DisposeAsync();
         await _rabbitMq.DisposeAsync();
+    }
+
+    public void PrintDebugInfo()
+    {
+        Debug.WriteLine($"Host: {_rabbitMq.Hostname}");
+        Debug.WriteLine($"Port: {_rabbitMq.GetMappedPublicPort(5672)}");
+        Debug.WriteLine($"UI:   {_rabbitMq.Hostname}:{_rabbitMq.GetMappedPublicPort(15672)}");
+        Debug.WriteLine($"db: {_postgres.GetConnectionString()}");
     }
 }
