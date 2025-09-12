@@ -127,7 +127,7 @@ public static class DependencyInjection
             config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
             {
                 endpointCfg.UseEntityFrameworkOutbox<WriteDbContext>(ctx);
-                endpointCfg.UseScheduledRedelivery(r =>
+                endpointCfg.UseMessageRetry(r =>
                 {
                     r.Handle<InvalidOperationException>();
                     r.Intervals(
