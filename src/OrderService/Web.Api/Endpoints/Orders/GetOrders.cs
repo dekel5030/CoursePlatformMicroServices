@@ -2,7 +2,6 @@
 using Application.Abstractions.Messaging;
 using Application.Orders.Queries.Dtos;
 using Application.Orders.Queries.GetOrders;
-using Microsoft.AspNetCore.Mvc;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 

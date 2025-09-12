@@ -14,13 +14,13 @@ namespace Application.UnitTests.Orders.Queries;
 
 public class GetOrdersQueryHandlerTest
 {
-    private readonly Mock<IApplicationDbContext> _dbContextMock;
+    private readonly Mock<IWriteDbContext> _dbContextMock;
     private readonly GetOrdersQueryHandler _handler;
     private readonly List<Order> _orders;
 
     public GetOrdersQueryHandlerTest()
     {
-        _dbContextMock = new Mock<IApplicationDbContext>();
+        _dbContextMock = new Mock<IWriteDbContext>();
         _handler = new GetOrdersQueryHandler(_dbContextMock.Object);
 
         // Initialize the list of orders

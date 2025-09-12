@@ -3,6 +3,7 @@ using Application.Abstractions.Messaging;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.MassTransit;
+using Infrastructure.MassTransit.Consumers;
 using Infrastructure.Time;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ public static class DependencyInjection
 {
     private static readonly string _readDatabaseSectionName = "ReadDatabase";
     private static readonly string _writeDatabaseSectionName = "WriteDatabase";
+    private static readonly string _rabbitMqSectionName = "RabbitMq";
 
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
@@ -61,7 +63,7 @@ public static class DependencyInjection
                 .UseSnakeCaseNamingConvention();
         });
 
-        services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ReadDbContext>());
+        services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<ReadDbContext>());
 
         return services;
     }
@@ -82,7 +84,7 @@ public static class DependencyInjection
                 .UseSnakeCaseNamingConvention();
         });
 
-        services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
+        services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
 
         return services;
     }
@@ -121,14 +123,23 @@ public static class DependencyInjection
                 o.QueryDelay = TimeSpan.FromSeconds(30);
             });
 
+
             config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
             {
                 endpointCfg.UseEntityFrameworkOutbox<WriteDbContext>(ctx);
+                endpointCfg.UseScheduledRedelivery(r =>
+                {
+                    r.Handle<InvalidOperationException>();
+                    r.Intervals(
+                        TimeSpan.FromSeconds(10),
+                        TimeSpan.FromSeconds(20),
+                        TimeSpan.FromSeconds(40));
+                });
             });
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                string connectionString = configuration.GetConnectionString("RabbitMQ")!;
+                string connectionString = configuration.GetConnectionString(_rabbitMqSectionName)!;
 
                 busConfig.Host(new Uri(connectionString!), h => { });
                 busConfig.ConfigureEndpoints(context);

@@ -9,9 +9,9 @@ namespace Application.Orders.Queries.GetOrders;
 public sealed class GetOrdersQueryHandler
     : IQueryHandler<GetOrdersQuery, PagedResponse<OrderReadDto>>
 {
-    private readonly IApplicationDbContext _dbContext;
+    private readonly IWriteDbContext _dbContext;
 
-    public GetOrdersQueryHandler(IApplicationDbContext dbContext)
+    public GetOrdersQueryHandler(IWriteDbContext dbContext)
     {
         _dbContext = dbContext;
     }
@@ -28,7 +28,7 @@ public sealed class GetOrdersQueryHandler
         int pageSize = Math.Clamp(pageParams.PageSize ?? 10, 1, 100);
 
         var items = await baseQuery
-            .OrderByDescending(o => o.Id.Value)
+            .OrderByDescending(o => o.Id)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(o => new OrderReadDto(
