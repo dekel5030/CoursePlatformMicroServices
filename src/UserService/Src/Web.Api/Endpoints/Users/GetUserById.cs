@@ -12,7 +12,7 @@ public class GetUserById : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("/api/users/{id:guid}", async (
-            Guid id, 
+            Guid id,
             IQueryHandler<GetUserByIdQuery, UserReadDto> handler,
             CancellationToken cancellationToken = default) =>
         {
@@ -20,6 +20,12 @@ public class GetUserById : IEndpoint
             Result<UserReadDto> result = await handler.Handle(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
-        })
+        });
+
+        app.MapGet("/api/users/", (
+            CancellationToken cancellationToken = default) =>
+        {
+            return Results.Ok("User endpoint is working");
+        });
     }
 }

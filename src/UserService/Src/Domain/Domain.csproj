@@ -12,4 +12,8 @@
     <Folder Include="Users\Events\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Kernel\Kernel.csproj" />
+  </ItemGroup>
+
 </Project>
