@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Users.Errors;
+using Domain.Users.Primitives;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,14 +12,15 @@ public class GetUserByIdQueryHandler(IReadDbContext DbContext) : IQueryHandler<G
     public async Task<Result<UserReadDto>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken = default)
     {
         UserReadDto? user = await DbContext.Users
-            .Where(u => u.Id.Value == request.UserId)
+            .Where(u => u.Id == new UserId(request.UserId))
             .Select(u => new UserReadDto(
                 u.Id.Value,
                 u.Email,
-                u.FullName?.FirstName,
-                u.FullName?.LastName,
+                u.FullName == null ? null : u.FullName.FirstName,
+                u.FullName == null ? null : u.FullName.LastName,
                 u.DateOfBirth,
-                u.PhoneNumber != null ? u.PhoneNumber.ToString() : null))
+                u.PhoneNumber == null ? null : u.PhoneNumber.ToString()
+            ))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (user is null)

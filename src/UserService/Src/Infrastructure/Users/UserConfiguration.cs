@@ -24,7 +24,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Email).IsRequired().HasMaxLength(_emailMaxLength);
         builder.HasIndex(u => u.Email).IsUnique();
 
-        builder.ComplexProperty(user => user.FullName);
-        builder.ComplexProperty(user => user.PhoneNumber);
+        builder.OwnsOne(user => user.FullName);
+        builder.OwnsOne(user => user.PhoneNumber);
     }
 }
