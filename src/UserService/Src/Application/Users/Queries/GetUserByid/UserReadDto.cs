@@ -2,8 +2,8 @@
 
 public record UserReadDto(
     Guid Id,
-    string FirstName,
-    string LastName,
     string Email,
+    string? FirstName,
+    string? LastName,
     DateTime? DateOfBirth,
     string? PhoneNumber);

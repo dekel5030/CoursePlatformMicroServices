@@ -14,9 +14,9 @@ public class GetUserByIdQueryHandler(IReadDbContext DbContext) : IQueryHandler<G
             .Where(u => u.Id.Value == request.UserId)
             .Select(u => new UserReadDto(
                 u.Id.Value,
-                u.FullName.FirstName,
-                u.FullName.LastName,
                 u.Email,
+                u.FullName?.FirstName,
+                u.FullName?.LastName,
                 u.DateOfBirth,
                 u.PhoneNumber != null ? u.PhoneNumber.ToString() : null))
             .FirstOrDefaultAsync(cancellationToken);
