@@ -1,12 +1,14 @@
+using Domain.Users.Primitives;
+
 namespace Domain.Users;
 
 public class User
 {
     public UserId Id { get; private set; }
-    public required string Email { get; set; }
-    public required FullName FullName { get; set; }
-    public PhoneNumber? PhoneNumber { get; set; }
-    public DateTime? DateOfBirth { get; set; }
+    public string Email { get; private set; }
+    public FullName FullName { get; private set; }
+    public PhoneNumber? PhoneNumber { get; private set; }
+    public DateTime? DateOfBirth { get; private set; }
 
     private User() { }
 
