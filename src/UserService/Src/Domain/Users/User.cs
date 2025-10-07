@@ -1,4 +1,4 @@
-namespace UserService.Models;
+namespace Domain.Users;
 
 public class User
 {
@@ -25,6 +25,4 @@ public class User
 
         return user;
     }
-
-
 }
