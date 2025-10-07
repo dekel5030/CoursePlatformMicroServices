@@ -5,14 +5,14 @@ namespace Domain.Users;
 public class User
 {
     public UserId Id { get; private set; }
-    public string Email { get; private set; }
-    public FullName FullName { get; private set; }
+    public string Email { get; private set; } = null!;
+    public FullName? FullName { get; private set; }
     public PhoneNumber? PhoneNumber { get; private set; }
     public DateTime? DateOfBirth { get; private set; }
 
     private User() { }
 
-    public static User CreateUser(string email, FullName fullName, PhoneNumber? phoneNumber, DateTime? dateOfBirth)
+    public static User CreateUser(string email, FullName? fullName, PhoneNumber? phoneNumber, DateTime? dateOfBirth)
     {
         var user = new User
         {
