@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Application.Users.Queries.Dtos;
 using Domain.Users.Errors;
 using Domain.Users.Primitives;
 using Kernel;
