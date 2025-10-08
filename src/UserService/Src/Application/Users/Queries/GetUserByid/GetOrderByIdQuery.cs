@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
+using Application.Users.Queries.Dtos;
 
 namespace Application.Users.Queries.GetUserByid;
 
