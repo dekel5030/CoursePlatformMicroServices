@@ -21,6 +21,7 @@ public class GetUserById : IEndpoint
             Result<UserReadDto> result = await handler.Handle(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
-        });
+        })
+        .WithName("GetUserById");
     }
 }
