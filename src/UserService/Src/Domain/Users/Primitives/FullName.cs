@@ -1,2 +1,2 @@
 namespace Domain.Users.Primitives;
-public record struct FullName(string FirstName, string LastName);
+public record FullName(string FirstName, string LastName);

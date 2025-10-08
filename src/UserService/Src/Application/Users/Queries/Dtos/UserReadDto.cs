@@ -1,4 +1,4 @@
-﻿namespace Application.Users.Queries.GetUserByid;
+﻿namespace Application.Users.Queries.Dtos;
 
 public record UserReadDto(
     Guid Id,
