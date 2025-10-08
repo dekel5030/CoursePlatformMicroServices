@@ -26,5 +26,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.OwnsOne(user => user.FullName);
         builder.OwnsOne(user => user.PhoneNumber);
+
+        builder.Property(u => u.DateOfBirth)
+            .HasColumnType("timestamp without time zone");
     }
 }
