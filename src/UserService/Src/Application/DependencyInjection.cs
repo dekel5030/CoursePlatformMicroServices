@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.Users.Commands.CreateUser;
+using Application.Users.IntegrationEvents.AuthRegistered;
 using Application.Users.Queries.Dtos;
 using Application.Users.Queries.GetUserByid;
 using Application.Users.Queries.GetUsers;
@@ -15,6 +16,8 @@ public static class DependencyInjection
         services.AddScoped<IQueryHandler<GetUsersQuery, CollectionDto<UserReadDto>>, GetUsersQueryHandler>();
 
         services.AddScoped<ICommandHandler<CreateUserCommand, CreatedUserRespondDto>, CreateUserCommandHandler>();
+
+        services.AddScoped<IIntegrationEventHandler<AuthRegisteredIntegrationEvent>, AuthRegisteredIntegrationEventHandler>();
         return services;
     }
 }
