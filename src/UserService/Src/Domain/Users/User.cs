@@ -13,7 +13,11 @@ public class User
 
     private User() { }
 
-    public static Result<User> CreateUser(string email, FullName? fullName, PhoneNumber? phoneNumber, DateTime? dateOfBirth)
+    public static Result<User> CreateUser(
+        string email, 
+        FullName? fullName = null, 
+        PhoneNumber? phoneNumber = null, 
+        DateTime? dateOfBirth = null)
     {
         var user = new User
         {
