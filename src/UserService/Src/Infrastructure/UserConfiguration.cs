@@ -3,7 +3,7 @@ using Domain.Users.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Users;
+namespace Infrastructure;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
@@ -26,5 +26,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.OwnsOne(user => user.FullName);
         builder.OwnsOne(user => user.PhoneNumber);
+
+        builder.Property(u => u.DateOfBirth)
+            .HasColumnType("timestamp without time zone");
     }
 }

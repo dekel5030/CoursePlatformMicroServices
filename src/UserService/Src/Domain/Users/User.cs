@@ -1,4 +1,5 @@
 using Domain.Users.Primitives;
+using Kernel;
 
 namespace Domain.Users;
 
@@ -12,7 +13,11 @@ public class User
 
     private User() { }
 
-    public static User CreateUser(string email, FullName? fullName, PhoneNumber? phoneNumber, DateTime? dateOfBirth)
+    public static Result<User> CreateUser(
+        string email, 
+        FullName? fullName = null, 
+        PhoneNumber? phoneNumber = null, 
+        DateTime? dateOfBirth = null)
     {
         var user = new User
         {
@@ -25,6 +30,6 @@ public class User
 
         // raise domain events here if needed
 
-        return user;
+        return Result.Success(user);
     }
 }

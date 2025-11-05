@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Domain.Users;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
@@ -20,5 +21,6 @@ public sealed class WriteDbContext(
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DependencyInjection).Assembly);
+        modelBuilder.AddTransactionalOutboxEntities();
     }
 }
