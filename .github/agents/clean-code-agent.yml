@@ -1,0 +1,5 @@
+name: CleanCodeAgent
+description: >
+  Suggests improvements for code clarity and architecture consistency.
+  Focuses on Clean Architecture and Event-Driven patterns,
+  ensuring meaningful names and readable, maintainable code.
