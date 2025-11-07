@@ -4,6 +4,12 @@ Accept: application/json
 
 ###
 
+### Get featured courses
+GET http://localhost:5198/api/courses/featured
+Accept: application/json
+
+###
+
 ### Search courses with query parameters (optional)
 GET http://localhost:5198/api/courses?Title=c&IsPublished=true&PageNumber=1&PageSize=5
 Accept: application/json

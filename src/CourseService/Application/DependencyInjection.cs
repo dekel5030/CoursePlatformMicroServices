@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.Courses.Queries.Dtos;
 using Application.Courses.Queries.GetById;
+using Application.Courses.Queries.GetFeatured;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -21,6 +22,7 @@ public static class DependencyInjection
     private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
     {
         services.AddScoped<IQueryHandler<GetCourseByIdQuery, CourseReadDto>, GetCourseByIdQueryHandler>();
+        services.AddScoped<IQueryHandler<GetFeaturedCoursesQuery, IEnumerable<CourseReadDto>>, GetFeaturedCoursesQueryHandler>();
 
         return services;
     }
