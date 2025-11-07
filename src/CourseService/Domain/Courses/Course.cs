@@ -16,6 +16,7 @@ public class Course : Entity
     public string? InstructorUserId { get; private set; }
 
     public bool IsPublished { get; private set; } = false;
+    public bool IsFeatured { get; private set; } = false;
 
     public Money Price { get; private set; } = Money.Zero();
 

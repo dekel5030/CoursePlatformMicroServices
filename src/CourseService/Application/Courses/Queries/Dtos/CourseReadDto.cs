@@ -8,6 +8,7 @@ public record CourseReadDto(
     string Title,
     string Description,
     bool IsPublished,
+    bool IsFeatured,
     string? ImageUrl,
     string? InstructorUserId,
     Money Price,

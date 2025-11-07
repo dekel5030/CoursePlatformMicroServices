@@ -27,6 +27,7 @@ public class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, Cours
                 course.Title,
                 course.Description,
                 course.IsPublished,
+                course.IsFeatured,
                 course.ImageUrl,
                 course.InstructorUserId,
                 course.Price,
