@@ -17,7 +17,6 @@
   <ItemGroup>
     <Folder Include="Courses\Commands\CreateCourse\" />
     <Folder Include="Courses\Queries\GetFeatured\" />
-    <Folder Include="Courses\Queries\GetCoureses\" />
     <Folder Include="Lessons\" />
   </ItemGroup>
 
