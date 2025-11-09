@@ -11,11 +11,10 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResp
 {
     private readonly IReadDbContext _dbContext;
 
-    // Keep featured IDs as CourseId so EF can apply the value converter on c.Id.
     private static readonly List<CourseId> _featuredCourseIds = new()
     {
-        // new CourseId(Guid.Parse("11111111-1111-1111-1111-111111111111")),
-        // new CourseId(Guid.Parse("22222222-2222-2222-2222-222222222222"))
+        new CourseId(Guid.Parse("019a6842-b9a5-714a-b257-d164982cbc19")),
+        new CourseId(Guid.Parse("019a6842-95e4-76bd-ac68-7884af14ae5f"))
     };
 
     public GetFeaturedQueryHandler(IReadDbContext dbContext)
