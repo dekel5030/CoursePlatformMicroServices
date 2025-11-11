@@ -1,0 +1,93 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 2rem;
+  background-color: var(--secondary-color);
+  border-bottom: 1px solid var(--border-color);
+  font-family: sans-serif;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.mainNav {
+  flex: 1;
+  margin-left: 2rem;
+}
+
+.navList {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 1.5rem;
+}
+
+.navItem {
+  position: relative;
+}
+
+.dropdownButton {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
+.dropdownMenu {
+  display: none;
+  position: absolute;
+  top: 2rem;
+  left: 0;
+  background: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 1rem;
+  list-style: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.navItem:hover .dropdownMenu {
+  display: block;
+}
+
+.authButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.loginBtn {
+  background: none;
+  border: 1px solid var(--primary-color);
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+.signupBtn {
+  background: var(--primary-color);
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  color: var(--secondary-color);
+  cursor: pointer;
+}
+
+.navItem:hover .dropdownMenu li {
+  background-color: #f3f4f6; /* רקע ריחוף ספציפי, לא משתנה עיקרי */
+}
+
+@media (max-width: 768px) {
+  .mainNav {
+    display: none;
+  }
+  .header {
+    justify-content: space-between;
+  }
+}
