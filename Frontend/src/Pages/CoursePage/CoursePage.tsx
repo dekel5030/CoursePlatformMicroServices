@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchCourseById } from "../../services/api";
 import type { Course } from "../../types/course";
-import Lesson from "../../components/Lesson/Lesson";
-import Button from "../../components/Button/Button";
+import Lesson from "../../features/lessons/components/Lesson";
+import { fetchCourseById } from "../../services/api";
 import styles from "./CoursePage.module.css";
 
 export default function CoursePage() {
@@ -13,137 +12,58 @@ export default function CoursePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) {
-      setError("Course ID is required");
-      setLoading(false);
-      return;
-    }
+    if (!id) return;
 
     setLoading(true);
-    setError(null);
-
     fetchCourseById(id)
-      .then((data) => setCourse(data))
-      .catch((err) => setError(err.message || "Failed to load course"))
+      .then(setCourse)
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleBuy = () => {
-    // TODO: Implement buy functionality
-    console.log("Buy course:", course?.id);
-    alert(`Purchasing course: ${course?.title}`);
-  };
-
-  const handleAddToCart = () => {
-    // TODO: Implement add to cart functionality
-    console.log("Add to cart:", course?.id);
-    alert(`Added to cart: ${course?.title}`);
-  };
-
-  if (loading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>Loading course...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.error}>
-          <h2>Error</h2>
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!course) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.error}>
-          <h2>Course not found</h2>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className={styles.status}>Loading course...</div>;
+  if (error) return <div className={styles.statusError}>Error: {error}</div>;
+  if (!course)
+    return <div className={styles.statusError}>Course not found</div>;
 
   return (
     <div className={styles.container}>
-      <div className={styles.courseHeader}>
+      <div className={styles.top}>
         {course.imageUrl && (
-          <div className={styles.imageContainer}>
-            <img
-              src={course.imageUrl}
-              alt={course.title}
-              className={styles.courseImage}
-            />
-          </div>
+          <img
+            src={course.imageUrl}
+            alt={course.title}
+            className={styles.courseImage}
+          />
         )}
-        
         <div className={styles.courseInfo}>
-          <h1 className={styles.courseTitle}>{course.title}</h1>
-          
-          {course.instructorUserId && (
-            <p className={styles.instructor}>
-              Instructor: {course.instructorUserId}
-            </p>
-          )}
-          
-          <div className={styles.priceAndActions}>
-            <div className={styles.price}>
-              <span className={styles.amount}>
-                {course.price.amount} {course.price.currency}
-              </span>
-            </div>
-            
-            <div className={styles.actions}>
-              <Button variant="filled" onClick={handleBuy}>
-                Buy Now
-              </Button>
-              <Button variant="outlined" onClick={handleAddToCart}>
-                Add to Cart
-              </Button>
-            </div>
+          <h1 className={styles.title}>{course.title}</h1>
+          <p className={styles.instructor}>
+            Instructor: {course.instructorUserId ?? "Unknown"}
+          </p>
+          <div className={styles.buttons}>
+            <button className={styles.buyButton}>Buy</button>
+            <button className={styles.cartButton}>Add to Cart</button>
           </div>
         </div>
       </div>
 
-      <div className={styles.courseDescription}>
-        <h2 className={styles.sectionTitle}>About this course</h2>
-        <p className={styles.description}>{course.description}</p>
-        
-        <div className={styles.metadata}>
-          <div className={styles.metadataItem}>
-            <span className={styles.metadataLabel}>Status:</span>
-            <span className={course.isPublished ? styles.published : styles.draft}>
-              {course.isPublished ? "Published" : "Draft"}
-            </span>
-          </div>
-          <div className={styles.metadataItem}>
-            <span className={styles.metadataLabel}>Last updated:</span>
-            <span>{new Date(course.updatedAtUtc).toLocaleDateString()}</span>
-          </div>
-          {course.lessons && (
-            <div className={styles.metadataItem}>
-              <span className={styles.metadataLabel}>Lessons:</span>
-              <span>{course.lessons.length}</span>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Description */}
+      <p className={styles.description}>{course.description}</p>
 
-      {course.lessons && course.lessons.length > 0 && (
-        <div className={styles.lessonsSection}>
-          <h2 className={styles.sectionTitle}>Course Content</h2>
-          <div className={styles.lessonsList}>
-            {course.lessons.map((lesson, index) => (
-              <Lesson key={lesson.id} lesson={lesson} index={index} />
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Lessons */}
+      <section className={styles.lessons}>
+        <h2>Lessons</h2>
+        {course.lessons && course.lessons.length > 0 ? (
+          course.lessons
+            .sort((a, b) => a.order - b.order)
+            .map((lesson, index) => (
+              <Lesson key={lesson.id.value} lesson={lesson} index={index} />
+            ))
+        ) : (
+          <p>No lessons available.</p>
+        )}
+      </section>
     </div>
   );
 }

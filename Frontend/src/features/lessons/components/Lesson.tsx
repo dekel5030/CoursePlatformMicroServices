@@ -1,4 +1,4 @@
-import type { Lesson as LessonType } from "../../types/Lesson";
+import type { Lesson as LessonType } from "../../../types/Lesson";
 import styles from "./Lesson.module.css";
 
 interface LessonProps {
@@ -9,13 +9,12 @@ interface LessonProps {
 export default function Lesson({ lesson, index }: LessonProps) {
   const formatDuration = (duration: string | null | undefined) => {
     if (!duration) return null;
-    
-    // Duration might be in format "HH:MM:SS" or as a TimeSpan string
-    const parts = duration.split(':');
+
+    const parts = duration.split(":");
     if (parts.length >= 2) {
       const hours = parseInt(parts[0]);
       const minutes = parseInt(parts[1]);
-      
+
       if (hours > 0) {
         return `${hours}h ${minutes}m`;
       }
