@@ -1,23 +1,29 @@
 :root {
-  --primary-color: #4f46e5; /* סגול עיקרי */
+  --primary-color: #4f46e5;
   --primary-color-rgb: 79, 70, 229;
-  --secondary-color: #fff; /* לבן */
-  --border-color: #e2e8f0; /* גבול */
-  --hover-bg: #f3f4f6; /* רקע בעת ריחוף */
-  
+  --secondary-color: #ffffff;
+  --border-color: #e2e8f0;
+  --hover-bg: #f3f4f6;
+
   /* Card colors */
-  --card-border: #ddd;
-  --card-shadow-color: rgba(0, 0, 0, 0.1);
-  
-  /* Error and status colors */
+  --card-border: #e5e7eb;
+  --card-shadow-color: rgba(0, 0, 0, 0.06);
+  --card-shadow-hover: rgba(0, 0, 0, 0.1);
+
+  /* Accent and status colors */
+  --accent-color: #4f46e5; /* סגול עיקרי למחירים או דגשים */
+  --success-bg: #e0fbea;
+  --success-text: #15803d;
+  --warning-bg: #fff7ed;
+  --warning-text: #b45309;
   --error-color: #dc2626;
-  
-  /* Background colors */
+
+  /* Backgrounds */
   --background-primary: #f9fafb;
   --background-secondary: #ffffff;
-  
-  /* Text colors */
-  --text-primary: #242424;
+
+  /* Text */
+  --text-primary: #1f2937;
   --text-secondary: #6b7280;
 }
 
