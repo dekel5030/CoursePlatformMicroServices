@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import { Link } from "react-router-dom";
 
 interface Course {
 	id: string;
@@ -30,7 +31,9 @@ const CourseCard: FC<{ course: Course }> = ({ course }) => {
 			<p style={{ margin: "0 0 .75rem 0", color: "#333" }}>{course.description}</p>
 			<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
 				<small style={{ color: "#666" }}>{course.author ?? "Unknown"}</small>
-				<button style={{ padding: ".4rem .6rem", borderRadius: 4 }}>View</button>
+				<Link to={`/courses/${course.id}`}>
+					<button style={{ padding: ".4rem .6rem", borderRadius: 4 }}>View</button>
+				</Link>
 			</div>
 		</article>
 	);
