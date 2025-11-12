@@ -1,5 +1,5 @@
 import type { Course } from "../../types/course";
-import "./CourseCard.css";
+import styles from "./CourseCard.module.css";
 
 interface Props {
   course: Course;
@@ -7,7 +7,7 @@ interface Props {
 
 export default function CourseCard({ course }: Props) {
   return (
-    <div className="course-card">
+    <div className={styles.card}>
       {course.imageUrl && <img src={course.imageUrl} alt={course.title} />}
       <h3>{course.title}</h3>
       <p>{course.description}</p>

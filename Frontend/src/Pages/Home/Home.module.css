@@ -8,7 +8,7 @@
 }
 
 .error {
-  color: red;
+  color: var(--error-color);
   margin-bottom: 1rem;
 }
 
