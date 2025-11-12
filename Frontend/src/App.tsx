@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout/Layout";
-import HomePage from "./pages/homePage/HomePage.tsx";
-import CoursePage from "./pages/coursePage/CoursePage.tsx";
+import HomePage from "./Pages/homePage/HomePage.tsx";
+import CoursePage from "./Pages/CoursePage/CoursePage.tsx";
 
 export default function App() {
   return (
