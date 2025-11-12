@@ -1,0 +1,95 @@
+.lesson {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.lesson:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px var(--card-shadow-color);
+}
+
+.lessonHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1;
+}
+
+.lessonNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: var(--background-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.lessonInfo {
+  flex: 1;
+}
+
+.lessonTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lessonDescription {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.previewBadge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background-color: var(--success-color);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.lessonMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.duration {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .lesson {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .lessonMeta {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

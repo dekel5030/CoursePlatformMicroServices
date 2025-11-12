@@ -14,7 +14,9 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResp
     private static readonly List<CourseId> _featuredCourseIds = new()
     {
         new CourseId(Guid.Parse("019a6842-b9a5-714a-b257-d164982cbc19")),
-        new CourseId(Guid.Parse("019a6842-95e4-76bd-ac68-7884af14ae5f"))
+        new CourseId(Guid.Parse("019a6842-95e4-76bd-ac68-7884af14ae5f")),
+        new CourseId(Guid.Parse("019a778e-4e98-7e5a-8e86-c2fc7b756f70")),
+        new CourseId(Guid.Parse("019a778e-ea05-7b08-9308-f381eae6b750")),
     };
 
     public GetFeaturedQueryHandler(IReadDbContext dbContext)
@@ -50,7 +52,8 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResp
                 c.ImageUrl,
                 c.InstructorUserId,
                 c.Price,
-                c.UpdatedAtUtc))
+                c.UpdatedAtUtc,
+                null))
             .ToListAsync(cancellationToken);
 
         var dto = new PagedResponseDto<CourseReadDto>

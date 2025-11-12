@@ -25,6 +25,21 @@
   /* Text */
   --text-primary: #1f2937;
   --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  
+  /* Action colors */
+  --success-color: #10b981;
+  --success-color-hover: #059669;
+  --warning-color: #f59e0b;
+  --info-color: #3b82f6;
+  
+  /* Button colors */
+  --button-primary-bg: var(--primary-color);
+  --button-primary-hover: #4338ca;
+  --button-secondary-bg: #6b7280;
+  --button-secondary-hover: #4b5563;
+  --button-success-bg: var(--success-color);
+  --button-success-hover: var(--success-color-hover);
 }
 
 html,
