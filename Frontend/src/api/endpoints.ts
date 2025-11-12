@@ -1,5 +1,3 @@
-// Centralized API endpoints with sensible local development fallbacks.
-// Use environment variables (Vite) to override in different environments.
 const USERSERVICE_BASE_URL =
   import.meta.env.VITE_USERSERVICE_BASE_URL || "http://localhost:4001";
 const COURSESERVICE_BASE_URL =
@@ -12,7 +10,3 @@ export const API = {
   COURSES: `${COURSESERVICE_BASE_URL}`,
   AUTH: `${AUTHSERVICE_BASE_URL}`,
 };
-
-// Example usage:
-// fetch(`${API.COURSES}/list`)
-// This centralizes base URLs so you can change them in one place or via env vars.

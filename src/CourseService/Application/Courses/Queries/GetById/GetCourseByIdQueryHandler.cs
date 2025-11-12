@@ -30,7 +30,19 @@ public class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, Cours
                 course.ImageUrl,
                 course.InstructorUserId,
                 course.Price,
-                course.UpdatedAtUtc))
+                course.UpdatedAtUtc,
+                course.Lessons.OrderBy(l => l.Order)
+                .Select(lesson => new LessonReadDto(
+                    lesson.Id,
+                    lesson.Title,
+                    lesson.Description,
+                    lesson.VideoUrl,
+                    lesson.ThumbnailImage,
+                    lesson.IsPreview,
+                    lesson.Order,
+                    lesson.Duration))
+                .ToList()
+                ))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (result is null)

@@ -1,18 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
+import { fetchFeaturedCourses } from "../../services/api";
+import type { Course } from "../../types/course";
+import CourseCard from "../../features/courses/components/CourseCard";
 import { Link } from "react-router-dom";
-import { API } from "../../api/endpoints";
-import CourseCard from "../Courses/CourseCard";
-import styles from "./Home.module.css";
+import styles from "./HomePage.module.css";
 
-interface Course {
-  id: string;
-  title: string;
-  description?: string;
-  author?: string;
-  category?: string;
-}
-
-export default function Home() {
+export default function HomePage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,24 +13,20 @@ export default function Home() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${API.COURSES}/list`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data) => setCourses(data))
-      .catch((err) => setError(String(err)))
+    fetchFeaturedCourses()
+      .then(setCourses)
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
-    courses.forEach((c) => c.category && set.add(c.category));
+    courses.forEach((c) => c.title && set.add(c.title));
     return Array.from(set).sort();
   }, [courses]);
 
   const filtered = selectedCategory
-    ? courses.filter((c) => c.category === selectedCategory)
+    ? courses.filter((c) => c.title === selectedCategory)
     : courses;
 
   return (
@@ -45,7 +34,9 @@ export default function Home() {
       <header className={styles.header}>
         <div>
           <h1 className={styles.title}>Learn anything, anywhere</h1>
-          <p className={styles.subtitle}>Browse curated courses from local dev or your API.</p>
+          <p className={styles.subtitle}>
+            Browse curated courses from local devs or your API.
+          </p>
         </div>
         <div>
           <Link to="/login" className={styles.loginButton}>
@@ -56,7 +47,9 @@ export default function Home() {
 
       <section className={styles.categories} aria-label="Categories">
         <button
-          className={!selectedCategory ? styles.categoryActive : styles.category}
+          className={
+            !selectedCategory ? styles.categoryActive : styles.category
+          }
           onClick={() => setSelectedCategory(null)}
         >
           All
@@ -64,7 +57,9 @@ export default function Home() {
         {categories.map((cat) => (
           <button
             key={cat}
-            className={selectedCategory === cat ? styles.categoryActive : styles.category}
+            className={
+              selectedCategory === cat ? styles.categoryActive : styles.category
+            }
             onClick={() => setSelectedCategory(cat)}
           >
             {cat}
@@ -78,8 +73,8 @@ export default function Home() {
 
         {!loading && !error && (
           <div className={styles.grid}>
-            {filtered.map((c) => (
-              <CourseCard key={c.id} course={c} />
+            {filtered.map((course) => (
+              <CourseCard key={course.id.value} course={course} />
             ))}
           </div>
         )}
