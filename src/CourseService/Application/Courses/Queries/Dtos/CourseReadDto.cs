@@ -11,4 +11,5 @@ public record CourseReadDto(
     string? ImageUrl,
     string? InstructorUserId,
     Money Price,
-    DateTimeOffset UpdatedAtUtc);
+    DateTimeOffset UpdatedAtUtc,
+    IEnumerable<LessonReadDto>? Lessons = null);

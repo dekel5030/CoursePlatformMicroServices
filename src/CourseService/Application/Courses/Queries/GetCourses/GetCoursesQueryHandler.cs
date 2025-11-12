@@ -38,7 +38,8 @@ public class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, PagedRespon
                 c.ImageUrl,
                 c.InstructorUserId,
                 c.Price,
-                c.UpdatedAtUtc))
+                c.UpdatedAtUtc,
+                null))
             .ToListAsync(cancellationToken);
 
         var dto = new PagedResponseDto<CourseReadDto>

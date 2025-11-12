@@ -11,3 +11,10 @@ export async function fetchFeaturedCourses() {
   const data = await response.json();
   return data.items;
 }
+
+export async function fetchCourseById(id: string) {
+  const response = await fetch(`${API_COURSES_URL}/courses/${id}`);
+  if (!response.ok) throw new Error("Failed to fetch course");
+
+  return await response.json();
+}
