@@ -4,6 +4,21 @@
   --secondary-color: #fff; /* לבן */
   --border-color: #e2e8f0; /* גבול */
   --hover-bg: #f3f4f6; /* רקע בעת ריחוף */
+  
+  /* Card colors */
+  --card-border: #ddd;
+  --card-shadow-color: rgba(0, 0, 0, 0.1);
+  
+  /* Error and status colors */
+  --error-color: #dc2626;
+  
+  /* Background colors */
+  --background-primary: #f9fafb;
+  --background-secondary: #ffffff;
+  
+  /* Text colors */
+  --text-primary: #242424;
+  --text-secondary: #6b7280;
 }
 
 html,
