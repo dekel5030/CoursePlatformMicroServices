@@ -6,7 +6,6 @@ using Domain.Lessons;
 using Domain.Lessons.Primitives;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 
 namespace Application.Lessons.Commands.CreateLesson;
 
@@ -25,7 +24,6 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
     {
         CreateLessonDto dto = request.Dto;
 
-        // Validate that the CourseId exists
         var courseId = new CourseId(dto.CourseId);
         var courseExists = await _dbContext.Courses
             .AnyAsync(c => c.Id == courseId, cancellationToken);
@@ -35,7 +33,6 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
             return Result.Failure<LessonId>(CourseErrors.NotFound);
         }
 
-        // Create the lesson using the domain factory method
         var lesson = Lesson.CreateLesson(
             dto.Title,
             dto.Description,
@@ -46,7 +43,6 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
             dto.Duration
         );
 
-        // Set the CourseId for the lesson
         lesson.CourseId = courseId;
 
         await _dbContext.Lessons.AddAsync(lesson, cancellationToken);

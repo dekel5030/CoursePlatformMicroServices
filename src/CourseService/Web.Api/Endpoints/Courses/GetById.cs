@@ -6,7 +6,7 @@ using Kernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Orders;
+namespace Web.Api.Endpoints.Courses;
 
 internal sealed class GetById : IEndpoint
 {
