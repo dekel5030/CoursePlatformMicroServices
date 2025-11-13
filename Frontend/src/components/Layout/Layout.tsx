@@ -1,5 +1,6 @@
 import Navbar from "../NavBar/Navbar";
 import Footer from "../Footer/Footer";
+import Breadcrumb from "../Breadcrumb/Breadcrumb";
 import type { ReactNode } from "react";
 import styles from "./Layout.module.css";
 
@@ -11,6 +12,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className={styles.layout}>
       <Navbar />
+      <Breadcrumb />
       <main>{children}</main>
       <Footer />
     </div>
