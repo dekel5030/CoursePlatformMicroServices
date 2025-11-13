@@ -4,7 +4,9 @@ using Application.Courses.Queries.Dtos;
 using Application.Courses.Queries.GetById;
 using Application.Courses.Queries.GetCourses;
 using Application.Courses.Queries.GetFeatured;
+using Application.Lessons.Commands.CreateLesson;
 using Domain.Courses.Primitives;
+using Domain.Lessons.Primitives;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -34,6 +36,7 @@ public static class DependencyInjection
     private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
     {
         services.AddScoped<ICommandHandler<CreateCourseCommand, CourseId>, CreateCourseCommandHandler>();
+        services.AddScoped<ICommandHandler<CreateLessonCommand, LessonId>, CreateLessonCommandHandler>();
 
         return services;
     }
