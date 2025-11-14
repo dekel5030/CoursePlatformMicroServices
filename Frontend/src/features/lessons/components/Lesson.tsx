@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import type { Lesson as LessonType } from "../../../types/Lesson";
 import styles from "./Lesson.module.css";
 
@@ -7,6 +8,7 @@ interface LessonProps {
 }
 
 export default function Lesson({ lesson, index }: LessonProps) {
+  const navigate = useNavigate();
   const formatDuration = (duration: string | null | undefined) => {
     if (!duration) return null;
 
@@ -23,8 +25,22 @@ export default function Lesson({ lesson, index }: LessonProps) {
     return duration;
   };
 
+  const handleLessonClick = () => {
+    navigate(`/lessons/${lesson.id.value}`);
+  };
+
   return (
-    <div className={styles.lesson}>
+    <div 
+      className={styles.lesson}
+      onClick={handleLessonClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          handleLessonClick();
+        }
+      }}
+    >
       <div className={styles.lessonHeader}>
         <div className={styles.lessonNumber}>{index + 1}</div>
         <div className={styles.lessonInfo}>
