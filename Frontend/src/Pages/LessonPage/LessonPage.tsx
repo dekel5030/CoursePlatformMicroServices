@@ -13,10 +13,18 @@ export default function LessonPage() {
   useEffect(() => {
     if (!id) return;
 
+    console.log("Fetching lesson id =", id);
+
     setLoading(true);
     fetchLessonById(id)
-      .then(setLesson)
-      .catch((err) => setError(err.message))
+      .then((data) => {
+        console.log("Lesson data:", data);
+        setLesson(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -32,7 +40,7 @@ export default function LessonPage() {
     const parts = duration.split(":");
     const hours = parseInt(parts[0], 10);
     const minutes = parseInt(parts[1], 10);
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
     }

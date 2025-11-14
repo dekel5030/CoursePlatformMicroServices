@@ -1,7 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.Courses.Queries.Dtos;
 using Application.Courses.Queries.GetCourses;
-using Microsoft.AspNetCore.Mvc;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
