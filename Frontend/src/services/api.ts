@@ -18,3 +18,10 @@ export async function fetchCourseById(id: string) {
 
   return await response.json();
 }
+
+export async function fetchLessonById(id: string) {
+  const response = await fetch(`${API_COURSES_URL}/lessons/${id}`);
+  if (!response.ok) throw new Error("Failed to fetch lesson");
+
+  return await response.json();
+}

@@ -5,6 +5,7 @@ using Application.Courses.Queries.GetById;
 using Application.Courses.Queries.GetCourses;
 using Application.Courses.Queries.GetFeatured;
 using Application.Lessons.Commands.CreateLesson;
+using Application.Lessons.Queries.GetById;
 using Domain.Courses.Primitives;
 using Domain.Lessons.Primitives;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,8 @@ public static class DependencyInjection
         services.AddScoped<IQueryHandler<GetCourseByIdQuery, CourseReadDto>, GetCourseByIdQueryHandler>();
         services.AddScoped<IQueryHandler<GetCoursesQuery, PagedResponseDto<CourseReadDto>>, GetCoursesQueryHandler>();
         services.AddScoped<IQueryHandler<GetFeaturedQuery, PagedResponseDto<CourseReadDto>>, GetFeaturedQueryHandler>();
+
+        services.AddScoped<IQueryHandler<GetLessonByIdQuery, LessonReadDto>, GetLessonByIdQueryHandler>();
 
         return services;
     }

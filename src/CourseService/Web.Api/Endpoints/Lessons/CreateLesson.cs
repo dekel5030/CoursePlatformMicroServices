@@ -17,8 +17,9 @@ public class CreateLesson : IEndpoint
             var result = await handler.Handle(new CreateLessonCommand(dto));
 
             return result.Match(
-                lessonId => Results.Created(
-                    $"/api/lessons/{lessonId.Value}",
+                lessonId => Results.CreatedAtRoute(
+                    "GetLessonById",
+                    new { id = lessonId.Value },
                     new { Id = lessonId.Value }
                 ),
                 CustomResults.Problem);
