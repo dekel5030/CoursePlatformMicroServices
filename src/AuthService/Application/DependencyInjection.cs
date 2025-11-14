@@ -2,6 +2,8 @@
 using Application.AuthUsers.Commands.LoginUser;
 using Application.AuthUsers.Commands.RegisterUser;
 using Application.AuthUsers.Dtos;
+using Application.AuthUsers.Events;
+using Domain.AuthUsers.Events;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -35,7 +37,8 @@ public static class DependencyInjection
 
     private static IServiceCollection AddDomainEventHandlers(this IServiceCollection services)
     {
-        // Domain event handlers will be added here
+        services.AddScoped<IDomainEventHandler<UserRegisteredDomainEvent>, UserRegisteredDomainEventHandler>();
+
         return services;
     }
 

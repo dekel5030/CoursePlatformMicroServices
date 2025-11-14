@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\..\..\Contracts\Auth.Contracts\Auth.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Contracts\Users.Contracts\Users.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

@@ -56,14 +56,8 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
                 Error.NotFound("Role.NotFound", "Default 'User' role not found"));
         }
 
-        // For now, we'll use a placeholder userId - in event-driven architecture,
-        // this would be handled via integration events from UserService
-        // TODO: Implement proper event-driven user creation
-        int temporaryUserId = 0; // This should come from UserService via event
-
-        // Create auth user
+        // Create auth user (UserId will be set asynchronously when UserService responds)
         var authUser = AuthUser.Create(
-            temporaryUserId,
             dto.Email,
             passwordHash,
             defaultRole.Id);

@@ -4,14 +4,23 @@ using Domain.AuthUsers.Primitives;
 using Domain.Permissions.Primitives;
 using Domain.Roles;
 using Domain.Roles.Primitives;
+using Infrastructure.DomainEvents;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace Infrastructure.Database;
 
 public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
 {
-    public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options) { }
+    private readonly IDomainEventsDispatcher? _domainEventsDispatcher;
+
+    public AuthDbContext(
+        DbContextOptions<AuthDbContext> options,
+        IDomainEventsDispatcher? domainEventsDispatcher = null) : base(options)
+    {
+        _domainEventsDispatcher = domainEventsDispatcher;
+    }
 
     public DbSet<AuthUser> AuthUsers { get; set; }
     public DbSet<Role> Roles { get; set; }
@@ -36,7 +45,27 @@ public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
         NormalizeEmails();
         UpdateTimestamps();
 
-        return await base.SaveChangesAsync(cancellationToken);
+        // Collect domain events before saving
+        var domainEvents = ChangeTracker
+            .Entries<Entity>()
+            .Select(entry => entry.Entity)
+            .SelectMany(entity =>
+            {
+                var events = entity.DomainEvents.ToList();
+                entity.ClearDomainEvents();
+                return events;
+            })
+            .ToList();
+
+        var result = await base.SaveChangesAsync(cancellationToken);
+
+        // Dispatch domain events after successful save
+        if (_domainEventsDispatcher != null && domainEvents.Any())
+        {
+            await _domainEventsDispatcher.DispatchAsync(domainEvents, cancellationToken);
+        }
+
+        return result;
     }
 
     private void ConfigureAuthUser(ModelBuilder modelBuilder)
@@ -52,7 +81,13 @@ public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
                 id => id.Value,
                 value => new AuthUserId(value));
 
-        user.HasIndex(u => u.UserId).IsUnique();
+        user.Property(u => u.UserId)
+            .IsRequired(false); // Allow null until linked
+
+        user.HasIndex(u => u.UserId)
+            .IsUnique()
+            .HasFilter("user_id IS NOT NULL"); // Only enforce uniqueness when not null
+        
         user.HasIndex(u => u.Email).IsUnique();
 
         user.Property(u => u.UpdatedAt)

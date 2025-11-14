@@ -1,8 +1,9 @@
 namespace Auth.Contracts.Events;
 
 public sealed record UserRegisteredV1(
-    int AuthUserId,
-    int UserId,
+    string AuthUserId,
     string Email,
-    DateTime RegisteredAt
+    DateTime RegisteredAt,
+    IEnumerable<string> Roles,
+    IEnumerable<string> Permissions
 );
