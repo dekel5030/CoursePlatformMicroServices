@@ -33,7 +33,7 @@ public class AuthUser : Entity
     {
         var authUser = new AuthUser
         {
-            Id = new AuthUserId(0), // Will be set by database
+            Id = new AuthUserId(Guid.CreateVersion7()),
             UserId = userId,
             Email = email,
             PasswordHash = passwordHash,

@@ -4,6 +4,7 @@ using Domain.AuthUsers.Primitives;
 using Domain.Permissions.Primitives;
 using Domain.Roles;
 using Domain.Roles.Primitives;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
@@ -24,6 +25,8 @@ public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
         ConfigureRolePermission(modelBuilder);
         ConfigureUserRole(modelBuilder);
         ConfigureUserPermission(modelBuilder);
+
+        modelBuilder.AddTransactionalOutboxEntities();
 
         base.OnModelCreating(modelBuilder);
     }

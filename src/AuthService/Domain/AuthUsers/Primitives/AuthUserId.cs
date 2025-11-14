@@ -1,3 +1,3 @@
 namespace Domain.AuthUsers.Primitives;
 
-public record AuthUserId(int Value);
+public record AuthUserId(Guid Value);
