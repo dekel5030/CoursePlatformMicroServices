@@ -28,12 +28,7 @@ public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        ConfigureAuthUser(modelBuilder);
-        ConfigurePermission(modelBuilder);
-        ConfigureRole(modelBuilder);
-        ConfigureRolePermission(modelBuilder);
-        ConfigureUserRole(modelBuilder);
-        ConfigureUserPermission(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DependencyInjection).Assembly);
 
         modelBuilder.AddTransactionalOutboxEntities();
 
