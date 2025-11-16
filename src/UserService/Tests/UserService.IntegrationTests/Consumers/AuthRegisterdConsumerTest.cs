@@ -1,14 +1,8 @@
 ﻿using Application.Abstractions.Data;
 using Auth.Contracts;
-using Domain.Users.Primitives;
-using FluentAssertions;
-using Infrastructure.Database;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace OrderService.IntegrationTests.Consumers;
