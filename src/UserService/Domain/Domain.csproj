@@ -4,15 +4,17 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<RootNamespace>Domain</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
+    <Folder Include="Users\Errors\" />
+    <Folder Include="Users\Events\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Kernel\Kernel.csproj" />
-    <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\Kernel\Kernel.csproj" />
+    <ProjectReference Include="..\SharedKernel\SharedKernel.csproj" />
   </ItemGroup>
 
 </Project>
