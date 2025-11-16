@@ -1,7 +1,6 @@
 using Application.Abstractions.Messaging;
 using Application.AuthUsers.Commands.LoginUser;
 using Application.AuthUsers.Dtos;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 

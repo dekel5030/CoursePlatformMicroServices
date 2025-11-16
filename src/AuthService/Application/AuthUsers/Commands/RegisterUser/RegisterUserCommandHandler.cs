@@ -4,6 +4,7 @@ using Application.Abstractions.Security;
 using Application.AuthUsers.Dtos;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
+using Domain.Roles;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
 
@@ -73,7 +74,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
                         .ThenInclude(rp => rp.Permission)
             .Include(u => u.UserPermissions)
                 .ThenInclude(up => up.Permission)
-            .FirstOrDefaultAsync(u => u.Id.Value == authUser.Id.Value, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Id == authUser.Id, cancellationToken);
 
         if (fullAuthUser == null)
         {
