@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Primitives;
-using Serilog.Context;
+// using Serilog.Context;
 
 namespace Web.Api.Middleware;
 
@@ -9,10 +9,11 @@ public class RequestContextLoggingMiddleware(RequestDelegate next)
 
     public Task Invoke(HttpContext context)
     {
-        using (LogContext.PushProperty("CorrelationId", GetCorrelationId(context)))
-        {
+        // Temporarily disabled Serilog dependency
+        // using (LogContext.PushProperty("CorrelationId", GetCorrelationId(context)))
+        // {
             return next.Invoke(context);
-        }
+        // }
     }
 
     private static string GetCorrelationId(HttpContext context)
