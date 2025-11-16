@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Infrastructure.Database;
+using Infrastructure.DomainEvents;
 using Infrastructure.MassTransit;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ public static class DependencyInjection
     {
         services.AddDatabase(configuration);
         services.AddMassTransitInternal(configuration);
+        services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
         return services;
     }

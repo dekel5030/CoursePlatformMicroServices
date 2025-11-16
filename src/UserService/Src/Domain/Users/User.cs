@@ -1,9 +1,10 @@
 using Domain.Users.Primitives;
 using Kernel;
+using SharedKernel;
 
 namespace Domain.Users;
 
-public class User
+public class User : Entity
 {
     public UserId Id { get; private set; }
     public string Email { get; private set; } = null!;
