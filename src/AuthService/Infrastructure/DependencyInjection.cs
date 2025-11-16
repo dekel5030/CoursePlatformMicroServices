@@ -1,12 +1,21 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Application.Abstractions.Data;
+using Application.Abstractions.Messaging;
+using Application.Abstractions.Security;
+using Infrastructure.Database;
+using Infrastructure.DomainEvents;
+using Infrastructure.MassTransit;
+using Infrastructure.Security;
+using MassTransit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure;
 
 public static class DependencyInjection
 {
-    private static readonly string _readDatabaseSectionName = "ReadDatabase";
-    private static readonly string _writeDatabaseSectionName = "WriteDatabase";
+    private static readonly string _databaseSectionName = "Database";
     private static readonly string _rabbitMqSectionName = "RabbitMq";
 
     public static IServiceCollection AddInfrastructure(
@@ -14,31 +23,25 @@ public static class DependencyInjection
         IConfiguration configuration) =>
         services
             .AddServices()
-            .AddDatabases(configuration)
+            .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
-            .AddHealthChecksInternal(configuration)
-            .AddAuthenticationInternal(configuration)
-            .AddAuthorizationInternal();
-
+            .AddHealthChecksInternal(configuration);
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
+        services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+        services.AddScoped<ITokenService, TokenService>();
+
         return services;
     }
 
-    private static IServiceCollection AddDatabases(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        return services
-            .AddReadDatabase(configuration)
-            .AddWriteDatabase(configuration);
-    }
-
-    private static IServiceCollection AddReadDatabase(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
+        services.AddDbContext<AuthDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(_readDatabaseSectionName)!;
+            string connectionString = configuration.GetConnectionString(_databaseSectionName)
+                ?? throw new InvalidOperationException("Database connection string not found");
 
             options
                 .UseNpgsql(connectionString, npgsqlOptions =>
@@ -49,69 +52,38 @@ public static class DependencyInjection
                 .UseSnakeCaseNamingConvention();
         });
 
-        services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<ReadDbContext>());
+        services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
+        services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
 
         return services;
     }
 
-    private static IServiceCollection AddWriteDatabase(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
-        {
-            string connectionString = configuration.GetConnectionString(_writeDatabaseSectionName)!;
-
-            options
-                .UseNpgsql(connectionString, npgsqlOptions =>
-                {
-                    npgsqlOptions.MigrationsHistoryTable(
-                        HistoryRepository.DefaultTableName);
-                })
-                .UseSnakeCaseNamingConvention();
-        });
-
-        services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
-
-        return services;
-    }
-
-    private static IServiceCollection AddHealthChecksInternal(this IServiceCollection services, IConfiguration configuration)
-    {
-        //services
-        //    .AddHealthChecks()
-        //    .AddNpgSql(configuration.GetConnectionString("Database")!);
-
-        return services;
-    }
-
-    private static IServiceCollection AddAuthenticationInternal(
-        this IServiceCollection services,
+    private static IServiceCollection AddHealthChecksInternal(
+        this IServiceCollection services, 
         IConfiguration configuration)
     {
+        // Health checks can be added here
         return services;
     }
 
-    private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
-    {
-        return services;
-    }
-
-    private static IServiceCollection AddMassTransitInternal(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddMassTransitInternal(
+        this IServiceCollection services, 
+        IConfiguration configuration)
     {
         services.AddMassTransit(config =>
         {
             config.AddConsumers(typeof(DependencyInjection).Assembly);
 
-            config.AddEntityFrameworkOutbox<WriteDbContext>(o =>
+            config.AddEntityFrameworkOutbox<AuthDbContext>(o =>
             {
                 o.UsePostgres();
                 o.UseBusOutbox();
                 o.QueryDelay = TimeSpan.FromSeconds(30);
             });
 
-
             config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
             {
-                endpointCfg.UseEntityFrameworkOutbox<WriteDbContext>(ctx);
+                endpointCfg.UseEntityFrameworkOutbox<AuthDbContext>(ctx);
                 endpointCfg.UseMessageRetry(r =>
                 {
                     r.Handle<InvalidOperationException>();
@@ -124,9 +96,10 @@ public static class DependencyInjection
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                string connectionString = configuration.GetConnectionString(_rabbitMqSectionName)!;
+                string connectionString = configuration.GetConnectionString(_rabbitMqSectionName)
+                    ?? throw new InvalidOperationException("RabbitMQ connection string not found");
 
-                busConfig.Host(new Uri(connectionString!), h => { });
+                busConfig.Host(new Uri(connectionString), h => { });
                 busConfig.ConfigureEndpoints(context);
             });
         });

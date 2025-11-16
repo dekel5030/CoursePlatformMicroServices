@@ -2,6 +2,5 @@
 
 public static class Tags
 {
-    public const string Courses = "Courses";
-    public const string Lessons = "Lessons";
+    public const string Auth = "Auth";
 }
