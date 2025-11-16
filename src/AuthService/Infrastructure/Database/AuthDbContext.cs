@@ -13,11 +13,11 @@ namespace Infrastructure.Database;
 
 public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
 {
-    private readonly IDomainEventsDispatcher? _domainEventsDispatcher;
+    private readonly IDomainEventsDispatcher _domainEventsDispatcher;
 
     public AuthDbContext(
         DbContextOptions<AuthDbContext> options,
-        IDomainEventsDispatcher? domainEventsDispatcher = null) : base(options)
+        IDomainEventsDispatcher domainEventsDispatcher) : base(options)
     {
         _domainEventsDispatcher = domainEventsDispatcher;
     }
@@ -45,27 +45,28 @@ public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
         NormalizeEmails();
         UpdateTimestamps();
 
-        // Collect domain events before saving
-        var domainEvents = ChangeTracker
-            .Entries<Entity>()
-            .Select(entry => entry.Entity)
-            .SelectMany(entity =>
-            {
-                var events = entity.DomainEvents.ToList();
-                entity.ClearDomainEvents();
-                return events;
-            })
+        await DispatchDomainEvents(this, cancellationToken);
+
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    private Task DispatchDomainEvents(
+        DbContext dbContext,
+        CancellationToken cancellationToken = default)
+    {
+        IEnumerable<Entity> entities = dbContext.ChangeTracker.Entries<Entity>()
+            .Select(entry => entry.Entity);
+
+        List<IDomainEvent> domainEvents = entities
+            .SelectMany(entity => entity.DomainEvents)
             .ToList();
 
-        var result = await base.SaveChangesAsync(cancellationToken);
-
-        // Dispatch domain events after successful save
-        if (_domainEventsDispatcher != null && domainEvents.Any())
+        foreach (Entity entity in entities)
         {
-            await _domainEventsDispatcher.DispatchAsync(domainEvents, cancellationToken);
+            entity.ClearDomainEvents();
         }
 
-        return result;
+        return _domainEventsDispatcher.DispatchAsync(domainEvents, cancellationToken);
     }
 
     private void ConfigureAuthUser(ModelBuilder modelBuilder)

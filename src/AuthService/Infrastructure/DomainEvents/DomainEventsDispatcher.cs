@@ -16,11 +16,14 @@ internal sealed class DomainEventsDispatcher(IServiceProvider serviceProvider) :
     {
         foreach (IDomainEvent domainEvent in domainEvents)
         {
+            //using IServiceScope scope = serviceProvider.CreateScope();
+
             Type domainEventType = domainEvent.GetType();
             Type handlerType = _handlerTypeDictionary.GetOrAdd(
                 domainEventType,
                 et => typeof(IDomainEventHandler<>).MakeGenericType(et));
 
+            //IEnumerable<object?> handlers = scope.ServiceProvider.GetServices(handlerType);
             IEnumerable<object?> handlers = serviceProvider.GetServices(handlerType);
 
             foreach (object? handler in handlers)
