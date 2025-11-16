@@ -1,3 +1,4 @@
+using Domain.Users.Events;
 using Domain.Users.Primitives;
 using Kernel;
 using SharedKernel;
@@ -7,6 +8,7 @@ namespace Domain.Users;
 public class User : Entity
 {
     public UserId Id { get; private set; }
+    public AuthUserId AuthUserId { get; private set; }
     public string Email { get; private set; } = null!;
     public FullName? FullName { get; private set; }
     public PhoneNumber? PhoneNumber { get; private set; }
@@ -15,6 +17,7 @@ public class User : Entity
     private User() { }
 
     public static Result<User> CreateUser(
+        AuthUserId authUserId,
         string email, 
         FullName? fullName = null, 
         PhoneNumber? phoneNumber = null, 
@@ -23,13 +26,19 @@ public class User : Entity
         var user = new User
         {
             Id = new UserId(Guid.CreateVersion7()),
+            AuthUserId = authUserId,
             Email = email,
             FullName = fullName,
             PhoneNumber = phoneNumber,
             DateOfBirth = dateOfBirth
         };
 
-        // raise domain events here if needed
+        // Raise domain event for user profile creation
+        user.Raise(new UserProfileCreatedDomainEvent(
+            user.Id,
+            user.AuthUserId,
+            user.Email,
+            DateTime.UtcNow));
 
         return Result.Success(user);
     }

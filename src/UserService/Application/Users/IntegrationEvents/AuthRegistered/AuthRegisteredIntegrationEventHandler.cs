@@ -1,6 +1,7 @@
-﻿using Application.Abstractions.Data;
+using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Users;
+using Domain.Users.Primitives;
 using Kernel;
 using Microsoft.Extensions.Logging;
 
@@ -15,25 +16,31 @@ public class AuthRegisteredIntegrationEventHandler(
         CancellationToken cancellationToken = default)
     {
         logger.LogInformation(
-            "Handling AuthRegisteredIntegrationEvent for Email: {Email}, Username: {Username}",
+            "Handling AuthRegisteredIntegrationEvent for AuthUserId: {AuthUserId}, Email: {Email}, Username: {Username}",
+            request.AuthUserId,
             request.Email,
             request.Username ?? "N/A");
 
+        AuthUserId authUserId = new AuthUserId(request.AuthUserId);
+
         User? user = dbContext.Users
-            .FirstOrDefault(u => u.Email == request.Email);
+            .FirstOrDefault(u => u.AuthUserId.Value == authUserId.Value);
 
         if (user is null)
         {
             logger.LogInformation(
-                "No existing user found with Email: {Email}. Creating new user.",
-                request.Email);
+                "No existing user found with AuthUserId: {AuthUserId}. Creating new user.",
+                request.AuthUserId);
 
-            Result<User> newUserResult = User.CreateUser(request.Email);
+            Result<User> newUserResult = User.CreateUser(
+                authUserId,
+                request.Email);
 
             if (newUserResult.IsFailure)
             {
                 logger.LogError(
-                    "Failed to create user for Email: {Email}. Error: {Error}",
+                    "Failed to create user for AuthUserId: {AuthUserId}, Email: {Email}. Error: {Error}",
+                    request.AuthUserId,
                     request.Email,
                     newUserResult.Error);
 
@@ -46,8 +53,8 @@ public class AuthRegisteredIntegrationEventHandler(
         else
         {
             logger.LogInformation(
-                "User with Email: {Email} already exists. No action taken.",
-                request.Email);
+                "User with AuthUserId: {AuthUserId} already exists. No action taken.",
+                request.AuthUserId);
             return Task.CompletedTask;
         }
     }
