@@ -12,7 +12,6 @@ public class AuthUser : Entity
     private AuthUser() { }
 
     public AuthUserId Id { get; private set; } = null!;
-    public string? UserId { get; private set; }
     public string Email { get; private set; } = string.Empty;
     public string PasswordHash { get; private set; } = string.Empty;
 
@@ -33,7 +32,6 @@ public class AuthUser : Entity
         var authUser = new AuthUser
         {
             Id = new AuthUserId(Guid.CreateVersion7()),
-            UserId = null, // Will be set when UserService responds
             Email = email,
             PasswordHash = passwordHash,
             UpdatedAt = DateTime.UtcNow,
@@ -148,22 +146,6 @@ public class AuthUser : Entity
     public void Confirm()
     {
         IsConfirmed = true;
-    }
-
-    public void LinkUserId(string userId)
-    {
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            throw new ArgumentException("UserId cannot be null or empty", nameof(userId));
-        }
-
-        if (!string.IsNullOrWhiteSpace(UserId))
-        {
-            throw new InvalidOperationException("UserId has already been linked");
-        }
-
-        UserId = userId;
-        UpdatedAt = DateTime.UtcNow;
     }
 }
 

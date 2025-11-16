@@ -29,4 +29,8 @@
     <ProjectReference Include="..\..\..\Contracts\Users.Contracts\Users.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MassTransit\Consumers\" />
+  </ItemGroup>
+
 </Project>

@@ -16,13 +16,6 @@ internal sealed class AuthUserConfiguration : IEntityTypeConfiguration<AuthUser>
         user.Property(u => u.Id)
             .HasConversion(id => id.Value, value => new AuthUserId(value));
 
-        user.Property(u => u.UserId)
-            .IsRequired(false);
-
-        user.HasIndex(u => u.UserId)
-            .IsUnique()
-            .HasFilter("user_id IS NOT NULL");
-
         user.HasIndex(u => u.Email).IsUnique();
 
         user.Property(u => u.UpdatedAt)
