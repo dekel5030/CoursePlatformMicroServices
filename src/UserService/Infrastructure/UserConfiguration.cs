@@ -26,9 +26,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConversion(
                 authUserId => authUserId.Value,
                 value => new AuthUserId(value))
-            .IsRequired()
-            .HasMaxLength(_authUserIdMaxLength);
-
+            .HasMaxLength(_authUserIdMaxLength)
+            .IsRequired(false); 
+        
         builder.HasIndex(u => u.AuthUserId).IsUnique();
 
         builder.Property(u => u.Email).IsRequired().HasMaxLength(_emailMaxLength);

@@ -24,7 +24,7 @@ public class AuthRegisteredIntegrationEventHandler(
         AuthUserId authUserId = new AuthUserId(request.AuthUserId);
 
         User? user = dbContext.Users
-            .FirstOrDefault(u => u.AuthUserId.Value == authUserId.Value);
+            .FirstOrDefault(u => u.AuthUserId == authUserId);
 
         if (user is null)
         {

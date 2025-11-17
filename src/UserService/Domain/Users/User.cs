@@ -8,7 +8,7 @@ namespace Domain.Users;
 public class User : Entity
 {
     public UserId Id { get; private set; }
-    public AuthUserId AuthUserId { get; private set; }
+    public AuthUserId? AuthUserId { get; private set; }
     public string Email { get; private set; } = null!;
     public FullName? FullName { get; private set; }
     public PhoneNumber? PhoneNumber { get; private set; }
