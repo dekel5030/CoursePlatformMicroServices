@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Domain.Users.Events;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.MassTransit;
@@ -21,6 +22,9 @@ public static class DependencyInjection
         services.AddDatabase(configuration);
         services.AddMassTransitInternal(configuration);
         services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
+        
+        // Register domain event handlers in Infrastructure layer
+        services.AddScoped<IDomainEventHandler<UserProfileCreatedDomainEvent>, UserProfileCreatedDomainEventHandler>();
 
         return services;
     }
