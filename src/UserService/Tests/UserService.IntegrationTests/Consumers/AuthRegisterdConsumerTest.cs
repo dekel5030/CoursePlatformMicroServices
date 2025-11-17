@@ -1,5 +1,5 @@
 ﻿using Application.Abstractions.Data;
-using Auth.Contracts;
+using Auth.Contracts.Events;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,11 +13,12 @@ public class AuthRegisterdConsumerTest : IntegrationTestsBase
     public async Task Consume_ShouldCreateUser_WhenNotExists()
     {
         // Arrange
+        string authUserId = Guid.NewGuid().ToString();
         string email = "user@example.com";
 
         // Act
         var bus = Factory.Services.GetRequiredService<IBus>();
-        await bus.Publish(new AuthRegistered(email, null));
+        await bus.Publish(new UserRegistered(authUserId, email, DateTime.UtcNow));
 
         await Task.Delay(TimeSpan.FromMinutes(1));
 
@@ -29,7 +30,7 @@ public class AuthRegisterdConsumerTest : IntegrationTestsBase
 
             var user = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-            return user != null;
+            return user != null && user.AuthUserId.Value == authUserId;
         });
     }
 
