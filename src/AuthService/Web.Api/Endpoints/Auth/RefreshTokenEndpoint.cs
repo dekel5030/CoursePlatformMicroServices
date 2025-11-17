@@ -1,31 +1,41 @@
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Security;
-using Application.AuthUsers.Commands.LoginUser;
+using Application.AuthUsers.Commands.RefreshToken;
 using Application.AuthUsers.Dtos;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Auth;
 
-public class Login : IEndpoint
+public class RefreshTokenEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("auth/login", async (
-            LoginRequestDto request,
-            ICommandHandler<LoginUserCommand, AuthTokensDto> handler,
+        app.MapPost("auth/refresh-token", async (
+            ICommandHandler<RefreshTokenCommand, AuthTokensDto> handler,
             ITokenService tokenService,
             HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
-            var command = new LoginUserCommand(request);
+            // Get refresh token from cookie
+            var refreshToken = CookieHelper.GetRefreshTokenFromCookie(httpContext);
+
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                return Results.Problem(
+                    title: "RefreshToken.Missing",
+                    detail: "Refresh token not found in cookies",
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var command = new RefreshTokenCommand(refreshToken);
 
             var result = await handler.Handle(command, cancellationToken);
 
             return result.Match(
                 onSuccess: tokensDto =>
                 {
-                    // Set cookies with tokens
+                    // Set new cookies with rotated tokens
                     CookieHelper.SetAuthCookies(
                         httpContext,
                         tokenService,
@@ -42,7 +52,7 @@ public class Login : IEndpoint
                         Email = tokensDto.Email,
                         Roles = tokensDto.Roles,
                         Permissions = tokensDto.Permissions,
-                        Message = "Login successful"
+                        Message = "Token refreshed successfully"
                     };
                     
                     return Results.Ok(response);
@@ -50,9 +60,9 @@ public class Login : IEndpoint
                 onFailure: CustomResults.Problem);
         })
         .WithTags(Tags.Auth)
-        .WithName("Login")
-        .WithSummary("Login user")
-        .WithDescription("Authenticates a user and returns authentication tokens in HttpOnly cookies")
+        .WithName("RefreshToken")
+        .WithSummary("Refresh access token")
+        .WithDescription("Validates refresh token from cookie and issues new access and refresh tokens")
         .Produces<AuthResponseDto>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound);

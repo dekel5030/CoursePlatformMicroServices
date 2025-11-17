@@ -21,6 +21,13 @@ internal sealed class AuthUserConfiguration : IEntityTypeConfiguration<AuthUser>
         user.Property(u => u.UpdatedAt)
             .HasDefaultValueSql("NOW()");
 
+        user.Property(u => u.RefreshToken)
+            .HasMaxLength(500)
+            .IsRequired(false);
+
+        user.Property(u => u.RefreshTokenExpiresAt)
+            .IsRequired(false);
+
         user.HasMany(u => u.UserRoles)
             .WithOne(ur => ur.User)
             .HasForeignKey(ur => ur.UserId);

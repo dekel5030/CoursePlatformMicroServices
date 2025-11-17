@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Application.Abstractions.Security;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +36,33 @@ public class TokenService : ITokenService
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
+    }
+
+    public bool ValidateRefreshToken(string refreshToken)
+    {
+        // Basic validation - check if it's a valid base64 string
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return false;
+        }
+
+        try
+        {
+            Convert.FromBase64String(refreshToken);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static List<Claim> GetClaims(TokenRequestDto request)
