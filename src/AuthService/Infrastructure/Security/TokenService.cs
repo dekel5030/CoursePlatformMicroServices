@@ -21,10 +21,15 @@ public class TokenService : ITokenService
     {
         var claims = GetClaims(request);
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            _configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured")));
-
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        // Use RSA asymmetric signing
+        var rsa = RSA.Create();
+        var privateKey = _configuration["Jwt:PrivateKey"] 
+            ?? throw new InvalidOperationException("JWT Private Key not configured");
+        
+        rsa.ImportFromPem(privateKey);
+        var signingCredentials = new SigningCredentials(
+            new RsaSecurityKey(rsa), 
+            SecurityAlgorithms.RsaSha256);
 
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
@@ -32,7 +37,7 @@ public class TokenService : ITokenService
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(
                 int.Parse(_configuration["Jwt:ExpirationMinutes"] ?? "60")),
-            signingCredentials: creds
+            signingCredentials: signingCredentials
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
@@ -44,6 +49,13 @@ public class TokenService : ITokenService
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
+    }
+
+    public string HashRefreshToken(string refreshToken)
+    {
+        using var sha256 = SHA256.Create();
+        var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
+        return Convert.ToBase64String(hashBytes);
     }
 
     public bool ValidateRefreshToken(string refreshToken)

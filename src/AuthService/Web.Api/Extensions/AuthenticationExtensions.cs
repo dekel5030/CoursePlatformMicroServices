@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -17,12 +18,16 @@ public static class AuthenticationExtensions
         })
         .AddJwtBearer(options =>
         {
-            var jwtKey = configuration["Jwt:Key"] 
-                ?? throw new InvalidOperationException("JWT Key not configured");
+            var jwtPublicKey = configuration["Jwt:PublicKey"] 
+                ?? throw new InvalidOperationException("JWT Public Key not configured");
             var jwtIssuer = configuration["Jwt:Issuer"] 
                 ?? throw new InvalidOperationException("JWT Issuer not configured");
             var jwtAudience = configuration["Jwt:Audience"] 
                 ?? throw new InvalidOperationException("JWT Audience not configured");
+
+            // Use RSA public key for validation
+            var rsa = RSA.Create();
+            rsa.ImportFromPem(jwtPublicKey);
 
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -32,7 +37,7 @@ public static class AuthenticationExtensions
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtIssuer,
                 ValidAudience = jwtAudience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+                IssuerSigningKey = new RsaSecurityKey(rsa),
                 ClockSkew = TimeSpan.Zero
             };
 

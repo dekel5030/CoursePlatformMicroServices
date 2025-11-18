@@ -152,9 +152,9 @@ public class AuthUser : Entity
         IsConfirmed = true;
     }
 
-    public void SetRefreshToken(string refreshToken, DateTime expiresAt)
+    public void SetRefreshToken(string refreshTokenHash, DateTime expiresAt)
     {
-        RefreshToken = refreshToken;
+        RefreshToken = refreshTokenHash;
         RefreshTokenExpiresAt = expiresAt;
     }
 
@@ -164,14 +164,14 @@ public class AuthUser : Entity
         RefreshTokenExpiresAt = null;
     }
 
-    public bool IsRefreshTokenValid(string refreshToken)
+    public bool IsRefreshTokenValid(string refreshTokenHash)
     {
         if (string.IsNullOrEmpty(RefreshToken) || !RefreshTokenExpiresAt.HasValue)
         {
             return false;
         }
 
-        return RefreshToken == refreshToken && RefreshTokenExpiresAt.Value > DateTime.UtcNow;
+        return RefreshToken == refreshTokenHash && RefreshTokenExpiresAt.Value > DateTime.UtcNow;
     }
 }
 

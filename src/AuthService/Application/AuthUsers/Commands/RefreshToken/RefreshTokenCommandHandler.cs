@@ -36,7 +36,10 @@ public class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCommand, A
                 Error.Problem("RefreshToken.Invalid", "Invalid refresh token format"));
         }
 
-        // Find user by refresh token
+        // Hash the provided refresh token to compare with stored hash
+        var refreshTokenHash = _tokenService.HashRefreshToken(request.RefreshToken);
+
+        // Find user by hashed refresh token
         var authUser = await _readDbContext.AuthUsers
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
@@ -44,7 +47,7 @@ public class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCommand, A
                         .ThenInclude(rp => rp.Permission)
             .Include(u => u.UserPermissions)
                 .ThenInclude(up => up.Permission)
-            .FirstOrDefaultAsync(u => u.RefreshToken == request.RefreshToken, cancellationToken);
+            .FirstOrDefaultAsync(u => u.RefreshToken == refreshTokenHash, cancellationToken);
 
         if (authUser == null)
         {
@@ -53,7 +56,7 @@ public class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCommand, A
         }
 
         // Validate refresh token expiration
-        if (!authUser.IsRefreshTokenValid(request.RefreshToken))
+        if (!authUser.IsRefreshTokenValid(refreshTokenHash))
         {
             return Result.Failure<AuthTokensDto>(
                 Error.Problem("RefreshToken.Expired", "Refresh token has expired"));
@@ -75,11 +78,12 @@ public class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCommand, A
         var newRefreshToken = _tokenService.GenerateRefreshToken();
         var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7); // 7 days expiration
         
-        // Update refresh token
-        authUser.SetRefreshToken(newRefreshToken, refreshTokenExpiresAt);
+        // Hash the new refresh token before storing
+        var newRefreshTokenHash = _tokenService.HashRefreshToken(newRefreshToken);
+        authUser.SetRefreshToken(newRefreshTokenHash, refreshTokenExpiresAt);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        // Generate response
+        // Generate response with plain token for cookie
         var response = CreateAuthTokensDto(authUser, newRefreshToken, refreshTokenExpiresAt);
         return Result.Success(response);
     }

@@ -110,8 +110,9 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
         var refreshToken = _tokenService.GenerateRefreshToken();
         var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7); // 7 days expiration
         
-        // Store refresh token in the user entity
-        authUser.SetRefreshToken(refreshToken, refreshTokenExpiresAt);
+        // Hash the refresh token before storing in the database
+        var refreshTokenHash = _tokenService.HashRefreshToken(refreshToken);
+        authUser.SetRefreshToken(refreshTokenHash, refreshTokenExpiresAt);
 
         return new AuthTokensDto
         {
@@ -119,7 +120,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
             Email = authUser.Email,
             Roles = roles,
             Permissions = allPermissions,
-            RefreshToken = refreshToken,
+            RefreshToken = refreshToken, // Return the plain token to set in cookie
             RefreshTokenExpiresAt = refreshTokenExpiresAt
         };
     }
