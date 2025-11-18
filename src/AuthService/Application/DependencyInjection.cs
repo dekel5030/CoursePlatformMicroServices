@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.AuthUsers.Commands.LoginUser;
+using Application.AuthUsers.Commands.RefreshToken;
 using Application.AuthUsers.Commands.RegisterUser;
 using Application.AuthUsers.Dtos;
 using Application.AuthUsers.Events;
@@ -29,8 +30,9 @@ public static class DependencyInjection
 
     private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
     {
-        services.AddScoped<ICommandHandler<RegisterUserCommand, AuthResponseDto>, RegisterUserCommandHandler>();
-        services.AddScoped<ICommandHandler<LoginUserCommand, AuthResponseDto>, LoginUserCommandHandler>();
+        services.AddScoped<ICommandHandler<RegisterUserCommand, AuthTokensDto>, RegisterUserCommandHandler>();
+        services.AddScoped<ICommandHandler<LoginUserCommand, AuthTokensDto>, LoginUserCommandHandler>();
+        services.AddScoped<ICommandHandler<RefreshTokenCommand, AuthTokensDto>, RefreshTokenCommandHandler>();
 
         return services;
     }
