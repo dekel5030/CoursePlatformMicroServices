@@ -1,5 +1,5 @@
 using System.Security.Cryptography;
-using System.Text;
+using Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -11,6 +11,56 @@ public static class AuthenticationExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // Bind JWT configuration to JwtOptions
+        var jwtOptions = new JwtOptions();
+        configuration.GetSection(JwtOptions.SectionName).Bind(jwtOptions);
+
+        // Load keys from files if file paths are provided
+        if (!string.IsNullOrEmpty(jwtOptions.PrivateKeyFile))
+        {
+            var privateKeyPath = Path.Combine(Directory.GetCurrentDirectory(), jwtOptions.PrivateKeyFile);
+            if (File.Exists(privateKeyPath))
+            {
+                jwtOptions.PrivateKey = File.ReadAllText(privateKeyPath);
+            }
+            else
+            {
+                throw new InvalidOperationException($"Private key file not found: {privateKeyPath}");
+            }
+        }
+
+        if (!string.IsNullOrEmpty(jwtOptions.PublicKeyFile))
+        {
+            var publicKeyPath = Path.Combine(Directory.GetCurrentDirectory(), jwtOptions.PublicKeyFile);
+            if (File.Exists(publicKeyPath))
+            {
+                jwtOptions.PublicKey = File.ReadAllText(publicKeyPath);
+            }
+            else
+            {
+                throw new InvalidOperationException($"Public key file not found: {publicKeyPath}");
+            }
+        }
+
+        // Validate that keys are configured
+        if (string.IsNullOrEmpty(jwtOptions.PublicKey))
+        {
+            throw new InvalidOperationException("JWT Public Key not configured. Provide either PublicKey or PublicKeyFile in configuration.");
+        }
+
+        if (string.IsNullOrEmpty(jwtOptions.Issuer))
+        {
+            throw new InvalidOperationException("JWT Issuer not configured");
+        }
+
+        if (string.IsNullOrEmpty(jwtOptions.Audience))
+        {
+            throw new InvalidOperationException("JWT Audience not configured");
+        }
+
+        // Register JwtOptions as singleton in DI
+        services.AddSingleton(jwtOptions);
+
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -18,16 +68,9 @@ public static class AuthenticationExtensions
         })
         .AddJwtBearer(options =>
         {
-            var jwtPublicKey = configuration["Jwt:PublicKey"] 
-                ?? throw new InvalidOperationException("JWT Public Key not configured");
-            var jwtIssuer = configuration["Jwt:Issuer"] 
-                ?? throw new InvalidOperationException("JWT Issuer not configured");
-            var jwtAudience = configuration["Jwt:Audience"] 
-                ?? throw new InvalidOperationException("JWT Audience not configured");
-
             // Use RSA public key for validation
             var rsa = RSA.Create();
-            rsa.ImportFromPem(jwtPublicKey);
+            rsa.ImportFromPem(jwtOptions.PublicKey);
 
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -35,8 +78,8 @@ public static class AuthenticationExtensions
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtIssuer,
-                ValidAudience = jwtAudience,
+                ValidIssuer = jwtOptions.Issuer,
+                ValidAudience = jwtOptions.Audience,
                 IssuerSigningKey = new RsaSecurityKey(rsa),
                 ClockSkew = TimeSpan.Zero
             };

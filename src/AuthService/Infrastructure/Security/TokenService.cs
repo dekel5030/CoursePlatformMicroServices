@@ -3,18 +3,18 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Application.Abstractions.Security;
-using Microsoft.Extensions.Configuration;
+using Infrastructure.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Security;
 
 public class TokenService : ITokenService
 {
-    private readonly IConfiguration _configuration;
+    private readonly JwtOptions _jwtOptions;
 
-    public TokenService(IConfiguration configuration)
+    public TokenService(JwtOptions jwtOptions)
     {
-        _configuration = configuration;
+        _jwtOptions = jwtOptions;
     }
 
     public string GenerateToken(TokenRequestDto request)
@@ -23,20 +23,21 @@ public class TokenService : ITokenService
 
         // Use RSA asymmetric signing
         var rsa = RSA.Create();
-        var privateKey = _configuration["Jwt:PrivateKey"] 
-            ?? throw new InvalidOperationException("JWT Private Key not configured");
+        if (string.IsNullOrEmpty(_jwtOptions.PrivateKey))
+        {
+            throw new InvalidOperationException("JWT Private Key not configured");
+        }
         
-        rsa.ImportFromPem(privateKey);
+        rsa.ImportFromPem(_jwtOptions.PrivateKey);
         var signingCredentials = new SigningCredentials(
             new RsaSecurityKey(rsa), 
             SecurityAlgorithms.RsaSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
+            issuer: _jwtOptions.Issuer,
+            audience: _jwtOptions.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(
-                int.Parse(_configuration["Jwt:ExpirationMinutes"] ?? "60")),
+            expires: DateTime.UtcNow.AddMinutes(_jwtOptions.ExpirationMinutes),
             signingCredentials: signingCredentials
         );
 
