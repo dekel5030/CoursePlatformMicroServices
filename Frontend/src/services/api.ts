@@ -25,3 +25,10 @@ export async function fetchLessonById(id: string) {
 
   return await response.json();
 }
+
+export async function fetchUserById(id: string) {
+  const response = await fetch(`${API_USERS_URL}/api/users/${id}`);
+  if (!response.ok) throw new Error("Failed to fetch user");
+
+  return await response.json();
+}
