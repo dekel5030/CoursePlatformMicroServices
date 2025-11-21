@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 
-interface AuthUser {
+export interface AuthUser {
   authUserId: string;
   userId: string;
   email: string;
@@ -9,7 +9,7 @@ interface AuthUser {
   permissions: string[];
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   currentUser: AuthUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -75,6 +75,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (context === undefined) {
