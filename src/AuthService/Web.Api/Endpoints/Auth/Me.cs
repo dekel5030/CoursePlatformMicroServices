@@ -24,10 +24,12 @@ public class Me : IEndpoint
                 return Results.Unauthorized();
             }
 
-            // Fetch user from database
+            // Fetch user from database with all necessary navigation properties
             var authUser = await readDbContext.AuthUsers
                 .Include(u => u.UserRoles)
                     .ThenInclude(ur => ur.Role)
+                        .ThenInclude(r => r.RolePermissions)
+                            .ThenInclude(rp => rp.Permission)
                 .Include(u => u.UserPermissions)
                     .ThenInclude(up => up.Permission)
                 .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
