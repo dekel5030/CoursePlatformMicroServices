@@ -1,7 +1,9 @@
 using System.Security.Claims;
-using Application.Abstractions.Data;
+using Application.Abstractions.Messaging;
 using Application.AuthUsers.Dtos;
-using Microsoft.EntityFrameworkCore;
+using Application.AuthUsers.Queries.GetCurrentUser;
+using Web.Api.Extensions;
+using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Auth;
 
@@ -11,7 +13,7 @@ public class Me : IEndpoint
     {
         app.MapGet("auth/me", async (
             HttpContext httpContext,
-            IReadDbContext readDbContext,
+            IQueryHandler<GetCurrentUserQuery, AuthResponseDto> handler,
             CancellationToken cancellationToken) =>
         {
             // Get email from JWT claims
@@ -23,49 +25,12 @@ public class Me : IEndpoint
                 return Results.Unauthorized();
             }
 
-            // Fetch user from database with all necessary navigation properties
-            var authUser = await readDbContext.AuthUsers
-                .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Role)
-                        .ThenInclude(r => r.RolePermissions)
-                            .ThenInclude(rp => rp.Permission)
-                .Include(u => u.UserPermissions)
-                    .ThenInclude(up => up.Permission)
-                .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+            var query = new GetCurrentUserQuery(email);
+            var result = await handler.Handle(query, cancellationToken);
 
-            if (authUser == null)
-            {
-                return Results.NotFound(new { message = "User not found" });
-            }
-
-            // Extract roles and permissions
-            var roles = authUser.UserRoles
-                .Select(ur => ur.Role.Name)
-                .Distinct()
-                .ToList();
-
-            var permissionsFromRoles = authUser.UserRoles
-                .SelectMany(ur => ur.Role.RolePermissions)
-                .Select(rp => rp.Permission.Name);
-
-            var directPermissions = authUser.UserPermissions
-                .Select(up => up.Permission.Name);
-
-            var allPermissions = permissionsFromRoles
-                .Concat(directPermissions)
-                .Distinct()
-                .ToList();
-
-            var response = new AuthResponseDto
-            {
-                AuthUserId = authUser.Id.Value,
-                UserId = authUser.Id.Value, // Unified ID
-                Email = authUser.Email,
-                Roles = roles,
-                Permissions = allPermissions
-            };
-
-            return Results.Ok(response);
+            return result.Match(
+                onSuccess: Results.Ok,
+                onFailure: CustomResults.Problem);
         })
         .RequireAuthorization() // This endpoint requires authentication
         .WithTags(Tags.Auth)

@@ -59,9 +59,15 @@ public static class CustomResults
 
         static Dictionary<string, object?>? GetErrors(Result result)
         {
-            // ValidationError type is not currently implemented in Kernel
-            // Return null for now - can be extended later if needed
-            return null;
+            if (result.Error is not ValidationError validationError)
+            {
+                return null;
+            }
+
+            return new Dictionary<string, object?>
+            {
+                { "errors", validationError.Errors }
+            };
         }
     }
 }

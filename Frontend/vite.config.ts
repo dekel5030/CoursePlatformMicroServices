@@ -12,6 +12,16 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/api/users": {
+        target: "https://localhost:7079",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/api/courses": {
+        target: "https://localhost:7171",
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

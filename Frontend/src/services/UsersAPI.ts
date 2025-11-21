@@ -1,5 +1,4 @@
-const API_USERS_URL =
-  import.meta.env.VITE_API_USERS_URL || "https://localhost:7079/api";
+const API_USERS_URL = "/api";
 
 export interface User {
   id: string;
@@ -11,7 +10,9 @@ export interface User {
 }
 
 export async function fetchUserById(id: string): Promise<User> {
-  const response = await fetch(`${API_USERS_URL}/users/${id}`);
+  const response = await fetch(`${API_USERS_URL}/users/${id}`, {
+    credentials: "include",
+  });
   if (!response.ok) throw new Error("Failed to fetch user");
 
   return await response.json();
