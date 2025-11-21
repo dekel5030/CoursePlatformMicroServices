@@ -16,12 +16,14 @@ public class AuthRegisteredIntegrationEventHandler(
         CancellationToken cancellationToken = default)
     {
         logger.LogInformation(
-            "Handling AuthRegisteredIntegrationEvent for AuthUserId: {AuthUserId}, Email: {Email}, Username: {Username}",
+            "Handling AuthRegisteredIntegrationEvent for AuthUserId: {AuthUserId}, UserId: {UserId}, Email: {Email}, Username: {Username}",
             request.AuthUserId,
+            request.UserId,
             request.Email,
             request.Username ?? "N/A");
 
         AuthUserId authUserId = new AuthUserId(request.AuthUserId);
+        UserId userId = new UserId(Guid.Parse(request.UserId));
 
         User? user = dbContext.Users
             .FirstOrDefault(u => u.AuthUserId == authUserId);
@@ -29,12 +31,14 @@ public class AuthRegisteredIntegrationEventHandler(
         if (user is null)
         {
             logger.LogInformation(
-                "No existing user found with AuthUserId: {AuthUserId}. Creating new user.",
-                request.AuthUserId);
+                "No existing user found with AuthUserId: {AuthUserId}. Creating new user with UserId: {UserId}.",
+                request.AuthUserId,
+                request.UserId);
 
             Result<User> newUserResult = User.CreateUser(
                 authUserId,
-                request.Email);
+                request.Email,
+                userId); // Pass the userId so it matches authUserId
 
             if (newUserResult.IsFailure)
             {

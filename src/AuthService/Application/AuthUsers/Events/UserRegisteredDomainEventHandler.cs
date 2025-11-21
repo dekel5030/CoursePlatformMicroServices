@@ -20,8 +20,10 @@ public class UserRegisteredDomainEventHandler : IDomainEventHandler<UserRegister
 
     public async Task Handle(UserRegisteredDomainEvent request, CancellationToken cancellationToken = default)
     {
+        var authUserId = request.AuthUserId.Value.ToString();
         var integrationEvent = new UserRegistered(
-            request.AuthUserId.Value.ToString(),
+            authUserId,
+            authUserId, // UserId is the same as AuthUserId - unified ID
             request.Email,
             request.RegisteredAt);
 
