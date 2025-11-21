@@ -4,6 +4,9 @@ export const API_COURSES_URL =
 export const API_USERS_URL =
   import.meta.env.VITE_API_USERS_URL || "https://localhost:7079/api";
 
+export const API_AUTH_URL =
+  import.meta.env.VITE_API_AUTH_URL || "https://localhost:7233/auth";
+
 export async function fetchFeaturedCourses() {
   const response = await fetch(`${API_COURSES_URL}/courses/featured`);
   if (!response.ok) throw new Error("Failed to fetch featured courses");
@@ -31,4 +34,22 @@ export async function fetchUserById(id: string) {
   if (!response.ok) throw new Error("Failed to fetch user");
 
   return await response.json();
+}
+
+export async function loginUser(data: { email: string; password: string }) {
+  const response = await fetch(`${API_AUTH_URL}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => null);
+    throw new Error(error?.title || "Login failed");
+  }
+
+  return response.json();
 }

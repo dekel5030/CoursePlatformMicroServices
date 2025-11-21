@@ -1,23 +1,28 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/Input/Input";
 import styles from "./LoginPage.module.css";
+import { loginUser } from "../../services/api";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {}
   );
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
+
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
@@ -42,25 +47,32 @@ export default function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
 
-    // TODO: Implement actual login logic here
-    console.log("Login submitted:", formData);
+    try {
+      const response = await loginUser(formData);
 
-    // Simulate API call
-    setTimeout(() => {
+      // Save logged-in userId to identify own profile
+      localStorage.setItem("userId", response.authUserId);
+
+      navigate(`/users/${response.authUserId}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert("An unexpected error occurred");
+      }
+    } finally {
       setIsSubmitting(false);
-      alert("Login functionality to be implemented");
-    }, 1000);
+    }
   };
 
+  // ---------- THE JSX RETURN ----------
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
