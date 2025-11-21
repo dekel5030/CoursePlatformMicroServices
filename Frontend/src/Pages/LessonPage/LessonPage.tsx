@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Lesson } from "../../types/Lesson";
-import { fetchLessonById } from "../../services/api";
+import { fetchLessonById } from "../../services/CoursesAPI";
 import styles from "./LessonPage.module.css";
 
 export default function LessonPage() {
