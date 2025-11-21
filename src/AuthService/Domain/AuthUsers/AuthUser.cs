@@ -23,6 +23,10 @@ public class AuthUser : Entity
     public bool IsConfirmed { get; private set; } = false;
     public int FailedLoginAttempts { get; private set; } = 0;
     public DateTime? LockedUntil { get; private set; } = null;
+    
+    // Refresh Token properties
+    public string? RefreshToken { get; private set; }
+    public DateTime? RefreshTokenExpiresAt { get; private set; }
 
     public static AuthUser Create(
         string email,
@@ -146,6 +150,28 @@ public class AuthUser : Entity
     public void Confirm()
     {
         IsConfirmed = true;
+    }
+
+    public void SetRefreshToken(string refreshTokenHash, DateTime expiresAt)
+    {
+        RefreshToken = refreshTokenHash;
+        RefreshTokenExpiresAt = expiresAt;
+    }
+
+    public void ClearRefreshToken()
+    {
+        RefreshToken = null;
+        RefreshTokenExpiresAt = null;
+    }
+
+    public bool IsRefreshTokenValid(string refreshTokenHash)
+    {
+        if (string.IsNullOrEmpty(RefreshToken) || !RefreshTokenExpiresAt.HasValue)
+        {
+            return false;
+        }
+
+        return RefreshToken == refreshTokenHash && RefreshTokenExpiresAt.Value > DateTime.UtcNow;
     }
 }
 

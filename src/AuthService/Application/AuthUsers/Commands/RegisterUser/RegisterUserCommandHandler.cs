@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.AuthUsers.Commands.RegisterUser;
 
-public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, AuthResponseDto>
+public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, AuthTokensDto>
 {
     private readonly IWriteDbContext _dbContext;
     private readonly IReadDbContext _readDbContext;
@@ -29,7 +29,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
         _tokenService = tokenService;
     }
 
-    public async Task<Result<AuthResponseDto>> Handle(
+    public async Task<Result<AuthTokensDto>> Handle(
         RegisterUserCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -41,7 +41,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
 
         if (existingUser != null)
         {
-            return Result.Failure<AuthResponseDto>(AuthUserErrors.DuplicateEmail);
+            return Result.Failure<AuthTokensDto>(AuthUserErrors.DuplicateEmail);
         }
 
         // Hash password
@@ -53,7 +53,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
 
         if (defaultRole == null)
         {
-            return Result.Failure<AuthResponseDto>(
+            return Result.Failure<AuthTokensDto>(
                 Error.NotFound("Role.NotFound", "Default 'User' role not found"));
         }
 
@@ -78,15 +78,16 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
 
         if (fullAuthUser == null)
         {
-            return Result.Failure<AuthResponseDto>(AuthUserErrors.NotFound);
+            return Result.Failure<AuthTokensDto>(AuthUserErrors.NotFound);
         }
 
         // Generate token and response
-        var response = CreateAuthResponseDto(fullAuthUser);
+        var response = CreateAuthTokensDto(fullAuthUser);
+        await _dbContext.SaveChangesAsync(cancellationToken); // Save refresh token
         return Result.Success(response);
     }
 
-    private AuthResponseDto CreateAuthResponseDto(AuthUser authUser)
+    private AuthTokensDto CreateAuthTokensDto(AuthUser authUser)
     {
         var roles = authUser.UserRoles
             .Select(ur => ur.Role.Name)
@@ -105,22 +106,22 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
             .Distinct()
             .ToList();
 
-        var tokenRequest = new TokenRequestDto
-        {
-            Email = authUser.Email,
-            Roles = roles,
-            Permissions = allPermissions
-        };
+        // Generate refresh token
+        var refreshToken = _tokenService.GenerateRefreshToken();
+        var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7); // 7 days expiration
+        
+        // Hash the refresh token before storing in the database
+        var refreshTokenHash = _tokenService.HashRefreshToken(refreshToken);
+        authUser.SetRefreshToken(refreshTokenHash, refreshTokenExpiresAt);
 
-        var token = _tokenService.GenerateToken(tokenRequest);
-
-        return new AuthResponseDto
+        return new AuthTokensDto
         {
             AuthUserId = authUser.Id.Value,
             Email = authUser.Email,
-            Token = token,
             Roles = roles,
-            Permissions = allPermissions
+            Permissions = allPermissions,
+            RefreshToken = refreshToken, // Return the plain token to set in cookie
+            RefreshTokenExpiresAt = refreshTokenExpiresAt
         };
     }
 }

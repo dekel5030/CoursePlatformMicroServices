@@ -7,34 +7,39 @@ using Domain.AuthUsers.Errors;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.AuthUsers.Commands.LoginUser;
+namespace Application.AuthUsers.Commands.RefreshToken;
 
-public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTokensDto>
+public class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCommand, AuthTokensDto>
 {
     private readonly IWriteDbContext _dbContext;
     private readonly IReadDbContext _readDbContext;
-    private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
 
-    public LoginUserCommandHandler(
+    public RefreshTokenCommandHandler(
         IWriteDbContext dbContext,
         IReadDbContext readDbContext,
-        IPasswordHasher passwordHasher,
         ITokenService tokenService)
     {
         _dbContext = dbContext;
         _readDbContext = readDbContext;
-        _passwordHasher = passwordHasher;
         _tokenService = tokenService;
     }
 
     public async Task<Result<AuthTokensDto>> Handle(
-        LoginUserCommand request,
+        RefreshTokenCommand request,
         CancellationToken cancellationToken = default)
     {
-        var dto = request.Dto;
+        // Validate refresh token format
+        if (!_tokenService.ValidateRefreshToken(request.RefreshToken))
+        {
+            return Result.Failure<AuthTokensDto>(
+                Error.Problem("RefreshToken.Invalid", "Invalid refresh token format"));
+        }
 
-        // Get user with all access data
+        // Hash the provided refresh token to compare with stored hash
+        var refreshTokenHash = _tokenService.HashRefreshToken(request.RefreshToken);
+
+        // Find user by hashed refresh token
         var authUser = await _readDbContext.AuthUsers
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
@@ -42,11 +47,19 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTok
                         .ThenInclude(rp => rp.Permission)
             .Include(u => u.UserPermissions)
                 .ThenInclude(up => up.Permission)
-            .FirstOrDefaultAsync(u => u.Email == dto.Email, cancellationToken);
+            .FirstOrDefaultAsync(u => u.RefreshToken == refreshTokenHash, cancellationToken);
 
         if (authUser == null)
         {
-            return Result.Failure<AuthTokensDto>(AuthUserErrors.InvalidCredentials);
+            return Result.Failure<AuthTokensDto>(
+                Error.NotFound("RefreshToken.NotFound", "Refresh token not found"));
+        }
+
+        // Validate refresh token expiration
+        if (!authUser.IsRefreshTokenValid(refreshTokenHash))
+        {
+            return Result.Failure<AuthTokensDto>(
+                Error.Problem("RefreshToken.Expired", "Refresh token has expired"));
         }
 
         // Check if account is locked
@@ -61,26 +74,21 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTok
             return Result.Failure<AuthTokensDto>(AuthUserErrors.AccountInactive);
         }
 
-        // Verify password
-        if (!_passwordHasher.VerifyPassword(dto.Password, authUser.PasswordHash))
-        {
-            // Record failed login attempt
-            authUser.RecordFailedLogin();
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return Result.Failure<AuthTokensDto>(AuthUserErrors.InvalidCredentials);
-        }
-
-        // Successful login
-        authUser.Login();
+        // Generate new refresh token (token rotation)
+        var newRefreshToken = _tokenService.GenerateRefreshToken();
+        var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7); // 7 days expiration
         
-        // Generate token and response
-        var response = CreateAuthTokensDto(authUser);
-        await _dbContext.SaveChangesAsync(cancellationToken); // Save refresh token and login state
+        // Hash the new refresh token before storing
+        var newRefreshTokenHash = _tokenService.HashRefreshToken(newRefreshToken);
+        authUser.SetRefreshToken(newRefreshTokenHash, refreshTokenExpiresAt);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        // Generate response with plain token for cookie
+        var response = CreateAuthTokensDto(authUser, newRefreshToken, refreshTokenExpiresAt);
         return Result.Success(response);
     }
 
-    private AuthTokensDto CreateAuthTokensDto(AuthUser authUser)
+    private AuthTokensDto CreateAuthTokensDto(AuthUser authUser, string refreshToken, DateTime refreshTokenExpiresAt)
     {
         var roles = authUser.UserRoles
             .Select(ur => ur.Role.Name)
@@ -99,21 +107,13 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTok
             .Distinct()
             .ToList();
 
-        // Generate refresh token
-        var refreshToken = _tokenService.GenerateRefreshToken();
-        var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7); // 7 days expiration
-        
-        // Hash the refresh token before storing in the database
-        var refreshTokenHash = _tokenService.HashRefreshToken(refreshToken);
-        authUser.SetRefreshToken(refreshTokenHash, refreshTokenExpiresAt);
-
         return new AuthTokensDto
         {
             AuthUserId = authUser.Id.Value,
             Email = authUser.Email,
             Roles = roles,
             Permissions = allPermissions,
-            RefreshToken = refreshToken, // Return the plain token to set in cookie
+            RefreshToken = refreshToken,
             RefreshTokenExpiresAt = refreshTokenExpiresAt
         };
     }
