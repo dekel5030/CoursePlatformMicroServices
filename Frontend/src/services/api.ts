@@ -2,7 +2,7 @@ export const API_COURSES_URL =
   import.meta.env.VITE_API_COURSES_URL || "https://localhost:7171/api";
 
 export const API_USERS_URL =
-  import.meta.env.VITE_API_USERS_URL || "http://localhost:234";
+  import.meta.env.VITE_API_USERS_URL || "https://localhost:7079/api";
 
 export async function fetchFeaturedCourses() {
   const response = await fetch(`${API_COURSES_URL}/courses/featured`);
@@ -27,7 +27,7 @@ export async function fetchLessonById(id: string) {
 }
 
 export async function fetchUserById(id: string) {
-  const response = await fetch(`${API_USERS_URL}/api/users/${id}`);
+  const response = await fetch(`${API_USERS_URL}/users/${id}`);
   if (!response.ok) throw new Error("Failed to fetch user");
 
   return await response.json();
