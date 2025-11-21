@@ -23,7 +23,7 @@ public class UserRegisteredDomainEventHandler : IDomainEventHandler<UserRegister
         var authUserId = request.AuthUserId.Value.ToString();
         var integrationEvent = new UserRegistered(
             authUserId,
-            authUserId, // UserId is the same as AuthUserId - unified ID
+            authUserId,
             request.Email,
             request.RegisteredAt);
 

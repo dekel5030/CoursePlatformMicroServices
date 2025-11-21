@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Application.Abstractions.Data;
 using Application.AuthUsers.Dtos;
 using Microsoft.EntityFrameworkCore;
-using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Auth;
 

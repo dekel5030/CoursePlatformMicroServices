@@ -49,7 +49,7 @@ public class RefreshTokenEndpoint : IEndpoint
                     var response = new AuthResponseDto
                     {
                         AuthUserId = tokensDto.AuthUserId,
-                        UserId = tokensDto.AuthUserId, // Unified ID
+                        UserId = tokensDto.AuthUserId,
                         Email = tokensDto.Email,
                         Roles = tokensDto.Roles,
                         Permissions = tokensDto.Permissions,

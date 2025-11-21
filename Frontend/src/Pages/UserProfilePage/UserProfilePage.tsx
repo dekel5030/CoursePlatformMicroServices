@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { User } from "../../types/user";
-import { fetchUserById } from "../../services/UsersAPI";
+import { type User, fetchUserById } from "../../services/UsersAPI";
 import { useAuth } from "../../features/auth/AuthContext";
 import styles from "./UserProfilePage.module.css";
 

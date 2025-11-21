@@ -1,5 +1,4 @@
-const API_AUTH_URL =
-  import.meta.env.VITE_API_AUTH_URL || "https://localhost:7233/auth";
+export const API_AUTH_URL = "/auth";
 
 export interface LoginData {
   email: string;

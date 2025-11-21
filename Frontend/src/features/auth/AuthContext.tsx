@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
+import { API_AUTH_URL } from "../../services/AuthAPI";
 
 export interface AuthUser {
   authUserId: string;
@@ -31,7 +32,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL || "https://localhost:7233/auth";
         const response = await fetch(`${API_AUTH_URL}/me`, {
           credentials: "include", // Include cookies
         });

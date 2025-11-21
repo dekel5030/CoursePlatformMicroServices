@@ -38,7 +38,7 @@ public class AuthRegisteredIntegrationEventHandler(
             Result<User> newUserResult = User.CreateUser(
                 authUserId,
                 request.Email,
-                userId); // Pass the userId so it matches authUserId
+                userId); 
 
             if (newUserResult.IsFailure)
             {
