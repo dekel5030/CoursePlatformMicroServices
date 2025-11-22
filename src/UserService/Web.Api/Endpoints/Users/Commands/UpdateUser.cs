@@ -1,5 +1,6 @@
 using Application.Abstractions.Messaging;
 using Application.Users.Commands.UpdateUser;
+using Domain.Users.Primitives;
 using Kernel;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Extensions;
@@ -34,5 +35,5 @@ public class UpdateUser : IEndpoint
 public record UpdateUserRequest(
     string? FirstName,
     string? LastName,
-    Domain.Users.Primitives.PhoneNumber? PhoneNumber,
+    PhoneNumber? PhoneNumber,
     DateTime? DateOfBirth);
