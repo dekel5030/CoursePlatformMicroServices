@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { type User, fetchUserById } from "../../services/UsersAPI";
+import {
+  type User,
+  type UpdateUserRequest,
+  fetchUserById,
+  updateUser,
+} from "../../services/UsersAPI";
 import { useAuth } from "../../features/auth/AuthContext";
+import EditProfileModal from "../../components/EditProfileModal/EditProfileModal";
 import styles from "./UserProfilePage.module.css";
 
 export default function UserProfilePage() {
@@ -9,6 +15,7 @@ export default function UserProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Get current user from AuthContext
   const { currentUser } = useAuth();
@@ -28,8 +35,20 @@ export default function UserProfilePage() {
   }, [id]);
 
   const handleEditProfile = () => {
-    // TODO: Navigate to edit profile page when implemented
-    alert("Edit profile functionality to be implemented");
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveProfile = async (updatedData: UpdateUserRequest) => {
+    if (!id) return;
+
+    try {
+      const updatedUser = await updateUser(id, updatedData);
+      setUser(updatedUser);
+    } catch (err) {
+      throw new Error(
+        err instanceof Error ? err.message : "Failed to update profile"
+      );
+    }
   };
 
   if (loading)
@@ -106,6 +125,15 @@ export default function UserProfilePage() {
           </div>
         )}
       </div>
+
+      {user && (
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          user={user}
+          onSave={handleSaveProfile}
+        />
+      )}
     </div>
   );
 }

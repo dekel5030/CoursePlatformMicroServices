@@ -45,4 +45,16 @@ public class User : Entity
 
         return Result.Success(user);
     }
+
+    public Result UpdateProfile(
+        FullName? fullName = null,
+        PhoneNumber? phoneNumber = null,
+        DateTime? dateOfBirth = null)
+    {
+        FullName = fullName;
+        PhoneNumber = phoneNumber;
+        DateOfBirth = dateOfBirth;
+
+        return Result.Success();
+    }
 }
