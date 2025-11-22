@@ -45,7 +45,13 @@ export async function getCurrentUser(): Promise<AuthResponse> {
 }
 
 export async function logout(): Promise<void> {
-  // TODO: Implement logout endpoint
-  // For now, just clear local state
-  return Promise.resolve();
+  const response = await fetch(`${API_AUTH_URL}/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    // Even if logout fails on server, we should clear client state
+    console.error("Logout failed on server, but clearing client state");
+  }
 }
