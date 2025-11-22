@@ -1,4 +1,4 @@
-const API_USERS_URL = "/api";
+const API_USERS_URL = "/userservice/api";
 
 export interface User {
   id: string;
@@ -18,7 +18,10 @@ export async function fetchUserById(id: string): Promise<User> {
   return await response.json();
 }
 
-export async function updateUser(id: string, data: Partial<User>): Promise<User> {
+export async function updateUser(
+  id: string,
+  data: Partial<User>
+): Promise<User> {
   const response = await fetch(`${API_USERS_URL}/users/${id}`, {
     method: "PUT",
     headers: {

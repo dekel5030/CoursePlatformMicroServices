@@ -1,7 +1,7 @@
 import type { Course } from "../types/course";
 import type { Lesson } from "../types/Lesson";
 
-const API_COURSES_URL = "/api";
+const API_COURSES_URL = "/courseservice/api";
 
 export async function fetchFeaturedCourses(): Promise<Course[]> {
   const response = await fetch(`${API_COURSES_URL}/courses/featured`, {

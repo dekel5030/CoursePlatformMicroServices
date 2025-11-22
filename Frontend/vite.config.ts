@@ -12,15 +12,17 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
-      "/api/users": {
-        target: "https://localhost:7079",
-        changeOrigin: true,
-        secure: false,
-      },
-      "/api/courses": {
+      "/courseservice": {
         target: "https://localhost:7171",
         changeOrigin: true,
         secure: false,
+        rewrite: (path) => path.replace(/^\/courseservice/, ""),
+      },
+      "/userservice": {
+        target: "https://localhost:7079",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/userservice/, ""),
       },
     },
   },
