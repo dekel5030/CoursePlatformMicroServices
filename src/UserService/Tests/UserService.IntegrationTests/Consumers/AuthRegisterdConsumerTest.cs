@@ -14,11 +14,12 @@ public class AuthRegisterdConsumerTest : IntegrationTestsBase
     {
         // Arrange
         string authUserId = Guid.NewGuid().ToString();
+        string userId = authUserId; // Unified ID
         string email = "user@example.com";
 
         // Act
         var bus = Factory.Services.GetRequiredService<IBus>();
-        await bus.Publish(new UserRegistered(authUserId, email, DateTime.UtcNow));
+        await bus.Publish(new UserRegistered(authUserId, userId, email, DateTime.UtcNow));
 
         await Task.Delay(TimeSpan.FromMinutes(1));
 
