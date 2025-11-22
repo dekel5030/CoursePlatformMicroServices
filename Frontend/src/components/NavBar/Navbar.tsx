@@ -1,9 +1,23 @@
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../features/auth/AuthContext";
 import styles from "./Navbar.module.css";
 import Dropdown from "../Dropdown/Dropdown";
 import Button from "../Button/Button";
 import SearchBox from "../SearchBox/SearchBox";
+import ProfileMenu from "../ProfileMenu/ProfileMenu";
 
 export default function Navbar() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const handleLoginClick = () => {
+    navigate("/login");
+  };
+
+  const handleSignUpClick = () => {
+    navigate("/signup");
+  };
+
   return (
     <header className={styles.header}>
       <div className={styles.logo}>CourseHub</div>
@@ -27,8 +41,18 @@ export default function Navbar() {
       </nav>
 
       <div className={styles.authButtons}>
-        <Button variant="outlined">Log in</Button>
-        <Button variant="filled">Sign up</Button>
+        {isAuthenticated ? (
+          <ProfileMenu />
+        ) : (
+          <>
+            <Button variant="outlined" onClick={handleLoginClick}>
+              Log in
+            </Button>
+            <Button variant="filled" onClick={handleSignUpClick}>
+              Sign up
+            </Button>
+          </>
+        )}
       </div>
     </header>
   );
