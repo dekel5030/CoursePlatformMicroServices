@@ -5,6 +5,7 @@ namespace Application.Users.Commands.CreateUser;
 
 public sealed record CreateUserCommand(
     string Email,
+    string? UserId,
     string? FirstName,
     string? LastName,
     PhoneNumber? PhoneNumber, 

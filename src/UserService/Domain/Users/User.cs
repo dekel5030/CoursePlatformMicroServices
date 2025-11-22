@@ -19,13 +19,16 @@ public class User : Entity
     public static Result<User> CreateUser(
         AuthUserId authUserId,
         string email, 
+        UserId? userId = null,
         FullName? fullName = null, 
         PhoneNumber? phoneNumber = null, 
         DateTime? dateOfBirth = null)
     {
         var user = new User
         {
-            Id = new UserId(Guid.CreateVersion7()),
+            // Use provided userId if available, otherwise generate new one
+            // When userId is provided from AuthService, it should match authUserId
+            Id = userId ?? new UserId(Guid.CreateVersion7()),
             AuthUserId = authUserId,
             Email = email,
             FullName = fullName,

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchFeaturedCourses } from "../../services/api";
+import { fetchFeaturedCourses } from "../../services/CoursesAPI";
 import type { Course } from "../../types/course";
 import CourseCard from "../../features/courses/components/CourseCard";
 import { Link } from "react-router-dom";

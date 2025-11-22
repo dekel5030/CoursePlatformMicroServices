@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { User } from "../../types/user";
-import { fetchUserById } from "../../services/api";
+import { type User, fetchUserById } from "../../services/UsersAPI";
+import { useAuth } from "../../features/auth/AuthContext";
 import styles from "./UserProfilePage.module.css";
 
 export default function UserProfilePage() {
@@ -10,17 +10,19 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // TODO: Replace with actual auth context when available
-  // For now, we'll check if the logged-in user ID matches the profile ID
-  const currentUserId = localStorage.getItem("userId"); // Placeholder
-  const isOwnProfile = currentUserId === id;
+  // Get current user from AuthContext
+  const { currentUser } = useAuth();
+  const isOwnProfile = currentUser?.userId === id;
 
   useEffect(() => {
     if (!id) return;
 
     setLoading(true);
     fetchUserById(id)
-      .then(setUser)
+      .then((userData) => {
+        setUser(userData);
+        console.log(userData);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [id]);
@@ -30,11 +32,13 @@ export default function UserProfilePage() {
     alert("Edit profile functionality to be implemented");
   };
 
-  if (loading) return <div className={styles.status}>Loading user profile...</div>;
+  if (loading)
+    return <div className={styles.status}>Loading user profile...</div>;
   if (error) return <div className={styles.statusError}>Error: {error}</div>;
   if (!user) return <div className={styles.statusError}>User not found</div>;
 
-  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || "N/A";
+  const fullName =
+    [user.firstName, user.lastName].filter(Boolean).join(" ") || "N/A";
   const formattedDate = user.dateOfBirth
     ? new Date(user.dateOfBirth).toLocaleDateString()
     : "N/A";
@@ -56,11 +60,13 @@ export default function UserProfilePage() {
 
         <div className={styles.infoSection}>
           <h2 className={styles.sectionTitle}>Personal Information</h2>
-          
+
           <div className={styles.infoGrid}>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>First Name</span>
-              <span className={styles.infoValue}>{user.firstName || "N/A"}</span>
+              <span className={styles.infoValue}>
+                {user.firstName || "N/A"}
+              </span>
             </div>
 
             <div className={styles.infoItem}>
@@ -75,7 +81,9 @@ export default function UserProfilePage() {
 
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Phone Number</span>
-              <span className={styles.infoValue}>{user.phoneNumber || "N/A"}</span>
+              <span className={styles.infoValue}>
+                {user.phoneNumber || "N/A"}
+              </span>
             </div>
 
             <div className={styles.infoItem}>

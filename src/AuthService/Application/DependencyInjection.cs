@@ -4,6 +4,7 @@ using Application.AuthUsers.Commands.RefreshToken;
 using Application.AuthUsers.Commands.RegisterUser;
 using Application.AuthUsers.Dtos;
 using Application.AuthUsers.Events;
+using Application.AuthUsers.Queries.GetCurrentUser;
 using Domain.AuthUsers.Events;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,7 +25,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
     {
-        // Query handlers will be added here
+        services.AddScoped<IQueryHandler<GetCurrentUserQuery, AuthResponseDto>, GetCurrentUserQueryHandler>();
         return services;
     }
 
