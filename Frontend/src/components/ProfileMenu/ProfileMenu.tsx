@@ -15,10 +15,17 @@ export default function ProfileMenu() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    setIsOpen(false);
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setIsOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Navigate anyway since client state is cleared
+      setIsOpen(false);
+      navigate("/");
+    }
   };
 
   const getInitial = () => {
