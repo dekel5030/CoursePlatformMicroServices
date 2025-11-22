@@ -9,6 +9,13 @@ export interface User {
   phoneNumber?: string | null;
 }
 
+export interface UpdateUserRequest {
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: { countryCode: string; number: string } | null;
+  dateOfBirth?: string | null;
+}
+
 export async function fetchUserById(id: string): Promise<User> {
   const response = await fetch(`${API_USERS_URL}/users/${id}`, {
     credentials: "include",
@@ -20,7 +27,7 @@ export async function fetchUserById(id: string): Promise<User> {
 
 export async function updateUser(
   id: string,
-  data: Partial<User>
+  data: UpdateUserRequest
 ): Promise<User> {
   const response = await fetch(`${API_USERS_URL}/users/${id}`, {
     method: "PUT",
