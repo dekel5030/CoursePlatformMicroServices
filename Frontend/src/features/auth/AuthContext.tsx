@@ -57,8 +57,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       // Call backend logout endpoint to invalidate refresh token and clear cookies
       await apiLogout();
-      
-      // Clear client state
       setCurrentUser(null);
     } catch (error) {
       console.error("Logout error:", error);

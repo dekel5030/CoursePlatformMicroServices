@@ -51,7 +51,6 @@ export async function logout(): Promise<void> {
   });
 
   if (!response.ok) {
-    // Even if logout fails on server, we should clear client state
     console.error("Logout failed on server, but clearing client state");
   }
 }
