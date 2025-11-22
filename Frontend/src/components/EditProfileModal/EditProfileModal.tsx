@@ -43,9 +43,15 @@ export default function EditProfileModal({
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    // Phone number validation (optional but if provided, should be valid)
-    if (formData.phoneNumber && !/^[+]?[\d\s-()]+$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = "Please enter a valid phone number";
+    // Phone number validation - must match format: countryCode number (e.g., "+1 1234567890")
+    if (formData.phoneNumber) {
+      const trimmed = formData.phoneNumber.trim();
+      // Check if it matches the expected format with country code and number separated by space
+      const phoneRegex = /^\+\d{1,4}\s\d{7,15}$/;
+      if (!phoneRegex.test(trimmed)) {
+        newErrors.phoneNumber = 
+          "Phone number must be in format: +CountryCode Number (e.g., +1 1234567890)";
+      }
     }
 
     // Date of birth validation (optional but if provided, should be valid)
@@ -74,20 +80,22 @@ export default function EditProfileModal({
 
     try {
       // Parse phone number if provided
+      // Expected format: "+CountryCode Number" (e.g., "+1 1234567890")
       let phoneNumber = null;
       if (formData.phoneNumber) {
-        // Simple parsing - split by space if format is "+1 1234567890"
-        const parts = formData.phoneNumber.trim().split(/\s+/);
-        if (parts.length >= 2) {
+        const trimmed = formData.phoneNumber.trim();
+        const spaceIndex = trimmed.indexOf(" ");
+        
+        if (spaceIndex > 0) {
           phoneNumber = {
-            countryCode: parts[0],
-            number: parts.slice(1).join(" "),
+            countryCode: trimmed.substring(0, spaceIndex),
+            number: trimmed.substring(spaceIndex + 1),
           };
         } else {
-          // If no space, assume whole thing is number with +1 as default country code
+          // This case should be caught by validation, but handle it safely
           phoneNumber = {
             countryCode: "+1",
-            number: formData.phoneNumber.trim(),
+            number: trimmed,
           };
         }
       }

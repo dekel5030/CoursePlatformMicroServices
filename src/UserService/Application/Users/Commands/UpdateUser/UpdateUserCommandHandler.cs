@@ -24,10 +24,22 @@ public class UpdateUserCommandHandler(IWriteDbContext dbContext)
             return Result.Failure<UpdatedUserResponseDto>(UserErrors.NotFound);
         }
 
-        FullName? fullName = null;
+        // Allow partial name updates - update only if both are provided, otherwise keep existing
+        FullName? fullName = user.FullName; // Keep existing by default
         if (request.FirstName is not null && request.LastName is not null)
         {
+            // Both provided - create new full name
             fullName = new FullName(request.FirstName, request.LastName);
+        }
+        else if (request.FirstName is not null && user.FullName is not null)
+        {
+            // Only first name provided - update first name, keep last name
+            fullName = new FullName(request.FirstName, user.FullName.LastName);
+        }
+        else if (request.LastName is not null && user.FullName is not null)
+        {
+            // Only last name provided - update last name, keep first name
+            fullName = new FullName(user.FullName.FirstName, request.LastName);
         }
 
         Result updateResult = user.UpdateProfile(
