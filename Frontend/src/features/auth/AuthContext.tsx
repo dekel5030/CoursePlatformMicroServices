@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { API_AUTH_URL } from "../../services/AuthAPI";
+import { API_AUTH_URL, logout as apiLogout } from "../../services/AuthAPI";
 
 export interface AuthUser {
   authUserId: string;
@@ -15,7 +15,7 @@ export interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   setCurrentUser: (user: AuthUser | null) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -53,9 +53,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     fetchCurrentUser();
   }, []);
 
-  const logout = () => {
-    setCurrentUser(null);
-    // TODO: Call logout endpoint to clear cookies
+  const logout = async () => {
+    try {
+      // Call backend logout endpoint to invalidate refresh token and clear cookies
+      await apiLogout();
+      setCurrentUser(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Clear client state even if backend call fails
+      setCurrentUser(null);
+    }
   };
 
   const isAuthenticated = currentUser !== null;
