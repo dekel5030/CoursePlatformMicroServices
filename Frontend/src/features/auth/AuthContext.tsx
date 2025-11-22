@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { API_AUTH_URL } from "../../services/AuthAPI";
+import { API_AUTH_URL, logout as apiLogout } from "../../services/AuthAPI";
 
 export interface AuthUser {
   authUserId: string;
@@ -55,13 +55,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
-      // Call backend logout endpoint to invalidate refresh token
-      await fetch(`${API_AUTH_URL}/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
+      // Call backend logout endpoint to invalidate refresh token and clear cookies
+      await apiLogout();
       
-      // Clear client state regardless of backend response
+      // Clear client state
       setCurrentUser(null);
     } catch (error) {
       console.error("Logout error:", error);

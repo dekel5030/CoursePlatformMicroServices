@@ -8,22 +8,18 @@ namespace Application.AuthUsers.Commands.Logout;
 public class LogoutCommandHandler : ICommandHandler<LogoutCommand>
 {
     private readonly IWriteDbContext _dbContext;
-    private readonly IReadDbContext _readDbContext;
 
-    public LogoutCommandHandler(
-        IWriteDbContext dbContext,
-        IReadDbContext readDbContext)
+    public LogoutCommandHandler(IWriteDbContext dbContext)
     {
         _dbContext = dbContext;
-        _readDbContext = readDbContext;
     }
 
     public async Task<Result> Handle(
         LogoutCommand request,
         CancellationToken cancellationToken = default)
     {
-        // Find the user by email
-        var authUser = await _readDbContext.AuthUsers
+        // Find the user by email using write context for proper change tracking
+        var authUser = await _dbContext.AuthUsers
             .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
 
         if (authUser == null)
