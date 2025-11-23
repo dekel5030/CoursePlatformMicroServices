@@ -7,17 +7,16 @@ using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Auth;
 
-public class RefreshTokenEndpoint : IEndpoint
+public class RefreshAccessToken : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("auth/refresh-token", async (
-            ICommandHandler<RefreshTokenCommand, AuthTokensDto> handler,
+            ICommandHandler<RefreshAccessTokenCommand, string> handler,
             ITokenService tokenService,
             HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
-            // Get refresh token from cookie
             var refreshToken = CookieHelper.GetRefreshTokenFromCookie(httpContext);
 
             if (string.IsNullOrEmpty(refreshToken))
@@ -28,40 +27,19 @@ public class RefreshTokenEndpoint : IEndpoint
                     statusCode: StatusCodes.Status400BadRequest);
             }
 
-            var command = new RefreshTokenCommand(refreshToken);
+            var command = new RefreshAccessTokenCommand(refreshToken);
 
             var result = await handler.Handle(command, cancellationToken);
 
             return result.Match(
-                onSuccess: tokensDto =>
+                onSuccess: accessToken =>
                 {
-                    // Set new cookies with rotated tokens
-                    CookieHelper.SetAuthCookies(
-                        httpContext,
-                        tokenService,
-                        tokensDto.Email,
-                        tokensDto.Roles,
-                        tokensDto.Permissions,
-                        tokensDto.RefreshToken,
-                        tokensDto.RefreshTokenExpiresAt);
-                    
-                    // Return public response without tokens
-                    var response = new AuthResponseDto
-                    {
-                        AuthUserId = tokensDto.AuthUserId,
-                        UserId = tokensDto.AuthUserId,
-                        Email = tokensDto.Email,
-                        Roles = tokensDto.Roles,
-                        Permissions = tokensDto.Permissions,
-                        Message = "Token refreshed successfully"
-                    };
-                    
-                    return Results.Ok(response);
+                    return Results.Ok(accessToken);
                 },
                 onFailure: CustomResults.Problem);
         })
         .WithTags(Tags.Auth)
-        .WithName("RefreshToken")
+        .WithName("RefreshAccessToken")
         .WithSummary("Refresh access token")
         .WithDescription("Validates refresh token from cookie and issues new access and refresh tokens")
         .Produces<AuthResponseDto>(StatusCodes.Status200OK)

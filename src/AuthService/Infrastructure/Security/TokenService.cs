@@ -1,27 +1,28 @@
+using Application.Abstractions.Security;
+using Infrastructure.Jwt;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Application.Abstractions.Security;
-using Infrastructure.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Security;
 
 public class TokenService : ITokenService
 {
+
     private readonly JwtOptions _jwtOptions;
 
-    public TokenService(JwtOptions jwtOptions)
+    public TokenService(IOptions<JwtOptions> options)
     {
-        _jwtOptions = jwtOptions;
+        _jwtOptions = options.Value;
     }
 
-    public string GenerateToken(TokenRequestDto request)
+    public string GenerateAccessToken(TokenRequestDto request)
     {
         var claims = GetClaims(request);
 
-        // Use RSA asymmetric signing
         var rsa = RSA.Create();
         if (string.IsNullOrEmpty(_jwtOptions.PrivateKey))
         {
@@ -61,7 +62,6 @@ public class TokenService : ITokenService
 
     public bool ValidateRefreshToken(string refreshToken)
     {
-        // Basic validation - check if it's a valid base64 string
         if (string.IsNullOrEmpty(refreshToken))
         {
             return false;

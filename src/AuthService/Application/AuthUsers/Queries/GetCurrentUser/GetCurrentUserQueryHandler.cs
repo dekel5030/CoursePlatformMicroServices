@@ -59,6 +59,7 @@ public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, Aut
             UserId = authUser.Id.Value, // Unified ID
             Email = authUser.Email,
             Roles = roles,
+            AccessToken = null!, 
             Permissions = allPermissions
         };
 

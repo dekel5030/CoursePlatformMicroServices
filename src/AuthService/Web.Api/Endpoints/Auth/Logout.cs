@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Application.Abstractions.Messaging;
 using Application.AuthUsers.Commands.Logout;
 using Web.Api.Extensions;
@@ -15,33 +14,23 @@ public class Logout : IEndpoint
             ICommandHandler<LogoutCommand> handler,
             CancellationToken cancellationToken) =>
         {
-            // Get email from JWT claims
-            var email = httpContext.User.FindFirst(ClaimTypes.Email)?.Value 
-                        ?? httpContext.User.FindFirst("email")?.Value;
+            string? refreshToken = CookieHelper.GetRefreshTokenFromCookie(httpContext);
+            CookieHelper.ClearRefreshCookies(httpContext);
 
-            if (string.IsNullOrEmpty(email))
+            if (string.IsNullOrEmpty(refreshToken))
             {
-                // Clear cookies even if user is not authenticated
-                CookieHelper.ClearAuthCookies(httpContext);
                 return Results.Ok(new { message = "Logged out successfully" });
             }
 
-            var command = new LogoutCommand(email);
+            var command = new LogoutCommand(refreshToken);
             var result = await handler.Handle(command, cancellationToken);
 
             return result.Match(
                 onSuccess: () =>
                 {
-                    // Clear auth cookies
-                    CookieHelper.ClearAuthCookies(httpContext);
                     return Results.Ok(new { message = "Logged out successfully" });
                 },
-                onFailure: error =>
-                {
-                    // Even on failure, clear cookies for security
-                    CookieHelper.ClearAuthCookies(httpContext);
-                    return Results.Ok(new { message = "Logged out successfully" });
-                });
+                onFailure: CustomResults.Problem);
         })
         .WithTags(Tags.Auth)
         .WithName("Logout")

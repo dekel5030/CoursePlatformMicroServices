@@ -4,7 +4,7 @@ using Domain.Permissions.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Auth;
+namespace Infrastructure.DomainConfigurations;
 
 internal sealed class UserPermissionConfiguration : IEntityTypeConfiguration<UserPermission>
 {

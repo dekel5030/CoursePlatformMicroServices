@@ -13,7 +13,7 @@ public class Register : IEndpoint
     {
         app.MapPost("auth/register", async (
             RegisterRequestDto request,
-            ICommandHandler<RegisterUserCommand, AuthTokensDto> handler,
+            ICommandHandler<RegisterUserCommand, AuthTokensResult> handler,
             ITokenService tokenService,
             HttpContext httpContext,
             CancellationToken cancellationToken) =>
@@ -23,26 +23,20 @@ public class Register : IEndpoint
             var result = await handler.Handle(command, cancellationToken);
 
             return result.Match(
-                onSuccess: tokensDto =>
+                onSuccess: authTokens =>
                 {
-                    // Set cookies with tokens
-                    CookieHelper.SetAuthCookies(
+                    CookieHelper.SetRefreshTokenCookie(
                         httpContext,
-                        tokenService,
-                        tokensDto.Email,
-                        tokensDto.Roles,
-                        tokensDto.Permissions,
-                        tokensDto.RefreshToken,
-                        tokensDto.RefreshTokenExpiresAt);
+                        authTokens);
                     
-                    // Return public response without tokens
                     var response = new AuthResponseDto
                     {
-                        AuthUserId = tokensDto.AuthUserId,
-                        UserId = tokensDto.AuthUserId,
-                        Email = tokensDto.Email,
-                        Roles = tokensDto.Roles,
-                        Permissions = tokensDto.Permissions,
+                        AuthUserId = authTokens.AuthUserId,
+                        UserId = authTokens.AuthUserId,
+                        Email = authTokens.Email,
+                        Roles = authTokens.Roles,
+                        AccessToken = authTokens.AccessToken,
+                        Permissions = authTokens.Permissions,
                         Message = "Registration successful"
                     };
                     

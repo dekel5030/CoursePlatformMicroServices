@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.AuthUsers.Commands.RegisterUser;
 
-public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, AuthTokensDto>
+public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, AuthTokensResult>
 {
     private readonly IWriteDbContext _dbContext;
     private readonly IReadDbContext _readDbContext;
@@ -29,7 +29,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
         _tokenService = tokenService;
     }
 
-    public async Task<Result<AuthTokensDto>> Handle(
+    public async Task<Result<AuthTokensResult>> Handle(
         RegisterUserCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -41,7 +41,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
 
         if (existingUser != null)
         {
-            return Result.Failure<AuthTokensDto>(AuthUserErrors.DuplicateEmail);
+            return Result.Failure<AuthTokensResult>(AuthUserErrors.DuplicateEmail);
         }
 
         // Hash password
@@ -53,7 +53,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
 
         if (defaultRole == null)
         {
-            return Result.Failure<AuthTokensDto>(
+            return Result.Failure<AuthTokensResult>(
                 Error.NotFound("Role.NotFound", "Default 'User' role not found"));
         }
 
@@ -78,7 +78,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
 
         if (fullAuthUser == null)
         {
-            return Result.Failure<AuthTokensDto>(AuthUserErrors.NotFound);
+            return Result.Failure<AuthTokensResult>(AuthUserErrors.NotFound);
         }
 
         // Generate token and response
@@ -87,7 +87,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
         return Result.Success(response);
     }
 
-    private AuthTokensDto CreateAuthTokensDto(AuthUser authUser)
+    private AuthTokensResult CreateAuthTokensDto(AuthUser authUser)
     {
         var roles = authUser.UserRoles
             .Select(ur => ur.Role.Name)
@@ -114,12 +114,13 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
         var refreshTokenHash = _tokenService.HashRefreshToken(refreshToken);
         authUser.SetRefreshToken(refreshTokenHash, refreshTokenExpiresAt);
 
-        return new AuthTokensDto
+        return new AuthTokensResult
         {
             AuthUserId = authUser.Id.Value,
             Email = authUser.Email,
             Roles = roles,
             Permissions = allPermissions,
+            AccessToken = null!,
             RefreshToken = refreshToken, // Return the plain token to set in cookie
             RefreshTokenExpiresAt = refreshTokenExpiresAt
         };
