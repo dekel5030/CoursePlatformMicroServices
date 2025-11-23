@@ -32,9 +32,9 @@ public static class DependencyInjection
 
     private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
     {
-        services.AddScoped<ICommandHandler<RegisterUserCommand, AuthTokensDto>, RegisterUserCommandHandler>();
-        services.AddScoped<ICommandHandler<LoginUserCommand, AuthTokensDto>, LoginUserCommandHandler>();
-        services.AddScoped<ICommandHandler<RefreshTokenCommand, AuthTokensDto>, RefreshTokenCommandHandler>();
+        services.AddScoped<ICommandHandler<RegisterUserCommand, AuthTokensResult>, RegisterUserCommandHandler>();
+        services.AddScoped<ICommandHandler<LoginUserCommand, AuthTokensResult>, LoginUserCommandHandler>();
+        services.AddScoped<ICommandHandler<RefreshAccessTokenCommand, string>, RefreshAccessTokenCommandHandler>();
         services.AddScoped<ICommandHandler<LogoutCommand>, LogoutCommandHandler>();
 
 

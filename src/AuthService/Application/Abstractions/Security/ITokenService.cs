@@ -2,7 +2,7 @@ namespace Application.Abstractions.Security;
 
 public interface ITokenService
 {
-    string GenerateToken(TokenRequestDto tokenRequest);
+    string GenerateAccessToken(TokenRequestDto tokenRequest);
     string GenerateRefreshToken();
     bool ValidateRefreshToken(string refreshToken);
     string HashRefreshToken(string refreshToken);

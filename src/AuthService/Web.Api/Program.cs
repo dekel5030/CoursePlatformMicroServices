@@ -22,7 +22,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
-builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddJwtCookieAuthentication();
 
 var app = builder.Build();
 

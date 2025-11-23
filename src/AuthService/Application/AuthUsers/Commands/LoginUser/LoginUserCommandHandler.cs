@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.AuthUsers.Commands.LoginUser;
 
-public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTokensDto>
+public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTokensResult>
 {
     private readonly IWriteDbContext _dbContext;
     private readonly IReadDbContext _readDbContext;
@@ -28,13 +28,12 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTok
         _tokenService = tokenService;
     }
 
-    public async Task<Result<AuthTokensDto>> Handle(
+    public async Task<Result<AuthTokensResult>> Handle(
         LoginUserCommand request,
         CancellationToken cancellationToken = default)
     {
         var dto = request.Dto;
 
-        // Get user with all access data
         var authUser = await _readDbContext.AuthUsers
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
@@ -46,41 +45,37 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTok
 
         if (authUser == null)
         {
-            return Result.Failure<AuthTokensDto>(AuthUserErrors.InvalidCredentials);
+            return Result.Failure<AuthTokensResult>(AuthUserErrors.InvalidCredentials);
         }
 
-        // Check if account is locked
         if (authUser.IsLocked())
         {
-            return Result.Failure<AuthTokensDto>(AuthUserErrors.AccountLocked);
+            return Result.Failure<AuthTokensResult>(AuthUserErrors.AccountLocked);
         }
 
-        // Check if account is active
         if (!authUser.IsActive)
         {
-            return Result.Failure<AuthTokensDto>(AuthUserErrors.AccountInactive);
+            return Result.Failure<AuthTokensResult>(AuthUserErrors.AccountInactive);
         }
 
-        // Verify password
         if (!_passwordHasher.VerifyPassword(dto.Password, authUser.PasswordHash))
         {
-            // Record failed login attempt
             authUser.RecordFailedLogin();
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Failure<AuthTokensDto>(AuthUserErrors.InvalidCredentials);
+            return Result.Failure<AuthTokensResult>(AuthUserErrors.InvalidCredentials);
         }
 
         // Successful login
         authUser.Login();
         
         // Generate token and response
-        var response = CreateAuthTokensDto(authUser);
-        await _dbContext.SaveChangesAsync(cancellationToken); // Save refresh token and login state
+        var response = CreateAuthTokensResponse(authUser);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return Result.Success(response);
     }
 
-    private AuthTokensDto CreateAuthTokensDto(AuthUser authUser)
+    private AuthTokensResult CreateAuthTokensResponse(AuthUser authUser)
     {
         var roles = authUser.UserRoles
             .Select(ur => ur.Role.Name)
@@ -99,21 +94,26 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTok
             .Distinct()
             .ToList();
 
-        // Generate refresh token
         var refreshToken = _tokenService.GenerateRefreshToken();
-        var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7); // 7 days expiration
+        var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);
         
-        // Hash the refresh token before storing in the database
         var refreshTokenHash = _tokenService.HashRefreshToken(refreshToken);
         authUser.SetRefreshToken(refreshTokenHash, refreshTokenExpiresAt);
 
-        return new AuthTokensDto
+        var accessToken = _tokenService.GenerateAccessToken(
+            new TokenRequestDto { 
+                Email = authUser.Email, 
+                Permissions = allPermissions, 
+                Roles = roles});
+
+        return new AuthTokensResult
         {
             AuthUserId = authUser.Id.Value,
             Email = authUser.Email,
             Roles = roles,
             Permissions = allPermissions,
-            RefreshToken = refreshToken, // Return the plain token to set in cookie
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
             RefreshTokenExpiresAt = refreshTokenExpiresAt
         };
     }
