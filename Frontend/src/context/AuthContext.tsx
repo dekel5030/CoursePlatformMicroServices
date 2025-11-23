@@ -3,6 +3,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useCallback,
   type ReactNode,
 } from "react";
 import {
@@ -11,6 +12,7 @@ import {
   refreshAccessToken as apiRefreshAccessToken,
   type AuthResponse,
 } from "../services/AuthAPI";
+import { initializeAuthenticatedFetch } from "../utils/authenticatedFetch";
 
 export type AuthUser = AuthResponse;
 
@@ -33,6 +35,35 @@ export function AuthProvider({ children }: Props) {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const logout = useCallback(async () => {
+    await apiLogout();
+    localStorage.removeItem("currentUser");
+    setCurrentUser(null);
+  }, []);
+
+  const refreshAccessToken = useCallback(async (): Promise<string> => {
+    const newToken = await apiRefreshAccessToken();
+
+    setCurrentUser((prevUser) => {
+      if (!prevUser) return prevUser;
+
+      const updatedUser = { ...prevUser, accessToken: newToken };
+      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+      return updatedUser;
+    });
+
+    return newToken;
+  }, []);
+
+  // Initialize authenticated fetch on mount and when dependencies change
+  useEffect(() => {
+    initializeAuthenticatedFetch(
+      () => currentUser?.accessToken,
+      refreshAccessToken,
+      logout
+    );
+  }, [currentUser, refreshAccessToken, logout]);
+
   useEffect(() => {
     const storedUser = localStorage.getItem("currentUser");
     setCurrentUser(storedUser ? (JSON.parse(storedUser) as AuthUser) : null);
@@ -50,24 +81,6 @@ export function AuthProvider({ children }: Props) {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const logout = async () => {
-    await apiLogout();
-    localStorage.removeItem("currentUser");
-    setCurrentUser(null);
-  };
-
-  const refreshAccessToken = async (): Promise<string> => {
-    const newToken = await apiRefreshAccessToken();
-
-    if (!currentUser) return newToken;
-
-    const updatedUser = { ...currentUser, accessToken: newToken };
-    setCurrentUser(updatedUser);
-    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-
-    return newToken;
   };
 
   return (
