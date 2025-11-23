@@ -1,14 +1,13 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Input from "../../components/Input/Input";
+import Input from "../../../components/Input/Input";
 import styles from "./LoginPage.module.css";
-import { loginUser } from "../../services/AuthAPI";
-import { useAuth } from "../../features/auth/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { setCurrentUser } = useAuth();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -57,19 +56,9 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await loginUser(formData);
+      const authResponse = await login(formData.email, formData.password);
 
-      // Update AuthContext with logged-in user
-      setCurrentUser({
-        authUserId: response.authUserId,
-        userId: response.userId,
-        email: response.email,
-        roles: response.roles,
-        permissions: response.permissions,
-      });
-
-      // Navigate to user profile
-      navigate(`/users/${response.userId}`);
+      navigate(`/users/${authResponse.userId}`);
     } catch (err: unknown) {
       if (err instanceof Error) {
         alert(err.message);

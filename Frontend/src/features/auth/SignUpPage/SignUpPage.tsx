@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
-import Input from "../../components/Input/Input";
+import Input from "../../../components/Input/Input";
 import styles from "./SignUpPage.module.css";
 
 export default function SignUpPage() {

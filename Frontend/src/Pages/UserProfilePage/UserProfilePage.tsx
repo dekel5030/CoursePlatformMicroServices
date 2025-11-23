@@ -6,9 +6,9 @@ import {
   fetchUserById,
   updateUser,
 } from "../../services/UsersAPI";
-import { useAuth } from "../../features/auth/AuthContext";
 import EditProfileModal from "../../components/EditProfileModal/EditProfileModal";
 import styles from "./UserProfilePage.module.css";
+import { useAuth } from "../../context/AuthContext";
 
 export default function UserProfilePage() {
   const { id } = useParams<{ id: string }>();

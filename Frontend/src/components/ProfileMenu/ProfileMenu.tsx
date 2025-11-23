@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../features/auth/AuthContext";
 import styles from "./ProfileMenu.module.css";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ProfileMenu() {
   const navigate = useNavigate();
