@@ -121,7 +121,9 @@ export function createAuthenticatedFetch(
           ...init,
           headers,
         });
-      } catch {
+      } catch (error) {
+        // Log the error for debugging
+        console.error('Token refresh failed:', error);
         // If refresh fails, logout the user
         await logout();
         throw new Error('Session expired. Please login again.');
@@ -179,6 +181,9 @@ export function initializeAuthenticatedFetch(
 /**
  * Gets the global authenticated fetch instance
  * Falls back to regular fetch if not initialized (e.g., for unauthenticated requests)
+ * 
+ * Note: This is a lightweight getter that returns a cached instance. Calling it
+ * multiple times has minimal performance impact.
  * 
  * @returns The authenticated fetch function or regular fetch
  */
