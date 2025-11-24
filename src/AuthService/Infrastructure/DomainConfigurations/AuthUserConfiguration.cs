@@ -3,7 +3,7 @@ using Domain.AuthUsers.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Auth;
+namespace Infrastructure.DomainConfigurations;
 
 internal sealed class AuthUserConfiguration : IEntityTypeConfiguration<AuthUser>
 {

@@ -24,7 +24,6 @@ public class AuthUser : Entity
     public int FailedLoginAttempts { get; private set; } = 0;
     public DateTime? LockedUntil { get; private set; } = null;
     
-    // Refresh Token properties
     public string? RefreshToken { get; private set; }
     public DateTime? RefreshTokenExpiresAt { get; private set; }
 
@@ -46,10 +45,8 @@ public class AuthUser : Entity
             UserPermissions = new List<UserPermission>()
         };
 
-        // Assign default role
         authUser.AddRole(defaultRoleId);
 
-        // Raise domain event
         authUser.Raise(new UserRegisteredDomainEvent(
             authUser.Id,
             email,
@@ -172,6 +169,23 @@ public class AuthUser : Entity
         }
 
         return RefreshToken == refreshTokenHash && RefreshTokenExpiresAt.Value > DateTime.UtcNow;
+    }
+
+    public IEnumerable<Permission> GetPermissions()
+    {
+        var rolePermissions = UserRoles
+            .SelectMany(ur => ur.Role.RolePermissions)
+            .Select(rp => rp.Permission);
+        var directPermissions = UserPermissions
+            .Select(up => up.Permission);
+        return rolePermissions
+            .Concat(directPermissions)
+            .Distinct();
+    }
+
+    public IEnumerable<Role> GetRoles()
+    {
+        return UserRoles.Select(userRole => userRole.Role);
     }
 }
 

@@ -1,3 +1,5 @@
+import { getAuthenticatedFetch } from "../utils/authenticatedFetch";
+
 const API_USERS_URL = "/userservice/api";
 
 export interface User {
@@ -9,8 +11,16 @@ export interface User {
   phoneNumber?: string | null;
 }
 
+export interface UpdateUserRequest {
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: { countryCode: string; number: string } | null;
+  dateOfBirth?: string | null;
+}
+
 export async function fetchUserById(id: string): Promise<User> {
-  const response = await fetch(`${API_USERS_URL}/users/${id}`, {
+  const authFetch = getAuthenticatedFetch();
+  const response = await authFetch(`${API_USERS_URL}/users/${id}`, {
     credentials: "include",
   });
   if (!response.ok) throw new Error("Failed to fetch user");
@@ -20,9 +30,10 @@ export async function fetchUserById(id: string): Promise<User> {
 
 export async function updateUser(
   id: string,
-  data: Partial<User>
+  data: UpdateUserRequest
 ): Promise<User> {
-  const response = await fetch(`${API_USERS_URL}/users/${id}`, {
+  const authFetch = getAuthenticatedFetch();
+  const response = await authFetch(`${API_USERS_URL}/users/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

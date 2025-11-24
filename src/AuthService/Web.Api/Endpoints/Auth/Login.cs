@@ -2,6 +2,7 @@ using Application.Abstractions.Messaging;
 using Application.Abstractions.Security;
 using Application.AuthUsers.Commands.LoginUser;
 using Application.AuthUsers.Dtos;
+using Kernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
@@ -13,36 +14,29 @@ public class Login : IEndpoint
     {
         app.MapPost("auth/login", async (
             LoginRequestDto request,
-            ICommandHandler<LoginUserCommand, AuthTokensDto> handler,
-            ITokenService tokenService,
+            ICommandHandler<LoginUserCommand, AuthTokensResult> handler,
             HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
             var command = new LoginUserCommand(request);
 
-            var result = await handler.Handle(command, cancellationToken);
+            Result<AuthTokensResult> result = await handler.Handle(command, cancellationToken);
 
             return result.Match(
-                onSuccess: tokensDto =>
+                onSuccess: authTokens =>
                 {
-                    // Set cookies with tokens
-                    CookieHelper.SetAuthCookies(
+                    CookieHelper.SetRefreshTokenCookie(
                         httpContext,
-                        tokenService,
-                        tokensDto.Email,
-                        tokensDto.Roles,
-                        tokensDto.Permissions,
-                        tokensDto.RefreshToken,
-                        tokensDto.RefreshTokenExpiresAt);
+                        authTokens);
                     
-                    // Return public response without tokens
                     var response = new AuthResponseDto
                     {
-                        AuthUserId = tokensDto.AuthUserId,
-                        UserId = tokensDto.AuthUserId,
-                        Email = tokensDto.Email,
-                        Roles = tokensDto.Roles,
-                        Permissions = tokensDto.Permissions,
+                        AuthUserId = authTokens.AuthUserId,
+                        UserId = authTokens.AuthUserId,
+                        Email = authTokens.Email,
+                        Roles = authTokens.Roles,
+                        Permissions = authTokens.Permissions,
+                        AccessToken = authTokens.AccessToken,
                         Message = "Login successful"
                     };
                     

@@ -2,8 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import HomePage from "../Pages/homePage/HomePage";
 import CoursePage from "../Pages/CoursePage/CoursePage";
 import LessonPage from "../Pages/LessonPage/LessonPage";
-import LoginPage from "../Pages/LoginPage/LoginPage";
-import SignUpPage from "../Pages/SignUpPage/SignUpPage";
+import LoginPage from "../features/auth/LoginPage/LoginPage";
+import SignUpPage from "../features/auth/SignUpPage/SignUpPage";
 import UserProfilePage from "../Pages/UserProfilePage/UserProfilePage";
 
 export default function AppRoutes() {

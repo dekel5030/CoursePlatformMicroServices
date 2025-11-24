@@ -7,5 +7,6 @@ public class AuthResponseDto
     public required string Email { get; set; }
     public required IEnumerable<string> Roles { get; set; }
     public required IEnumerable<string> Permissions { get; set; }
+    public required string AccessToken { get; set; }
     public string? Message { get; set; }
 }

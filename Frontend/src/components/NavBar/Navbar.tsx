@@ -1,14 +1,16 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../features/auth/AuthContext";
 import styles from "./Navbar.module.css";
 import Dropdown from "../Dropdown/Dropdown";
 import Button from "../Button/Button";
 import SearchBox from "../SearchBox/SearchBox";
 import ProfileMenu from "../ProfileMenu/ProfileMenu";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) return null;
 
   const handleLoginClick = () => {
     navigate("/login");

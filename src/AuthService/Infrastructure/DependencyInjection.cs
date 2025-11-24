@@ -3,13 +3,16 @@ using Application.Abstractions.Messaging;
 using Application.Abstractions.Security;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
+using Infrastructure.Jwt;
 using Infrastructure.MassTransit;
 using Infrastructure.Security;
 using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure;
 
@@ -25,7 +28,9 @@ public static class DependencyInjection
             .AddServices()
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
-            .AddHealthChecksInternal(configuration);
+            .AddHealthChecksInternal(configuration)
+            .AddSingleton<IConfigureOptions<JwtBearerOptions>, JwtBearerOptionsSetup>()
+            .ReadRSAKeys(configuration);
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -105,6 +110,44 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
+
+        return services;
+    }
+
+    static IServiceCollection ReadRSAKeys(
+        this IServiceCollection services, 
+        IConfiguration configuration)
+    {
+        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+
+        services.PostConfigure<JwtOptions>(options =>
+        {
+            if (!string.IsNullOrEmpty(options.PrivateKeyFile))
+            {
+                var privateKeyPath = Path.Combine(Directory.GetCurrentDirectory(), options.PrivateKeyFile);
+                if (!File.Exists(privateKeyPath))
+                    throw new InvalidOperationException($"Private key file not found: {privateKeyPath}");
+
+                options.PrivateKey = File.ReadAllText(privateKeyPath);
+            }
+
+            if (!string.IsNullOrEmpty(options.PublicKeyFile))
+            {
+                var publicKeyPath = Path.Combine(Directory.GetCurrentDirectory(), options.PublicKeyFile);
+                if (!File.Exists(publicKeyPath))
+                    throw new InvalidOperationException($"Public key file not found: {publicKeyPath}");
+
+                options.PublicKey = File.ReadAllText(publicKeyPath);
+            }
+
+            if (string.IsNullOrEmpty(options.PublicKey))
+                throw new InvalidOperationException("JWT Public Key not configured");
+            if (string.IsNullOrEmpty(options.Issuer))
+                throw new InvalidOperationException("JWT Issuer not configured");
+            if (string.IsNullOrEmpty(options.Audience))
+                throw new InvalidOperationException("JWT Audience not configured");
+        });
+
 
         return services;
     }

@@ -3,7 +3,7 @@ using Domain.Roles.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Auth;
+namespace Infrastructure.DomainConfigurations;
 
 internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
 {

@@ -18,18 +18,14 @@ public class LogoutCommandHandler : ICommandHandler<LogoutCommand>
         LogoutCommand request,
         CancellationToken cancellationToken = default)
     {
-        // Find the user by email using write context for proper change tracking
         var authUser = await _dbContext.AuthUsers
-            .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+            .FirstOrDefaultAsync(user => user.RefreshToken == request.RefreshToken, cancellationToken);
 
         if (authUser == null)
         {
-            // User not found - still return success for security reasons
-            // (don't reveal whether a user exists)
             return Result.Success();
         }
 
-        // Clear the refresh token
         authUser.ClearRefreshToken();
         await _dbContext.SaveChangesAsync(cancellationToken);
 
