@@ -33,7 +33,7 @@ interface Props {
 
 export function AuthProvider({ children }: Props) {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const logout = useCallback(async () => {
     await apiLogout();
@@ -67,6 +67,7 @@ export function AuthProvider({ children }: Props) {
   useEffect(() => {
     const storedUser = localStorage.getItem("currentUser");
     setCurrentUser(storedUser ? (JSON.parse(storedUser) as AuthUser) : null);
+    setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
