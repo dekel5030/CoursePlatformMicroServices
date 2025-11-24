@@ -1,10 +1,12 @@
+import { getAuthenticatedFetch } from "../utils/authenticatedFetch";
 import type { Course } from "../types/course";
 import type { Lesson } from "../types/Lesson";
 
 const API_COURSES_URL = "/courseservice/api";
 
 export async function fetchFeaturedCourses(): Promise<Course[]> {
-  const response = await fetch(`${API_COURSES_URL}/courses/featured`, {
+  const authFetch = getAuthenticatedFetch();
+  const response = await authFetch(`${API_COURSES_URL}/courses/featured`, {
     credentials: "include",
   });
   if (!response.ok) throw new Error("Failed to fetch featured courses");
@@ -14,7 +16,8 @@ export async function fetchFeaturedCourses(): Promise<Course[]> {
 }
 
 export async function fetchCourseById(id: string): Promise<Course> {
-  const response = await fetch(`${API_COURSES_URL}/courses/${id}`, {
+  const authFetch = getAuthenticatedFetch();
+  const response = await authFetch(`${API_COURSES_URL}/courses/${id}`, {
     credentials: "include",
   });
   if (!response.ok) throw new Error("Failed to fetch course");
@@ -23,7 +26,8 @@ export async function fetchCourseById(id: string): Promise<Course> {
 }
 
 export async function fetchLessonById(id: string): Promise<Lesson> {
-  const response = await fetch(`${API_COURSES_URL}/lessons/${id}`, {
+  const authFetch = getAuthenticatedFetch();
+  const response = await authFetch(`${API_COURSES_URL}/lessons/${id}`, {
     credentials: "include",
   });
   if (!response.ok) throw new Error("Failed to fetch lesson");
