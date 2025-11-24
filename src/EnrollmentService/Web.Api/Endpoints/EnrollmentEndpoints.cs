@@ -17,7 +17,7 @@ public static class EnrollmentEndpoints
             .WithTags("Enrollments")
             .WithOpenApi();
 
-        group.MapGet("/{id:guid}", GetEnrollmentById)
+        group.MapGet("/{id:int}", GetEnrollmentById)
             .WithName("GetEnrollmentById")
             .Produces<EnrollmentReadDto>()
             .Produces(404);
@@ -30,7 +30,7 @@ public static class EnrollmentEndpoints
             .Produces(400)
             .Produces(409);
 
-        group.MapDelete("/{id:guid}", DeleteEnrollment)
+        group.MapDelete("/{id:int}", DeleteEnrollment)
             .Produces(204)
             .Produces(404);
 
@@ -38,7 +38,7 @@ public static class EnrollmentEndpoints
     }
 
     private static async Task<IResult> GetEnrollmentById(
-        Guid id,
+        int id,
         IQueryHandler<GetEnrollmentByIdQuery, EnrollmentReadDto> handler)
     {
         var query = new GetEnrollmentByIdQuery(id);
@@ -88,7 +88,15 @@ public static class EnrollmentEndpoints
             ? Results.CreatedAtRoute(
                 "GetEnrollmentById",
                 new { id = result.Value!.Value },
-                new { id = result.Value.Value })
+                new EnrollmentReadDto
+                {
+                    Id = result.Value.Value,
+                    UserId = command.UserId,
+                    CourseId = command.CourseId,
+                    Status = EnrollmentStatus.Pending,
+                    EnrolledAt = DateTime.UtcNow,
+                    ExpiresAt = command.ExpiresAt
+                })
             : Results.Problem(
                 statusCode: result.Error!.Type == ErrorType.Conflict ? 409 : 400,
                 title: result.Error.Code,
@@ -96,7 +104,7 @@ public static class EnrollmentEndpoints
     }
 
     private static async Task<IResult> DeleteEnrollment(
-        Guid id,
+        int id,
         ICommandHandler<DeleteEnrollmentCommand> handler)
     {
         var command = new DeleteEnrollmentCommand(id);

@@ -24,7 +24,7 @@ public sealed class EnrollmentCreatedDomainEventHandler
         CancellationToken cancellationToken = default)
     {
         var integrationEvent = new EnrollmentUpsertedV1(
-            EnrollmentId: 0, // Will be mapped properly in infrastructure
+            EnrollmentId: domainEvent.EnrollmentId.Value,
             UserId: domainEvent.UserId.Value,
             CourseId: domainEvent.CourseId.Value,
             IsActive: true);

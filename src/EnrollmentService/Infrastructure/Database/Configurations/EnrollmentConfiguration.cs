@@ -19,7 +19,8 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
             .HasConversion(
                 id => id.Value,
                 value => new EnrollmentId(value))
-            .HasColumnName("id");
+            .HasColumnName("id")
+            .ValueGeneratedOnAdd();
 
         builder.Property(e => e.UserId)
             .HasConversion(

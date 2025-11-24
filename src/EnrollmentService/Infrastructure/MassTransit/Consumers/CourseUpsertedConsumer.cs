@@ -18,8 +18,8 @@ public class CourseUpsertedConsumer : IConsumer<CourseUpsertedV1>
     {
         var integrationEvent = new CourseUpsertedIntegrationEvent(
             context.Message.CourseId,
-            Title: "", // CourseUpsertedV1 doesn't have title
-            context.Message.IsPublished);
+            Title: "Course", // CourseUpsertedV1 doesn't include title - default placeholder
+            context.Message.IsPublished); // IsPublished maps to IsActive (published courses are active)
 
         await _handler.Handle(integrationEvent, context.CancellationToken);
     }

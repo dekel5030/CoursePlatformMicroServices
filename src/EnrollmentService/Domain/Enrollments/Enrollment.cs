@@ -27,7 +27,7 @@ public class Enrollment : Entity, IVersionedEntity
     {
         var enrollment = new Enrollment
         {
-            Id = new EnrollmentId(Guid.CreateVersion7()),
+            Id = new EnrollmentId(0), // Will be set by database
             UserId = userId,
             CourseId = courseId,
             Status = EnrollmentStatus.Pending,

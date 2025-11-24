@@ -3,4 +3,4 @@ using Application.Enrollments.Queries.Dtos;
 
 namespace Application.Enrollments.Queries.GetEnrollmentById;
 
-public sealed record GetEnrollmentByIdQuery(Guid EnrollmentId) : IQuery<EnrollmentReadDto>;
+public sealed record GetEnrollmentByIdQuery(int EnrollmentId) : IQuery<EnrollmentReadDto>;
