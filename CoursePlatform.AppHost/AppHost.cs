@@ -50,10 +50,10 @@ var coursesService = builder.AddProject<Projects.Course_Api>("courseservice")
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
 
 var frontend = builder.AddNpmApp("frontend", "../Frontend")
-    .WithReference(authService)   // מאפשר לפרונט גישה לכתובת של ה-Auth
-    .WithReference(usersService)  // מאפשר לפרונט גישה לכתובת של ה-Users
+    .WithReference(authService)
+    .WithReference(usersService)
     .WithReference(coursesService)
-    .WithHttpEndpoint(env: "PORT") // אומר ל-Aspire להזריק את הפורט למשתנה סביבה
-    .WithExternalHttpEndpoints(); // חושף את הפרונט החוצה לדפדפן
+    .WithHttpEndpoint(env: "PORT")
+    .WithExternalHttpEndpoints();
 
 builder.Build().Run();
