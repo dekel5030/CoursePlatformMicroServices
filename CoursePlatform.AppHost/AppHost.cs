@@ -6,6 +6,8 @@ var rabbitMq = builder
     .WithManagementPlugin(15672)
     .WithDataVolume();
 
+// ADD FRONTEDND TO BE IMPLEMENTED
+
 // AuthService configuration
 
 var authDb = builder
