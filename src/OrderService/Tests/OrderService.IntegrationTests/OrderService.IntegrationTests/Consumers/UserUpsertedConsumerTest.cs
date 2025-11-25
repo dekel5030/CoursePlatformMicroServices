@@ -87,7 +87,4 @@ public class UserUpsertedConsumerTest: IntegrationTestsBase
         final.IsActive.Should().BeFalse();
         final.EntityVersion.Should().Be(3);
     }
-
-
-
 }
