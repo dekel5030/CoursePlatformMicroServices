@@ -1,32 +1,44 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
+export default defineConfig(({ mode }) => {
+  // טוען משתני סביבה (אם יש)
+  const env = loadEnv(mode, process.cwd(), "");
 
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    host: true, // מאפשר גישה מחוץ ל-localhost (קריטי לדוקר/aspire)
-    port: process.env.PORT ? parseInt(process.env.PORT) : 5173, // שימוש בפורט ש-Aspire מקצה
-    strictPort: true, // אם הפורט תפוס - אל תחליף פורט, אלא תכשיל (כדי ש-Aspire ידע שיש בעיה)
-    proxy: {
-      "/auth": {
-        target: "https://localhost:7233",
-        changeOrigin: true,
-        secure: false,
-      },
-      "/courseservice": {
-        target: "https://localhost:7171",
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/courseservice/, ""),
-      },
-      "/userservice": {
-        target: "https://localhost:7079",
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/userservice/, ""),
+  const authUrl =
+    process.env.services__authservice__https__0 ||
+    process.env.services__authservice__http__0;
+  const usersUrl =
+    process.env.services__userservice__https__0 ||
+    process.env.services__userservice__http__0;
+  const coursesUrl =
+    process.env.services__courseservice__https__0 ||
+    process.env.services__courseservice__http__0;
+
+  return {
+    plugins: [react()],
+    server: {
+      host: true,
+      port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
+      proxy: {
+        "/auth": {
+          target: authUrl,
+          changeOrigin: true,
+          secure: false,
+        },
+        "/userservice": {
+          target: usersUrl,
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/userservice/, ""),
+        },
+        "/courseservice": {
+          target: coursesUrl,
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/courseservice/, ""),
+        },
       },
     },
-  },
+  };
 });

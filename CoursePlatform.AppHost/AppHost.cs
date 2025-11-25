@@ -49,7 +49,7 @@ var coursesService = builder.AddProject<Projects.Course_Api>("courseservice")
     .WithEnvironment("ConnectionStrings:WriteDatabase", coursesDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
 
-var frontend = builder.AddNpmApp("frontend", "../Frontend")
+var frontend = builder.AddNpmApp("frontend", "../Frontend", "dev")
     .WithReference(authService)
     .WithReference(usersService)
     .WithReference(coursesService)
