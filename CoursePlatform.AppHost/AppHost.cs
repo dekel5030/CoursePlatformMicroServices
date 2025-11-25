@@ -6,8 +6,6 @@ var rabbitMq = builder
     .WithManagementPlugin(15672)
     .WithDataVolume();
 
-// ADD FRONTEDND TO BE IMPLEMENTED
-
 // AuthService configuration
 
 var authDb = builder
@@ -50,5 +48,12 @@ var coursesService = builder.AddProject<Projects.Course_Api>("courseservice")
     .WithEnvironment("ConnectionStrings:ReadDatabase", coursesDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:WriteDatabase", coursesDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
+
+var frontend = builder.AddNpmApp("frontend", "../Frontend")
+    .WithReference(authService)   // מאפשר לפרונט גישה לכתובת של ה-Auth
+    .WithReference(usersService)  // מאפשר לפרונט גישה לכתובת של ה-Users
+    .WithReference(coursesService)
+    .WithHttpEndpoint(env: "PORT") // אומר ל-Aspire להזריק את הפורט למשתנה סביבה
+    .WithExternalHttpEndpoints(); // חושף את הפרונט החוצה לדפדפן
 
 builder.Build().Run();

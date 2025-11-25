@@ -6,6 +6,9 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: true, // מאפשר גישה מחוץ ל-localhost (קריטי לדוקר/aspire)
+    port: process.env.PORT ? parseInt(process.env.PORT) : 5173, // שימוש בפורט ש-Aspire מקצה
+    strictPort: true, // אם הפורט תפוס - אל תחליף פורט, אלא תכשיל (כדי ש-Aspire ידע שיש בעיה)
     proxy: {
       "/auth": {
         target: "https://localhost:7233",
