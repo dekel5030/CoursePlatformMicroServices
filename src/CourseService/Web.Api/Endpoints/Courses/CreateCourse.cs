@@ -1,11 +1,12 @@
 ﻿
 using Application.Abstractions.Messaging;
 using Application.Courses.Commands.CreateCourse;
+using Course.Api.Endpoints;
+using Course.Api.Extensions;
+using Course.Api.Infrastructure;
 using Domain.Courses.Primitives;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Courses;
+namespace Course.Api.Endpoints.Courses;
 
 public class CreateCourse : IEndpoint
 {

@@ -4,10 +4,11 @@ using Application.Users.Queries.Dtos;
 using Application.Users.Queries.GetUserByid;
 using Application.Users.Queries.GetUsers;
 using Kernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+using User.Api.Endpoints;
+using User.Api.Extensions;
+using User.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Users;
+namespace User.Api.Endpoints.Users.Queries;
 
 public class GetUserById : IEndpoint
 {

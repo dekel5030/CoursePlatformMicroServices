@@ -1,12 +1,13 @@
 using Application.Abstractions.Messaging;
 using Application.Courses.Queries.Dtos;
 using Application.Lessons.Queries.GetById;
+using Course.Api.Endpoints;
+using Course.Api.Extensions;
+using Course.Api.Infrastructure;
 using Domain.Lessons.Primitives;
 using Kernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Lessons;
+namespace Course.Api.Endpoints.Lessons;
 
 internal sealed class GetById : IEndpoint
 {

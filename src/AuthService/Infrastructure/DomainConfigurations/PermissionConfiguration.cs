@@ -1,5 +1,5 @@
-﻿using Domain.Permissions.Primitives;
-using Domain.Roles;
+﻿using Domain.Permissions;
+using Domain.Permissions.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

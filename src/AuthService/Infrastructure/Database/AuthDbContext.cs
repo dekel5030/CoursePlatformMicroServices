@@ -1,6 +1,7 @@
 using Application.Abstractions.Data;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Primitives;
+using Domain.Permissions;
 using Domain.Permissions.Primitives;
 using Domain.Roles;
 using Domain.Roles.Primitives;

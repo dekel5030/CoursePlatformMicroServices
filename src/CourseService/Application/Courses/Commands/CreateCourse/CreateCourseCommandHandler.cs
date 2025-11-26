@@ -3,7 +3,6 @@ using Application.Abstractions.Messaging;
 using Domain.Courses;
 using Domain.Courses.Primitives;
 using Kernel;
-using SharedKernel;
 
 namespace Application.Courses.Commands.CreateCourse;
 

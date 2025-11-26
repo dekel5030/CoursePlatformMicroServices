@@ -1,6 +1,6 @@
-﻿using Web.Api.Infrastructure;
+﻿using User.Api.Infrastructure;
 
-namespace Web.Api;
+namespace User.Api;
 
 public static class DependencyInjection
 {

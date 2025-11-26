@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.AuthUsers.Commands.LoginUser;
 using Application.AuthUsers.Commands.Logout;
-using Application.AuthUsers.Commands.RefreshToken;
+using Application.AuthUsers.Commands.RefreshAccessToken;
 using Application.AuthUsers.Commands.RegisterUser;
 using Application.AuthUsers.Dtos;
 using Application.AuthUsers.Events;

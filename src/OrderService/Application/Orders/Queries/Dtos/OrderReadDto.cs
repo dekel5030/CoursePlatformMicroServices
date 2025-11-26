@@ -1,4 +1,5 @@
-﻿using SharedKernel;
+﻿using Kernel;
+using SharedKernel;
 
 namespace Application.Orders.Queries.Dtos;
 

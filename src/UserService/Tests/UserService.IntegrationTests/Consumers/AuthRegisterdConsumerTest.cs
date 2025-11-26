@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace OrderService.IntegrationTests.Consumers;
+namespace UserService.IntegrationTests.Consumers;
 
 public class AuthRegisterdConsumerTest : IntegrationTestsBase
 {

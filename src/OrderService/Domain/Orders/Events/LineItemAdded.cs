@@ -1,5 +1,6 @@
 ﻿using SharedKernel;
 using Domain.Orders.Primitives;
+using Kernel;
 
 namespace Domain.Orders.Events;
 

@@ -2,10 +2,11 @@ using System.Security.Claims;
 using Application.Abstractions.Messaging;
 using Application.AuthUsers.Dtos;
 using Application.AuthUsers.Queries.GetCurrentUser;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+using Auth.Api.Endpoints;
+using Auth.Api.Extensions;
+using Auth.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Auth;
+namespace Auth.Api.Endpoints.Auth;
 
 public class Me : IEndpoint
 {

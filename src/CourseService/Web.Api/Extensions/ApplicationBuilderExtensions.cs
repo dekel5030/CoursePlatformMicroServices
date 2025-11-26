@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Extensions;
+﻿namespace Course.Api.Extensions;
 
 public static class ApplicationBuilderExtensions
 {

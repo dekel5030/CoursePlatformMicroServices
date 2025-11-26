@@ -1,10 +1,10 @@
 using Application.Abstractions.Messaging;
 using Application.Lessons.Commands.CreateLesson;
+using Course.Api.Extensions;
+using Course.Api.Infrastructure;
 using Domain.Lessons.Primitives;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Lessons;
+namespace Course.Api.Endpoints.Lessons;
 
 public class CreateLesson : IEndpoint
 {
