@@ -3,6 +3,7 @@ using Application.Abstractions.Messaging;
 using Domain.Users.Events;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
+using Infrastructure.Jwt;
 using Infrastructure.MassTransit;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ public static class DependencyInjection
         // Register domain event handlers in Infrastructure layer
         services.AddScoped<IDomainEventHandler<UserProfileCreatedDomainEvent>, UserProfileCreatedDomainEventHandler>();
 
+        services.ConfigureJwtAuthentication(configuration);
         return services;
     }
 
