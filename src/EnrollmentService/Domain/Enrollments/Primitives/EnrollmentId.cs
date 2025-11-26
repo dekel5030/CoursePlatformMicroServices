@@ -1,3 +1,3 @@
 namespace Domain.Enrollments.Primitives;
 
-public record EnrollmentId(int Value);
+public record EnrollmentId(Guid Value);

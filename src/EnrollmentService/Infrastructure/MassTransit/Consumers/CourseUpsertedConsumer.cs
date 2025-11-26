@@ -1,25 +1,26 @@
+using Application.Abstractions.Messaging;
 using Application.Courses.IntegrationEvents;
 using Courses.Contracts.Events;
 using MassTransit;
 
 namespace Infrastructure.MassTransit.Consumers;
 
-public class CourseUpsertedConsumer : IConsumer<CourseUpsertedV1>
+public class CourseUpsertedConsumer : IConsumer<CourseUpserted>
 {
-    private readonly Application.Abstractions.Messaging.IIntegrationEventHandler<CourseUpsertedIntegrationEvent> _handler;
+    private readonly IIntegrationEventHandler<CourseUpsertedIntegrationEvent> _handler;
 
     public CourseUpsertedConsumer(
-        Application.Abstractions.Messaging.IIntegrationEventHandler<CourseUpsertedIntegrationEvent> handler)
+        IIntegrationEventHandler<CourseUpsertedIntegrationEvent> handler)
     {
         _handler = handler;
     }
 
-    public async Task Consume(ConsumeContext<CourseUpsertedV1> context)
+    public async Task Consume(ConsumeContext<CourseUpserted> context)
     {
         var integrationEvent = new CourseUpsertedIntegrationEvent(
             context.Message.CourseId,
-            Title: "Course", // CourseUpsertedV1 doesn't include title - default placeholder
-            context.Message.IsPublished); // IsPublished maps to IsActive (published courses are active)
+            Title: context.Message.Title,
+            context.Message.IsPublished);
 
         await _handler.Handle(integrationEvent, context.CancellationToken);
     }

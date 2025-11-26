@@ -1,7 +1,7 @@
-using Kernel;
+﻿using Kernel;
 using Microsoft.AspNetCore.Diagnostics;
 
-namespace Web.Api.Infrastructure;
+namespace Enrollments.Api.Infrastructure;
 
 public class GlobalExceptionHandler : IExceptionHandler
 {

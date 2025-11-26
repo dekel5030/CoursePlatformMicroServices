@@ -1,8 +1,9 @@
-using SharedKernel;
+﻿using SharedKernel;
 
 namespace Application.Abstractions.Messaging;
 
-public interface IDomainEventHandler<in TDomainEvent> where TDomainEvent : IDomainEvent
+public interface IDomainEventHandler<TEvent>
+    where TEvent : IDomainEvent
 {
-    Task Handle(TDomainEvent domainEvent, CancellationToken cancellationToken = default);
+    Task Handle(TEvent domainEvent, CancellationToken cancellationToken = default);
 }

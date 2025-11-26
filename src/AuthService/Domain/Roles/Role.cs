@@ -1,3 +1,4 @@
+using Domain.Permissions;
 using Domain.Permissions.Primitives;
 using Domain.Roles.Primitives;
 using SharedKernel;

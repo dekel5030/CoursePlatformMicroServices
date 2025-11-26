@@ -1,16 +1,11 @@
-using Kernel;
+﻿using Kernel;
 
 namespace Application.Abstractions.Messaging;
 
-public interface ICommandHandler<in TCommand>
+public interface ICommandHandler<TCommand> : IHandler<TCommand, Result>
     where TCommand : ICommand
-{
-    Task<Result> Handle(TCommand command, CancellationToken cancellationToken = default);
-}
+{ }
 
-public interface ICommandHandler<in TCommand, TResponse>
+public interface ICommandHandler<TCommand, TResponse> : IHandler<TCommand, Result<TResponse>>
     where TCommand : ICommand<TResponse>
-    where TResponse : notnull
-{
-    Task<Result<TResponse>> Handle(TCommand command, CancellationToken cancellationToken = default);
-}
+{}

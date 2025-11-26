@@ -2,7 +2,6 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Enrollments.Queries.Dtos;
 using Domain.Enrollments.Errors;
-using Domain.Enrollments.Primitives;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,13 +21,11 @@ public sealed class GetEnrollmentByIdQueryHandler
         GetEnrollmentByIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var enrollmentId = new EnrollmentId(query.EnrollmentId);
-
         var enrollment = await _dbContext.Enrollments
-            .Where(e => e.Id == enrollmentId)
+            .Where(e => e.Id == query.Id)
             .Select(e => new EnrollmentReadDto
             {
-                Id = e.Id.Value,
+                Id = e.Id.Value.ToString(),
                 UserId = e.UserId.Value,
                 CourseId = e.CourseId.Value,
                 Status = e.Status,

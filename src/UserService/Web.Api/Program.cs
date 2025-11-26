@@ -1,7 +1,7 @@
 using Application;
 using Infrastructure;
-using Web.Api.Endpoints;
-using Web.Api.Extensions;
+using User.Api.Endpoints;
+using User.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

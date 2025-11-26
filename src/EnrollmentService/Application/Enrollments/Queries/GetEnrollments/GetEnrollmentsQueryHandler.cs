@@ -1,8 +1,8 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Enrollments.Queries.Dtos;
-using Domain.Users.Primitives;
 using Domain.Courses.Primitives;
+using Domain.Users.Primitives;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,34 +22,35 @@ public sealed class GetEnrollmentsQueryHandler
         GetEnrollmentsQuery query,
         CancellationToken cancellationToken = default)
     {
+        var queryParams = query.Params;
         var queryable = _dbContext.Enrollments.AsQueryable();
 
-        if (query.UserId.HasValue)
+        if (queryParams.UserId is not null)
         {
-            var userId = new ExternalUserId(query.UserId.Value);
+            var userId = new ExternalUserId(queryParams.UserId);
             queryable = queryable.Where(e => e.UserId == userId);
         }
 
-        if (query.CourseId.HasValue)
+        if (queryParams.CourseId is not null)
         {
-            var courseId = new ExternalCourseId(query.CourseId.Value);
+            var courseId = new ExternalCourseId(queryParams.CourseId);
             queryable = queryable.Where(e => e.CourseId == courseId);
         }
 
-        if (query.Status.HasValue)
+        if (queryParams.Status is not null)
         {
-            queryable = queryable.Where(e => e.Status == query.Status.Value);
+            queryable = queryable.Where(e => e.Status.ToString() == queryParams.Status);
         }
 
         var totalCount = await queryable.CountAsync(cancellationToken);
 
         var enrollments = await queryable
             .OrderByDescending(e => e.EnrolledAt)
-            .Skip((query.PageNumber - 1) * query.PageSize)
-            .Take(query.PageSize)
+            .Skip((queryParams.PageNumber - 1) * queryParams.PageSize)
+            .Take(queryParams.PageSize)
             .Select(e => new EnrollmentReadDto
             {
-                Id = e.Id.Value,
+                Id = e.Id.Value.ToString(),
                 UserId = e.UserId.Value,
                 CourseId = e.CourseId.Value,
                 Status = e.Status,
@@ -62,8 +63,8 @@ public sealed class GetEnrollmentsQueryHandler
         {
             Items = enrollments,
             TotalCount = totalCount,
-            PageSize = query.PageSize,
-            PageNumber = query.PageNumber
+            PageSize = queryParams.PageSize,
+            PageNumber = queryParams.PageNumber
         });
     }
 }

@@ -1,3 +1,3 @@
 namespace Domain.Users.Primitives;
 
-public record ExternalUserId(int Value);
+public record ExternalUserId(string Value);

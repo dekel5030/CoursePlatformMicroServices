@@ -1,8 +1,8 @@
-using SharedKernel;
+﻿using SharedKernel;
 
 namespace Infrastructure.DomainEvents;
 
 public interface IDomainEventsDispatcher
 {
-    Task DispatchAsync(IEnumerable<Entity> entities, CancellationToken cancellationToken = default);
+    Task DispatchAsync(IEnumerable<IDomainEvent> domainEvents, CancellationToken cancellationToken = default);
 }

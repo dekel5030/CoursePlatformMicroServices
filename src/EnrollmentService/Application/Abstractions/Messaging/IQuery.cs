@@ -1,5 +1,3 @@
-namespace Application.Abstractions.Messaging;
+﻿namespace Application.Abstractions.Messaging;
 
-public interface IQuery<TResponse> where TResponse : notnull
-{
-}
+public interface IQuery<TResponse>;

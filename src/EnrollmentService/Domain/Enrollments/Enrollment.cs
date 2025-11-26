@@ -8,15 +8,15 @@ using SharedKernel;
 
 namespace Domain.Enrollments;
 
-public class Enrollment : Entity, IVersionedEntity
+public class Enrollment : Entity
 {
     private Enrollment() { }
 
-    public EnrollmentId Id { get; private set; }
-    public ExternalUserId UserId { get; private set; }
-    public ExternalCourseId CourseId { get; private set; }
-    public EnrollmentStatus Status { get; private set; }
-    public DateTime EnrolledAt { get; private set; }
+    public EnrollmentId Id { get; private set; } = null!;
+    public ExternalUserId UserId { get; private set; } = null!;
+    public ExternalCourseId CourseId { get; private set; } = null!;
+    public EnrollmentStatus Status { get; private set; } = EnrollmentStatus.Pending;
+    public DateTime EnrolledAt { get; private set; } = DateTime.UtcNow;
     public DateTime? ExpiresAt { get; private set; }
     public long EntityVersion { get; private set; }
 
@@ -27,7 +27,7 @@ public class Enrollment : Entity, IVersionedEntity
     {
         var enrollment = new Enrollment
         {
-            Id = new EnrollmentId(0), // Will be set by database
+            Id = new EnrollmentId(Guid.CreateVersion7()),
             UserId = userId,
             CourseId = courseId,
             Status = EnrollmentStatus.Pending,

@@ -1,4 +1,5 @@
 using Domain.AuthUsers;
+using Domain.Permissions;
 using Domain.Roles;
 using Microsoft.EntityFrameworkCore;
 

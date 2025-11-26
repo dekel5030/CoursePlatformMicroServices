@@ -11,7 +11,7 @@ using Testcontainers.RabbitMq;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace OrderService.IntegrationTests;
+namespace UserService.IntegrationTests;
 
 public abstract class IntegrationTestsBase : IAsyncLifetime
 {

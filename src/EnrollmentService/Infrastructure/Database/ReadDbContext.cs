@@ -10,9 +10,9 @@ public class ReadDbContext : DbContext, IReadDbContext
 {
     public ReadDbContext(DbContextOptions<ReadDbContext> options) : base(options) { }
 
-    public DbSet<Enrollment> Enrollments => Set<Enrollment>();
-    public DbSet<KnownUser> KnownUsers => Set<KnownUser>();
-    public DbSet<KnownCourse> KnownCourses => Set<KnownCourse>();
+    public DbSet<Enrollment> Enrollments { get; set; }
+    public DbSet<KnownUser> KnownUsers { get; set; }
+    public DbSet<KnownCourse> KnownCourses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

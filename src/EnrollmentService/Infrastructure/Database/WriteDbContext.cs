@@ -1,9 +1,10 @@
 using Application.Abstractions.Data;
+using Domain.Courses;
 using Domain.Enrollments;
 using Domain.Users;
-using Domain.Courses;
 using Infrastructure.DomainEvents;
 using Kernel;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -20,48 +21,43 @@ public class WriteDbContext : DbContext, IWriteDbContext
         _domainEventsDispatcher = domainEventsDispatcher;
     }
 
-    public DbSet<Enrollment> Enrollments => Set<Enrollment>();
-    public DbSet<KnownUser> KnownUsers => Set<KnownUser>();
-    public DbSet<KnownCourse> KnownCourses => Set<KnownCourse>();
+    public DbSet<Enrollment> Enrollments { get; set; }
+    public DbSet<KnownUser> KnownUsers { get; set; }
+    public DbSet<KnownCourse> KnownCourses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema(Schemas.Default);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(WriteDbContext).Assembly);
+        modelBuilder.AddTransactionalOutboxEntities();
 
         base.OnModelCreating(modelBuilder);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        UpdateEntityVersions();
+        await DispatchDomainEvents(this, cancellationToken);
 
-        var entities = ChangeTracker
-            .Entries<Entity>()
-            .Where(e => e.Entity.DomainEvents.Any())
-            .Select(e => e.Entity)
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    private Task DispatchDomainEvents(
+        DbContext dbContext,
+        CancellationToken cancellationToken = default)
+    {
+        IEnumerable<Entity> entities = dbContext.ChangeTracker.Entries<Entity>()
+            .Select(entry => entry.Entity);
+
+        List<IDomainEvent> domainEvents = entities
+            .SelectMany(entity => entity.DomainEvents)
             .ToList();
 
-        var result = await base.SaveChangesAsync(cancellationToken);
-
-        await _domainEventsDispatcher.DispatchAsync(entities, cancellationToken);
-
-        return result;
-    }
-
-    private void UpdateEntityVersions()
-    {
-        foreach (var entry in ChangeTracker.Entries<IVersionedEntity>())
+        foreach (Entity entity in entities)
         {
-            if (entry.State == EntityState.Added)
-            {
-                entry.Property(nameof(IVersionedEntity.EntityVersion)).CurrentValue = 1L;
-            }
-            else if (entry.State == EntityState.Modified)
-            {
-                var currentVersion = (long)entry.Property(nameof(IVersionedEntity.EntityVersion)).CurrentValue!;
-                entry.Property(nameof(IVersionedEntity.EntityVersion)).CurrentValue = currentVersion + 1;
-            }
+            entity.ClearDomainEvents();
         }
+
+        return _domainEventsDispatcher.DispatchAsync(domainEvents, cancellationToken);
     }
+
 }

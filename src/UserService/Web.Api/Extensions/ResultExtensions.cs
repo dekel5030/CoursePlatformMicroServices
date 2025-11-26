@@ -1,6 +1,6 @@
 ﻿using Kernel;
 
-namespace Web.Api.Extensions;
+namespace User.Api.Extensions;
 
 public static class ResultExtensions
 {

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Products;
 using SharedKernel;
 using Domain.Products.Primitives;
+using Kernel;
 
 namespace Application.Products.IntegrationEvents.ProductPublished;
 

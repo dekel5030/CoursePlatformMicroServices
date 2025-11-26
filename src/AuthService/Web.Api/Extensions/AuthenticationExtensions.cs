@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 
-namespace Web.Api.Extensions;
+namespace Auth.Api.Extensions;
 
 public static class AuthenticationExtensions
 {

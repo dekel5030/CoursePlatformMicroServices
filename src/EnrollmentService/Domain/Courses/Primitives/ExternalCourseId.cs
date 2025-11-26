@@ -1,3 +1,3 @@
 namespace Domain.Courses.Primitives;
 
-public record ExternalCourseId(int Value);
+public record ExternalCourseId(string Value);

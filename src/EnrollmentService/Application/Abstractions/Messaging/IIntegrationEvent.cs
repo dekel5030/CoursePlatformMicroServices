@@ -1,5 +1,4 @@
-namespace Application.Abstractions.Messaging;
+﻿namespace Application.Abstractions.Messaging;
 
-public interface IIntegrationEvent
-{
-}
+public interface IIntegrationEvent { }
+

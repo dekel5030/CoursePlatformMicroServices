@@ -26,21 +26,19 @@ public sealed class DeleteEnrollmentCommandHandler
         DeleteEnrollmentCommand command,
         CancellationToken cancellationToken = default)
     {
-        var enrollmentId = new EnrollmentId(command.EnrollmentId);
-
         var enrollment = await _dbContext.Enrollments
-            .FirstOrDefaultAsync(e => e.Id == enrollmentId, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == command.Id, cancellationToken);
 
         if (enrollment is null)
         {
-            _logger.LogWarning("Enrollment {EnrollmentId} not found", command.EnrollmentId);
+            _logger.LogWarning("Enrollment {EnrollmentId} not found", command.Id);
             return Result.Failure(EnrollmentErrors.EnrollmentNotFound);
         }
 
         _dbContext.Enrollments.Remove(enrollment);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("Enrollment {EnrollmentId} deleted", command.EnrollmentId);
+        _logger.LogInformation("Enrollment {EnrollmentId} deleted", command.Id);
 
         return Result.Success();
     }

@@ -1,4 +1,4 @@
-﻿namespace SharedKernel;
+﻿namespace Kernel;
 
 public sealed record Money(decimal Amount, string Currency)
 {

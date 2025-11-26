@@ -1,11 +1,5 @@
-using Kernel;
+﻿namespace Application.Abstractions.Messaging;
 
-namespace Application.Abstractions.Messaging;
+public interface ICommand;
 
-public interface ICommand
-{
-}
-
-public interface ICommand<TResponse> where TResponse : notnull
-{
-}
+public interface ICommand<TResponse>;

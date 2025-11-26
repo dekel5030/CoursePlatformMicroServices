@@ -6,7 +6,7 @@ public class KnownCourse
 {
     private KnownCourse() { }
 
-    public ExternalCourseId CourseId { get; private set; }
+    public ExternalCourseId CourseId { get; private set; } = new ExternalCourseId(string.Empty);
     public string Title { get; private set; } = string.Empty;
     public bool IsActive { get; private set; }
 

@@ -1,6 +1,6 @@
-using Web.Api.Infrastructure;
+using Enrollments.Api.Infrastructure;
 
-namespace Web.Api;
+namespace Enrollments.Api;
 
 public static class DependencyInjection
 {

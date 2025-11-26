@@ -6,7 +6,7 @@ public class KnownUser
 {
     private KnownUser() { }
 
-    public ExternalUserId UserId { get; private set; }
+    public ExternalUserId UserId { get; private set; } = null!;
     public string Name { get; private set; } = string.Empty;
     public bool IsActive { get; private set; }
 

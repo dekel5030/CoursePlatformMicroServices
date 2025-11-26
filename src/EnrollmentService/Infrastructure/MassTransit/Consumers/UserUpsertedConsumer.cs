@@ -1,20 +1,21 @@
+using Application.Abstractions.Messaging;
 using Application.Users.IntegrationEvents;
 using MassTransit;
 using Users.Contracts.Events;
 
 namespace Infrastructure.MassTransit.Consumers;
 
-public class UserUpsertedConsumer : IConsumer<UserUpsertedV1>
+public class UserUpsertedConsumer : IConsumer<UserUpserted>
 {
-    private readonly Application.Abstractions.Messaging.IIntegrationEventHandler<UserUpsertedIntegrationEvent> _handler;
+    private readonly IIntegrationEventHandler<UserUpsertedIntegrationEvent> _handler;
 
     public UserUpsertedConsumer(
-        Application.Abstractions.Messaging.IIntegrationEventHandler<UserUpsertedIntegrationEvent> handler)
+        IIntegrationEventHandler<UserUpsertedIntegrationEvent> handler)
     {
         _handler = handler;
     }
 
-    public async Task Consume(ConsumeContext<UserUpsertedV1> context)
+    public async Task Consume(ConsumeContext<UserUpserted> context)
     {
         var integrationEvent = new UserUpsertedIntegrationEvent(
             context.Message.UserId,

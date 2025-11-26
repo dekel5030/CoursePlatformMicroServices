@@ -1,10 +1,7 @@
-using Kernel;
+﻿using Kernel;
 
 namespace Application.Abstractions.Messaging;
 
-public interface IQueryHandler<in TQuery, TResponse>
+public interface IQueryHandler<TQuery, TResponse> : IHandler<TQuery, Result<TResponse>>
     where TQuery : IQuery<TResponse>
-    where TResponse : notnull
-{
-    Task<Result<TResponse>> Handle(TQuery query, CancellationToken cancellationToken = default);
-}
+{ }
