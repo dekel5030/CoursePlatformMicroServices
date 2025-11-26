@@ -7,12 +7,10 @@ using Infrastructure.Jwt;
 using Infrastructure.MassTransit;
 using Infrastructure.Security;
 using MassTransit;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Infrastructure;
 
@@ -29,8 +27,7 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
-            .AddSingleton<IConfigureOptions<JwtBearerOptions>, JwtBearerOptionsSetup>()
-            .ReadRSAKeys(configuration);
+            .ConfigureJwtAuthentication(configuration);
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -110,15 +107,6 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
-
-        return services;
-    }
-
-    private static IServiceCollection ReadRSAKeys(
-        this IServiceCollection services, 
-        IConfiguration configuration)
-    {
-        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
 
         return services;
     }
