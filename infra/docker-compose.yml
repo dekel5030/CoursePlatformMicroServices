@@ -12,7 +12,7 @@ services:
     ports:
       - "${USERSERVICE_DB_PORT}:5432"
     volumes:
-      - userservice-data:/var/lib/postgresql/data
+      - C:\AspireVolumes\UsersService:/var/lib/postgresql/data
 
   userservice-srv:
     build:
@@ -38,7 +38,7 @@ services:
     ports:
       - "${AUTHSERVICE_DB_PORT}:5432"
     volumes:
-      - authservice-data:/var/lib/postgresql/data
+      - C:\AspireVolumes\AuthService:/var/lib/postgresql/data
 
   courseservice-db-srv:
     image: postgres:16
@@ -51,7 +51,7 @@ services:
     ports:
       - "${COURSESERVICE_DB_PORT}:5432"
     volumes:
-      - courseservice-data:/var/lib/postgresql/data
+      - C:\AspireVolumes\CourseService:/var/lib/postgresql/data
 
   enrollmentservice-db-srv:
     image: postgres:16
@@ -64,7 +64,7 @@ services:
     ports:
       - "${ENROLLMENTSERVICE_DB_PORT}:5432"
     volumes:
-      - enrollmentservice-data:/var/lib/postgresql/data
+      - C:\AspireVolumes\EnrollmentService:/var/lib/postgresql/data
 
   orderservice-db-srv:
     image: postgres:16
@@ -77,11 +77,4 @@ services:
     ports:
       - "${ORDERSERVICE_DB_PORT}:5432"
     volumes:
-      - orderservice-data:/var/lib/postgresql/data
-
-volumes:
-  userservice-data:
-  authservice-data:
-  courseservice-data:
-  enrollmentservice-data:
-  orderservice-data:
+      - C:\AspireVolumes\OrderService:/var/lib/postgresql/data
