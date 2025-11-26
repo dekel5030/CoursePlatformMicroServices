@@ -9,12 +9,12 @@ using System.Text;
 
 namespace Infrastructure.Security;
 
-public class TokenService : ITokenService
+public class JwtTokenService : ITokenService
 {
 
     private readonly JwtOptions _jwtOptions;
 
-    public TokenService(IOptions<JwtOptions> options)
+    public JwtTokenService(IOptions<JwtOptions> options)
     {
         _jwtOptions = options.Value;
     }
@@ -22,8 +22,8 @@ public class TokenService : ITokenService
     public string GenerateAccessToken(TokenRequestDto request)
     {
         var claims = GetClaims(request);
-
         var rsa = RSA.Create();
+
         if (string.IsNullOrEmpty(_jwtOptions.PrivateKey))
         {
             throw new InvalidOperationException("JWT Private Key not configured");

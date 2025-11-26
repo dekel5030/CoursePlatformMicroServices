@@ -12,8 +12,8 @@ public class MassTransitEventPublisher : IEventPublisher
         _publishEndpoint = publishEndpoint;
     }
 
-    public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
-        where TEvent : class
+    public async Task Publish<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
+        where TEvent : notnull
     {
         await _publishEndpoint.Publish(@event, cancellationToken);
     }

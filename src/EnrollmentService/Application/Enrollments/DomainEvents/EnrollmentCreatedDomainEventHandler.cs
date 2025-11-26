@@ -29,7 +29,7 @@ public sealed class EnrollmentCreatedDomainEventHandler
             CourseId: domainEvent.CourseId.Value,
             IsActive: true);
 
-        await _eventPublisher.PublishAsync(integrationEvent, cancellationToken);
+        await _eventPublisher.Publish(integrationEvent, cancellationToken);
 
         _logger.LogInformation("Published EnrollmentUpserted for EnrollmentId: {EnrollmentId}",
             domainEvent.EnrollmentId.Value);
