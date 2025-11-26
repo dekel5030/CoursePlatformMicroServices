@@ -9,7 +9,7 @@ public class DeleteEnrollmentEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/api/enrollments/{id:int}", async (
+        app.MapDelete("/api/enrollments/{id:guid}", async (
             Guid id,
             ICommandHandler<DeleteEnrollmentCommand> handler) =>
         {

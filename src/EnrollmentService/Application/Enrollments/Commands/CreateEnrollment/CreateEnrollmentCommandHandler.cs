@@ -1,10 +1,10 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Domain.Courses.Primitives;
 using Domain.Enrollments;
 using Domain.Enrollments.Errors;
 using Domain.Enrollments.Primitives;
 using Domain.Users.Primitives;
-using Domain.Courses.Primitives;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -38,7 +38,7 @@ public sealed class CreateEnrollmentCommandHandler
 
         if (existingEnrollment is not null)
         {
-            _logger.LogWarning("Enrollment already exists for UserId: {UserId}, CourseId: {CourseId}", 
+            _logger.LogWarning("Enrollment already exists for UserId: {UserId}, CourseId: {CourseId}",
                 enrollmentDto.UserId, enrollmentDto.CourseId);
             return Result.Failure<EnrollmentId>(EnrollmentErrors.EnrollmentAlreadyExists);
         }

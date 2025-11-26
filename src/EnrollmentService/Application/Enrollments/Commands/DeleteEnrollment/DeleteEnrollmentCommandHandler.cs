@@ -1,7 +1,6 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Enrollments.Errors;
-using Domain.Enrollments.Primitives;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

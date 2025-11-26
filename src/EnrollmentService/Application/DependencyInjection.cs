@@ -1,11 +1,11 @@
 using Application.Abstractions.Messaging;
+using Application.Courses.IntegrationEvents;
 using Application.Enrollments.Commands.CreateEnrollment;
 using Application.Enrollments.Commands.DeleteEnrollment;
 using Application.Enrollments.DomainEvents;
 using Application.Enrollments.Queries.Dtos;
 using Application.Enrollments.Queries.GetEnrollmentById;
 using Application.Enrollments.Queries.GetEnrollments;
-using Application.Courses.IntegrationEvents;
 using Application.Users.IntegrationEvents;
 using Domain.Enrollments.Events;
 using Domain.Enrollments.Primitives;

@@ -11,7 +11,7 @@ public class GetEnrollmentByIdEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/enrollments/{id:int}", async (
+        app.MapGet("/api/enrollments/{id:guid}", async (
             Guid id,
             IQueryHandler<GetEnrollmentByIdQuery, EnrollmentReadDto> handler) =>
         {

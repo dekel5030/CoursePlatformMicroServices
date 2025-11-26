@@ -1,6 +1,6 @@
+using Domain.Courses;
 using Domain.Enrollments;
 using Domain.Users;
-using Domain.Courses;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Abstractions.Data;
