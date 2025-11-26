@@ -36,7 +36,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
-        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<ITokenService, JwtTokenService>();
 
         return services;
     }
@@ -114,40 +114,11 @@ public static class DependencyInjection
         return services;
     }
 
-    static IServiceCollection ReadRSAKeys(
+    private static IServiceCollection ReadRSAKeys(
         this IServiceCollection services, 
         IConfiguration configuration)
     {
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
-
-        services.PostConfigure<JwtOptions>(options =>
-        {
-            if (!string.IsNullOrEmpty(options.PrivateKeyFile))
-            {
-                var privateKeyPath = Path.Combine(Directory.GetCurrentDirectory(), options.PrivateKeyFile);
-                if (!File.Exists(privateKeyPath))
-                    throw new InvalidOperationException($"Private key file not found: {privateKeyPath}");
-
-                options.PrivateKey = File.ReadAllText(privateKeyPath);
-            }
-
-            if (!string.IsNullOrEmpty(options.PublicKeyFile))
-            {
-                var publicKeyPath = Path.Combine(Directory.GetCurrentDirectory(), options.PublicKeyFile);
-                if (!File.Exists(publicKeyPath))
-                    throw new InvalidOperationException($"Public key file not found: {publicKeyPath}");
-
-                options.PublicKey = File.ReadAllText(publicKeyPath);
-            }
-
-            if (string.IsNullOrEmpty(options.PublicKey))
-                throw new InvalidOperationException("JWT Public Key not configured");
-            if (string.IsNullOrEmpty(options.Issuer))
-                throw new InvalidOperationException("JWT Issuer not configured");
-            if (string.IsNullOrEmpty(options.Audience))
-                throw new InvalidOperationException("JWT Audience not configured");
-        });
-
 
         return services;
     }
