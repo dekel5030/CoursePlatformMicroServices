@@ -49,11 +49,26 @@ var coursesService = builder.AddProject<Projects.Course_Api>("courseservice")
     .WithEnvironment("ConnectionStrings:WriteDatabase", coursesDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
 
+// EnrollmentService configuration
+
+var enrollmentDb = builder
+    .AddPostgres("enrollmentservice-db")
+    .WithBindMount(@"C:\AspireVolumes\EnrollmentService", "/var/lib/postgresql/data")
+    .AddDatabase("enrollmentdb");
+
+var enrollmentService = builder.AddProject<Projects.Enrollments_Api>("enrollmentservice")
+    .WithReference(enrollmentDb)
+    .WithReference(rabbitMq)
+    .WithEnvironment("ConnectionStrings:ReadDatabase", enrollmentDb.Resource.ConnectionStringExpression)
+    .WithEnvironment("ConnectionStrings:WriteDatabase", enrollmentDb.Resource.ConnectionStringExpression)
+    .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
+
+// Frontend configuration
 var frontend = builder.AddNpmApp("frontend", "../Frontend", "dev")
     .WithReference(authService)
     .WithReference(usersService)
     .WithReference(coursesService)
-    .WithHttpEndpoint(env: "PORT")
+    .WithHttpEndpoint(port: 5067, env: "PORT")
     .WithExternalHttpEndpoints();
 
 builder.Build().Run();
