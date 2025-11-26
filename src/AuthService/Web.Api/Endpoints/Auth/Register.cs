@@ -2,10 +2,10 @@ using Application.Abstractions.Messaging;
 using Application.Abstractions.Security;
 using Application.AuthUsers.Commands.RegisterUser;
 using Application.AuthUsers.Dtos;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+using Auth.Api.Extensions;
+using Auth.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Auth;
+namespace Auth.Api.Endpoints.Auth;
 
 public class Register : IEndpoint
 {

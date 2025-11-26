@@ -13,13 +13,13 @@ public sealed class UserUpsertedConsumer(
     IIntegrationEventHandler<UserUpsertedIntegrationEvent> handler,
     ReadDbContext dbContext,
     ILogger<UserUpsertedConsumer> logger) 
-        : IConsumer<UserUpsertedV1>
+        : IConsumer<UserUpserted>
 {
-    public Task Consume(ConsumeContext<UserUpsertedV1> context)
+    public Task Consume(ConsumeContext<UserUpserted> context)
     {
         logger.LogInformation("Received UserUpsertedV1 event for UserId: {UserId}", context.Message.UserId);
 
-        UserUpsertedV1 message = context.Message;
+        UserUpserted message = context.Message;
 
         User? user = dbContext.Users
             .SingleOrDefault(u => u.ExternalUserId == new ExternalUserId(message.UserId));

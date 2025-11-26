@@ -3,10 +3,11 @@ using Application.Abstractions.Messaging;
 using Application.Users.Queries.Dtos;
 using Application.Users.Queries.GetUserByid;
 using Kernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+using User.Api.Endpoints;
+using User.Api.Extensions;
+using User.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Users.Queries;
+namespace User.Api.Endpoints.Users.Queries;
 
 public class GetUserById : IEndpoint
 {

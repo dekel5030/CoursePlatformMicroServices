@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Endpoints;
+﻿namespace Auth.Api.Endpoints;
 
 public interface IEndpoint
 {

@@ -1,7 +1,7 @@
 using Domain.Permissions.Primitives;
 using SharedKernel;
 
-namespace Domain.Roles;
+namespace Domain.Permissions;
 
 public class Permission : Entity
 {

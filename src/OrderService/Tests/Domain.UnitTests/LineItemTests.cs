@@ -2,6 +2,7 @@
 using Domain.Orders.Errors;
 using Domain.Products.Primitives;
 using FluentAssertions;
+using Kernel;
 using SharedKernel;
 using Xunit;
 

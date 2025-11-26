@@ -1,5 +1,5 @@
 ﻿using Domain.Courses.Primitives;
-using SharedKernel;
+using Kernel;
 
 namespace Application.Courses.Queries.Dtos;
 

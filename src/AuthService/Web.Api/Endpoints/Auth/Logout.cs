@@ -1,9 +1,10 @@
 using Application.Abstractions.Messaging;
 using Application.AuthUsers.Commands.Logout;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+using Auth.Api.Endpoints;
+using Auth.Api.Extensions;
+using Auth.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Auth;
+namespace Auth.Api.Endpoints.Auth;
 
 public class Logout : IEndpoint
 {

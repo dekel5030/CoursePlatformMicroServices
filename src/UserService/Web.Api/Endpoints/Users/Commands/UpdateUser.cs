@@ -3,10 +3,11 @@ using Application.Users.Commands.UpdateUser;
 using Domain.Users.Primitives;
 using Kernel;
 using Microsoft.AspNetCore.Mvc;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+using User.Api.Endpoints;
+using User.Api.Extensions;
+using User.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Users.Commands;
+namespace User.Api.Endpoints.Users.Commands;
 
 public class UpdateUser : IEndpoint
 {

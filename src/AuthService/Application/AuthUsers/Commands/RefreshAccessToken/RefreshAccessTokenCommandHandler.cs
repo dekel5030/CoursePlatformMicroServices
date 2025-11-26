@@ -5,7 +5,7 @@ using Domain.AuthUsers.Errors;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.AuthUsers.Commands.RefreshToken;
+namespace Application.AuthUsers.Commands.RefreshAccessToken;
 
 public class RefreshAccessTokenCommandHandler 
     : ICommandHandler<RefreshAccessTokenCommand, string>

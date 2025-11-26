@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Endpoints;
+﻿namespace Course.Api.Endpoints;
 
 public static class Tags
 {

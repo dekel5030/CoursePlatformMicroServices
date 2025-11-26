@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Xunit;
 
-namespace OrderService.IntegrationTests.Endpoints;
+namespace UserService.IntegrationTests.Endpoints;
 
 public class UpdateUserEndpointTests : IntegrationTestsBase
 {

@@ -6,6 +6,7 @@ using Domain.Users;
 using Domain.Users.Primitives;
 using FluentAssertions;
 using Infrastructure.Database;
+using Kernel;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

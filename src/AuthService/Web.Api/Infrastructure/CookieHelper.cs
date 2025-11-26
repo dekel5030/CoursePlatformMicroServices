@@ -1,7 +1,7 @@
-    using Application.Abstractions.Security;
+using Application.Abstractions.Security;
 using Application.AuthUsers.Dtos;
 
-namespace Web.Api.Infrastructure;
+namespace Auth.Api.Infrastructure;
 
 public static class CookieHelper
 {

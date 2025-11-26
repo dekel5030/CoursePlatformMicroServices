@@ -1,6 +1,6 @@
 ﻿using Kernel;
 
-namespace Web.Api.Infrastructure;
+namespace Auth.Api.Infrastructure;
 
 public static class CustomResults
 {

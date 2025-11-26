@@ -2,11 +2,12 @@ using Application.Abstractions.Messaging;
 using Application.Abstractions.Security;
 using Application.AuthUsers.Commands.LoginUser;
 using Application.AuthUsers.Dtos;
+using Auth.Api.Endpoints;
+using Auth.Api.Extensions;
+using Auth.Api.Infrastructure;
 using Kernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Auth;
+namespace Auth.Api.Endpoints.Auth;
 
 public class Login : IEndpoint
 {

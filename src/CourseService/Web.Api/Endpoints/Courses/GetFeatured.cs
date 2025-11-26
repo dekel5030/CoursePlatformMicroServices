@@ -2,10 +2,11 @@
 using Application.Abstractions.Messaging;
 using Application.Courses.Queries.Dtos;
 using Application.Courses.Queries.GetFeatured;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+using Course.Api.Endpoints;
+using Course.Api.Extensions;
+using Course.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Courses;
+namespace Course.Api.Endpoints.Courses;
 
 public class GetFeatured : IEndpoint
 {
