@@ -16,7 +16,7 @@ export default function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/users/:id" element={<UserProfilePage />} />
-      <Route path="/admin" element={<AdminPage />} />
+      <Route path="/management" element={<AdminPage />} />
     </Routes>
   );
 }
