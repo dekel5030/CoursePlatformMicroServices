@@ -26,6 +26,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
+        "/admin": {
+          target: authUrl,
+          changeOrigin: true,
+          secure: false,
+        },
         "/userservice": {
           target: usersUrl,
           changeOrigin: true,

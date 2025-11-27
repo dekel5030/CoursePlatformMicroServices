@@ -5,6 +5,7 @@ import LessonPage from "../Pages/LessonPage/LessonPage";
 import LoginPage from "../features/auth/LoginPage/LoginPage";
 import SignUpPage from "../features/auth/SignUpPage/SignUpPage";
 import UserProfilePage from "../Pages/UserProfilePage/UserProfilePage";
+import AdminPage from "../features/admin/AdminPage/AdminPage";
 
 export default function AppRoutes() {
   return (
@@ -15,6 +16,7 @@ export default function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/users/:id" element={<UserProfilePage />} />
+      <Route path="/admin" element={<AdminPage />} />
     </Routes>
   );
 }

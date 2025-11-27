@@ -1,0 +1,388 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--background-primary);
+  padding: 2rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background-color: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.tabActive {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.tabActive:hover {
+  background-color: var(--button-primary-hover);
+  color: white;
+}
+
+.section {
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px var(--card-shadow-color);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.addForm {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.inputLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  min-width: 200px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.addButton {
+  padding: 0.5rem 1rem;
+  background-color: var(--button-success-bg);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.addButton:hover {
+  background-color: var(--button-success-hover);
+}
+
+.addButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.table td {
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.table tr:hover {
+  background-color: var(--hover-bg);
+}
+
+.actionButton {
+  padding: 0.375rem 0.75rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background-color 0.2s;
+  margin-right: 0.5rem;
+}
+
+.deleteButton {
+  background-color: var(--error-color);
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #b91c1c;
+}
+
+.assignButton {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.assignButton:hover {
+  background-color: var(--button-primary-hover);
+}
+
+.removeButton {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.removeButton:hover {
+  background-color: #d97706;
+}
+
+.permissionsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.permissionTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background-color: var(--hover-bg);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.removeTag {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.removeTag:hover {
+  color: var(--error-color);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.closeButton:hover {
+  color: var(--text-primary);
+}
+
+.modalBody {
+  margin-bottom: 1rem;
+}
+
+.checkboxList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.checkboxItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.checkboxItem:hover {
+  background-color: var(--hover-bg);
+}
+
+.checkboxItem input {
+  width: 1rem;
+  height: 1rem;
+}
+
+.checkboxItem label {
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.cancelButton {
+  padding: 0.5rem 1rem;
+  background-color: var(--button-secondary-bg);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.cancelButton:hover {
+  background-color: var(--button-secondary-hover);
+}
+
+.saveButton {
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.saveButton:hover {
+  background-color: var(--button-primary-hover);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+.error {
+  text-align: center;
+  padding: 1rem;
+  background-color: #fef2f2;
+  color: var(--error-color);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  min-width: 150px;
+  background-color: white;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.rolesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.roleTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(79, 70, 229, 0.1);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+}
