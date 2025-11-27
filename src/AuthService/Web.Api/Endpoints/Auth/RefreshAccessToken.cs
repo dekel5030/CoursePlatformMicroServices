@@ -35,7 +35,7 @@ public class RefreshAccessToken : IEndpoint
             return result.Match(
                 onSuccess: accessToken =>
                 {
-                    return Results.Ok(accessToken);
+                    return Results.Ok(new { accessToken = accessToken });
                 },
                 onFailure: CustomResults.Problem);
         })
