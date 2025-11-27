@@ -55,14 +55,15 @@ export function AuthProvider({ children }: Props) {
     return newToken;
   }, []);
 
-  // Initialize authenticated fetch on mount and when dependencies change
   useEffect(() => {
+    if (isLoading) return;
+
     initializeAuthenticatedFetch(
       () => currentUser?.accessToken,
       refreshAccessToken,
       logout
     );
-  }, [currentUser, refreshAccessToken, logout]);
+  }, [currentUser?.accessToken, isLoading, logout, refreshAccessToken]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("currentUser");

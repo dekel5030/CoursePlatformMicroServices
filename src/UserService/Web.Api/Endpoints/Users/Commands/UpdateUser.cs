@@ -29,7 +29,7 @@ public class UpdateUser : IEndpoint
             Result<UpdatedUserResponseDto> result = await handler.Handle(command, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
-        });
+        }).RequireAuthorization();
     }
 }
 

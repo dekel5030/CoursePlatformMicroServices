@@ -1,4 +1,5 @@
 using Application;
+using Auth.Api.Extensions;
 using Infrastructure;
 using User.Api.Endpoints;
 using User.Api.Extensions;
@@ -21,6 +22,8 @@ builder.Services.AddCors(options =>
     );
 });
 
+builder.Services.AddJwtCookieAuthentication();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -28,6 +31,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseCors("LocalDev");
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 app.MapEndpoints();
