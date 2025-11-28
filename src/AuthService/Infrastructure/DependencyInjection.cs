@@ -40,7 +40,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<AuthDbContext>((serviceProvider, options) =>
+        services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
             string connectionString = configuration.GetConnectionString(_databaseSectionName)
                 ?? throw new InvalidOperationException("Database connection string not found");
@@ -54,8 +54,8 @@ public static class DependencyInjection
                 .UseSnakeCaseNamingConvention();
         });
 
-        services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
-        services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
+        services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
+        services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
 
         return services;
     }
@@ -76,7 +76,7 @@ public static class DependencyInjection
         {
             config.AddConsumers(typeof(DependencyInjection).Assembly);
 
-            config.AddEntityFrameworkOutbox<AuthDbContext>(o =>
+            config.AddEntityFrameworkOutbox<WriteDbContext>(o =>
             {
                 o.UsePostgres();
                 o.UseBusOutbox();
@@ -85,7 +85,7 @@ public static class DependencyInjection
 
             config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
             {
-                endpointCfg.UseEntityFrameworkOutbox<AuthDbContext>(ctx);
+                endpointCfg.UseEntityFrameworkOutbox<WriteDbContext>(ctx);
                 endpointCfg.UseMessageRetry(r =>
                 {
                     r.Handle<InvalidOperationException>();

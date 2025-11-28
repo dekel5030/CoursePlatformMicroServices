@@ -9,8 +9,8 @@ public static class MigrationExtensions
     {
         using IServiceScope scope = app.ApplicationServices.CreateScope();
 
-        using AuthDbContext dbContext =
-            scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+        using WriteDbContext dbContext =
+            scope.ServiceProvider.GetRequiredService<WriteDbContext>();
 
         dbContext.Database.Migrate();
     }
