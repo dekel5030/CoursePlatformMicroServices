@@ -4,12 +4,13 @@ using Domain.Permissions;
 using Domain.Roles;
 using Infrastructure.DomainEvents;
 using MassTransit;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
 namespace Infrastructure.Database;
 
-public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
+public class AuthDbContext : IdentityDbContext<AuthUser, Role, Guid>, IWriteDbContext, IReadDbContext
 {
     private readonly IDomainEventsDispatcher _domainEventsDispatcher;
 
@@ -19,10 +20,6 @@ public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
     {
         _domainEventsDispatcher = domainEventsDispatcher;
     }
-
-    public DbSet<AuthUser> AuthUsers { get; set; }
-    public DbSet<Role> Roles { get; set; }
-    public DbSet<Permission> Permissions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -44,7 +41,7 @@ public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
         DbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        IEnumerable<Entity> entities = dbContext.ChangeTracker.Entries<Entity>()
+        IEnumerable<IHasDomainEvents> entities = dbContext.ChangeTracker.Entries<IHasDomainEvents>()
             .Select(entry => entry.Entity);
 
         List<IDomainEvent> domainEvents = entities
