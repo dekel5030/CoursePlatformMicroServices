@@ -72,7 +72,7 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTok
 
     private async Task<AuthTokensResult> CreateAuthTokensResponse(AuthUser authUser)
     {
-        var userClaims = (await _userManager.GetClaimsAsync(authUser)).Select(claim => claim.ToString());
+        var userClaims = (await _userManager.GetClaimsAsync(authUser)).Select(claim => claim.Value);
         var roles = await _userManager.GetRolesAsync(authUser);
 
         var refreshToken = _tokenService.GenerateRefreshToken();

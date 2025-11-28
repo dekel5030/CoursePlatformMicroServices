@@ -68,7 +68,7 @@ public class RefreshAccessTokenCommandHandler
             return Result.Failure<string>(AuthUserErrors.AccountInactive);
         }
 
-        var userClaims = (await _userManager.GetClaimsAsync(authUser)).Select(claim => claim.ToString());
+        var userClaims = (await _userManager.GetClaimsAsync(authUser)).Select(claim => claim.Value);
         var roles = await _userManager.GetRolesAsync(authUser);
 
         var accessToken = _tokenService.GenerateAccessToken(
