@@ -1,10 +1,7 @@
 using Application.Abstractions.Data;
 using Domain.AuthUsers;
-using Domain.AuthUsers.Primitives;
 using Domain.Permissions;
-using Domain.Permissions.Primitives;
 using Domain.Roles;
-using Domain.Roles.Primitives;
 using Infrastructure.DomainEvents;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -38,9 +35,6 @@ public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        NormalizeEmails();
-        UpdateTimestamps();
-
         await DispatchDomainEvents(this, cancellationToken);
 
         return await base.SaveChangesAsync(cancellationToken);
@@ -63,29 +57,5 @@ public class AuthDbContext : DbContext, IWriteDbContext, IReadDbContext
         }
 
         return _domainEventsDispatcher.DispatchAsync(domainEvents, cancellationToken);
-    }
-
-    private void NormalizeEmails()
-    {
-        foreach (var entry in ChangeTracker.Entries<AuthUser>())
-        {
-            if ((entry.State == EntityState.Added || entry.State == EntityState.Modified) &&
-                !string.IsNullOrWhiteSpace(entry.Entity.Email))
-            {
-                entry.Property(nameof(AuthUser.Email)).CurrentValue = 
-                    entry.Entity.Email.ToLowerInvariant();
-            }
-        }
-    }
-
-    private void UpdateTimestamps()
-    {
-        foreach (var entry in ChangeTracker.Entries<AuthUser>())
-        {
-            if (entry.State == EntityState.Modified && entry.Properties.Any(p => p.IsModified))
-            {
-                entry.Property(nameof(AuthUser.UpdatedAt)).CurrentValue = DateTime.UtcNow;
-            }
-        }
     }
 }
