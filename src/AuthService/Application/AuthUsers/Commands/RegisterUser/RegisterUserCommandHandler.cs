@@ -4,28 +4,27 @@ using Application.Abstractions.Security;
 using Application.AuthUsers.Dtos;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
-using Domain.Roles;
 using Kernel;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.AuthUsers.Commands.RegisterUser;
 
 public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, AuthTokensResult>
 {
     private readonly IWriteDbContext _dbContext;
-    private readonly IReadDbContext _readDbContext;
-    private readonly IPasswordHasher _passwordHasher;
+    private readonly UserManager<AuthUser> _userManager;
+    private readonly RoleManager<Domain.Roles.Role> _roleManager;
     private readonly ITokenService _tokenService;
 
     public RegisterUserCommandHandler(
         IWriteDbContext dbContext,
-        IReadDbContext readDbContext,
-        IPasswordHasher passwordHasher,
+        UserManager<AuthUser> userManager,
+        RoleManager<Domain.Roles.Role> roleManager,
         ITokenService tokenService)
     {
         _dbContext = dbContext;
-        _readDbContext = readDbContext;
-        _passwordHasher = passwordHasher;
+        _userManager = userManager;
+        _roleManager = roleManager;
         _tokenService = tokenService;
     }
 
@@ -36,92 +35,63 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, A
         var dto = request.Dto;
 
         // Check if user already exists
-        var existingUser = await _readDbContext.AuthUsers
-            .FirstOrDefaultAsync(u => u.Email == dto.Email, cancellationToken);
+        var existingUser = await _userManager.FindByEmailAsync(dto.Email);
 
         if (existingUser != null)
         {
             return Result.Failure<AuthTokensResult>(AuthUserErrors.DuplicateEmail);
         }
 
-        // Hash password
-        string passwordHash = _passwordHasher.Hash(dto.Password);
+        // Create auth user using Identity
+        var authUser = AuthUser.Create(dto.Email, dto.Email);
 
-        // Get default role
-        var defaultRole = await _readDbContext.Roles
-            .FirstOrDefaultAsync(r => r.Name == "User", cancellationToken);
-
-        if (defaultRole == null)
+        var createResult = await _userManager.CreateAsync(authUser, dto.Password);
+        if (!createResult.Succeeded)
         {
+            var errorMessage = string.Join(", ", createResult.Errors.Select(e => e.Description));
             return Result.Failure<AuthTokensResult>(
-                Error.NotFound("Role.NotFound", "Default 'User' role not found"));
+                Error.Validation("Registration.Failed", errorMessage));
         }
 
-        // Create auth user (UserId will be set asynchronously when UserService responds)
-        var authUser = AuthUser.Create(
-            dto.Email,
-            passwordHash,
-            defaultRole.Id);
-
-        await _dbContext.AuthUsers.AddAsync(authUser, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        // Load user with roles and permissions for token generation
-        var fullAuthUser = await _readDbContext.AuthUsers
-            .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-                    .ThenInclude(r => r.RolePermissions)
-                        .ThenInclude(rp => rp.Permission)
-            .Include(u => u.UserPermissions)
-                .ThenInclude(up => up.Permission)
-            .FirstOrDefaultAsync(u => u.Id == authUser.Id, cancellationToken);
-
-        if (fullAuthUser == null)
+        // Assign default "User" role
+        if (await _roleManager.RoleExistsAsync("User"))
         {
-            return Result.Failure<AuthTokensResult>(AuthUserErrors.NotFound);
+            await _userManager.AddToRoleAsync(authUser, "User");
         }
 
         // Generate token and response
-        var response = CreateAuthTokensDto(fullAuthUser);
-        await _dbContext.SaveChangesAsync(cancellationToken); // Save refresh token
+        var response = await CreateAuthTokensResponse(authUser);
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return Result.Success(response);
     }
 
-    private AuthTokensResult CreateAuthTokensDto(AuthUser authUser)
+    private async Task<AuthTokensResult> CreateAuthTokensResponse(AuthUser authUser)
     {
-        var roles = authUser.UserRoles
-            .Select(ur => ur.Role.Name)
-            .Distinct()
-            .ToList();
+        var userClaims = (await _userManager.GetClaimsAsync(authUser)).Select(claim => claim.ToString());
+        var roles = await _userManager.GetRolesAsync(authUser);
 
-        var permissionsFromRoles = authUser.UserRoles
-            .SelectMany(ur => ur.Role.RolePermissions)
-            .Select(rp => rp.Permission.Name);
-
-        var directPermissions = authUser.UserPermissions
-            .Select(up => up.Permission.Name);
-
-        var allPermissions = permissionsFromRoles
-            .Concat(directPermissions)
-            .Distinct()
-            .ToList();
-
-        // Generate refresh token
         var refreshToken = _tokenService.GenerateRefreshToken();
-        var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7); // 7 days expiration
+        var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);
         
-        // Hash the refresh token before storing in the database
         var refreshTokenHash = _tokenService.HashRefreshToken(refreshToken);
-        authUser.SetRefreshToken(refreshTokenHash, refreshTokenExpiresAt);
+        await _userManager
+            .SetAuthenticationTokenAsync(authUser, "AuthService", "refreshToken", refreshTokenHash);
+
+        var accessToken = _tokenService.GenerateAccessToken(
+            new TokenRequestDto { 
+                Email = authUser.Email!, 
+                Permissions = userClaims.AsEnumerable(), 
+                Roles = roles});
 
         return new AuthTokensResult
         {
-            AuthUserId = authUser.Id.Value,
-            Email = authUser.Email,
+            AuthUserId = authUser.Id,
+            Email = authUser.Email!,
             Roles = roles,
-            Permissions = allPermissions,
-            AccessToken = null!,
-            RefreshToken = refreshToken, // Return the plain token to set in cookie
+            Permissions = userClaims.ToArray(),
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
             RefreshTokenExpiresAt = refreshTokenExpiresAt
         };
     }

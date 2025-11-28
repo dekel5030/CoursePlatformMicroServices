@@ -1,5 +1,6 @@
 using Application.Abstractions.Data;
 using Domain.AuthUsers;
+using Domain.Permissions;
 using Domain.Roles;
 using Infrastructure.DomainEvents;
 using MassTransit;
@@ -20,13 +21,20 @@ public class AuthDbContext : IdentityDbContext<AuthUser, Role, Guid>, IWriteDbCo
         _domainEventsDispatcher = domainEventsDispatcher;
     }
 
+    // Explicit implementation for IWriteDbContext
+    DbSet<AuthUser> IWriteDbContext.AuthUsers => Users;
+    DbSet<Permission> IWriteDbContext.Permissions => Set<Permission>();
+    
+    // Explicit implementation for IReadDbContext
+    IQueryable<AuthUser> IReadDbContext.AuthUsers => Users;
+    IQueryable<Permission> IReadDbContext.Permissions => Set<Permission>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DependencyInjection).Assembly);
         modelBuilder.AddTransactionalOutboxEntities();
-
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -47,7 +55,7 @@ public class AuthDbContext : IdentityDbContext<AuthUser, Role, Guid>, IWriteDbCo
             .SelectMany(entity => entity.DomainEvents)
             .ToList();
 
-        foreach (Entity entity in entities)
+        foreach (IHasDomainEvents entity in entities)
         {
             entity.ClearDomainEvents();
         }

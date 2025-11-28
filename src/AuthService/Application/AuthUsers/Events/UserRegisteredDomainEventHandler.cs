@@ -20,7 +20,7 @@ public class UserRegisteredDomainEventHandler : IDomainEventHandler<UserRegister
 
     public async Task Handle(UserRegisteredDomainEvent request, CancellationToken cancellationToken = default)
     {
-        var authUserId = request.AuthUserId.Value.ToString();
+        var authUserId = request.AuthUserId.ToString();
         var integrationEvent = new UserRegistered(
             authUserId,
             authUserId,
