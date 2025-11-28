@@ -1,6 +1,5 @@
 using Application.Abstractions.Data;
 using Domain.AuthUsers;
-using Domain.Permissions;
 using Domain.Roles;
 using Infrastructure.DomainEvents;
 using MassTransit;
@@ -23,11 +22,11 @@ public class AuthDbContext : IdentityDbContext<AuthUser, Role, Guid>, IWriteDbCo
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DependencyInjection).Assembly);
+        base.OnModelCreating(modelBuilder);
 
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DependencyInjection).Assembly);
         modelBuilder.AddTransactionalOutboxEntities();
 
-        base.OnModelCreating(modelBuilder);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
