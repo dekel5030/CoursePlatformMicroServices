@@ -4,7 +4,7 @@ using SharedKernel;
 
 namespace Domain.AuthUsers;
 
-public class AuthUser : IdentityUser<Guid>
+public class AuthUser : IdentityUser<Guid>, IHasDomainEvents
 {
     private readonly DomainEventContainer _eventHandler = new();
 
@@ -33,3 +33,9 @@ public class AuthUser : IdentityUser<Guid>
 }
 
 public class DomainEventContainer : Entity { }
+
+public interface IHasDomainEvents
+{
+    IReadOnlyCollection<IDomainEvent> DomainEvents { get; }
+    void ClearDomainEvents();
+}
