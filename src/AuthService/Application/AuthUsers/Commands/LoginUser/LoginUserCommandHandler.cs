@@ -4,29 +4,21 @@ using Application.Abstractions.Security;
 using Application.AuthUsers.Dtos;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
-using Domain.Roles;
 using Kernel;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace Application.AuthUsers.Commands.LoginUser;
 
 public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTokensResult>
 {
-    private readonly IWriteDbContext _dbContext;
-    private readonly IReadDbContext _readDbContext;
     private readonly ITokenService _tokenService;
     private readonly UserManager<AuthUser> _userManager;
 
     public LoginUserCommandHandler(
         IWriteDbContext dbContext,
-        IReadDbContext readDbContext,
         ITokenService tokenService,
         UserManager<AuthUser> userManager)
     {
-        _dbContext = dbContext;
-        _readDbContext = readDbContext;
         _tokenService = tokenService;
         _userManager = userManager;
     }
@@ -66,7 +58,6 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTok
 
         var response = await CreateAuthTokensResponse(user);
         
-        await _dbContext.SaveChangesAsync(cancellationToken);
         return Result.Success(response);
     }
 
@@ -85,7 +76,7 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTok
         var accessToken = _tokenService.GenerateAccessToken(
             new TokenRequestDto { 
                 Email = authUser.Email!, 
-                Permissions = userClaims.AsEnumerable(), 
+                Permissions = userClaims, 
                 Roles = roles});
 
         return new AuthTokensResult
@@ -93,7 +84,7 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTok
             AuthUserId = authUser.Id,
             Email = authUser.Email!,
             Roles = roles,
-            Permissions = userClaims.ToArray(),
+            Permissions = userClaims,
             AccessToken = accessToken,
             RefreshToken = refreshToken,
             RefreshTokenExpiresAt = refreshTokenExpiresAt
