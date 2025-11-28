@@ -13,6 +13,7 @@ public class Logout : IEndpoint
         app.MapPost("auth/logout", async (
             HttpContext httpContext,
             ICommandHandler<LogoutCommand> handler,
+            string email,
             CancellationToken cancellationToken) =>
         {
             string? refreshToken = CookieHelper.GetRefreshTokenFromCookie(httpContext);
@@ -23,7 +24,7 @@ public class Logout : IEndpoint
                 return Results.Ok(new { message = "Logged out successfully" });
             }
 
-            var command = new LogoutCommand(refreshToken);
+            var command = new LogoutCommand(email, refreshToken);
             var result = await handler.Handle(command, cancellationToken);
 
             return result.Match(
