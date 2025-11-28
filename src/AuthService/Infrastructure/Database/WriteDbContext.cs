@@ -9,12 +9,12 @@ using SharedKernel;
 
 namespace Infrastructure.Database;
 
-public class AuthDbContext : IdentityDbContext<AuthUser, Role, Guid>, IWriteDbContext, IReadDbContext
+public class WriteDbContext : IdentityDbContext<AuthUser, Role, Guid>, IWriteDbContext
 {
     private readonly IDomainEventsDispatcher _domainEventsDispatcher;
 
-    public AuthDbContext(
-        DbContextOptions<AuthDbContext> options,
+    public WriteDbContext(
+        DbContextOptions<WriteDbContext> options,
         IDomainEventsDispatcher domainEventsDispatcher) : base(options)
     {
         _domainEventsDispatcher = domainEventsDispatcher;
