@@ -4,8 +4,11 @@ using Application.Abstractions.Security;
 using Application.AuthUsers.Dtos;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
+using Domain.Roles;
 using Kernel;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Application.AuthUsers.Commands.LoginUser;
 
@@ -13,105 +16,84 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTok
 {
     private readonly IWriteDbContext _dbContext;
     private readonly IReadDbContext _readDbContext;
-    private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
+    private readonly UserManager<AuthUser> _userManager;
 
     public LoginUserCommandHandler(
         IWriteDbContext dbContext,
         IReadDbContext readDbContext,
-        IPasswordHasher passwordHasher,
-        ITokenService tokenService)
+        ITokenService tokenService,
+        UserManager<AuthUser> userManager)
     {
         _dbContext = dbContext;
         _readDbContext = readDbContext;
-        _passwordHasher = passwordHasher;
         _tokenService = tokenService;
+        _userManager = userManager;
     }
 
     public async Task<Result<AuthTokensResult>> Handle(
         LoginUserCommand request,
         CancellationToken cancellationToken = default)
     {
-        var dto = request.Dto;
+        var requestDto = request.Dto;
 
-        var authUser = await _readDbContext.AuthUsers
-            .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-                    .ThenInclude(r => r.RolePermissions)
-                        .ThenInclude(rp => rp.Permission)
-            .Include(u => u.UserPermissions)
-                .ThenInclude(up => up.Permission)
-            .FirstOrDefaultAsync(u => u.Email == dto.Email, cancellationToken);
+        var user = await _userManager.FindByEmailAsync(requestDto.Email);
 
-        if (authUser == null)
+        if (user == null)
         {
             return Result.Failure<AuthTokensResult>(AuthUserErrors.InvalidCredentials);
         }
 
-        if (authUser.IsLocked())
+        if (await _userManager.IsLockedOutAsync(user))
         {
             return Result.Failure<AuthTokensResult>(AuthUserErrors.AccountLocked);
         }
 
-        if (!authUser.IsActive)
+        if (!user.EmailConfirmed)
         {
             return Result.Failure<AuthTokensResult>(AuthUserErrors.AccountInactive);
         }
 
-        if (!_passwordHasher.VerifyPassword(dto.Password, authUser.PasswordHash))
-        {
-            authUser.RecordFailedLogin();
-            await _dbContext.SaveChangesAsync(cancellationToken);
+        bool correctPassword = await _userManager.CheckPasswordAsync(user, requestDto.Password);
 
+        if (!correctPassword)
+        {
+            await _userManager.AccessFailedAsync(user);
             return Result.Failure<AuthTokensResult>(AuthUserErrors.InvalidCredentials);
         }
 
-        // Successful login
-        authUser.Login();
+        await _userManager.ResetAccessFailedCountAsync(user);
+
+        var response = await CreateAuthTokensResponse(user);
         
-        // Generate token and response
-        var response = CreateAuthTokensResponse(authUser);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return Result.Success(response);
     }
 
-    private AuthTokensResult CreateAuthTokensResponse(AuthUser authUser)
+    private async Task<AuthTokensResult> CreateAuthTokensResponse(AuthUser authUser)
     {
-        var roles = authUser.UserRoles
-            .Select(ur => ur.Role.Name)
-            .Distinct()
-            .ToList();
-
-        var permissionsFromRoles = authUser.UserRoles
-            .SelectMany(ur => ur.Role.RolePermissions)
-            .Select(rp => rp.Permission.Name);
-
-        var directPermissions = authUser.UserPermissions
-            .Select(up => up.Permission.Name);
-
-        var allPermissions = permissionsFromRoles
-            .Concat(directPermissions)
-            .Distinct()
-            .ToList();
+        var userClaims = (await _userManager.GetClaimsAsync(authUser)).Select(claim => claim.ToString());
+        var roles = await _userManager.GetRolesAsync(authUser);
 
         var refreshToken = _tokenService.GenerateRefreshToken();
         var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);
         
         var refreshTokenHash = _tokenService.HashRefreshToken(refreshToken);
-        authUser.SetRefreshToken(refreshTokenHash, refreshTokenExpiresAt);
+        await _userManager
+            .SetAuthenticationTokenAsync(authUser, "AuthService", "refreshToken", refreshTokenHash);
 
         var accessToken = _tokenService.GenerateAccessToken(
             new TokenRequestDto { 
-                Email = authUser.Email, 
-                Permissions = allPermissions, 
+                Email = authUser.Email!, 
+                Permissions = userClaims.AsEnumerable(), 
                 Roles = roles});
 
         return new AuthTokensResult
         {
-            AuthUserId = authUser.Id.Value,
-            Email = authUser.Email,
+            AuthUserId = authUser.Id,
+            Email = authUser.Email!,
             Roles = roles,
-            Permissions = allPermissions,
+            Permissions = userClaims.ToArray(),
             AccessToken = accessToken,
             RefreshToken = refreshToken,
             RefreshTokenExpiresAt = refreshTokenExpiresAt
