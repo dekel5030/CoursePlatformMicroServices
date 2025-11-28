@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Roles;
 
-public class Role : IdentityRole<int>
+public class Role : IdentityRole<Guid>
 {
     private Role() { }
     
