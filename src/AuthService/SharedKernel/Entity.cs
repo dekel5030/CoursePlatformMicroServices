@@ -1,5 +1,3 @@
-using Domain.AuthUsers;
-
 namespace SharedKernel;
 
 public abstract class Entity : IHasDomainEvents

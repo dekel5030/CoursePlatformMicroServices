@@ -1,6 +1,4 @@
-using SharedKernel;
-
-namespace Domain.AuthUsers;
+namespace SharedKernel;
 
 public interface IHasDomainEvents
 {
