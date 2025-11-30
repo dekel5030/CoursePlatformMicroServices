@@ -37,7 +37,7 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, Current
 
         if (signInResult.Succeeded)
         {
-            var loginResultDto = new CurrentUserDto(user.Id, user.Email!, user.UserName!);
+            var loginResultDto = new CurrentUserDto(user.Id, user.Email!, user.UserName);
             return Result.Success(loginResultDto);
         }
 
