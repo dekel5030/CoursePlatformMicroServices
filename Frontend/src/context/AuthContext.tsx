@@ -53,8 +53,12 @@ export function AuthProvider({ children }: Props) {
       try {
         const user = await getCurrentUser();
         setCurrentUser(user);
-      } catch {
+      } catch (error) {
         // No active session - user is not authenticated
+        // Log only unexpected errors (not 401/403 which are expected for unauthenticated users)
+        if (error instanceof Error && !error.message.includes("Failed to fetch current user")) {
+          console.error("Unexpected error checking session:", error);
+        }
         setCurrentUser(null);
       } finally {
         setIsLoading(false);
