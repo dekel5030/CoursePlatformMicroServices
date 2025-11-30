@@ -58,7 +58,7 @@ export default function LoginPage() {
     try {
       const authResponse = await login(formData.email, formData.password);
 
-      navigate(`/users/${authResponse.userId}`);
+      navigate(`/users/${authResponse.id}`);
     } catch (err: unknown) {
       if (err instanceof Error) {
         alert(err.message);

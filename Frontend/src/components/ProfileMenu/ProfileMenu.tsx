@@ -10,7 +10,7 @@ export default function ProfileMenu() {
 
   const handleProfileClick = () => {
     if (currentUser) {
-      navigate(`/users/${currentUser.userId}`);
+      navigate(`/users/${currentUser.id}`);
       setIsOpen(false);
     }
   };

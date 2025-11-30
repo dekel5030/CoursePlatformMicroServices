@@ -1,10 +1,14 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../../../components/Input/Input";
 import styles from "./SignUpPage.module.css";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function SignUpPage() {
+  const navigate = useNavigate();
+  const { register } = useAuth();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -64,7 +68,7 @@ export default function SignUpPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -73,17 +77,23 @@ export default function SignUpPage() {
 
     setIsSubmitting(true);
 
-    // TODO: Implement actual sign-up logic here
-    console.log("Sign up submitted:", {
-      name: formData.name,
-      email: formData.email,
-    });
+    try {
+      const user = await register({
+        email: formData.email,
+        password: formData.password,
+        fullname: formData.name,
+      });
 
-    // Simulate API call
-    setTimeout(() => {
+      navigate(`/users/${user.id}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert("An unexpected error occurred");
+      }
+    } finally {
       setIsSubmitting(false);
-      alert("Sign up functionality to be implemented");
-    }, 1000);
+    }
   };
 
   return (
