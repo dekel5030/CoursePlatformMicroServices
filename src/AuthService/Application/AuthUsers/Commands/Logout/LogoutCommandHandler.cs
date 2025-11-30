@@ -2,32 +2,23 @@ using Application.Abstractions.Messaging;
 using Domain.AuthUsers;
 using Kernel;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.AuthUsers.Commands.Logout;
 
 public class LogoutCommandHandler : ICommandHandler<LogoutCommand>
 {
-    private readonly UserManager<AuthUser> _userManager;
+    private readonly SignInManager<AuthUser> _signInManager;
 
-    public LogoutCommandHandler(UserManager<AuthUser> userManager)
+    public LogoutCommandHandler(SignInManager<AuthUser> signInManager)
     {
-        _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     public async Task<Result> Handle(
         LogoutCommand request,
         CancellationToken cancellationToken = default)
     {
-        var authUser = await _userManager.Users
-            .FirstOrDefaultAsync(user => user.Email == request.Email, cancellationToken);
-
-        if (authUser == null)
-        {
-            return Result.Success();
-        }
-
-        await _userManager.RemoveAuthenticationTokenAsync(authUser, "AuthService", "RefreshToken");
+        await _signInManager.SignOutAsync();
 
         return Result.Success();
     }
