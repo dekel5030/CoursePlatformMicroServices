@@ -31,4 +31,8 @@ public static class AuthUserErrors
     public static readonly Error EmailNotConfirmed = Error.Validation(
         "AuthUser.EmailNotConfirmed",
         "Email address is not confirmed");
+
+    public static readonly Error Unauthorized = Error.Unauthorized(
+        "AuthUser.Unauthorized",
+        "Unauthorized access to the resource");
 }
