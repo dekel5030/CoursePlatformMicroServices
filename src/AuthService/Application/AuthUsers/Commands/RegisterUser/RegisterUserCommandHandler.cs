@@ -35,7 +35,11 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, C
             return result.ToApplicationResult<CurrentUserDto>();
         }
 
-        await _userManager.AddToRoleAsync(user, _defaultRole);
+        var addToRoleResult = await _userManager.AddToRoleAsync(user, _defaultRole);
+        if (!addToRoleResult.Succeeded)
+        {
+            return addToRoleResult.ToApplicationResult<CurrentUserDto>();
+        }
 
         await _signInManager.SignInAsync(user, true);
 
