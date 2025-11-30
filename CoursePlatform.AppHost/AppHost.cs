@@ -17,7 +17,9 @@ var authService = builder
     .AddProject<Projects.Auth_Api>("authservice")
     .WithReference(authDb)
     .WithReference(rabbitMq)
-    .WithEnvironment("ConnectionStrings:Database", authDb.Resource.ConnectionStringExpression)
+    .WaitFor(authDb)
+    .WithEnvironment("ConnectionStrings:ReadDatabase", authDb.Resource.ConnectionStringExpression)
+    .WithEnvironment("ConnectionStrings:WriteDatabase", authDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
 
 // UserService configuration
@@ -47,20 +49,6 @@ var coursesService = builder.AddProject<Projects.Course_Api>("courseservice")
     .WithReference(rabbitMq)
     .WithEnvironment("ConnectionStrings:ReadDatabase", coursesDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:WriteDatabase", coursesDb.Resource.ConnectionStringExpression)
-    .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
-
-// EnrollmentService configuration
-
-var enrollmentDb = builder
-    .AddPostgres("enrollmentservice-db")
-    .WithBindMount(@"C:\AspireVolumes\EnrollmentService", "/var/lib/postgresql/data")
-    .AddDatabase("enrollmentdb");
-
-var enrollmentService = builder.AddProject<Projects.Enrollments_Api>("enrollmentservice")
-    .WithReference(enrollmentDb)
-    .WithReference(rabbitMq)
-    .WithEnvironment("ConnectionStrings:ReadDatabase", enrollmentDb.Resource.ConnectionStringExpression)
-    .WithEnvironment("ConnectionStrings:WriteDatabase", enrollmentDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
 
 // Frontend configuration
