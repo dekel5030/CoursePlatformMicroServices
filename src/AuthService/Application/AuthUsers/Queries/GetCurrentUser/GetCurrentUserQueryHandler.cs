@@ -1,68 +1,34 @@
-using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.AuthUsers.Dtos;
+using Application.AuthUsers.Queries.GetCurrentUser;
+using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
 using Kernel;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
-namespace Application.AuthUsers.Queries.GetCurrentUser;
-
-public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, AuthResponseDto>
+public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, CurrentUserDto>
 {
-    private readonly IReadDbContext _readDbContext;
+    private readonly UserManager<AuthUser> _userManager;
 
-    public GetCurrentUserQueryHandler(IReadDbContext readDbContext)
+    public GetCurrentUserQueryHandler(
+        UserManager<AuthUser> userManager)
     {
-        _readDbContext = readDbContext;
+        _userManager = userManager;
     }
 
-    public async Task<Result<AuthResponseDto>> Handle(
+    public async Task<Result<CurrentUserDto>> Handle(
         GetCurrentUserQuery request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        // Fetch user from database with all necessary navigation properties
-        var authUser = await _readDbContext.AuthUsers
-            .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-                    .ThenInclude(r => r.RolePermissions)
-                        .ThenInclude(rp => rp.Permission)
-            .Include(u => u.UserPermissions)
-                .ThenInclude(up => up.Permission)
-            .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+        var user = await _userManager.FindByIdAsync(request.UserId);
 
-        if (authUser == null)
+        if (user is null)
         {
-            return Result.Failure<AuthResponseDto>(AuthUserErrors.NotFound);
+            return Result.Failure<CurrentUserDto>(AuthUserErrors.NotFound);
         }
 
-        // Extract roles and permissions
-        var roles = authUser.UserRoles
-            .Select(ur => ur.Role.Name)
-            .Distinct()
-            .ToList();
+        var currentUserDTO = new CurrentUserDto(user.Id, user.Email!, user.UserName);
 
-        var permissionsFromRoles = authUser.UserRoles
-            .SelectMany(ur => ur.Role.RolePermissions)
-            .Select(rp => rp.Permission.Name);
-
-        var directPermissions = authUser.UserPermissions
-            .Select(up => up.Permission.Name);
-
-        var allPermissions = permissionsFromRoles
-            .Concat(directPermissions)
-            .Distinct()
-            .ToList();
-
-        var response = new AuthResponseDto
-        {
-            AuthUserId = authUser.Id.Value,
-            UserId = authUser.Id.Value, // Unified ID
-            Email = authUser.Email,
-            Roles = roles,
-            AccessToken = null!, 
-            Permissions = allPermissions
-        };
-
-        return Result.Success(response);
+        return Result.Success(currentUserDTO);
     }
 }
