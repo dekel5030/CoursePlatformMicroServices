@@ -10,7 +10,7 @@ public class Role : IdentityRole<Guid>
     {
         return new Role
         {
-            Id = 0,
+            Id = Guid.CreateVersion7(),
             Name = roleName,
         };
     }

@@ -20,7 +20,7 @@ public class AuthUser : IdentityUser<Guid>, IHasDomainEvents
         {
             Id = Guid.CreateVersion7(),
             Email = email,
-            UserName = userName
+            UserName = string.IsNullOrEmpty(userName) ? email : userName
         };
 
         authUser.Raise(new UserRegisteredDomainEvent(
@@ -33,9 +33,3 @@ public class AuthUser : IdentityUser<Guid>, IHasDomainEvents
 }
 
 public class DomainEventContainer : Entity { }
-
-public interface IHasDomainEvents
-{
-    IReadOnlyCollection<IDomainEvent> DomainEvents { get; }
-    void ClearDomainEvents();
-}

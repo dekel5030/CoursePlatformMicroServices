@@ -16,13 +16,11 @@ builder.Services.AddCors(options =>
     );
 });
 
-
 builder.Services.AddOpenApi();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
-builder.Services.AddJwtCookieAuthentication();
 
 var app = builder.Build();
 
@@ -30,6 +28,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseCors("LocalDev");
+    await app.ApplyMigrationsAndSeed();
 }
 
 app.UseHttpsRedirection();
