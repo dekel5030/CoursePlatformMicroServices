@@ -13,41 +13,20 @@ public class Login : IEndpoint
     {
         app.MapPost("auth/login", async (
             LoginRequestDto request,
-            ICommandHandler<LoginUserCommand, AuthTokensResult> handler,
-            HttpContext httpContext,
+            ICommandHandler<LoginUserCommand, LoginResultDto> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new LoginUserCommand(request);
 
-            Result<AuthTokensResult> result = await handler.Handle(command, cancellationToken);
+            Result<LoginResultDto> result = await handler.Handle(command, cancellationToken);
 
-            return result.Match(
-                onSuccess: authTokens =>
-                {
-                    CookieHelper.SetRefreshTokenCookie(
-                        httpContext,
-                        authTokens);
-                    
-                    var response = new AuthResponseDto
-                    {
-                        AuthUserId = authTokens.AuthUserId,
-                        UserId = authTokens.AuthUserId,
-                        Email = authTokens.Email,
-                        Roles = authTokens.Roles,
-                        Permissions = authTokens.Permissions,
-                        AccessToken = authTokens.AccessToken,
-                        Message = "Login successful"
-                    };
-                    
-                    return Results.Ok(response);
-                },
-                onFailure: CustomResults.Problem);
+            return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Auth)
         .WithName("Login")
         .WithSummary("Login user")
-        .WithDescription("Authenticates a user and returns authentication tokens in HttpOnly cookies")
-        .Produces<AuthResponseDto>(StatusCodes.Status200OK)
+        .WithDescription("Authenticates a user and returns user information via JSON + HttpOnly Cookie")
+        .Produces<LoginResultDto>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound);
     }

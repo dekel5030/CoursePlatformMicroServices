@@ -1,6 +1,4 @@
-using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.Abstractions.Security;
 using Application.AuthUsers.Dtos;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
@@ -9,85 +7,50 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Application.AuthUsers.Commands.LoginUser;
 
-public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, AuthTokensResult>
+public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, LoginResultDto>
 {
-    private readonly ITokenService _tokenService;
-    private readonly UserManager<AuthUser> _userManager;
+    private readonly SignInManager<AuthUser> _signInManager;
 
-    public LoginUserCommandHandler(
-        IWriteDbContext dbContext,
-        ITokenService tokenService,
-        UserManager<AuthUser> userManager)
+    public LoginUserCommandHandler(SignInManager<AuthUser> signInManager)
     {
-        _tokenService = tokenService;
-        _userManager = userManager;
+        _signInManager = signInManager;
     }
 
-    public async Task<Result<AuthTokensResult>> Handle(
+    public async Task<Result<LoginResultDto>> Handle(
         LoginUserCommand request,
         CancellationToken cancellationToken = default)
     {
-        var requestDto = request.Dto;
+        LoginRequestDto requestDto = request.Dto;
 
-        var user = await _userManager.FindByEmailAsync(requestDto.Email);
+        AuthUser? user = await _signInManager.UserManager.FindByEmailAsync(requestDto.Email);
 
-        if (user == null)
+        if (user is null)
         {
-            return Result.Failure<AuthTokensResult>(AuthUserErrors.InvalidCredentials);
+            return Result.Failure<LoginResultDto>(AuthUserErrors.InvalidCredentials);
         }
 
-        if (await _userManager.IsLockedOutAsync(user))
+        var signInResult = await _signInManager.PasswordSignInAsync(
+            user,
+            requestDto.Password,
+            isPersistent: true,
+            lockoutOnFailure: true);
+
+        if (signInResult.Succeeded)
         {
-            return Result.Failure<AuthTokensResult>(AuthUserErrors.AccountLocked);
+            var loginResultDto = new LoginResultDto(user.Id, user.Email!, user.UserName!);
+            return Result.Success(loginResultDto);
         }
 
-        if (!user.EmailConfirmed)
+        if (signInResult.IsLockedOut)
         {
-            return Result.Failure<AuthTokensResult>(AuthUserErrors.AccountInactive);
+            return Result.Failure<LoginResultDto>(AuthUserErrors.UserLockedOut);
         }
 
-        bool correctPassword = await _userManager.CheckPasswordAsync(user, requestDto.Password);
-
-        if (!correctPassword)
+        if (signInResult.IsNotAllowed)
         {
-            await _userManager.AccessFailedAsync(user);
-            return Result.Failure<AuthTokensResult>(AuthUserErrors.InvalidCredentials);
+            return Result.Failure<LoginResultDto>(AuthUserErrors.EmailNotConfirmed);
         }
 
-        await _userManager.ResetAccessFailedCountAsync(user);
-
-        var response = await CreateAuthTokensResponse(user);
-        
-        return Result.Success(response);
-    }
-
-    private async Task<AuthTokensResult> CreateAuthTokensResponse(AuthUser authUser)
-    {
-        var userClaims = (await _userManager.GetClaimsAsync(authUser)).Select(claim => claim.ToString());
-        var roles = await _userManager.GetRolesAsync(authUser);
-
-        var refreshToken = _tokenService.GenerateRefreshToken();
-        var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);
-        
-        var refreshTokenHash = _tokenService.HashRefreshToken(refreshToken);
-        await _userManager
-            .SetAuthenticationTokenAsync(authUser, "AuthService", "refreshToken", refreshTokenHash);
-
-        var accessToken = _tokenService.GenerateAccessToken(
-            new TokenRequestDto { 
-                Email = authUser.Email!, 
-                Permissions = userClaims, 
-                Roles = roles});
-
-        return new AuthTokensResult
-        {
-            AuthUserId = authUser.Id,
-            Email = authUser.Email!,
-            Roles = roles,
-            Permissions = userClaims,
-            AccessToken = accessToken,
-            RefreshToken = refreshToken,
-            RefreshTokenExpiresAt = refreshTokenExpiresAt
-        };
+        return Result.Failure<LoginResultDto>(AuthUserErrors.InvalidCredentials);
     }
 }
