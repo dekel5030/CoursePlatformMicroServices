@@ -11,7 +11,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, C
 {
     private readonly SignInManager<AuthUser> _signInManager;
     private readonly UserManager<AuthUser> _userManager;
-    private readonly static string _defaultRole = "User";
+    private const string _defaultRole = "User";
 
     public RegisterUserCommandHandler(
         SignInManager<AuthUser> signInManager, 
