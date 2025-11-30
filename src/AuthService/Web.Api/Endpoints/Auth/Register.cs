@@ -1,5 +1,4 @@
 using Application.Abstractions.Messaging;
-using Application.Abstractions.Security;
 using Application.AuthUsers.Commands.RegisterUser;
 using Application.AuthUsers.Dtos;
 using Auth.Api.Extensions;
@@ -13,42 +12,20 @@ public class Register : IEndpoint
     {
         app.MapPost("auth/register", async (
             RegisterRequestDto request,
-            ICommandHandler<RegisterUserCommand, AuthTokensResult> handler,
-            ITokenService tokenService,
-            HttpContext httpContext,
+            ICommandHandler<RegisterUserCommand, CurrentUserDto> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new RegisterUserCommand(request);
 
             var result = await handler.Handle(command, cancellationToken);
 
-            return result.Match(
-                onSuccess: authTokens =>
-                {
-                    CookieHelper.SetRefreshTokenCookie(
-                        httpContext,
-                        authTokens);
-                    
-                    var response = new AuthResponseDto
-                    {
-                        AuthUserId = authTokens.AuthUserId,
-                        UserId = authTokens.AuthUserId,
-                        Email = authTokens.Email,
-                        Roles = authTokens.Roles,
-                        AccessToken = authTokens.AccessToken,
-                        Permissions = authTokens.Permissions,
-                        Message = "Registration successful"
-                    };
-                    
-                    return Results.Ok(response);
-                },
-                onFailure: CustomResults.Problem);
+            return result.Match(Results.Ok ,CustomResults.Problem);
         })
         .WithTags(Tags.Auth)
         .WithName("Register")
         .WithSummary("Register a new user")
-        .WithDescription("Creates a new user account and returns authentication tokens in HttpOnly cookies")
-        .Produces<AuthResponseDto>(StatusCodes.Status200OK)
+        .WithDescription("Creates a new user account and set cookies")
+        .Produces<CurrentUserDto>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status409Conflict);
     }
