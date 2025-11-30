@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Application.AuthUsers.Commands.LoginUser;
 
-public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, LoginResultDto>
+public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, CurrentUserDto>
 {
     private readonly SignInManager<AuthUser> _signInManager;
 
@@ -16,7 +16,7 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, LoginRe
         _signInManager = signInManager;
     }
 
-    public async Task<Result<LoginResultDto>> Handle(
+    public async Task<Result<CurrentUserDto>> Handle(
         LoginUserCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -26,7 +26,7 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, LoginRe
 
         if (user is null)
         {
-            return Result.Failure<LoginResultDto>(AuthUserErrors.InvalidCredentials);
+            return Result.Failure<CurrentUserDto>(AuthUserErrors.InvalidCredentials);
         }
 
         var signInResult = await _signInManager.PasswordSignInAsync(
@@ -37,20 +37,20 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, LoginRe
 
         if (signInResult.Succeeded)
         {
-            var loginResultDto = new LoginResultDto(user.Id, user.Email!, user.UserName!);
+            var loginResultDto = new CurrentUserDto(user.Id, user.Email!, user.UserName!);
             return Result.Success(loginResultDto);
         }
 
         if (signInResult.IsLockedOut)
         {
-            return Result.Failure<LoginResultDto>(AuthUserErrors.UserLockedOut);
+            return Result.Failure<CurrentUserDto>(AuthUserErrors.UserLockedOut);
         }
 
         if (signInResult.IsNotAllowed)
         {
-            return Result.Failure<LoginResultDto>(AuthUserErrors.EmailNotConfirmed);
+            return Result.Failure<CurrentUserDto>(AuthUserErrors.EmailNotConfirmed);
         }
 
-        return Result.Failure<LoginResultDto>(AuthUserErrors.InvalidCredentials);
+        return Result.Failure<CurrentUserDto>(AuthUserErrors.InvalidCredentials);
     }
 }

@@ -13,12 +13,12 @@ public class Login : IEndpoint
     {
         app.MapPost("auth/login", async (
             LoginRequestDto request,
-            ICommandHandler<LoginUserCommand, LoginResultDto> handler,
+            ICommandHandler<LoginUserCommand, CurrentUserDto> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new LoginUserCommand(request);
 
-            Result<LoginResultDto> result = await handler.Handle(command, cancellationToken);
+            Result<CurrentUserDto> result = await handler.Handle(command, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
@@ -26,7 +26,7 @@ public class Login : IEndpoint
         .WithName("Login")
         .WithSummary("Login user")
         .WithDescription("Authenticates a user and returns user information via JSON + HttpOnly Cookie")
-        .Produces<LoginResultDto>(StatusCodes.Status200OK)
+        .Produces<CurrentUserDto>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound);
     }

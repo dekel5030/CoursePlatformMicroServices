@@ -1,4 +1,4 @@
-namespace Application.AuthUsers.Commands.LoginUser;
+namespace Application.AuthUsers.Dtos;
 
 public class LoginRequestDto
 {
