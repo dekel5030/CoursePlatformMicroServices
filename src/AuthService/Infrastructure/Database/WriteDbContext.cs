@@ -47,7 +47,7 @@ public class WriteDbContext : IdentityDbContext<AuthUser, Role, Guid>, IWriteDbC
             .SelectMany(entity => entity.DomainEvents)
             .ToList();
 
-        foreach (Entity entity in entities)
+        foreach (IHasDomainEvents entity in entities)
         {
             entity.ClearDomainEvents();
         }
