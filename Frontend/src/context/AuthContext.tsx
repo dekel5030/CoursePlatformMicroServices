@@ -9,20 +9,22 @@ import {
 import {
   login as apiLogin,
   logout as apiLogout,
-  refreshAccessToken as apiRefreshAccessToken,
-  type AuthResponse,
+  register as apiRegister,
+  getCurrentUser,
+  type AuthUser,
+  type RegisterData,
 } from "../services/AuthAPI";
 import { initializeAuthenticatedFetch } from "../utils/authenticatedFetch";
 
-export type AuthUser = AuthResponse;
+export type { AuthUser };
 
 interface AuthContextType {
   currentUser: AuthUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<AuthResponse>;
+  login: (email: string, password: string) => Promise<AuthUser>;
+  register: (data: RegisterData) => Promise<AuthUser>;
   logout: () => Promise<void>;
-  refreshAccessToken: () => Promise<string>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,48 +39,51 @@ export function AuthProvider({ children }: Props) {
 
   const logout = useCallback(async () => {
     await apiLogout();
-    localStorage.removeItem("currentUser");
     setCurrentUser(null);
   }, []);
 
-  const refreshAccessToken = useCallback(async (): Promise<string> => {
-    const newToken = await apiRefreshAccessToken();
-
-    setCurrentUser((prevUser) => {
-      if (!prevUser) return prevUser;
-
-      const updatedUser = { ...prevUser, accessToken: newToken };
-      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-      return updatedUser;
-    });
-
-    return newToken;
-  }, []);
-
+  // Initialize authenticated fetch with logout handler
   useEffect(() => {
-    if (isLoading) return;
+    initializeAuthenticatedFetch(logout);
+  }, [logout]);
 
-    initializeAuthenticatedFetch(
-      () => currentUser?.accessToken,
-      refreshAccessToken,
-      logout
-    );
-  }, [currentUser?.accessToken, isLoading, logout, refreshAccessToken]);
-
+  // Check session on app load by calling /auth/me
   useEffect(() => {
-    const storedUser = localStorage.getItem("currentUser");
-    setCurrentUser(storedUser ? (JSON.parse(storedUser) as AuthUser) : null);
-    setIsLoading(false);
+    const checkSession = async () => {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        // No active session - user is not authenticated
+        // Log only unexpected errors (not 401/403 which are expected for unauthenticated users)
+        if (error instanceof Error && !error.message.includes("Failed to fetch current user")) {
+          console.error("Unexpected error checking session:", error);
+        }
+        setCurrentUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
   }, []);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
       const user = await apiLogin({ email, password });
-
       setCurrentUser(user);
-      localStorage.setItem("currentUser", JSON.stringify(user));
+      return user;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  const register = async (data: RegisterData) => {
+    setIsLoading(true);
+    try {
+      const user = await apiRegister(data);
+      setCurrentUser(user);
       return user;
     } finally {
       setIsLoading(false);
@@ -92,8 +97,8 @@ export function AuthProvider({ children }: Props) {
         isLoading,
         isAuthenticated: currentUser !== null,
         login,
+        register,
         logout,
-        refreshAccessToken,
       }}
     >
       {children}

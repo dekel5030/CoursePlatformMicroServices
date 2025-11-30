@@ -19,7 +19,7 @@ export default function UserProfilePage() {
 
   // Get current user from AuthContext
   const { currentUser } = useAuth();
-  const isOwnProfile = currentUser?.userId === id;
+  const isOwnProfile = currentUser?.id === id;
 
   useEffect(() => {
     if (!id) return;
