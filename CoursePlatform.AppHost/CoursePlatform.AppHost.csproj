@@ -24,8 +24,6 @@
         <ProjectReference Include="..\src\CourseService\Web.Api\Course.Api.csproj">
         </ProjectReference>
 
-        <ProjectReference Include="..\src\EnrollmentService\Web.Api\Enrollments.Api.csproj" />
-
         <ProjectReference Include="..\src\UserService\Web.Api\User.Api.csproj">
         </ProjectReference>
     </ItemGroup>

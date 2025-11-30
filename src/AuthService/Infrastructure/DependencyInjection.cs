@@ -1,12 +1,13 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.Abstractions.Security;
+using Domain.AuthUsers;
+using Domain.Roles;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
-using Infrastructure.Jwt;
 using Infrastructure.MassTransit;
-using Infrastructure.Security;
 using MassTransit;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,8 @@ namespace Infrastructure;
 
 public static class DependencyInjection
 {
-    private static readonly string _databaseSectionName = "Database";
+    private static readonly string _writeDbSectionName = "WriteDatabase";
+    private static readonly string _readDbSectionName = "ReadDatabase";
     private static readonly string _rabbitMqSectionName = "RabbitMq";
 
     public static IServiceCollection AddInfrastructure(
@@ -27,22 +29,20 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
-            .ConfigureJwtAuthentication(configuration);
+            .ConfigureIdentities(configuration);
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
-        services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
-        services.AddScoped<ITokenService, JwtTokenService>();
 
         return services;
     }
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<AuthDbContext>((serviceProvider, options) =>
+        services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(_databaseSectionName)
+            string connectionString = configuration.GetConnectionString(_writeDbSectionName)
                 ?? throw new InvalidOperationException("Database connection string not found");
 
             options
@@ -54,8 +54,23 @@ public static class DependencyInjection
                 .UseSnakeCaseNamingConvention();
         });
 
-        services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
-        services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
+        services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
+        {
+            string connectionString = configuration.GetConnectionString(_readDbSectionName)
+                ?? throw new InvalidOperationException("Database connection string not found");
+
+            options
+                .UseNpgsql(connectionString, npgsqlOptions =>
+                {
+                    npgsqlOptions.MigrationsHistoryTable(
+                        HistoryRepository.DefaultTableName);
+                })
+                .UseSnakeCaseNamingConvention()
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+        });
+
+        services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
+        services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<ReadDbContext>());
 
         return services;
     }
@@ -64,7 +79,6 @@ public static class DependencyInjection
         this IServiceCollection services, 
         IConfiguration configuration)
     {
-        // Health checks can be added here
         return services;
     }
 
@@ -76,7 +90,7 @@ public static class DependencyInjection
         {
             config.AddConsumers(typeof(DependencyInjection).Assembly);
 
-            config.AddEntityFrameworkOutbox<AuthDbContext>(o =>
+            config.AddEntityFrameworkOutbox<WriteDbContext>(o =>
             {
                 o.UsePostgres();
                 o.UseBusOutbox();
@@ -85,7 +99,7 @@ public static class DependencyInjection
 
             config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
             {
-                endpointCfg.UseEntityFrameworkOutbox<AuthDbContext>(ctx);
+                endpointCfg.UseEntityFrameworkOutbox<WriteDbContext>(ctx);
                 endpointCfg.UseMessageRetry(r =>
                 {
                     r.Handle<InvalidOperationException>();
@@ -107,6 +121,50 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
+
+        return services;
+    }
+
+    private static IServiceCollection ConfigureIdentities(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddIdentity<AuthUser, Role>(options =>
+        {
+            options.Password.RequireDigit = false;
+            options.Password.RequiredLength = 6;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireLowercase = false;
+
+            options.User.RequireUniqueEmail = true;
+        })
+        .AddEntityFrameworkStores<WriteDbContext>()
+        .AddDefaultTokenProviders();
+
+        services.AddAuthorization();
+
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.Name = "CoursePlatform.Auth";
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SameSite = SameSiteMode.Strict;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.ExpireTimeSpan = TimeSpan.FromDays(14);
+            options.SlidingExpiration = true;
+
+            options.Events.OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
+            };
+
+            options.Events.OnRedirectToAccessDenied = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return Task.CompletedTask;
+            };
+        });
 
         return services;
     }

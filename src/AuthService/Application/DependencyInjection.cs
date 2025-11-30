@@ -1,7 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.AuthUsers.Commands.LoginUser;
 using Application.AuthUsers.Commands.Logout;
-using Application.AuthUsers.Commands.RefreshAccessToken;
 using Application.AuthUsers.Commands.RegisterUser;
 using Application.AuthUsers.Dtos;
 using Application.AuthUsers.Events;
@@ -26,15 +25,14 @@ public static class DependencyInjection
 
     private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
     {
-        services.AddScoped<IQueryHandler<GetCurrentUserQuery, AuthResponseDto>, GetCurrentUserQueryHandler>();
+        services.AddScoped<IQueryHandler<GetCurrentUserQuery, CurrentUserDto>, GetCurrentUserQueryHandler>();
         return services;
     }
 
     private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
     {
-        services.AddScoped<ICommandHandler<RegisterUserCommand, AuthTokensResult>, RegisterUserCommandHandler>();
-        services.AddScoped<ICommandHandler<LoginUserCommand, AuthTokensResult>, LoginUserCommandHandler>();
-        services.AddScoped<ICommandHandler<RefreshAccessTokenCommand, string>, RefreshAccessTokenCommandHandler>();
+        services.AddScoped<ICommandHandler<RegisterUserCommand, CurrentUserDto>, RegisterUserCommandHandler>();
+        services.AddScoped<ICommandHandler<LoginUserCommand, CurrentUserDto>, LoginUserCommandHandler>();
         services.AddScoped<ICommandHandler<LogoutCommand>, LogoutCommandHandler>();
 
 
