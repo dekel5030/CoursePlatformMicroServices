@@ -29,13 +29,13 @@ public static class HostingExtensions
         builder.Services.AddHealthChecks()
             .AddNpgSql(writeDatabaseConnectionString, name: "postgres-write", tags: ["ready"])
             .AddNpgSql(readDatabaseConnectionString, name: "postgres-read", tags: ["ready"])
-            .AddRabbitMQ(_ =>
+            .AddRabbitMQ(async _ =>
             {
                 var factory = new ConnectionFactory
                 {
                     Uri = new Uri(rabbitMqConnectionString)
                 };
-                return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+                return await factory.CreateConnectionAsync().ConfigureAwait(false);
             }, name: "rabbitmq", tags: ["ready"]);
 
         return builder;
