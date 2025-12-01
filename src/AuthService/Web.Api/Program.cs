@@ -41,7 +41,7 @@ app.UseAuthorization();
 
 app.MapEndpoints();
 
-app.UseInfrastructureEndpoints();
+app.UseInfrastructureDefaultEndpoints();
 
 app.Run();
 
