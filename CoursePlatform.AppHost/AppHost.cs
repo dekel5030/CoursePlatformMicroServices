@@ -52,9 +52,12 @@ var coursesDb = builder
 var coursesService = builder.AddProject<Projects.Course_Api>("courseservice")
     .WithReference(coursesDb)
     .WithReference(rabbitMq)
+    .WaitFor(coursesDb)
+    .WaitFor(rabbitMq)
     .WithEnvironment("ConnectionStrings:ReadDatabase", coursesDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:WriteDatabase", coursesDb.Resource.ConnectionStringExpression)
-    .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
+    .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression)
+    .WithHttpHealthCheck("/health");
 
 // Gateway configuration
 
