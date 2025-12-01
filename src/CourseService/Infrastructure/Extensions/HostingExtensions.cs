@@ -15,7 +15,9 @@ public static class HostingExtensions
     {
         builder.AddServiceDefaults();
 
-        string connectionString = builder.Configuration.GetConnectionString(WriteDatabaseSectionName)!;
+        string connectionString = builder.Configuration.GetConnectionString(WriteDatabaseSectionName)
+            ?? throw new InvalidOperationException(
+                $"Connection string '{WriteDatabaseSectionName}' not found in configuration.");
 
         builder.Services.AddHealthChecks()
             .AddNpgSql(connectionString, name: "postgres", tags: ["db", "postgres"]);
