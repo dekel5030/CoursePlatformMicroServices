@@ -18,9 +18,11 @@ var authService = builder
     .WithReference(authDb)
     .WithReference(rabbitMq)
     .WaitFor(authDb)
+    .WaitFor(rabbitMq)
     .WithEnvironment("ConnectionStrings:ReadDatabase", authDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:WriteDatabase", authDb.Resource.ConnectionStringExpression)
-    .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
+    .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression)
+    .WithHttpHealthCheck("/health");
 
 // UserService configuration
 
