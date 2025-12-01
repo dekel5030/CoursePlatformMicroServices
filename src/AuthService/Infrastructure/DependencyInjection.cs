@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Infrastructure;
 
@@ -117,6 +118,13 @@ public static class DependencyInjection
 
                 busConfig.Host(new Uri(connectionString), h => { });
                 busConfig.ConfigureEndpoints(context);
+            });
+
+            config.ConfigureHealthCheckOptions(options =>
+            {
+                options.Name = "masstransit";
+                options.MinimalFailureStatus = HealthStatus.Unhealthy;
+                options.Tags.Add("ready");
             });
         });
 
