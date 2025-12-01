@@ -15,8 +15,8 @@ namespace Infrastructure;
 public static class DependencyInjection
 {
     internal const string ReadDatabaseConnectionStringName = "ReadDatabase";
-    private static readonly string _writeDatabaseConnectionStringName = "WriteDatabase";
-    private static readonly string _rabbitMqSectionName = "RabbitMq";
+    internal const string WriteDatabaseConnectionStringName = "WriteDatabase";
+    internal const string RabbitMqConnectionStringName = "RabbitMq";
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
@@ -58,7 +58,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(_writeDatabaseConnectionStringName)!;
+            string connectionString = configuration.GetConnectionString(WriteDatabaseConnectionStringName)!;
 
             options.UseNpgsql(connectionString);
         });
@@ -97,7 +97,7 @@ public static class DependencyInjection
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                string connectionString = configuration.GetConnectionString(_rabbitMqSectionName)!;
+                string connectionString = configuration.GetConnectionString(RabbitMqConnectionStringName)!;
 
                 busConfig.Host(new Uri(connectionString!), h => { });
                 busConfig.ConfigureEndpoints(context);
