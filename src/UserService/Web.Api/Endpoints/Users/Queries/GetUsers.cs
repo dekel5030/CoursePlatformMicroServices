@@ -12,7 +12,7 @@ public class GetUser : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/users/", async (
+        app.MapGet("/users/", async (
             IQueryHandler<GetUsersQuery, CollectionDto<UserReadDto>> handler,
             [AsParameters] GetUsersQuery query,
             CancellationToken cancellationToken = default) =>

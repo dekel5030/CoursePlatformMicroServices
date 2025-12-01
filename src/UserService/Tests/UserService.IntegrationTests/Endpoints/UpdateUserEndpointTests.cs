@@ -33,7 +33,7 @@ public class UpdateUserEndpointTests : IntegrationTestsBase
         };
 
         // Act
-        var response = await Client.PutAsJsonAsync($"/api/users/{userId}", updateRequest);
+        var response = await Client.PutAsJsonAsync($"/users/{userId}", updateRequest);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -57,7 +57,7 @@ public class UpdateUserEndpointTests : IntegrationTestsBase
         };
 
         // Act
-        var response = await Client.PutAsJsonAsync($"/api/users/{nonExistentUserId}", updateRequest);
+        var response = await Client.PutAsJsonAsync($"/users/{nonExistentUserId}", updateRequest);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -84,7 +84,7 @@ public class UpdateUserEndpointTests : IntegrationTestsBase
         };
 
         // Act
-        var response = await Client.PutAsJsonAsync($"/api/users/{userId}", updateRequest);
+        var response = await Client.PutAsJsonAsync($"/users/{userId}", updateRequest);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

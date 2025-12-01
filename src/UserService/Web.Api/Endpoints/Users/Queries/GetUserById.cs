@@ -13,7 +13,7 @@ public class GetUserById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/users/{id:guid}", async (
+        app.MapGet("/users/{id:guid}", async (
             Guid id,
             IQueryHandler<GetUserByIdQuery, UserReadDto> handler,
             CancellationToken cancellationToken = default) =>
