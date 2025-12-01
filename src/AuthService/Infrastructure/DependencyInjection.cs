@@ -18,8 +18,8 @@ namespace Infrastructure;
 public static class DependencyInjection
 {
     internal const string WriteDbSectionName = "WriteDatabase";
-    private const string ReadDbSectionName = "ReadDatabase";
-    private const string RabbitMqSectionName = "RabbitMq";
+    internal const string ReadDbSectionName = "ReadDatabase";
+    internal const string RabbitMqSectionName = "RabbitMq";
 
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
