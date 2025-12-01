@@ -60,12 +60,8 @@ var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
 
 // Frontend configuration
 var frontend = builder.AddNpmApp("frontend", "../Frontend", "dev")
-    .WithReference(authService)
-    .WithReference(usersService)
-    .WithReference(coursesService)
-    .WaitFor(authService)
-    .WaitFor(usersService)
-    .WaitFor(coursesService)
+    .WithReference(gateway)
+    .WaitFor(gateway)
     .WithHttpEndpoint(port: 5067, env: "PORT")
     .WithExternalHttpEndpoints();
 
