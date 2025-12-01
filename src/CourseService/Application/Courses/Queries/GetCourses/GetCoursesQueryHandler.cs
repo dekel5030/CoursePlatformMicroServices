@@ -16,7 +16,7 @@ public class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, PagedRespon
     }
 
     public async Task<Result<PagedResponseDto<CourseReadDto>>> Handle(
-        GetCoursesQuery request, 
+        GetCoursesQuery request,
         CancellationToken cancellationToken = default)
     {
         var pageNumber = Math.Max(1, request.PagedQuery.PageNumber ?? 1);

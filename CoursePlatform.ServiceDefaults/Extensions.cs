@@ -17,8 +17,8 @@ namespace CoursePlatform.ServiceDefaults;
 // To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
 public static class Extensions
 {
-    private const string _healthEndpointPath = "/health";
-    private const string _alivenessEndpointPath = "/alive";
+    private const string HealthEndpointPath = "/health";
+    private const string AlivenessEndpointPath = "/alive";
 
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
@@ -67,8 +67,8 @@ public static class Extensions
                     .AddAspNetCoreInstrumentation(tracing =>
                         // Exclude health check requests from tracing
                         tracing.Filter = context =>
-                            !context.Request.Path.StartsWithSegments(_healthEndpointPath)
-                            && !context.Request.Path.StartsWithSegments(_alivenessEndpointPath)
+                            !context.Request.Path.StartsWithSegments(HealthEndpointPath)
+                            && !context.Request.Path.StartsWithSegments(AlivenessEndpointPath)
                     )
                     // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
                     //.AddGrpcClientInstrumentation()
@@ -110,7 +110,7 @@ public static class Extensions
 
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
     {
-        app.MapHealthChecks(_healthEndpointPath, new HealthCheckOptions
+        app.MapHealthChecks(HealthEndpointPath, new HealthCheckOptions
         {
             Predicate = r => r.Tags.Contains("ready") || r.Tags.Contains("live"),
 
@@ -122,7 +122,7 @@ public static class Extensions
             }
         });
 
-        app.MapHealthChecks(_alivenessEndpointPath, new HealthCheckOptions
+        app.MapHealthChecks(AlivenessEndpointPath, new HealthCheckOptions
         {
             Predicate = r => r.Tags.Contains("live")
         });

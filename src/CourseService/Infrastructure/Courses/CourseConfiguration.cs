@@ -11,14 +11,14 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
     {
         builder.ToTable("Courses");
 
-        builder.HasKey(Course => Course.Id);
+        builder.HasKey(course => course.Id);
 
         builder.Property(course => course.Id)
             .HasConversion(
                 id => id.Value,
                 value => new CourseId(value));
 
-        builder.Property(Course => Course.Title)
+        builder.Property(course => course.Title)
             .IsRequired()
             .HasMaxLength(200);
 

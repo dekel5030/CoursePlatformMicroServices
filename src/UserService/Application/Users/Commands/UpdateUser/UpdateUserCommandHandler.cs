@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.Commands.UpdateUser;
 
-public class UpdateUserCommandHandler(IWriteDbContext dbContext) 
+public class UpdateUserCommandHandler(IWriteDbContext dbContext)
     : ICommandHandler<UpdateUserCommand, UpdatedUserResponseDto>
 {
     public async Task<Result<UpdatedUserResponseDto>> Handle(

@@ -12,7 +12,7 @@ public class AuthRegisteredIntegrationEventHandler(
     ILogger<AuthRegisteredIntegrationEventHandler> logger) : IIntegrationEventHandler<AuthRegisteredIntegrationEvent>
 {
     public Task Handle(
-        AuthRegisteredIntegrationEvent request, 
+        AuthRegisteredIntegrationEvent request,
         CancellationToken cancellationToken = default)
     {
         logger.LogInformation(
@@ -38,7 +38,7 @@ public class AuthRegisteredIntegrationEventHandler(
             Result<User> newUserResult = User.CreateUser(
                 authUserId,
                 request.Email,
-                userId); 
+                userId);
 
             if (newUserResult.IsFailure)
             {

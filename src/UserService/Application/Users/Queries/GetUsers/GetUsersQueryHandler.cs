@@ -9,7 +9,7 @@ namespace Application.Users.Queries.GetUsers;
 public class GetUsersQueryHandler(IReadDbContext DbContext) : IQueryHandler<GetUsersQuery, CollectionDto<UserReadDto>>
 {
     public async Task<Result<CollectionDto<UserReadDto>>> Handle(
-        GetUsersQuery request, 
+        GetUsersQuery request,
         CancellationToken cancellationToken = default)
     {
         if (request.PageNumber <= 0 || request.PageSize <= 0)

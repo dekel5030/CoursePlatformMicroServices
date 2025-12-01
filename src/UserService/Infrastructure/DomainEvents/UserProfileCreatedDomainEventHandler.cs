@@ -9,7 +9,7 @@ public class UserProfileCreatedDomainEventHandler(
     IPublishEndpoint publishEndpoint) : IDomainEventHandler<UserProfileCreatedDomainEvent>
 {
     public async Task Handle(
-        UserProfileCreatedDomainEvent request, 
+        UserProfileCreatedDomainEvent request,
         CancellationToken cancellationToken = default)
     {
         // Map domain event to integration event contract

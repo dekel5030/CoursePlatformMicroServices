@@ -7,7 +7,7 @@ namespace Auth.Api.Extensions;
 
 public static class MigrationExtensions
 {
-    public static async Task ApplyMigrationsAndSeed(this IApplicationBuilder app)
+    public static async Task ApplyMigrationsAndSeedAsync(this IApplicationBuilder app)
     {
         using IServiceScope scope = app.ApplicationServices.CreateScope();
         IServiceProvider services = scope.ServiceProvider;

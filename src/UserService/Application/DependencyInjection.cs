@@ -20,7 +20,7 @@ public static class DependencyInjection
         services.AddScoped<ICommandHandler<UpdateUserCommand, UpdatedUserResponseDto>, UpdateUserCommandHandler>();
 
         services.AddScoped<IIntegrationEventHandler<AuthRegisteredIntegrationEvent>, AuthRegisteredIntegrationEventHandler>();
-        
+
         return services;
     }
 }

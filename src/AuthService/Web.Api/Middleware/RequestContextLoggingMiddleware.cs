@@ -5,21 +5,21 @@ namespace Auth.Api.Middleware;
 
 public class RequestContextLoggingMiddleware(RequestDelegate next)
 {
-    private const string _correlationIdHeaderName = "Correlation-Id";
+    private const string CorrelationIdHeaderName = "Correlation-Id";
 
     public Task Invoke(HttpContext context)
     {
         // Temporarily disabled Serilog dependency
         // using (LogContext.PushProperty("CorrelationId", GetCorrelationId(context)))
         // {
-            return next.Invoke(context);
+        return next.Invoke(context);
         // }
     }
 
     private static string GetCorrelationId(HttpContext context)
     {
         context.Request.Headers.TryGetValue(
-            _correlationIdHeaderName,
+            CorrelationIdHeaderName,
             out StringValues correlationId);
 
         return correlationId.FirstOrDefault() ?? context.TraceIdentifier;

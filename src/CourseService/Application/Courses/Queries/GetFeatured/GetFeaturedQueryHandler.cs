@@ -42,7 +42,7 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResp
         var featuredIds = _featuredCourseIds.ToArray();
 
         var items = await _dbContext.Courses
-            .Where(c => featuredIds.Contains(c.Id)) 
+            .Where(c => featuredIds.Contains(c.Id))
             .OrderByDescending(c => c.UpdatedAtUtc)
             .Select(c => new CourseReadDto(
                 c.Id,

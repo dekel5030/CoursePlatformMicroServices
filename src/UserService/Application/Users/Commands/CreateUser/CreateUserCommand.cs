@@ -8,6 +8,6 @@ public sealed record CreateUserCommand(
     string? UserId,
     string? FirstName,
     string? LastName,
-    PhoneNumber? PhoneNumber, 
+    PhoneNumber? PhoneNumber,
     DateTime? DateOfBirth) : ICommand<CreatedUserRespondDto>
 { }

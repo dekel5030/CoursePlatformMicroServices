@@ -1,7 +1,7 @@
-﻿using System.Collections.Concurrent;
-using Application.Abstractions.Messaging;
+﻿using Application.Abstractions.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using SharedKernel;
+using System.Collections.Concurrent;
 
 namespace Infrastructure.DomainEvents;
 

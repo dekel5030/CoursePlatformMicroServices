@@ -10,14 +10,14 @@ internal sealed class MassTransitEventPublisher : IEventPublisher
     private readonly ILogger<MassTransitEventPublisher> _logger;
 
     public MassTransitEventPublisher(
-        IPublishEndpoint publishEndpoint, 
+        IPublishEndpoint publishEndpoint,
         ILogger<MassTransitEventPublisher> logger)
     {
         _publishEndpoint = publishEndpoint;
         _logger = logger;
     }
 
-    public async Task Publish<T>(T message, CancellationToken cancellationToken = default) 
+    public async Task Publish<T>(T message, CancellationToken cancellationToken = default)
         where T : notnull
     {
         _logger.LogInformation("Publishing message of type {MessageType}: {Message}", message.GetType(), message);

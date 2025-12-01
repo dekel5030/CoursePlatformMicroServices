@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Reflection;
 using User.Api.Endpoints;
 
 namespace User.Api.Extensions;

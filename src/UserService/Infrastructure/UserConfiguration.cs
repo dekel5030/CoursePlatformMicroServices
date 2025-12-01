@@ -24,11 +24,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.AuthUserId)
             .HasConversion(
-                authUserId => authUserId.Value,
+                authUserId => authUserId != null ? authUserId.Value : default,
                 value => new AuthUserId(value))
-            .HasMaxLength(_authUserIdMaxLength)
-            .IsRequired(false); 
-        
+            .IsRequired(false);
+
         builder.HasIndex(u => u.AuthUserId).IsUnique();
 
         builder.Property(u => u.Email).IsRequired().HasMaxLength(_emailMaxLength);

@@ -31,7 +31,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseCors("LocalDev");
-    await app.ApplyMigrationsAndSeed();
+    await app.ApplyMigrationsAndSeedAsync();
 }
 
 app.UseHttpsRedirection();

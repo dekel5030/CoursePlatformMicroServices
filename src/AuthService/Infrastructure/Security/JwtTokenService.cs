@@ -1,11 +1,11 @@
-using Application.Abstractions.Security;
-using Infrastructure.Jwt;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Application.Abstractions.Security;
+using Infrastructure.Jwt;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Security;
 
@@ -28,10 +28,10 @@ public class JwtTokenService : ITokenService
         {
             throw new InvalidOperationException("JWT Private Key not configured");
         }
-        
+
         rsa.ImportFromPem(_jwtOptions.PrivateKey);
         var signingCredentials = new SigningCredentials(
-            new RsaSecurityKey(rsa), 
+            new RsaSecurityKey(rsa),
             SecurityAlgorithms.RsaSha256);
 
         var token = new JwtSecurityToken(
@@ -84,8 +84,8 @@ public class JwtTokenService : ITokenService
         {
             new Claim(JwtRegisteredClaimNames.Email, request.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, 
-                DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), 
+            new Claim(JwtRegisteredClaimNames.Iat,
+                DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 ClaimValueTypes.Integer64)
         };
 
