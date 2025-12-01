@@ -12,7 +12,7 @@ public class GetFeatured : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/courses/featured", async (
+        app.MapGet("courses/featured", async (
             IQueryHandler<GetFeaturedQuery, PagedResponseDto<CourseReadDto>> handler,
             CancellationToken cancellationToken) =>
         {
