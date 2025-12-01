@@ -3,7 +3,6 @@ using Application.Users.Commands.UpdateUser;
 using Domain.Users.Primitives;
 using Kernel;
 using Microsoft.AspNetCore.Mvc;
-using User.Api.Endpoints;
 using User.Api.Extensions;
 using User.Api.Infrastructure;
 
@@ -29,7 +28,7 @@ public class UpdateUser : IEndpoint
             Result<UpdatedUserResponseDto> result = await handler.Handle(command, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
-        }).RequireAuthorization();
+        });
     }
 }
 
