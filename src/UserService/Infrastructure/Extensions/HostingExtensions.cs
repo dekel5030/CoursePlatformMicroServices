@@ -9,41 +9,35 @@ namespace Infrastructure.Extensions;
 
 public static class HostingExtensions
 {
-    public static TBuilder AddInfrastructureDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    public static TBuilder AddInfrastructureDefaults<TBuilder>(this TBuilder builder)
+        where TBuilder : IHostApplicationBuilder
     {
         builder.AddServiceDefaults();
-
         var healthChecks = builder.Services.AddHealthChecks();
 
-        var readDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.ReadDatabaseConnectionStringName);
-        if (!string.IsNullOrEmpty(readDbConnectionString))
-        {
-            healthChecks.AddNpgSql(readDbConnectionString, name: "postgres-read", tags: ["ready"]);
-        }
-
-        var writeDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.WriteDatabaseConnectionStringName);
+        var writeDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection._writeDatabaseConnectionStringName);
         if (!string.IsNullOrEmpty(writeDbConnectionString))
         {
-            healthChecks.AddNpgSql(writeDbConnectionString, name: "postgres-write", tags: ["ready"]);
+            healthChecks.AddNpgSql(
+                writeDbConnectionString,
+                name: "postgres-write",
+                tags: ["ready"]);
         }
 
-        var rabbitMqConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.RabbitMqConnectionStringName);
-        if (!string.IsNullOrEmpty(rabbitMqConnectionString))
+        var readDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection._readDatabaseConnectionStringName);
+        if (!string.IsNullOrEmpty(readDbConnectionString) 
+            && !string.Equals(readDbConnectionString, writeDbConnectionString))
         {
-            healthChecks.AddRabbitMQ(
-                async _ =>
-                {
-                    var factory = new ConnectionFactory { Uri = new Uri(rabbitMqConnectionString) };
-                    return await factory.CreateConnectionAsync();
-                },
-                name: "rabbitmq",
+            healthChecks.AddNpgSql(
+                readDbConnectionString,
+                name: "postgres-read",
                 tags: ["ready"]);
         }
 
         return builder;
     }
 
-    public static WebApplication UseInfrastructureEndpoints(this WebApplication app)
+    public static WebApplication UseInfrastructureDefaultEndpoints(this WebApplication app)
     {
         app.MapDefaultEndpoints();
 

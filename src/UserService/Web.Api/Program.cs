@@ -40,7 +40,7 @@ app.UseAuthorization();
 
 app.UseHttpsRedirection();
 app.MapEndpoints();
-app.UseInfrastructureEndpoints();
+app.UseInfrastructureDefaultEndpoints();
 app.Run();
 
 public partial class Program { }
