@@ -8,4 +8,4 @@ public interface ICommandHandler<TCommand> : IHandler<TCommand, Result>
 
 public interface ICommandHandler<TCommand, TResponse> : IHandler<TCommand, Result<TResponse>>
     where TCommand : ICommand<TResponse>
-{}
+{ }

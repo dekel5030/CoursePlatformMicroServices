@@ -19,7 +19,7 @@ public class Register : IEndpoint
 
             var result = await handler.Handle(command, cancellationToken);
 
-            return result.Match(Results.Ok ,CustomResults.Problem);
+            return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Auth)
         .WithName("Register")

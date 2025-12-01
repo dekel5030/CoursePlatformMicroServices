@@ -9,7 +9,7 @@ public class ReadDbContext : DbContext, IReadDbContext
 {
     public ReadDbContext(DbContextOptions<ReadDbContext> options) : base(options)
     {
-        
+
     }
 
     public DbSet<Course> Courses { get; set; }

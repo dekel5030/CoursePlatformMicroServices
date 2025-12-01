@@ -11,10 +11,10 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, C
 {
     private readonly SignInManager<AuthUser> _signInManager;
     private readonly UserManager<AuthUser> _userManager;
-    private const string _defaultRole = "User";
+    private const string DefaultRole = "User";
 
     public RegisterUserCommandHandler(
-        SignInManager<AuthUser> signInManager, 
+        SignInManager<AuthUser> signInManager,
         UserManager<AuthUser> userManager)
     {
         _signInManager = signInManager;
@@ -27,7 +27,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, C
     {
         RegisterRequestDto requestDto = request.Dto;
         AuthUser user = AuthUser.Create(requestDto.Email, requestDto.UserName);
-        
+
         var result = await _userManager.CreateAsync(user, requestDto.Password);
 
         if (!result.Succeeded)
@@ -35,7 +35,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, C
             return result.ToApplicationResult<CurrentUserDto>();
         }
 
-        var addToRoleResult = await _userManager.AddToRoleAsync(user, _defaultRole);
+        var addToRoleResult = await _userManager.AddToRoleAsync(user, DefaultRole);
         if (!addToRoleResult.Succeeded)
         {
             return addToRoleResult.ToApplicationResult<CurrentUserDto>();
@@ -44,7 +44,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, C
         await _signInManager.SignInAsync(user, true);
 
         var currentUserDto = new CurrentUserDto(user.Id, user.Email!, user.UserName);
-        
+
         return Result<CurrentUserDto>.Success(currentUserDto);
     }
 }

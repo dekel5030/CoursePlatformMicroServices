@@ -21,7 +21,7 @@ public static class MessagingExtensions
             x.UsingRabbitMq((ctx, cfg) =>
             {
                 var rabbit = ctx.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
-                var mt     = ctx.GetRequiredService<IOptions<MassTransitOptions>>().Value;
+                var mt = ctx.GetRequiredService<IOptions<MassTransitOptions>>().Value;
 
                 cfg.Host(rabbit.CreateUri(), h =>
                 {

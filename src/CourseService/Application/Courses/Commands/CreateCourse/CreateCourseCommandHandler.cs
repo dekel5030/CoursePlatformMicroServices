@@ -16,7 +16,7 @@ public class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand, C
     }
 
     public async Task<Result<CourseId>> Handle(
-        CreateCourseCommand request, 
+        CreateCourseCommand request,
         CancellationToken cancellationToken = default)
     {
         CreateCourseDto dto = request.Dto;

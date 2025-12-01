@@ -28,7 +28,7 @@ public class CreateUserCommandHandler(IWriteDbContext dbContext) : ICommandHandl
         // Note: Manual user creation is deprecated. Users should be created via AuthService events.
         // This creates a temporary AuthUserId for backward compatibility.
         var tempAuthUserId = new AuthUserId($"temp-{Guid.NewGuid()}");
-        
+
         // Parse userId if provided, otherwise it will be generated
         UserId? userId = null;
         if (!string.IsNullOrEmpty(request.UserId))

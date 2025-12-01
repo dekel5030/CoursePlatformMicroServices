@@ -32,9 +32,9 @@ public sealed class RabbitMqOptions
         return new UriBuilder
         {
             Scheme = scheme,
-            Host   = Host,
-            Port   = Port,
-            Path   = vhost
+            Host = Host,
+            Port = Port,
+            Path = vhost
         }.Uri;
     }
 }

@@ -77,14 +77,14 @@ public static class DependencyInjection
     }
 
     private static IServiceCollection AddHealthChecksInternal(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration)
     {
         return services;
     }
 
     private static IServiceCollection AddMassTransitInternal(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration)
     {
         services.AddMassTransit(config =>

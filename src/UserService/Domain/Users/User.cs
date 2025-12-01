@@ -18,10 +18,10 @@ public class User : Entity
 
     public static Result<User> CreateUser(
         AuthUserId authUserId,
-        string email, 
+        string email,
         UserId? userId = null,
-        FullName? fullName = null, 
-        PhoneNumber? phoneNumber = null, 
+        FullName? fullName = null,
+        PhoneNumber? phoneNumber = null,
         DateTime? dateOfBirth = null)
     {
         var user = new User

@@ -17,7 +17,7 @@ public class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, Cours
     }
 
     public async Task<Result<CourseReadDto>> Handle(
-        GetCourseByIdQuery request, 
+        GetCourseByIdQuery request,
         CancellationToken cancellationToken = default)
     {
         CourseReadDto? result = await _dbContext.Courses
