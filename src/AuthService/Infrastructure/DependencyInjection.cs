@@ -17,9 +17,9 @@ namespace Infrastructure;
 
 public static class DependencyInjection
 {
-    private static readonly string _writeDbSectionName = "WriteDatabase";
-    private static readonly string _readDbSectionName = "ReadDatabase";
-    private static readonly string _rabbitMqSectionName = "RabbitMq";
+    internal const string WriteDbSectionName = "WriteDatabase";
+    private const string ReadDbSectionName = "ReadDatabase";
+    private const string RabbitMqSectionName = "RabbitMq";
 
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
@@ -42,7 +42,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(_writeDbSectionName)
+            string connectionString = configuration.GetConnectionString(WriteDbSectionName)
                 ?? throw new InvalidOperationException("Database connection string not found");
 
             options
@@ -56,7 +56,7 @@ public static class DependencyInjection
 
         services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(_readDbSectionName)
+            string connectionString = configuration.GetConnectionString(ReadDbSectionName)
                 ?? throw new InvalidOperationException("Database connection string not found");
 
             options
@@ -112,7 +112,7 @@ public static class DependencyInjection
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                string connectionString = configuration.GetConnectionString(_rabbitMqSectionName)
+                string connectionString = configuration.GetConnectionString(RabbitMqSectionName)
                     ?? throw new InvalidOperationException("RabbitMQ connection string not found");
 
                 busConfig.Host(new Uri(connectionString), h => { });

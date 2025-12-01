@@ -8,17 +8,16 @@ namespace Infrastructure.Extensions;
 
 public static class HostingExtensions
 {
-    private const string WriteDbSectionName = "WriteDatabase";
-
     public static TBuilder AddInfrastructureDefaults<TBuilder>(this TBuilder builder)
         where TBuilder : IHostApplicationBuilder
     {
         builder.AddServiceDefaults();
 
-        string connectionString = builder.Configuration.GetConnectionString(WriteDbSectionName)
+        string connectionString = builder.Configuration.GetConnectionString(DependencyInjection.WriteDbSectionName)
             ?? throw new InvalidOperationException("Database connection string not found");
 
-        builder.Services.AddHealthChecks()
+        builder.Services
+            .AddHealthChecks()
             .AddNpgSql(connectionString, name: "authservice-db", tags: ["db", "postgres"]);
 
         return builder;
