@@ -12,14 +12,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Infrastructure;
 
 public static class DependencyInjection
 {
-    private static readonly string _writeDbSectionName = "WriteDatabase";
-    private static readonly string _readDbSectionName = "ReadDatabase";
-    private static readonly string _rabbitMqSectionName = "RabbitMq";
+    internal const string WriteDbSectionName = "WriteDatabase";
+    internal const string ReadDbSectionName = "ReadDatabase";
+    internal const string RabbitMqSectionName = "RabbitMq";
 
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
@@ -42,7 +43,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(_writeDbSectionName)
+            string connectionString = configuration.GetConnectionString(WriteDbSectionName)
                 ?? throw new InvalidOperationException("Database connection string not found");
 
             options
@@ -56,7 +57,7 @@ public static class DependencyInjection
 
         services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(_readDbSectionName)
+            string connectionString = configuration.GetConnectionString(ReadDbSectionName)
                 ?? throw new InvalidOperationException("Database connection string not found");
 
             options
@@ -112,11 +113,18 @@ public static class DependencyInjection
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                string connectionString = configuration.GetConnectionString(_rabbitMqSectionName)
+                string connectionString = configuration.GetConnectionString(RabbitMqSectionName)
                     ?? throw new InvalidOperationException("RabbitMQ connection string not found");
 
                 busConfig.Host(new Uri(connectionString), h => { });
                 busConfig.ConfigureEndpoints(context);
+            });
+
+            config.ConfigureHealthCheckOptions(options =>
+            {
+                options.Name = "masstransit";
+                options.MinimalFailureStatus = HealthStatus.Unhealthy;
+                options.Tags.Add("ready");
             });
         });
 

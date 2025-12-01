@@ -2,8 +2,11 @@ using Application;
 using Auth.Api.Endpoints;
 using Auth.Api.Extensions;
 using Infrastructure;
+using Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddInfrastructureDefaults();
 
 builder.Services.AddCors(options =>
 {
@@ -37,6 +40,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapEndpoints();
+
+app.UseInfrastructureDefaultEndpoints();
 
 app.Run();
 

@@ -79,9 +79,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoursePlatform.ServiceDefau
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel", "src\AuthService\SharedKernel\SharedKernel.csproj", "{31FF6020-8DE3-97C0-0960-DBE7856436BF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{A68F5050-39A6-475B-B6F3-2D488B0CF39D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway,Api", "Gateway,Api", "{8BE38EB1-D958-48FF-9602-D2F7F331DD63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gateway.Api", "Gateway.Api\Gateway.Api.csproj", "{E056C78C-22FD-497B-B03F-8C8C7A7FD85A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gateway.Api", "Gateway.Api\Gateway.Api.csproj", "{4F1E9837-C92F-9BB8-E5A0-8D4BCF47834F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C5D0D5C1-7D52-4604-8D5C-42F31B9AE149}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -189,10 +194,10 @@ Global
 		{31FF6020-8DE3-97C0-0960-DBE7856436BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31FF6020-8DE3-97C0-0960-DBE7856436BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31FF6020-8DE3-97C0-0960-DBE7856436BF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E056C78C-22FD-497B-B03F-8C8C7A7FD85A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E056C78C-22FD-497B-B03F-8C8C7A7FD85A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E056C78C-22FD-497B-B03F-8C8C7A7FD85A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E056C78C-22FD-497B-B03F-8C8C7A7FD85A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F1E9837-C92F-9BB8-E5A0-8D4BCF47834F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F1E9837-C92F-9BB8-E5A0-8D4BCF47834F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F1E9837-C92F-9BB8-E5A0-8D4BCF47834F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F1E9837-C92F-9BB8-E5A0-8D4BCF47834F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -230,7 +235,7 @@ Global
 		{22CB999C-EDC4-DFF4-1AFE-4D1A3F948500} = {3E4914A7-2AC0-463F-914E-44E8413B2641}
 		{259DBF29-2A6C-2A4B-F841-47AAAC1F95DB} = {3E4914A7-2AC0-463F-914E-44E8413B2641}
 		{31FF6020-8DE3-97C0-0960-DBE7856436BF} = {0597FC0A-755C-41DA-A39D-FAD52273C2AE}
-		{E056C78C-22FD-497B-B03F-8C8C7A7FD85A} = {A68F5050-39A6-475B-B6F3-2D488B0CF39D}
+		{4F1E9837-C92F-9BB8-E5A0-8D4BCF47834F} = {8BE38EB1-D958-48FF-9602-D2F7F331DD63}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9DB79B1-93CC-4F9E-B232-9AB7C522E5A2}
