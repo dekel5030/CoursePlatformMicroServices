@@ -32,9 +32,12 @@ var usersDb = builder
 var usersService = builder.AddProject<Projects.User_Api>("userservice")
     .WithReference(usersDb)
     .WithReference(rabbitMq)
+    .WaitFor(usersDb)
+    .WaitFor(rabbitMq)
     .WithEnvironment("ConnectionStrings:ReadDatabase", usersDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:WriteDatabase", usersDb.Resource.ConnectionStringExpression)
-    .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
+    .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression)
+    .WithHttpHealthCheck("/health");
 
 
 // CourseService configuration
@@ -60,12 +63,8 @@ var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
 
 // Frontend configuration
 var frontend = builder.AddNpmApp("frontend", "../Frontend", "dev")
-    .WithReference(authService)
-    .WithReference(usersService)
-    .WithReference(coursesService)
-    .WaitFor(authService)
-    .WaitFor(usersService)
-    .WaitFor(coursesService)
+    .WithReference(gateway)
+    .WaitFor(gateway)
     .WithHttpEndpoint(port: 5067, env: "PORT")
     .WithExternalHttpEndpoints();
 

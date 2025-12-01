@@ -1,10 +1,13 @@
 using Application;
 using Auth.Api.Extensions;
 using Infrastructure;
+using Infrastructure.Extensions;
 using User.Api.Endpoints;
 using User.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddInfrastructureDefaults();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -37,6 +40,7 @@ app.UseAuthorization();
 
 app.UseHttpsRedirection();
 app.MapEndpoints();
+app.UseInfrastructureDefaultEndpoints();
 app.Run();
 
 public partial class Program { }
