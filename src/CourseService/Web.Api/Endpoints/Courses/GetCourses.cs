@@ -10,7 +10,7 @@ public class GetCourses : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/courses", async (
+        app.MapGet("courses", async (
             [AsParameters] PagedQueryDto pagedQuery,
             IQueryHandler<GetCoursesQuery, PagedResponseDto<CourseReadDto>> handler,
             CancellationToken cancellationToken) =>

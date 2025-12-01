@@ -10,7 +10,7 @@ public class CreateLesson : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/lessons", async (
+        app.MapPost("lessons", async (
             CreateLessonDto dto,
             ICommandHandler<CreateLessonCommand, LessonId> handler) =>
         {

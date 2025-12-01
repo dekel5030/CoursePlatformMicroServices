@@ -12,7 +12,7 @@ public class CreateCourse : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/courses", async (
+        app.MapPost("courses", async (
             [AsParameters] CreateCourseDto dto,
             ICommandHandler<CreateCourseCommand, CourseId> handler) =>
         {
