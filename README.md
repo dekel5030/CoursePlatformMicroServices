@@ -1,6 +1,14 @@
 # 📚 Course Platform – Microservices Architecture
 
-A full-featured **Course Platform** built with a **microservices architecture** using **.NET 9** and **React**. This project demonstrates scalable system design, distributed communication patterns, and modern software engineering practices.
+> **A learning management system (LMS) demonstrating production-ready microservices patterns with .NET 9, React, RabbitMQ, and PostgreSQL.**
+
+[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.13-FF6600?logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
+[![License](https://img.shields.io/badge/License-Educational-green)](LICENSE)
+
+A full-featured **Course Platform** built with a **microservices architecture** using **.NET 9** and **React**. This project demonstrates scalable system design, distributed communication patterns, and modern software engineering practices including DDD, Clean Architecture, CQRS, and event-driven messaging.
 
 ---
 
