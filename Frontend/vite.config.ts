@@ -6,8 +6,8 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
 
   const gatewayUrl =
-    process.env.services__gatewayUrl__https__0 ||
-    process.env.services__gatewayUrl__http__0;
+    process.env.services__gateway__https__0 ||
+    process.env.services__gateway__http__0;
 
   return {
     plugins: [react()],
