@@ -32,9 +32,12 @@ var usersDb = builder
 var usersService = builder.AddProject<Projects.User_Api>("userservice")
     .WithReference(usersDb)
     .WithReference(rabbitMq)
+    .WaitFor(usersDb)
+    .WaitFor(rabbitMq)
     .WithEnvironment("ConnectionStrings:ReadDatabase", usersDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:WriteDatabase", usersDb.Resource.ConnectionStringExpression)
-    .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
+    .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression)
+    .WithHttpHealthCheck("/health");
 
 
 // CourseService configuration
