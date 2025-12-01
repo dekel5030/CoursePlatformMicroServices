@@ -1,6 +1,6 @@
 import { getAuthenticatedFetch } from "../utils/authenticatedFetch";
 
-const API_USERS_URL = "/userservice/api";
+const API_USERS_URL = "api/userservice/api";
 
 export interface User {
   id: string;

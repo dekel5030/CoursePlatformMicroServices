@@ -1,4 +1,4 @@
-export const API_AUTH_URL = "/auth";
+export const API_AUTH_URL = "api/auth";
 
 export interface LoginData {
   email: string;

@@ -2,7 +2,7 @@ import { getAuthenticatedFetch } from "../utils/authenticatedFetch";
 import type { Course } from "../types/course";
 import type { Lesson } from "../types/Lesson";
 
-const API_COURSES_URL = "/courseservice/api";
+const API_COURSES_URL = "api/courseservice/api";
 
 export async function fetchFeaturedCourses(): Promise<Course[]> {
   const authFetch = getAuthenticatedFetch();
