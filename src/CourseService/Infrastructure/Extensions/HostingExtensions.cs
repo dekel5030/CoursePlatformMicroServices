@@ -3,45 +3,42 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RabbitMQ.Client;
 
 namespace Infrastructure.Extensions;
 
 public static class HostingExtensions
 {
-    public static TBuilder AddInfrastructureServiceDefaults<TBuilder>(this TBuilder builder)
+    public static TBuilder AddInfrastructureDefaults<TBuilder>(this TBuilder builder)
         where TBuilder : IHostApplicationBuilder
     {
         builder.AddServiceDefaults();
+        var healthChecks = builder.Services.AddHealthChecks();
 
-        string writeDatabaseConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.WriteDatabaseConnectionName)
-            ?? throw new InvalidOperationException(
-                $"Connection string '{DependencyInjection.WriteDatabaseConnectionName}' not found in configuration.");
+        var writeDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.WriteDatabaseConnectionSection);
+        if (!string.IsNullOrEmpty(writeDbConnectionString))
+        {
+            healthChecks.AddNpgSql(
+                writeDbConnectionString,
+                name: "postgres-write",
+                tags: ["ready"],
+                timeout: TimeSpan.FromSeconds(3));
+        }
 
-        string readDatabaseConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.ReadDatabaseConnectionName)
-            ?? throw new InvalidOperationException(
-                $"Connection string '{DependencyInjection.ReadDatabaseConnectionName}' not found in configuration.");
-
-        string rabbitMqConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.RabbitMqConnectionName)
-            ?? throw new InvalidOperationException(
-                $"Connection string '{DependencyInjection.RabbitMqConnectionName}' not found in configuration.");
-
-        builder.Services.AddHealthChecks()
-            .AddNpgSql(writeDatabaseConnectionString, name: "postgres-write", tags: ["ready"])
-            .AddNpgSql(readDatabaseConnectionString, name: "postgres-read", tags: ["ready"])
-            .AddRabbitMQ(async _ =>
-            {
-                var factory = new ConnectionFactory
-                {
-                    Uri = new Uri(rabbitMqConnectionString)
-                };
-                return await factory.CreateConnectionAsync().ConfigureAwait(false);
-            }, name: "rabbitmq", tags: ["ready"]);
+        var readDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.ReadDatabaseConnectionSection);
+        if (!string.IsNullOrEmpty(readDbConnectionString) 
+            && !string.Equals(readDbConnectionString, writeDbConnectionString))
+        {
+            healthChecks.AddNpgSql(
+                readDbConnectionString,
+                name: "postgres-read",
+                tags: ["ready"],
+                timeout: TimeSpan.FromSeconds(3));
+        }
 
         return builder;
     }
 
-    public static WebApplication UseInfrastructureEndpoints(this WebApplication app)
+    public static WebApplication UseInfrastructureDefaultEndpoints(this WebApplication app)
     {
         app.MapDefaultEndpoints();
 

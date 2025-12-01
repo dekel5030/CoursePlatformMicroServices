@@ -6,7 +6,7 @@ using Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddInfrastructureServiceDefaults();
+builder.AddInfrastructureDefaults();
 
 builder.Services.AddCors(options =>
 {
@@ -36,7 +36,7 @@ app.UseHttpsRedirection();
 app.MapGet("/", () => "OK");
 app.MapEndpoints();
 
-app.UseInfrastructureEndpoints();
+app.UseInfrastructureDefaultEndpoints();
 
 app.Run();
 

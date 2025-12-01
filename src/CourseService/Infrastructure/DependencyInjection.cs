@@ -8,14 +8,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Infrastructure;
 
 public static class DependencyInjection
 {
-    internal const string ReadDatabaseConnectionName = "ReadDatabase";
-    internal const string WriteDatabaseConnectionName = "WriteDatabase";
-    internal const string RabbitMqConnectionName = "RabbitMq";
+    internal const string ReadDatabaseConnectionSection = "ReadDatabase";
+    internal const string WriteDatabaseConnectionSection = "WriteDatabase";
+    internal const string RabbitMqConnectionSection = "RabbitMq";
 
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
@@ -46,7 +47,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(ReadDatabaseConnectionName)!;
+            string connectionString = configuration.GetConnectionString(ReadDatabaseConnectionSection)!;
 
             options
                 .UseNpgsql(connectionString, npgsqlOptions =>
@@ -66,7 +67,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(WriteDatabaseConnectionName)!;
+            string connectionString = configuration.GetConnectionString(WriteDatabaseConnectionSection)!;
 
             options
                 .UseNpgsql(connectionString, npgsqlOptions =>
@@ -132,10 +133,17 @@ public static class DependencyInjection
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                string connectionString = configuration.GetConnectionString(RabbitMqConnectionName)!;
+                string connectionString = configuration.GetConnectionString(RabbitMqConnectionSection)!;
 
                 busConfig.Host(new Uri(connectionString!), h => { });
                 busConfig.ConfigureEndpoints(context);
+            });
+
+            config.ConfigureHealthCheckOptions(options =>
+            {
+                options.Name = "masstransit";
+                options.MinimalFailureStatus = HealthStatus.Unhealthy;
+                options.Tags.Add("ready");
             });
         });
 
