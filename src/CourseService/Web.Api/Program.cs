@@ -2,8 +2,11 @@ using Application;
 using Course.Api.Endpoints;
 using Course.Api.Extensions;
 using Infrastructure;
+using Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddInfrastructureServiceDefaults();
 
 builder.Services.AddCors(options =>
 {
@@ -32,6 +35,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.MapGet("/", () => "OK");
 app.MapEndpoints();
+
+app.UseInfrastructureEndpoints();
 
 app.Run();
 
