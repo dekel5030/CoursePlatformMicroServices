@@ -12,7 +12,7 @@ public class CreateUser : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/users/", async (
+        app.MapPost("/users/", async (
             ICommandHandler<CreateUserCommand, CreatedUserRespondDto> handler,
             [FromBody] CreateUserCommand command,
             CancellationToken cancellationToken = default) =>
