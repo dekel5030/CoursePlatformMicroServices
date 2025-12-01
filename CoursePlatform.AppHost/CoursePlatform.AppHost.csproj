@@ -18,6 +18,7 @@
   </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Gateway.Api\Gateway.Api.csproj" />
         <ProjectReference Include="..\src\AuthService\Web.Api\Auth.Api.csproj">
         </ProjectReference>
 

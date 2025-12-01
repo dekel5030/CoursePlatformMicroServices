@@ -51,11 +51,21 @@ var coursesService = builder.AddProject<Projects.Course_Api>("courseservice")
     .WithEnvironment("ConnectionStrings:WriteDatabase", coursesDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
 
+// Gateway configuration
+
+var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
+    .WithReference(authService)
+    .WithReference(usersService)
+    .WithReference(coursesService);
+
 // Frontend configuration
 var frontend = builder.AddNpmApp("frontend", "../Frontend", "dev")
     .WithReference(authService)
     .WithReference(usersService)
     .WithReference(coursesService)
+    .WaitFor(authService)
+    .WaitFor(usersService)
+    .WaitFor(coursesService)
     .WithHttpEndpoint(port: 5067, env: "PORT")
     .WithExternalHttpEndpoints();
 
