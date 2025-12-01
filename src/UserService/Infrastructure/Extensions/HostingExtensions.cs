@@ -21,7 +21,8 @@ public static class HostingExtensions
             healthChecks.AddNpgSql(
                 writeDbConnectionString,
                 name: "postgres-write",
-                tags: ["ready"]);
+                tags: ["ready"],
+                timeout: TimeSpan.FromSeconds(3));
         }
 
         var readDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection._readDatabaseConnectionStringName);
@@ -31,7 +32,8 @@ public static class HostingExtensions
             healthChecks.AddNpgSql(
                 readDbConnectionString,
                 name: "postgres-read",
-                tags: ["ready"]);
+                tags: ["ready"],
+                timeout: TimeSpan.FromSeconds(3));
         }
 
         return builder;
