@@ -14,7 +14,7 @@ namespace Infrastructure;
 
 public static class DependencyInjection
 {
-    private static readonly string _readDatabaseConnectionStringName = "ReadDatabase";
+    internal const string ReadDatabaseConnectionStringName = "ReadDatabase";
     private static readonly string _writeDatabaseConnectionStringName = "WriteDatabase";
     private static readonly string _rabbitMqSectionName = "RabbitMq";
 
@@ -44,7 +44,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(_readDatabaseConnectionStringName)!;
+            string connectionString = configuration.GetConnectionString(ReadDatabaseConnectionStringName)!;
 
             options.UseNpgsql(connectionString);
         });
