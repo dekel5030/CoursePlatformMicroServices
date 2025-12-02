@@ -48,7 +48,7 @@ public class GatewayHeaderAuthenticationHandler : AuthenticationHandler<Authenti
 
         if (Request.Headers.TryGetValue(HeaderNames.UserPermissionsHeader, out StringValues permissionValues))
         {
-            foreach (var permission in permissionValues.Where(p => p is not null))
+            foreach (var permission in permissionValues.Where(p => !string.IsNullOrEmpty(p)))
             {
                 if (PermissionClaim.TryParse(permission!, out var parsedPermission))
                 {
