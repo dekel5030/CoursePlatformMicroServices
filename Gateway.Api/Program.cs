@@ -1,4 +1,5 @@
 using CoursePlatform.ServiceDefaults;
+using Gateway.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,8 @@ builder.Services.AddReverseProxy()
     .AddServiceDiscoveryDestinationResolver();
 
 builder.AddServiceDefaults();
+
+builder.AddGateway();
 
 var app = builder.Build();
 
