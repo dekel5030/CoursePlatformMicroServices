@@ -107,6 +107,13 @@ public static class DependencyInjection
                         {
                             transformContext.ProxyRequest.Headers.Add(HeaderNames.UserRoleHeader, role);
                         }
+
+                        var permissions = user.FindAll(PermissionClaim.ClaimType).Select(c => c.Value);
+
+                        foreach (var perrmission in permissions)
+                        {
+                            transformContext.ProxyRequest.Headers.Add(HeaderNames.UserPermissionsHeader, perrmission);
+                        }
                     }
 
                     return ValueTask.CompletedTask;
