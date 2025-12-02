@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using CoursePlatform.ServiceDefaults;
+using CoursePlatform.ServiceDefaults.Auth;
 using Gateway.Api.Database;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -97,14 +98,14 @@ public static class DependencyInjection
                         var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                         if (!string.IsNullOrEmpty(userId))
                         {
-                            transformContext.ProxyRequest.Headers.Add("X-User-Id", userId);
+                            transformContext.ProxyRequest.Headers.Add(HeaderNames.UserIdHeader, userId);
                         }
 
                         var roles = user.FindAll(ClaimTypes.Role).Select(c => c.Value);
 
                         foreach (var role in roles)
                         {
-                            transformContext.ProxyRequest.Headers.Add("X-User-Role", role);
+                            transformContext.ProxyRequest.Headers.Add(HeaderNames.UserRoleHeader, role);
                         }
                     }
 
