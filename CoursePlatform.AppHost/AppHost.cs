@@ -62,9 +62,14 @@ var coursesService = builder.AddProject<Projects.Course_Api>("courseservice")
 // Gateway configuration
 
 var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
+    .WithReference(authDb)
     .WithReference(authService)
     .WithReference(usersService)
-    .WithReference(coursesService);
+    .WithReference(coursesService)
+    .WaitFor(authDb)
+    .WaitFor(authService)
+    .WaitFor(usersService)
+    .WaitFor(coursesService);
 
 // Frontend configuration
 var frontend = builder.AddNpmApp("frontend", "../Frontend", "dev")
