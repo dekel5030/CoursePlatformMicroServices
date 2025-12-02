@@ -39,6 +39,11 @@ public static class PermissionClaim
             ResourceType resource,
             string id)
     {
+        if (id != "*" && id.Contains(':'))
+        {
+            throw new ArgumentException("Resource ID cannot contain the claim delimiter ':'.", nameof(id));
+        }
+
         string effectString = effect.ToString().ToLowerInvariant();
         string actionString = action == ActionType.Wildcard ? "*" : action.ToString().ToLowerInvariant();
         string resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
