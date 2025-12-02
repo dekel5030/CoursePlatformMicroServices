@@ -17,7 +17,7 @@ public static class PermissionClaim
         string actionString = action == ActionType.Wildcard ? "*" : action.ToString().ToLowerInvariant();
         string resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
         string idString = id == "*" ? "*" : id.ToLowerInvariant();
-
+        
         return new Claim(PermissionType, $"{effectString}:{actionString}:{resourceString}:{idString}");
     }
 
@@ -38,56 +38,6 @@ public static class PermissionClaim
         string id = ParseId(idSegment);
 
         return Create(effect, action, resource, id);
-    }
-
-    private static EffectType ParseEffect(string effectSegment)
-    {
-        if (!Enum.TryParse(effectSegment, true, out EffectType effect))
-            throw new ArgumentException("Invalid effect value.");
-
-        return effect;
-    }
-
-    private static ActionType ParseAction(string actionSegment)
-    {
-        ActionType action;
-
-        if (actionSegment == "*")
-        {
-            return ActionType.Wildcard;
-        }
-        else if (!Enum.TryParse(actionSegment, ignoreCase: true, out action))
-        {   
-            throw new ArgumentException("Invalid action value.");
-        }
-
-        return action;
-    }
-
-    private static ResourceType ParseResource(string resourceSegment)
-    {
-        ResourceType resource;
-
-        if (resourceSegment == "*")
-        {
-            return ResourceType.Wildcard;
-        }
-        else if (!Enum.TryParse(resourceSegment, ignoreCase: true, out resource))
-        {
-            throw new ArgumentException("Invalid resource value.");
-        }
-
-        return resource;
-    }
-
-    private static string ParseId(string idSegment)
-    {
-        if (string.IsNullOrWhiteSpace(idSegment))
-        {
-            throw new ArgumentException("Invalid id value.");
-        }
-
-        return idSegment;
     }
 
     public static Claim? TryParse(string claimValue)
@@ -141,5 +91,55 @@ public static class PermissionClaim
         User,
         Enrollment,
         Wildcard
+    }
+
+    private static EffectType ParseEffect(string effectSegment)
+    {
+        if (!Enum.TryParse(effectSegment, true, out EffectType effect))
+            throw new ArgumentException("Invalid effect value.");
+
+        return effect;
+    }
+
+    private static ActionType ParseAction(string actionSegment)
+    {
+        ActionType action;
+
+        if (actionSegment == "*")
+        {
+            return ActionType.Wildcard;
+        }
+        else if (!Enum.TryParse(actionSegment, ignoreCase: true, out action))
+        {
+            throw new ArgumentException("Invalid action value.");
+        }
+
+        return action;
+    }
+
+    private static ResourceType ParseResource(string resourceSegment)
+    {
+        ResourceType resource;
+
+        if (resourceSegment == "*")
+        {
+            return ResourceType.Wildcard;
+        }
+        else if (!Enum.TryParse(resourceSegment, ignoreCase: true, out resource))
+        {
+            throw new ArgumentException("Invalid resource value.");
+        }
+
+        return resource;
+    }
+
+    private static string ParseId(string idSegment)
+    {
+        if (string.IsNullOrWhiteSpace(idSegment))
+        {
+            throw new ArgumentException("Invalid id value.");
+        }
+
+        return idSegment;
     }
 }
