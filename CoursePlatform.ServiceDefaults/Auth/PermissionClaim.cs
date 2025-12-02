@@ -5,7 +5,7 @@ namespace CoursePlatform.ServiceDefaults.Auth;
 
 public static class PermissionClaim
 {
-    public const string PermissionType = "cp_permission";
+    public const string ClaimType = "cp_permission";
 
     public static Claim Create(
             EffectType effect,
@@ -18,7 +18,7 @@ public static class PermissionClaim
         string resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
         string idString = id == "*" ? "*" : id.ToLowerInvariant();
         
-        return new Claim(PermissionType, $"{effectString}:{actionString}:{resourceString}:{idString}");
+        return new Claim(ClaimType, $"{effectString}:{actionString}:{resourceString}:{idString}");
     }
 
     public static Claim Parse(string claimValue)
