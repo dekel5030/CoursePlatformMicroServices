@@ -6,6 +6,7 @@ using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.MassTransit;
 using MassTransit;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -68,6 +69,19 @@ public static class DependencyInjection
                 })
                 .UseSnakeCaseNamingConvention()
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+        });
+
+        services.AddDbContext<DataProtectionKeysContext>((serviceProvider, options) =>
+        {
+            string connectionString = configuration.GetConnectionString(WriteDbSectionName)
+                ?? throw new InvalidOperationException("Database connection string not found");
+            options
+                .UseNpgsql(connectionString, npgsqlOptions =>
+                {
+                    npgsqlOptions.MigrationsHistoryTable(
+                        HistoryRepository.DefaultTableName);
+                })
+                .UseSnakeCaseNamingConvention();
         });
 
         services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
@@ -137,6 +151,8 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        const string applicationName = "CoursePlatform.Auth";
+
         services.AddIdentity<AuthUser, Role>(options =>
         {
             options.Password.RequireDigit = false;
@@ -154,7 +170,7 @@ public static class DependencyInjection
 
         services.ConfigureApplicationCookie(options =>
         {
-            options.Cookie.Name = "CoursePlatform.Auth";
+            options.Cookie.Name = applicationName;
             options.Cookie.HttpOnly = true;
             options.Cookie.SameSite = SameSiteMode.Strict;
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
@@ -173,6 +189,10 @@ public static class DependencyInjection
                 return Task.CompletedTask;
             };
         });
+
+        services.AddDataProtection()
+            .SetApplicationName(applicationName)
+            .PersistKeysToDbContext<DataProtectionKeysContext>();
 
         return services;
     }
