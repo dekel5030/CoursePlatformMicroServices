@@ -40,20 +40,17 @@ public class GatewayHeaderAuthenticationHandler : AuthenticationHandler<Authenti
 
         if (Request.Headers.TryGetValue(HeaderNames.UserRoleHeader, out StringValues roleValues))
         {
-            foreach (var role in roleValues)
+            foreach (var role in roleValues.Where(r => !string.IsNullOrEmpty(r)))
             {
-                if (!string.IsNullOrEmpty(role))
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, role));
-                }
+                claims.Add(new Claim(ClaimTypes.Role, role!));
             }
         }
 
         if (Request.Headers.TryGetValue(HeaderNames.UserPermissionsHeader, out StringValues permissionValues))
         {
-            foreach (var permission in permissionValues)
+            foreach (var permission in permissionValues.Where(p => p is not null))
             {
-                if (permission is not null && PermissionClaim.TryParse(permission, out var parsedPermission))
+                if (PermissionClaim.TryParse(permission!, out var parsedPermission))
                 {
                     claims.Add(parsedPermission);
                 }
