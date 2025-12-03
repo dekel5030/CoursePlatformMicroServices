@@ -1,4 +1,5 @@
 ﻿using Domain.Courses.Primitives;
+using Domain.Enrollments;
 using Domain.Lessons;
 using Kernel;
 using SharedKernel;
@@ -7,6 +8,8 @@ namespace Domain.Courses;
 
 public class Course : Entity
 {
+    private readonly List<Enrollment> _enrollments = new();
+
     private Course() { }
 
     public CourseId Id { get; private set; }
@@ -21,6 +24,7 @@ public class Course : Entity
     public Money Price { get; private set; } = Money.Zero();
 
     public ICollection<Lesson> Lessons { get; private set; } = new List<Lesson>();
+    public IReadOnlyCollection<Enrollment> Enrollments => _enrollments.AsReadOnly();
     public DateTimeOffset UpdatedAtUtc { get; private set; }
 
     public static Course CreateCourse(
@@ -42,5 +46,18 @@ public class Course : Entity
             Lessons = new List<Lesson>(),
             UpdatedAtUtc = DateTimeOffset.UtcNow
         };
+    }
+
+    public Enrollment EnrollStudent(Guid studentId)
+    {
+        var existingEnrollment = _enrollments.Find(e => e.StudentId == studentId);
+        if (existingEnrollment is not null)
+        {
+            return existingEnrollment;
+        }
+
+        var enrollment = Enrollment.Create(studentId, Id);
+        _enrollments.Add(enrollment);
+        return enrollment;
     }
 }
