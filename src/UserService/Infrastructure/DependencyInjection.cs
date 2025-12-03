@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using CoursePlatform.ServiceDefaults.Auth;
 using Domain.Users.Events;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
@@ -25,10 +26,10 @@ public static class DependencyInjection
         services.AddMassTransitInternal(configuration);
         services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
-        // Register domain event handlers in Infrastructure layer
         services.AddScoped<IDomainEventHandler<UserProfileCreatedDomainEvent>, UserProfileCreatedDomainEventHandler>();
 
-        services.ConfigureJwtAuthentication(configuration);
+        //services.ConfigureJwtAuthentication(configuration);
+        services.AddGatewayAuth();
 
         return services;
     }
