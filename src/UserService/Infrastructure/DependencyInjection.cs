@@ -7,6 +7,7 @@ using Infrastructure.DomainEvents;
 using Infrastructure.Jwt;
 using Infrastructure.MassTransit;
 using MassTransit;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,14 @@ public static class DependencyInjection
         services.AddGatewayAuth();
 
         return services;
+    }
+
+    public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder app)
+    {
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        return app;
     }
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
@@ -117,4 +126,6 @@ public static class DependencyInjection
 
         return services;
     }
+
+    
 }
