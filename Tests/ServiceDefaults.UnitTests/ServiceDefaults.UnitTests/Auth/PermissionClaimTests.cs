@@ -1,5 +1,6 @@
 ﻿using CoursePlatform.ServiceDefaults.Auth;
 using FluentAssertions;
+using Kernel.AuthTypes;
 
 namespace ServiceDefaults.Tests;
 
@@ -10,9 +11,9 @@ public class PermissionClaimTests
     {
         // Arrange & Act
         var claim = PermissionClaim.Create(
-            PermissionClaim.EffectType.Allow,
-            PermissionClaim.ActionType.Read,
-            PermissionClaim.ResourceType.Course,
+            EffectType.Allow,
+            ActionType.Read,
+            ResourceType.Course,
             "ABC123");
 
         // Assert
@@ -25,9 +26,9 @@ public class PermissionClaimTests
     {
         // Arrange & Act
         var claim = PermissionClaim.Create(
-            PermissionClaim.EffectType.Allow,
-            PermissionClaim.ActionType.Wildcard,
-            PermissionClaim.ResourceType.Course,
+            EffectType.Allow,
+            ActionType.Wildcard,
+            ResourceType.Course,
             "123");
 
         // Assert
@@ -39,9 +40,9 @@ public class PermissionClaimTests
     {
         // Arrange & Act
         var claim = PermissionClaim.Create(
-            PermissionClaim.EffectType.Allow,
-            PermissionClaim.ActionType.Read,
-            PermissionClaim.ResourceType.Wildcard,
+            EffectType.Allow,
+            ActionType.Read,
+            ResourceType.Wildcard,
             "123");
 
         // Assert
@@ -53,9 +54,9 @@ public class PermissionClaimTests
     {
         // Arrange & Act
         var claim = PermissionClaim.Create(
-            PermissionClaim.EffectType.Allow,
-            PermissionClaim.ActionType.Read,
-            PermissionClaim.ResourceType.Course,
+            EffectType.Allow,
+            ActionType.Read,
+            ResourceType.Course,
             "*");
 
         // Assert
@@ -67,9 +68,9 @@ public class PermissionClaimTests
     {
         // Arrange & Act
         var action = () => PermissionClaim.Create(
-            PermissionClaim.EffectType.Allow,
-            PermissionClaim.ActionType.Read,
-            PermissionClaim.ResourceType.Course,
+            EffectType.Allow,
+            ActionType.Read,
+            ResourceType.Course,
             "invalid:id");
 
         // Assert
@@ -83,9 +84,9 @@ public class PermissionClaimTests
     {
         // Arrange & Act
         var claim = PermissionClaim.Create(
-            PermissionClaim.EffectType.Deny,
-            PermissionClaim.ActionType.Delete,
-            PermissionClaim.ResourceType.User,
+            EffectType.Deny,
+            ActionType.Delete,
+            ResourceType.User,
             "*");
 
         // Assert
@@ -320,9 +321,9 @@ public class PermissionClaimTests
     {
         // Arrange
         var original = PermissionClaim.Create(
-            PermissionClaim.EffectType.Allow,
-            PermissionClaim.ActionType.Update,
-            PermissionClaim.ResourceType.Lesson,
+            EffectType.Allow,
+            ActionType.Update,
+            ResourceType.Lesson,
             "789");
 
         // Act

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
+using Kernel.AuthTypes;
 
 namespace CoursePlatform.ServiceDefaults.Auth;
 
@@ -20,7 +21,7 @@ namespace CoursePlatform.ServiceDefaults.Auth;
 /// A static factory for creating and parsing structured permission claims 
 /// in the format: [Effect]:[Action]:[Resource Type]:[Resource ID].
 /// </summary>
-public static class PermissionClaim
+public static partial class PermissionClaim
 {
     public const string ClaimType = "cp_permission";
 
@@ -119,47 +120,6 @@ public static class PermissionClaim
         {
             return false;
         }
-    }
-
-    /// <summary>
-    /// The effect type of a permission: either Allow or Deny.
-    /// </summary>
-    public enum EffectType
-    {
-        /// <summary>Permission is allowed.</summary>
-        Allow,
-        /// <summary>Permission is denied.</summary>
-        Deny
-    }
-
-    /// <summary>
-    /// Actions that can be performed on a resource.
-    /// </summary>
-    public enum ActionType
-    {
-        /// <summary>Create a resource.</summary>
-        Create,
-        /// <summary>Read a resource.</summary>
-        Read,
-        /// <summary>Update a resource.</summary>
-        Update,
-        /// <summary>Delete a resource.</summary>
-        Delete,
-        /// <summary>Wildcard for all actions.</summary>
-        Wildcard
-    }
-
-    /// <summary>
-    /// Resources that can be accessed.
-    /// </summary>
-    public enum ResourceType
-    {
-        Course,
-        Lesson,
-        User,
-        Enrollment,
-        /// <summary>Wildcard for all resources.</summary>
-        Wildcard
     }
 
     private static EffectType ParseEffect(string effectSegment)
