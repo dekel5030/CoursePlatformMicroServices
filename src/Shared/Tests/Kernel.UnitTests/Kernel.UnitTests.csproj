@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\CoursePlatform.ServiceDefaults\CoursePlatform.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\Kernel\Kernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

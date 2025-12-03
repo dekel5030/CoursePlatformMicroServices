@@ -1,11 +1,15 @@
-﻿using Application.Abstractions.Data;
+﻿using Application.Abstractions.Context;
+using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using CoursePlatform.ServiceDefaults.Auth;
 using Domain.Users.Events;
+using Infrastructure.Auth;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.Jwt;
 using Infrastructure.MassTransit;
 using MassTransit;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,12 +29,22 @@ public static class DependencyInjection
         services.AddMassTransitInternal(configuration);
         services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
-        // Register domain event handlers in Infrastructure layer
         services.AddScoped<IDomainEventHandler<UserProfileCreatedDomainEvent>, UserProfileCreatedDomainEventHandler>();
 
-        services.ConfigureJwtAuthentication(configuration);
+        //services.ConfigureJwtAuthentication(configuration);
+        services.AddGatewayAuth();
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 
         return services;
+    }
+
+    public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder app)
+    {
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        return app;
     }
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)

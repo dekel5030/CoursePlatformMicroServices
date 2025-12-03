@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
+using Kernel.Auth.AuthTypes;
 
-namespace CoursePlatform.ServiceDefaults.Auth;
+namespace Kernel.Auth;
 
 /// <summary>
 /// A static factory for creating and parsing structured permission claims 
@@ -20,7 +21,7 @@ namespace CoursePlatform.ServiceDefaults.Auth;
 /// A static factory for creating and parsing structured permission claims 
 /// in the format: [Effect]:[Action]:[Resource Type]:[Resource ID].
 /// </summary>
-public static class PermissionClaim
+public static partial class PermissionClaim
 {
     public const string ClaimType = "cp_permission";
 
@@ -44,10 +45,10 @@ public static class PermissionClaim
             throw new ArgumentException("Resource ID cannot contain the claim delimiter ':'.", nameof(id));
         }
 
-        string effectString = effect.ToString().ToLowerInvariant();
-        string actionString = action == ActionType.Wildcard ? "*" : action.ToString().ToLowerInvariant();
-        string resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
-        string idString = id == "*" ? "*" : id.ToLowerInvariant();
+        var effectString = effect.ToString().ToLowerInvariant();
+        var actionString = action == ActionType.Wildcard ? "*" : action.ToString().ToLowerInvariant();
+        var resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
+        var idString = id == "*" ? "*" : id.ToLowerInvariant();
         
         return new Claim(ClaimType, $"{effectString}:{actionString}:{resourceString}:{idString}");
     }
@@ -65,15 +66,15 @@ public static class PermissionClaim
         if (segments.Length != 4)
             throw new ArgumentException("Invalid permission claim format.");
 
-        string effectSegment = segments[0];
-        string actionSegment = segments[1];
-        string resourceSegment = segments[2];
-        string idSegment = segments[3];
+        var effectSegment = segments[0];
+        var actionSegment = segments[1];
+        var resourceSegment = segments[2];
+        var idSegment = segments[3];
 
         EffectType effect = ParseEffect(effectSegment);
         ActionType action = ParseAction(actionSegment);
         ResourceType resource = ParseResource(resourceSegment);
-        string id = ParseId(idSegment);
+        var id = ParseId(idSegment);
 
         return Create(effect, action, resource, id);
     }
@@ -119,47 +120,6 @@ public static class PermissionClaim
         {
             return false;
         }
-    }
-
-    /// <summary>
-    /// The effect type of a permission: either Allow or Deny.
-    /// </summary>
-    public enum EffectType
-    {
-        /// <summary>Permission is allowed.</summary>
-        Allow,
-        /// <summary>Permission is denied.</summary>
-        Deny
-    }
-
-    /// <summary>
-    /// Actions that can be performed on a resource.
-    /// </summary>
-    public enum ActionType
-    {
-        /// <summary>Create a resource.</summary>
-        Create,
-        /// <summary>Read a resource.</summary>
-        Read,
-        /// <summary>Update a resource.</summary>
-        Update,
-        /// <summary>Delete a resource.</summary>
-        Delete,
-        /// <summary>Wildcard for all actions.</summary>
-        Wildcard
-    }
-
-    /// <summary>
-    /// Resources that can be accessed.
-    /// </summary>
-    public enum ResourceType
-    {
-        Course,
-        Lesson,
-        User,
-        Enrollment,
-        /// <summary>Wildcard for all resources.</summary>
-        Wildcard
     }
 
     private static EffectType ParseEffect(string effectSegment)

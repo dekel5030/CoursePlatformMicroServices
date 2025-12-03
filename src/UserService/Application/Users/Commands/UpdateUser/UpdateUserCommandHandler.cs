@@ -1,14 +1,15 @@
+using Application.Abstractions.Context;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Users;
 using Domain.Users.Errors;
 using Domain.Users.Primitives;
 using Kernel;
-using Microsoft.EntityFrameworkCore;
+using Kernel.Auth.AuthTypes;
 
 namespace Application.Users.Commands.UpdateUser;
 
-public class UpdateUserCommandHandler(IWriteDbContext dbContext)
+public class UpdateUserCommandHandler(IWriteDbContext dbContext, ICurrentUserContext currentUser)
     : ICommandHandler<UpdateUserCommand, UpdatedUserResponseDto>
 {
     public async Task<Result<UpdatedUserResponseDto>> Handle(
@@ -16,30 +17,28 @@ public class UpdateUserCommandHandler(IWriteDbContext dbContext)
         CancellationToken cancellationToken = default)
     {
         var userId = new UserId(request.UserId);
-        User? user = await dbContext.Users
-            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var user = await dbContext.Users.FindAsync([userId], cancellationToken);
 
         if (user is null)
         {
             return Result.Failure<UpdatedUserResponseDto>(UserErrors.NotFound);
         }
 
-        FullName? fullName = user.FullName;
-        if (request.FirstName is not null && request.LastName is not null)
+        if (currentUser.UserId != user.Id.Value &&
+            !currentUser.HasPermissionOnUsersResource(ActionType.Update, user.Id.Value))
         {
-            fullName = new FullName(request.FirstName, request.LastName);
-        }
-        else if (request.FirstName is not null && user.FullName is not null)
-        {
-            fullName = new FullName(request.FirstName, user.FullName.LastName);
-        }
-        else if (request.LastName is not null && user.FullName is not null)
-        {
-            fullName = new FullName(user.FullName.FirstName, request.LastName);
+            return Result.Failure<UpdatedUserResponseDto>(UserErrors.Forbidden);
         }
 
+        FullName currentFullName = user.FullName ?? new FullName(string.Empty, string.Empty);
+
+        string firstName = request.FirstName ?? currentFullName.FirstName;
+        string lastName = request.LastName ?? currentFullName.LastName;
+
+        var updatedFullName = new FullName(firstName, lastName);
+
         Result updateResult = user.UpdateProfile(
-            fullName: fullName,
+            fullName: updatedFullName,
             phoneNumber: request.PhoneNumber,
             dateOfBirth: request.DateOfBirth);
 
@@ -50,14 +49,17 @@ public class UpdateUserCommandHandler(IWriteDbContext dbContext)
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        var response = new UpdatedUserResponseDto(
+        return Result.Success(MapToDto(user));
+    }
+
+    private static UpdatedUserResponseDto MapToDto(User user)
+    {
+        return new UpdatedUserResponseDto(
             user.Id.Value,
             user.Email,
             user.FullName?.FirstName,
             user.FullName?.LastName,
             user.DateOfBirth,
             user.PhoneNumber?.ToString());
-
-        return Result.Success(response);
     }
 }

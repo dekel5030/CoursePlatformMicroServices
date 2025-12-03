@@ -2,6 +2,7 @@
 using CoursePlatform.ServiceDefaults;
 using CoursePlatform.ServiceDefaults.Auth;
 using Gateway.Api.Database;
+using Kernel.Auth;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
