@@ -4,8 +4,10 @@ using Domain.AuthUsers;
 using Domain.Roles;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
+using Infrastructure.Extensions;
 using Infrastructure.MassTransit;
 using MassTransit;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +16,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure;
 
@@ -22,8 +25,26 @@ public static class DependencyInjection
     internal const string WriteDbSectionName = "WriteDatabase";
     internal const string ReadDbSectionName = "ReadDatabase";
     internal const string RabbitMqSectionName = "RabbitMq";
+    internal const string Redis = "redis";
 
-    public static IServiceCollection AddInfrastructure(
+    public static IHostApplicationBuilder AddInfrastructure(this IHostApplicationBuilder builder)
+    {
+        builder.AddInfrastructureDefaults();
+        builder.Services.AddInfrastructure(builder.Configuration);
+
+        return builder;
+    }
+
+    public static WebApplication UseInfrastructure(this WebApplication app)
+    {
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.UseInfrastructureDefaultEndpoints();
+
+        return app;
+    }
+
+    private static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration) =>
         services
