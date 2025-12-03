@@ -1,0 +1,41 @@
+﻿using Application.Abstractions.Context;
+using Kernel.Auth;
+using Kernel.Auth.AuthTypes;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+
+namespace Infrastructure.Auth;
+
+public class CurrentUserContext : ICurrentUserContext
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private ClaimsPrincipal? User => _httpContextAccessor.HttpContext?.User;
+
+    public CurrentUserContext(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public bool IsAuthenticated => User?.Identity?.IsAuthenticated ?? false;
+
+    public Guid UserId
+    {
+        get
+        {
+            return User != null && 
+                Guid.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId) ? userId : Guid.Empty;
+        }
+    }
+
+    public bool HasRole(RoleType role)
+    {
+        return User?.IsInRole(role.ToString().ToLowerInvariant()) ?? false;
+    }
+
+    public bool HasPermissionOnUsersResource(ActionType action, Guid resourceId)
+    {
+        if (User == null) return false;
+
+        return PermissionEvaluator.HasPermission(User, action, ResourceType.User, resourceId.ToString());
+    }
+}
