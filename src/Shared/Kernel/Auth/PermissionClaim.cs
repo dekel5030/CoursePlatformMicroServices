@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
-using Kernel.AuthTypes;
+using Kernel.Auth.AuthTypes;
 
-namespace CoursePlatform.ServiceDefaults.Auth;
+namespace Kernel.Auth;
 
 /// <summary>
 /// A static factory for creating and parsing structured permission claims 
@@ -45,10 +45,10 @@ public static partial class PermissionClaim
             throw new ArgumentException("Resource ID cannot contain the claim delimiter ':'.", nameof(id));
         }
 
-        string effectString = effect.ToString().ToLowerInvariant();
-        string actionString = action == ActionType.Wildcard ? "*" : action.ToString().ToLowerInvariant();
-        string resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
-        string idString = id == "*" ? "*" : id.ToLowerInvariant();
+        var effectString = effect.ToString().ToLowerInvariant();
+        var actionString = action == ActionType.Wildcard ? "*" : action.ToString().ToLowerInvariant();
+        var resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
+        var idString = id == "*" ? "*" : id.ToLowerInvariant();
         
         return new Claim(ClaimType, $"{effectString}:{actionString}:{resourceString}:{idString}");
     }
@@ -66,15 +66,15 @@ public static partial class PermissionClaim
         if (segments.Length != 4)
             throw new ArgumentException("Invalid permission claim format.");
 
-        string effectSegment = segments[0];
-        string actionSegment = segments[1];
-        string resourceSegment = segments[2];
-        string idSegment = segments[3];
+        var effectSegment = segments[0];
+        var actionSegment = segments[1];
+        var resourceSegment = segments[2];
+        var idSegment = segments[3];
 
         EffectType effect = ParseEffect(effectSegment);
         ActionType action = ParseAction(actionSegment);
         ResourceType resource = ParseResource(resourceSegment);
-        string id = ParseId(idSegment);
+        var id = ParseId(idSegment);
 
         return Create(effect, action, resource, id);
     }

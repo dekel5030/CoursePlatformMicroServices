@@ -1,4 +1,4 @@
-﻿namespace Kernel.AuthTypes;
+﻿namespace Kernel.Auth.AuthTypes;
 
 public enum ActionType
 {

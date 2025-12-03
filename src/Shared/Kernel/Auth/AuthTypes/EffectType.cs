@@ -1,4 +1,4 @@
-﻿namespace Kernel.AuthTypes;
+﻿namespace Kernel.Auth.AuthTypes;
 
 /// <summary>
 /// The effect type of a permission: either Allow or Deny.

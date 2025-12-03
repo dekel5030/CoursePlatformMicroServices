@@ -1,8 +1,8 @@
-﻿using CoursePlatform.ServiceDefaults.Auth;
-using FluentAssertions;
-using Kernel.AuthTypes;
+﻿using FluentAssertions;
+using Kernel.Auth;
+using Kernel.Auth.AuthTypes;
 
-namespace ServiceDefaults.Tests;
+namespace Kernel.UnitTests.Auth;
 
 public class PermissionClaimTests
 {
