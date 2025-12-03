@@ -18,12 +18,17 @@ public class CurrentUserContext : ICurrentUserContext
 
     public bool IsAuthenticated => User?.Identity?.IsAuthenticated ?? false;
 
-    public Guid UserId
+    public Guid? UserId
     {
         get
         {
-            return User != null && 
-                Guid.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId) ? userId : Guid.Empty;
+            if (User == null || !IsAuthenticated)
+            {
+                return null;
+            }
+
+            string? idValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return Guid.TryParse(idValue, out var userId) ? userId : null;
         }
     }
 

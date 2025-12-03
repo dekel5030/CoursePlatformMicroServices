@@ -57,8 +57,8 @@ public class UpdateUserCommandHandler(IWriteDbContext dbContext, ICurrentUserCon
         return new UpdatedUserResponseDto(
             user.Id.Value,
             user.Email,
-            user.FullName?.FirstName ?? null,
-            user.FullName?.LastName ?? null,
+            user.FullName?.FirstName,
+            user.FullName?.LastName,
             user.DateOfBirth,
             user.PhoneNumber?.ToString());
     }
