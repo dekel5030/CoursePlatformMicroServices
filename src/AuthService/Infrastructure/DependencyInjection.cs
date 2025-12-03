@@ -25,12 +25,13 @@ public static class DependencyInjection
     internal const string WriteDbSectionName = "WriteDatabase";
     internal const string ReadDbSectionName = "ReadDatabase";
     internal const string RabbitMqSectionName = "RabbitMq";
-    internal const string Redis = "redis";
+    internal const string RedisConnectionName = "redis";
 
     public static IHostApplicationBuilder AddInfrastructure(this IHostApplicationBuilder builder)
     {
         builder.AddInfrastructureDefaults();
         builder.Services.AddInfrastructure(builder.Configuration);
+        builder.AddRedisClient(RedisConnectionName);
 
         return builder;
     }
