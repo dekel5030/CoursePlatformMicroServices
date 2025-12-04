@@ -156,7 +156,7 @@ public static class DependencyInjection
     {
         const string applicationName = "CoursePlatform.Auth";
 
-        services.AddIdentity<ApplicationIdentityUser, ApplicationIdentityRole>(options =>
+        services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>(options =>
         {
             options.Password.RequireDigit = false;
             options.Password.RequiredLength = 6;

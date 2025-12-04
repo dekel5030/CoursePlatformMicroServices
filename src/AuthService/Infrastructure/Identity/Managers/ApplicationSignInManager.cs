@@ -1,7 +1,6 @@
 ﻿using Application.Abstractions.Identity;
 using Domain.AuthUsers;
 using Infrastructure.Identity.Extensions;
-using Infrastructure.Identity.Users;
 using Kernel;
 using Microsoft.AspNetCore.Identity;
 
@@ -9,11 +8,11 @@ namespace Infrastructure.Identity.Managers;
 
 public class ApplicationSignInManager : ISignInManager<AuthUser>
 {
-    private readonly SignInManager<ApplicationIdentityUser> _aspSignInManager;
+    private readonly SignInManager<IdentityUser<Guid>> _aspSignInManager;
     private readonly IUserManager<AuthUser> _userManager;
 
     public ApplicationSignInManager(
-        SignInManager<ApplicationIdentityUser> signInManager, 
+        SignInManager<IdentityUser<Guid>> signInManager, 
         IUserManager<AuthUser> userManager)
     {
         _aspSignInManager = signInManager;
@@ -36,7 +35,7 @@ public class ApplicationSignInManager : ISignInManager<AuthUser>
 
         if (identityUser == null)
         {
-            return;
+            throw new InvalidOperationException($"User with Id {user.Id} not found");
         }
 
         await _aspSignInManager.SignInAsync(identityUser, isPersistent);

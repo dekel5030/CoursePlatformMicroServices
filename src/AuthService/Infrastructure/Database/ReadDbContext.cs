@@ -1,23 +1,22 @@
 using Application.Abstractions.Data;
 using Domain.AuthUsers;
 using Domain.Roles;
-using Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
 
-public class ReadDbContext
-    : IdentityDbContext<ApplicationIdentityUser, ApplicationIdentityRole, Guid>, IReadDbContext
+public class ReadDbContext : DbContext, IReadDbContext
 {
-    public ReadDbContext(DbContextOptions options) : base(options)
+    public ReadDbContext(DbContextOptions<ReadDbContext> options) : base(options)
     {
     }
 
+    public DbSet<AuthUser> Users { get; set; } 
+    public DbSet<Role> Roles { get; set; }
 
-    public IQueryable<AuthUser> AuthUsers => base.Users.AsNoTracking().Select(u => u.DomainUser);
-    public new IQueryable<Role> Roles => base.Roles.AsNoTracking().Select(r => r.DomainRole);
+    IQueryable<AuthUser> IReadDbContext.AuthUsers => Users.AsNoTracking().AsQueryable();
 
+    IQueryable<Role> IReadDbContext.Roles => Roles.AsNoTracking().AsQueryable();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

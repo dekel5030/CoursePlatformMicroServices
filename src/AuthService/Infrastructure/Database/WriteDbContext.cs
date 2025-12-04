@@ -1,7 +1,8 @@
 using Application.Abstractions.Data;
+using Domain.AuthUsers;
 using Infrastructure.DomainEvents;
-using Infrastructure.Identity;
 using MassTransit;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -9,9 +10,11 @@ using SharedKernel;
 namespace Infrastructure.Database;
 
 public class WriteDbContext
-    : IdentityDbContext<ApplicationIdentityUser, ApplicationIdentityRole, Guid>, IWriteDbContext
+    : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>, IWriteDbContext
 {
     private readonly IDomainEventsDispatcher _domainEventsDispatcher;
+
+    public DbSet<AuthUser> DomainUsers { get; set; }
 
     public WriteDbContext(
         DbContextOptions<WriteDbContext> options,
