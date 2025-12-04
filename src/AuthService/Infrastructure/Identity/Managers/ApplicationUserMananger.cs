@@ -1,10 +1,12 @@
 ﻿using Application.Abstractions.Identity;
+using Application.Extensions;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
+using Infrastructure.Identity.Extensions;
 using Kernel;
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Identity;
+namespace Infrastructure.Identity.Managers;
 
 public class ApplicationUserMananger : IUserManager<AuthUser>
 {

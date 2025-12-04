@@ -2,7 +2,7 @@
 using Kernel;
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Identity;
+namespace Infrastructure.Identity.Extensions;
 
 public static class SignInResultExtensions
 {
@@ -18,7 +18,7 @@ public static class SignInResultExtensions
         }
         if (signInResult.IsNotAllowed)
         {
-            return Result.Failure(AuthUserErrors.IsLockOut);
+            return Result.Failure(AuthUserErrors.EmailNotConfirmed);
         }
         if (signInResult.RequiresTwoFactor)
         {

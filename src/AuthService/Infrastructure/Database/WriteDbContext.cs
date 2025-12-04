@@ -1,7 +1,6 @@
 using Application.Abstractions.Data;
-using Domain.AuthUsers;
-using Domain.Roles;
 using Infrastructure.DomainEvents;
+using Infrastructure.Identity;
 using MassTransit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +8,8 @@ using SharedKernel;
 
 namespace Infrastructure.Database;
 
-public class WriteDbContext : IdentityDbContext<AuthUser, Role, Guid>, IWriteDbContext
+public class WriteDbContext
+    : IdentityDbContext<ApplicationIdentityUser, ApplicationIdentityRole, Guid>, IWriteDbContext
 {
     private readonly IDomainEventsDispatcher _domainEventsDispatcher;
 
@@ -26,7 +26,6 @@ public class WriteDbContext : IdentityDbContext<AuthUser, Role, Guid>, IWriteDbC
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DependencyInjection).Assembly);
         modelBuilder.AddTransactionalOutboxEntities();
-
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

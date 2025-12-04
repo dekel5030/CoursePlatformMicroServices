@@ -1,9 +1,12 @@
 ﻿using Application.Abstractions.Data;
+using Application.Abstractions.Identity;
 using Application.Abstractions.Messaging;
 using Domain.AuthUsers;
 using Domain.Roles;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
+using Infrastructure.Identity;
+using Infrastructure.Identity.Managers;
 using Infrastructure.MassTransit;
 using MassTransit;
 using Microsoft.AspNetCore.DataProtection;
@@ -153,7 +156,7 @@ public static class DependencyInjection
     {
         const string applicationName = "CoursePlatform.Auth";
 
-        services.AddIdentity<AuthUser, Role>(options =>
+        services.AddIdentity<ApplicationIdentityUser, ApplicationIdentityRole>(options =>
         {
             options.Password.RequireDigit = false;
             options.Password.RequiredLength = 6;
@@ -193,6 +196,9 @@ public static class DependencyInjection
         services.AddDataProtection()
             .SetApplicationName(applicationName)
             .PersistKeysToDbContext<DataProtectionKeysContext>();
+
+        services.AddScoped<IUserManager<AuthUser>, ApplicationUserMananger>();
+        services.AddScoped<ISignInManager<AuthUser>, ApplicationSignInManager>();
 
         return services;
     }

@@ -1,9 +1,11 @@
 ﻿using Application.Abstractions.Identity;
 using Domain.AuthUsers;
+using Infrastructure.Identity.Extensions;
+using Infrastructure.Identity.Users;
 using Kernel;
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Identity;
+namespace Infrastructure.Identity.Managers;
 
 public class ApplicationSignInManager : ISignInManager<AuthUser>
 {
