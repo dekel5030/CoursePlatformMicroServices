@@ -1,18 +1,15 @@
 using Domain.AuthUsers.Events;
-using Microsoft.AspNetCore.Identity;
 using SharedKernel;
 
 namespace Domain.AuthUsers;
 
-public class AuthUser : IdentityUser<Guid>, IHasDomainEvents
+public class AuthUser : Entity
 {
-    private readonly DomainEventContainer _eventHandler = new();
+    public Guid Id { get; private set; }
+    public string Email { get; private set; } = null!;
+    public string UserName { get; private set; } = null!;
 
     private AuthUser() { }
-
-    public IReadOnlyCollection<IDomainEvent> DomainEvents => _eventHandler.DomainEvents;
-    public void ClearDomainEvents() => _eventHandler.ClearDomainEvents();
-    public void Raise(IDomainEvent domainEvent) => _eventHandler.Raise(domainEvent);
 
     public static AuthUser Create(string email, string? userName)
     {
@@ -31,5 +28,3 @@ public class AuthUser : IdentityUser<Guid>, IHasDomainEvents
         return authUser;
     }
 }
-
-public class DomainEventContainer : Entity { }

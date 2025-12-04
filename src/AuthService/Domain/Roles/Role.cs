@@ -1,9 +1,12 @@
-using Microsoft.AspNetCore.Identity;
+using SharedKernel;
 
 namespace Domain.Roles;
 
-public class Role : IdentityRole<Guid>
+public class Role : Entity
 {
+    public Guid Id { get; private set; }
+    public string Name { get; private set; } = null!;
+
     private Role() { }
 
     public static Role Create(string roleName)
