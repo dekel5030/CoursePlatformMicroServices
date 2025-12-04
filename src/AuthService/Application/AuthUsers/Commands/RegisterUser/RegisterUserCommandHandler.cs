@@ -1,21 +1,21 @@
+using Application.Abstractions.Identity;
 using Application.Abstractions.Messaging;
 using Application.AuthUsers.Dtos;
 using Application.Extensions;
 using Domain.AuthUsers;
 using Kernel;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.AuthUsers.Commands.RegisterUser;
 
 public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, CurrentUserDto>
 {
-    private readonly SignInManager<AuthUser> _signInManager;
-    private readonly UserManager<AuthUser> _userManager;
+    private readonly ISignInManager<AuthUser> _signInManager;
+    private readonly IUserManager<AuthUser> _userManager;
     private const string DefaultRole = "User";
 
     public RegisterUserCommandHandler(
-        SignInManager<AuthUser> signInManager,
-        UserManager<AuthUser> userManager)
+        ISignInManager<AuthUser> signInManager,
+        IUserManager<AuthUser> userManager)
     {
         _signInManager = signInManager;
         _userManager = userManager;
@@ -30,15 +30,15 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, C
 
         var result = await _userManager.CreateAsync(user, requestDto.Password);
 
-        if (!result.Succeeded)
+        if (result.IsFailure)
         {
-            return result.ToApplicationResult<CurrentUserDto>();
+            return Result<CurrentUserDto>.Failure(result.Error);
         }
 
         var addToRoleResult = await _userManager.AddToRoleAsync(user, DefaultRole);
-        if (!addToRoleResult.Succeeded)
+        if (addToRoleResult.IsFailure)
         {
-            return addToRoleResult.ToApplicationResult<CurrentUserDto>();
+            return Result<CurrentUserDto>.Failure(addToRoleResult.Error);
         }
 
         await _signInManager.SignInAsync(user, true);
