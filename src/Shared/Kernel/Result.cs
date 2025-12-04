@@ -4,9 +4,10 @@ namespace Kernel;
 
 public class Result
 {
-    [MemberNotNullWhen(false, nameof(Error)), MemberNotNullWhen(true, nameof(Error))]
+    [MemberNotNullWhen(false, nameof(Error))]
     public bool IsSuccess { get; }
 
+    [MemberNotNullWhen(true, nameof(Error))]
     public bool IsFailure => !IsSuccess;
     public Error? Error { get; }
 
