@@ -1,7 +1,6 @@
 using Application.Abstractions.Identity;
 using Application.Abstractions.Messaging;
 using Application.AuthUsers.Dtos;
-using Application.Extensions;
 using Domain.AuthUsers;
 using Kernel;
 

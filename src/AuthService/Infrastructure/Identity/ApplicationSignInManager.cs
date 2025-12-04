@@ -7,30 +7,41 @@ namespace Infrastructure.Identity;
 
 public class ApplicationSignInManager : ISignInManager<AuthUser>
 {
-    private readonly SignInManager<IdentityUser> _aspSignInManager;
+    private readonly SignInManager<ApplicationIdentityUser> _aspSignInManager;
+    private readonly IUserManager<AuthUser> _userManager;
 
-    public ApplicationSignInManager(SignInManager<IdentityUser> signInManager)
+    public ApplicationSignInManager(
+        SignInManager<ApplicationIdentityUser> signInManager, 
+        IUserManager<AuthUser> userManager)
     {
         _aspSignInManager = signInManager;
+        _userManager = userManager;
     }
 
-    public IUserManager<AuthUser> UserManager => throw new NotImplementedException();
+    public IUserManager<AuthUser> UserManager => _userManager;
 
     public async Task<Result> PasswordSignInAsync(AuthUser user, string password, bool isPersistent, bool lockoutOnFailure)
     {
-        SignInResult signInResult = await _aspSignInManager
-            .PasswordSignInAsync(user.Id.ToString(), password, isPersistent, lockoutOnFailure);
+        SignInResult result = await _aspSignInManager
+            .PasswordSignInAsync(user.UserName, password, isPersistent, lockoutOnFailure);
 
-        
+        return result.ToApplicationResult();
     }
 
-    public Task SignInAsync(AuthUser user, bool isPersistent)
+    public async Task SignInAsync(AuthUser user, bool isPersistent)
     {
-        throw new NotImplementedException();
+        var identityUser = await _aspSignInManager.UserManager.FindByIdAsync(user.Id.ToString());
+
+        if (identityUser == null)
+        {
+            return;
+        }
+
+        await _aspSignInManager.SignInAsync(identityUser, isPersistent);
     }
 
     public Task SignOutAsync()
     {
-        throw new NotImplementedException();
+        return _aspSignInManager.SignOutAsync();
     }
 }
