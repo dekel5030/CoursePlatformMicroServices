@@ -11,7 +11,7 @@ public class AuthUser : Entity
 
     private AuthUser() { }
 
-    public static AuthUser Create(string email, string? userName)
+    public static AuthUser Create(string email, string userName)
     {
         var authUser = new AuthUser
         {
