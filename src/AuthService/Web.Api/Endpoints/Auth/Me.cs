@@ -17,7 +17,13 @@ public class Me : IEndpoint
             CancellationToken cancellationToken) =>
         {
             var userIdString = user.FindFirstValue(ClaimTypes.NameIdentifier);
-            var query = new GetCurrentUserQuery(userIdString!);
+            Guid.TryParse(userIdString, out Guid userId);
+
+            if (userId == Guid.Empty)
+            {
+                return Results.Unauthorized();
+            }
+            var query = new GetCurrentUserQuery(userId);
             var result = await handler.Handle(query, cancellationToken);
 
             return result.Match(
