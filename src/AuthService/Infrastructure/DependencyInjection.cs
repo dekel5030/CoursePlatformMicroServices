@@ -7,6 +7,7 @@ using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.Identity;
 using Infrastructure.Identity.Managers;
+using Infrastructure.Identity.Stores;
 using Infrastructure.MassTransit;
 using MassTransit;
 using Microsoft.AspNetCore.DataProtection;
@@ -167,6 +168,7 @@ public static class DependencyInjection
             options.User.RequireUniqueEmail = true;
         })
         .AddEntityFrameworkStores<WriteDbContext>()
+        .AddUserStore<NoAutoSaveUserStore>()
         .AddDefaultTokenProviders();
 
         services.AddAuthorization();
@@ -199,6 +201,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUserManager<AuthUser>, ApplicationUserMananger>();
         services.AddScoped<ISignInManager<AuthUser>, ApplicationSignInManager>();
+        services.AddScoped<IRoleManager<Role>, ApplicationRoleManger>();
 
         return services;
     }

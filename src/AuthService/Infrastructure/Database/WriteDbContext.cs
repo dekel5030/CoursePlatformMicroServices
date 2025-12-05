@@ -1,5 +1,6 @@
 using Application.Abstractions.Data;
 using Domain.AuthUsers;
+using Domain.Roles;
 using Infrastructure.DomainEvents;
 using MassTransit;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +16,7 @@ public class WriteDbContext
     private readonly IDomainEventsDispatcher _domainEventsDispatcher;
 
     public DbSet<AuthUser> DomainUsers { get; set; }
+    public DbSet<Role> DomainRoles { get; set; }
 
     public WriteDbContext(
         DbContextOptions<WriteDbContext> options,

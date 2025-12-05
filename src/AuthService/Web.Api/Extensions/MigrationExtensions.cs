@@ -1,8 +1,8 @@
-﻿using Domain.Roles;
+﻿using Application.Abstractions.Identity;
+using Domain.Roles;
 using Infrastructure.Database;
-using Infrastructure.Identity;
+using Infrastructure.Identity.Managers;
 using Kernel.Auth.AuthTypes;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Api.Extensions;
@@ -14,19 +14,20 @@ public static class MigrationExtensions
         using IServiceScope scope = app.ApplicationServices.CreateScope();
         IServiceProvider services = scope.ServiceProvider;
 
+        using var readDb = services.GetRequiredService<ReadDbContext>();
+        await readDb.Database.MigrateAsync();
+
         using WriteDbContext dbContext = services.GetRequiredService<WriteDbContext>();
-        await dbContext.Database.EnsureDeletedAsync();
         await dbContext.Database.MigrateAsync();
 
-        var roleManager = services.GetRequiredService<RoleManager<ApplicationIdentityRole>>();
+        var roleManager = services.GetRequiredService<IRoleManager<Role>>();
         if (!roleManager.Roles.Any())
         {
             var roleTypes = Enum.GetValues<RoleType>();
             foreach (var role in roleTypes)
             {
                 var domainRole = Role.Create(role.ToString());
-                var applicationRole = new ApplicationIdentityRole(domainRole);
-                await roleManager.CreateAsync(applicationRole);
+                await roleManager.CreateAsync(domainRole);
             }
         }
 
