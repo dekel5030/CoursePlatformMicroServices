@@ -9,14 +9,14 @@ namespace Infrastructure.Identity.Managers;
 
 public class ApplicationRoleManger : IRoleManager<Role>
 {
-    private readonly RoleManager<IdentityRole<Guid>> _aspRoleManager;
+    private readonly RoleManager<ApplicationIdentityRole> _aspRoleManager;
     private readonly WriteDbContext _writeDbContext;
     private readonly ReadDbContext _readDbContext;
 
     public IQueryable<Role> Roles => _readDbContext.Roles.AsQueryable();
     
     public ApplicationRoleManger(
-        RoleManager<IdentityRole<Guid>> aspRoleManager, 
+        RoleManager<ApplicationIdentityRole> aspRoleManager, 
         WriteDbContext writeDbContext, 
         ReadDbContext readDbContext)
     {
@@ -28,12 +28,7 @@ public class ApplicationRoleManger : IRoleManager<Role>
 
     public async Task<Result> CreateAsync(Role role)
     {
-        IdentityRole<Guid> aspRole = new IdentityRole<Guid>
-        {
-            Id = role.Id,
-            Name = role.Name,
-        };
-
+        ApplicationIdentityRole aspRole = new ApplicationIdentityRole(role);
 
         IdentityResult result = await _aspRoleManager.CreateAsync(aspRole);
 
@@ -41,9 +36,6 @@ public class ApplicationRoleManger : IRoleManager<Role>
         {
             return result.ToApplicationResult();
         }
-
-        await _writeDbContext.DomainRoles.AddAsync(role);
-        await _writeDbContext.SaveChangesAsync();
 
         return result.ToApplicationResult();
     }

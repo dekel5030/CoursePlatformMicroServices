@@ -30,6 +30,7 @@ public static class MigrationExtensions
                 await roleManager.CreateAsync(domainRole);
             }
         }
+        await dbContext.SaveChangesAsync();
 
         using DataProtectionKeysContext dataProtectionKeysContext = services.GetRequiredService<DataProtectionKeysContext>();
 

@@ -90,6 +90,7 @@ public static class DependencyInjection
 
         services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
         services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<ReadDbContext>());
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<WriteDbContext>());
 
         return services;
     }
@@ -157,7 +158,7 @@ public static class DependencyInjection
     {
         const string applicationName = "CoursePlatform.Auth";
 
-        services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>(options =>
+        services.AddIdentity<ApplicationIdentityUser, ApplicationIdentityRole>(options =>
         {
             options.Password.RequireDigit = false;
             options.Password.RequiredLength = 6;
@@ -169,6 +170,7 @@ public static class DependencyInjection
         })
         .AddEntityFrameworkStores<WriteDbContext>()
         .AddUserStore<NoAutoSaveUserStore>()
+        .AddRoleStore<NoAutoSaveRoleStore>()
         .AddDefaultTokenProviders();
 
         services.AddAuthorization();

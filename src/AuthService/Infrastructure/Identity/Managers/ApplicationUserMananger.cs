@@ -12,20 +12,23 @@ namespace Infrastructure.Identity.Managers;
 
 public class ApplicationUserMananger : IUserManager<AuthUser>
 {
-    private readonly UserManager<IdentityUser<Guid>> _aspUserManager;
+    private readonly UserManager<ApplicationIdentityUser> _aspUserManager;
     private readonly WriteDbContext _writeDbContext;
+    private readonly ReadDbContext _readDbContext;
 
     public ApplicationUserMananger(
-        UserManager<IdentityUser<Guid>> userManager, 
-        WriteDbContext writeDbContext)
+        UserManager<ApplicationIdentityUser> userManager,
+        WriteDbContext writeDbContext,
+        ReadDbContext readDbContext)
     {
         _aspUserManager = userManager;
         _writeDbContext = writeDbContext;
+        _readDbContext = readDbContext;
     }
 
     public async Task<Result> AddToRoleAsync(AuthUser domainUser, string defaultRole)
     {
-        IdentityUser<Guid>? identityUser = await _aspUserManager.FindByIdAsync(domainUser.Id.ToString());
+        ApplicationIdentityUser? identityUser = await _aspUserManager.FindByIdAsync(domainUser.Id.ToString());
 
         if (identityUser == null)
         {
@@ -39,30 +42,20 @@ public class ApplicationUserMananger : IUserManager<AuthUser>
 
     public async Task<Result> CreateAsync(AuthUser user, string password)
     {
-        IdentityUser<Guid> identityUser = new() { 
-            Id = user.Id, 
-            UserName = user.UserName, 
-            Email = user.Email};
+        var identityUser = new ApplicationIdentityUser(user);
 
         IdentityResult result = await _aspUserManager.CreateAsync(identityUser, password);
 
-        if (!result.Succeeded)
-        {
-            return result.ToApplicationResult();
-        }
-
-        await _writeDbContext.DomainUsers.AddAsync(user);
-        await _writeDbContext.SaveChangesAsync();
         return result.ToApplicationResult();
     }
 
     public Task<AuthUser?> FindByEmailAsync(string email)
     {
-        return _writeDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
+        return _readDbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<AuthUser?> FindByIdAsync(Guid userId)
     {
-        return await _writeDbContext.DomainUsers.FindAsync(userId);
+        return await _readDbContext.Users.FindAsync(userId);
     }
 }

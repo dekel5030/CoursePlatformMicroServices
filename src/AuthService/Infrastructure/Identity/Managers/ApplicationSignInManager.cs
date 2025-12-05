@@ -8,11 +8,11 @@ namespace Infrastructure.Identity.Managers;
 
 public class ApplicationSignInManager : ISignInManager<AuthUser>
 {
-    private readonly SignInManager<IdentityUser<Guid>> _aspSignInManager;
+    private readonly SignInManager<ApplicationIdentityUser> _aspSignInManager;
     private readonly IUserManager<AuthUser> _userManager;
 
     public ApplicationSignInManager(
-        SignInManager<IdentityUser<Guid>> signInManager, 
+        SignInManager<ApplicationIdentityUser> signInManager, 
         IUserManager<AuthUser> userManager)
     {
         _aspSignInManager = signInManager;
