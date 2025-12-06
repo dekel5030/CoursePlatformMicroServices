@@ -1,5 +1,6 @@
 using Domain.Permissions;
 using Domain.Permissions.Errors;
+using Domain.Roles.Errors;
 using Domain.Roles.Events;
 using Kernel;
 using SharedKernel;
@@ -11,13 +12,18 @@ public class Role : Entity
     public Guid Id { get; private set; }
     public string Name { get; private set; } = null!;
 
-    private readonly List<UserPermission> _permissions = new();
-    public IReadOnlyCollection<UserPermission> Permissions => _permissions.AsReadOnly();
+    private readonly List<RolePermission> _permissions = new();
+    public IReadOnlyCollection<RolePermission> Permissions => _permissions.AsReadOnly();
 
     private Role() { }
 
     public static Result<Role> Create(string roleName)
     {
+        if (string.IsNullOrWhiteSpace(roleName))
+        {
+            return Result.Failure<Role>(RoleErrors.NameCannotBeEmpty);
+        }
+
         var role = new Role
         {
             Id = Guid.CreateVersion7(),
@@ -29,9 +35,9 @@ public class Role : Entity
         return Result.Success(role);
     }
 
-    public Result AddPermission(UserPermission permission)
+    public Result AddPermission(RolePermission permission)
     {
-        if (_permissions.Any(p => p.Id == permission.Id))
+        if (_permissions.Contains(permission))
         {
             return Result.Failure(PermissionErrors.PermissionAlreadyAssigned);
         }
@@ -41,13 +47,10 @@ public class Role : Entity
         return Result.Success();
     }
 
-    public Result RemovePermission(UserPermission permission)
+    public Result RemovePermission(RolePermission permission)
     {
-        var existingPermission = _permissions.FirstOrDefault(p => p.Id == permission.Id);
-
-        if (existingPermission != null)
+        if (_permissions.Remove(permission))
         {
-            _permissions.Remove(existingPermission);
             Raise(new RolePermissionRemovedDomainEvent(this));
         }
 
