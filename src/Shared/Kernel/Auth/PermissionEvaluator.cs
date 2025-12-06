@@ -5,7 +5,7 @@ namespace Kernel.Auth;
 
 public static class PermissionEvaluator
 {
-    public static bool HasPermission(ClaimsPrincipal user, ActionType action, ResourceType resource, string resourceId)
+    public static bool HasPermission(ClaimsPrincipal user, ActionType action, ResourceType resource, ResourceId resourceId)
     {
         if (CheckRule(user, EffectType.Deny, action, resource, resourceId))
         {
@@ -25,19 +25,23 @@ public static class PermissionEvaluator
         EffectType effect, 
         ActionType action, 
         ResourceType resource, 
-        string resourceId)
+        ResourceId resourceId)
     {
-        var patternsToCheck = new[]
-        {
-            (Action: action, ResourceId: resourceId),
-            (Action: action, ResourceId: "*"),
-            (Action: ActionType.Wildcard, ResourceId: resourceId),
-            (Action: ActionType.Wildcard, ResourceId: "*")
+        var patternsToCheck = new[] {
+            (Action: action, Resource: resource, ResourceId: resourceId),
+            (Action: action, Resource: resource, ResourceId: ResourceId.Wildcard),
+            (Action: action, Resource: ResourceType.Wildcard, ResourceId: resourceId), 
+            (Action: action, Resource: ResourceType.Wildcard, ResourceId: ResourceId.Wildcard),
+
+            (Action: ActionType.Wildcard, Resource: resource, ResourceId: resourceId),
+            (Action: ActionType.Wildcard, Resource: resource, ResourceId: ResourceId.Wildcard),
+            (Action: ActionType.Wildcard, Resource: ResourceType.Wildcard, ResourceId: resourceId),
+            (Action: ActionType.Wildcard, Resource: ResourceType.Wildcard, ResourceId: ResourceId.Wildcard)
         };
 
-        foreach (var (checkAction, checkResourceId) in patternsToCheck)
+        foreach (var (checkAction, checkResource, checkResourceId) in patternsToCheck)
         {
-            var claimValue = PermissionClaim.Create(effect, checkAction, resource, checkResourceId).Value;
+            var claimValue = PermissionClaim.ToClaimValue(effect, checkAction, checkResource, checkResourceId);
 
             if (user.HasClaim(PermissionClaim.ClaimType, claimValue))
             {

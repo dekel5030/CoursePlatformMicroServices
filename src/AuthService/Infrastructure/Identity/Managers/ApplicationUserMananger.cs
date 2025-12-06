@@ -40,12 +40,17 @@ public class ApplicationUserMananger : IUserManager<AuthUser>
         return identityResult.ToApplicationResult();
     }
 
-    public async Task<Result> CreateAsync(AuthUser user, string password)
+    public async Task<Result> AddUserAsync(AuthUser user, string password)
     {
         var identityUser = new ApplicationIdentityUser(user);
 
-        IdentityResult result = await _aspUserManager.CreateAsync(identityUser, password);
+        foreach (var role in user.Roles)
+        {
+            identityUser.UserRoles.Add(
+                new IdentityUserRole<Guid>() { UserId = identityUser.Id, RoleId = role.Id });
+        }
 
+        IdentityResult result = await _aspUserManager.CreateAsync(identityUser, password);
         return result.ToApplicationResult();
     }
 

@@ -1,5 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
+var redis = builder.AddRedis("redis").WithDataVolume();
+
 // RabbitMq configuration
 var rabbitMq = builder
     .AddRabbitMQ("rabbitmq")
@@ -17,8 +19,10 @@ var authService = builder
     .AddProject<Projects.Auth_Api>("authservice")
     .WithReference(authDb)
     .WithReference(rabbitMq)
+    .WithReference(redis)
     .WaitFor(authDb)
     .WaitFor(rabbitMq)
+    .WaitFor(redis)
     .WithEnvironment("ConnectionStrings:ReadDatabase", authDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:WriteDatabase", authDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression)
@@ -40,7 +44,6 @@ var usersService = builder.AddProject<Projects.User_Api>("userservice")
     .WithEnvironment("ConnectionStrings:WriteDatabase", usersDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression)
     .WithHttpHealthCheck("/health");
-
 
 // CourseService configuration
 

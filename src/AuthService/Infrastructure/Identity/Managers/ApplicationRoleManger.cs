@@ -3,6 +3,7 @@ using Application.Extensions;
 using Domain.Roles;
 using Infrastructure.Database;
 using Kernel;
+using Kernel.Auth;
 using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Identity.Managers;
@@ -26,15 +27,30 @@ public class ApplicationRoleManger : IRoleManager<Role>
     }
 
 
-    public async Task<Result> CreateAsync(Role role)
+    public async Task<Result> AddRoleAsync(Role role)
     {
         ApplicationIdentityRole aspRole = new ApplicationIdentityRole(role);
-
         IdentityResult result = await _aspRoleManager.CreateAsync(aspRole);
 
         if (!result.Succeeded)
         {
             return result.ToApplicationResult();
+        }
+
+        foreach (var permission in role.Permissions)
+        {
+            var permissionClaim = PermissionClaim.Create(
+                    permission.Effect,
+                    permission.Action,
+                    permission.Resource,
+                    permission.ResourceId);
+
+            IdentityResult claimResult = await _aspRoleManager.AddClaimAsync(aspRole, permissionClaim);
+
+            if (!claimResult.Succeeded)
+            {
+                return claimResult.ToApplicationResult();
+            }
         }
 
         return result.ToApplicationResult();

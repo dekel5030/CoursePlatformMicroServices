@@ -5,6 +5,6 @@ namespace Application.Abstractions.Identity;
 
 public interface IRoleManager<TRole> where TRole : Role
 {
-    Task<Result> CreateAsync(TRole role);
+    Task<Result> AddRoleAsync(TRole role);
     IQueryable<TRole> Roles { get; }
 }
