@@ -24,7 +24,7 @@ public class Role : Entity
             Name = roleName,
         };
 
-        role.Raise(new RoleUpsertedDomainEvent(role));
+        role.Raise(new RoleCreatedDomainEvent(role));
 
         return role;
     }
@@ -41,5 +41,3 @@ public class Role : Entity
         return Result.Success();
     }
 }
-
-public record RolePermissionAssignedDomainEvent(Role Role) : IDomainEvent;

@@ -2,4 +2,4 @@
 
 namespace Domain.Roles.Events;
 
-public record RoleCreatedDomainEvent(Guid RoleId, string RoleName) : IDomainEvent;
+public record RoleCreatedDomainEvent(Role Role) : IDomainEvent;
