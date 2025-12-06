@@ -1,11 +1,12 @@
-﻿using Application.Abstractions.Identity;
+﻿using Application.Abstractions.Data;
+using Application.Abstractions.Identity;
 using Application.Abstractions.Messaging;
 using Domain.Roles;
 using Kernel;
 
 namespace Application.Roles.CreateRole;
 
-public class CreateRoleCommandHandler(IRoleManager<Role> roleManager)
+public class CreateRoleCommandHandler(IRoleManager<Role> roleManager, IUnitOfWork unitOfWork)
         : ICommandHandler<CreateRoleCommand, CreateRoleResponseDto>
 {
     public async Task<Result<CreateRoleResponseDto>> Handle(
@@ -23,12 +24,14 @@ public class CreateRoleCommandHandler(IRoleManager<Role> roleManager)
 
         var response = new CreateRoleResponseDto(role.Id.ToString(), role.Name);
 
-        Result creationResult = await roleManager.CreateAsync(role);
+        Result creationResult = await roleManager.AddRoleAsync(role);
 
         if (creationResult.IsFailure)
         {
             return Result.Failure<CreateRoleResponseDto>(creationResult.Error);
         }
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success(response);
     }

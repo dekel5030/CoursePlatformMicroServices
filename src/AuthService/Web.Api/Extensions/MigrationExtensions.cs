@@ -33,7 +33,7 @@ public static class MigrationExtensions
                     throw new InvalidOperationException($"Failed to create role {role}: {domainRole.Error}");
                 }
 
-                await roleManager.CreateAsync(domainRole.Value);
+                await roleManager.AddRoleAsync(domainRole.Value);
             }
         }
         await dbContext.SaveChangesAsync();
