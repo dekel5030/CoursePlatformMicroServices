@@ -20,6 +20,7 @@ public class CreateRoleCommandHandler(IRoleManager<Role> roleManager)
         }
 
         Role role = result.Value;
+
         var response = new CreateRoleResponseDto(role.Id.ToString(), role.Name);
 
         Result creationResult = await roleManager.CreateAsync(role);

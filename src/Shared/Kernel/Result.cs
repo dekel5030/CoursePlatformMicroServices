@@ -48,6 +48,11 @@ public sealed class Result<TValue> : Result
     [MemberNotNullWhen(true, nameof(Value))]
     public new bool IsSuccess => base.IsSuccess;
 
+    [MemberNotNullWhen(false, nameof(Value)), MemberNotNullWhen(true, nameof(Error))]
+    public new bool IsFailure => !base.IsSuccess;
+
+    public new Error? Error => base.Error;
+
     public TValue? Value => IsSuccess
         ? _value
         : throw new InvalidOperationException("The value of a failure result can't be accessed.");
