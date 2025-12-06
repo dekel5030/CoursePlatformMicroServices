@@ -16,7 +16,7 @@ public class Role : Entity
 
     private Role() { }
 
-    public static Role Create(string roleName)
+    public static Result<Role> Create(string roleName)
     {
         var role = new Role
         {
@@ -26,7 +26,7 @@ public class Role : Entity
 
         role.Raise(new RoleCreatedDomainEvent(role));
 
-        return role;
+        return Result.Success(role);
     }
 
     public Result AddPermission(Permission permission)

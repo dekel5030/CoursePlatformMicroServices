@@ -29,7 +29,6 @@ public class ApplicationRoleManger : IRoleManager<Role>
     public async Task<Result> CreateAsync(Role role)
     {
         ApplicationIdentityRole aspRole = new ApplicationIdentityRole(role);
-
         IdentityResult result = await _aspRoleManager.CreateAsync(aspRole);
 
         if (!result.Succeeded)

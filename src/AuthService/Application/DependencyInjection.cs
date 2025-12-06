@@ -5,6 +5,7 @@ using Application.AuthUsers.Commands.RegisterUser;
 using Application.AuthUsers.Dtos;
 using Application.AuthUsers.Events;
 using Application.AuthUsers.Queries.GetCurrentUser;
+using Application.Roles.CreateRole;
 using Domain.AuthUsers.Events;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,7 +35,7 @@ public static class DependencyInjection
         services.AddScoped<ICommandHandler<RegisterUserCommand, CurrentUserDto>, RegisterUserCommandHandler>();
         services.AddScoped<ICommandHandler<LoginUserCommand, CurrentUserDto>, LoginUserCommandHandler>();
         services.AddScoped<ICommandHandler<LogoutCommand>, LogoutCommandHandler>();
-
+        services.AddScoped<ICommandHandler<CreateRoleCommand, CreateRoleResponseDto>, CreateRoleCommandHandler>();
 
         return services;
     }
