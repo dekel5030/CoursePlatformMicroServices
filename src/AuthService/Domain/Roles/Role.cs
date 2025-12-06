@@ -11,8 +11,8 @@ public class Role : Entity
     public Guid Id { get; private set; }
     public string Name { get; private set; } = null!;
 
-    private readonly List<Permission> _permissions = new();
-    public IReadOnlyCollection<Permission> Permissions => _permissions.AsReadOnly();
+    private readonly List<UserPermission> _permissions = new();
+    public IReadOnlyCollection<UserPermission> Permissions => _permissions.AsReadOnly();
 
     private Role() { }
 
@@ -29,7 +29,7 @@ public class Role : Entity
         return Result.Success(role);
     }
 
-    public Result AddPermission(Permission permission)
+    public Result AddPermission(UserPermission permission)
     {
         if (_permissions.Any(p => p.Id == permission.Id))
         {
@@ -41,7 +41,7 @@ public class Role : Entity
         return Result.Success();
     }
 
-    public Result RemovePermission(Permission permission)
+    public Result RemovePermission(UserPermission permission)
     {
         var existingPermission = _permissions.FirstOrDefault(p => p.Id == permission.Id);
 
