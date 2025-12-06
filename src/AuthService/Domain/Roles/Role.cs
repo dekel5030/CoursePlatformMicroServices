@@ -1,3 +1,4 @@
+using Domain.Roles.Events;
 using SharedKernel;
 
 namespace Domain.Roles;
@@ -11,10 +12,14 @@ public class Role : Entity
 
     public static Role Create(string roleName)
     {
-        return new Role
+        var role = new Role
         {
             Id = Guid.CreateVersion7(),
             Name = roleName,
         };
+
+        role.Raise(new RoleUpsertedDomainEvent(role.Id, role.Name));
+
+        return role;
     }
 }

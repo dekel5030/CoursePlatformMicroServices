@@ -5,6 +5,7 @@ using Domain.AuthUsers;
 using Domain.Roles;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
+using Infrastructure.Extensions;
 using Infrastructure.Identity;
 using Infrastructure.Identity.Managers;
 using Infrastructure.Identity.Stores;
