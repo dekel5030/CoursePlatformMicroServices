@@ -2,11 +2,8 @@ using Application;
 using Auth.Api.Endpoints;
 using Auth.Api.Extensions;
 using Infrastructure;
-using Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.AddInfrastructureDefaults();
 
 builder.Services.AddCors(options =>
 {
@@ -21,7 +18,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.AddInfrastructure();
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
 
@@ -35,13 +32,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseInfrastructure();
 
 app.MapEndpoints();
-
-app.UseInfrastructureDefaultEndpoints();
 
 app.Run();
 
