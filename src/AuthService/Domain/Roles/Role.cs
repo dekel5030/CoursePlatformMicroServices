@@ -29,7 +29,7 @@ public class Role : Entity
         return role;
     }
 
-    public Result AssignPermission(Permission permission)
+    public Result AddPermission(Permission permission)
     {
         if (_permissions.Any(p => p.Id == permission.Id))
         {
@@ -38,6 +38,19 @@ public class Role : Entity
 
         _permissions.Add(permission);
         Raise(new RolePermissionAssignedDomainEvent(this));
+        return Result.Success();
+    }
+
+    public Result RemovePermission(Permission permission)
+    {
+        var existingPermission = _permissions.FirstOrDefault(p => p.Id == permission.Id);
+
+        if (existingPermission != null)
+        {
+            _permissions.Remove(existingPermission);
+            Raise(new RolePermissionRemovedDomainEvent(this));
+        }
+
         return Result.Success();
     }
 }
