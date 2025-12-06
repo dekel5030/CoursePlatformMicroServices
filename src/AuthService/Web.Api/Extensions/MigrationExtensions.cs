@@ -27,7 +27,13 @@ public static class MigrationExtensions
             foreach (var role in roleTypes)
             {
                 var domainRole = Role.Create(role.ToString());
-                await roleManager.CreateAsync(domainRole);
+
+                if (!domainRole.IsSuccess)
+                {
+                    throw new InvalidOperationException($"Failed to create role {role}: {domainRole.Error}");
+                }
+
+                await roleManager.CreateAsync(domainRole.Value);
             }
         }
         await dbContext.SaveChangesAsync();
