@@ -1,15 +1,15 @@
+using Application.Abstractions.Identity;
 using Application.Abstractions.Messaging;
 using Domain.AuthUsers;
 using Kernel;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.AuthUsers.Commands.Logout;
 
 public class LogoutCommandHandler : ICommandHandler<LogoutCommand>
 {
-    private readonly SignInManager<AuthUser> _signInManager;
+    private readonly ISignInManager<AuthUser> _signInManager;
 
-    public LogoutCommandHandler(SignInManager<AuthUser> signInManager)
+    public LogoutCommandHandler(ISignInManager<AuthUser> signInManager)
     {
         _signInManager = signInManager;
     }

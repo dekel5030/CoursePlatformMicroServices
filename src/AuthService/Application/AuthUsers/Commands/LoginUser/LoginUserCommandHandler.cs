@@ -1,17 +1,17 @@
+using Application.Abstractions.Identity;
 using Application.Abstractions.Messaging;
 using Application.AuthUsers.Dtos;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
 using Kernel;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.AuthUsers.Commands.LoginUser;
 
 public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, CurrentUserDto>
 {
-    private readonly SignInManager<AuthUser> _signInManager;
+    private readonly ISignInManager<AuthUser> _signInManager;
 
-    public LoginUserCommandHandler(SignInManager<AuthUser> signInManager)
+    public LoginUserCommandHandler(ISignInManager<AuthUser> signInManager)
     {
         _signInManager = signInManager;
     }
@@ -35,22 +35,12 @@ public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, Current
             isPersistent: true,
             lockoutOnFailure: true);
 
-        if (signInResult.Succeeded)
+        if (signInResult.IsFailure)
         {
-            var loginResultDto = new CurrentUserDto(user.Id, user.Email!, user.UserName);
-            return Result.Success(loginResultDto);
+            return Result.Failure<CurrentUserDto>(signInResult.Error);
         }
 
-        if (signInResult.IsLockedOut)
-        {
-            return Result.Failure<CurrentUserDto>(AuthUserErrors.UserLockedOut);
-        }
-
-        if (signInResult.IsNotAllowed)
-        {
-            return Result.Failure<CurrentUserDto>(AuthUserErrors.EmailNotConfirmed);
-        }
-
-        return Result.Failure<CurrentUserDto>(AuthUserErrors.InvalidCredentials);
+        var loginResultDto = new CurrentUserDto(user.Id, user.Email!, user.UserName);
+        return Result.Success(loginResultDto);
     }
 }

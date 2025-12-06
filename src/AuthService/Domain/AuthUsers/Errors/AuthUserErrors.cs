@@ -35,4 +35,12 @@ public static class AuthUserErrors
     public static readonly Error Unauthorized = Error.Unauthorized(
         "AuthUser.Unauthorized",
         "Unauthorized access to the resource");
+
+    public static readonly Error IsLockOut = Error.Validation(
+        "AuthUser.IsLockOut",
+        "User account is locked out due to multiple failed login attempts.");
+
+    public static readonly Error Required2FA = Error.Validation(
+        "AuthUser.Required2FA",
+        "Two-factor authentication is required to sign in.");
 }

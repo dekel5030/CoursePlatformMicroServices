@@ -1,17 +1,17 @@
+using Application.Abstractions.Identity;
 using Application.Abstractions.Messaging;
 using Application.AuthUsers.Dtos;
 using Application.AuthUsers.Queries.GetCurrentUser;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
 using Kernel;
-using Microsoft.AspNetCore.Identity;
 
 public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, CurrentUserDto>
 {
-    private readonly UserManager<AuthUser> _userManager;
+    private readonly IUserManager<AuthUser> _userManager;
 
     public GetCurrentUserQueryHandler(
-        UserManager<AuthUser> userManager)
+        IUserManager<AuthUser> userManager)
     {
         _userManager = userManager;
     }

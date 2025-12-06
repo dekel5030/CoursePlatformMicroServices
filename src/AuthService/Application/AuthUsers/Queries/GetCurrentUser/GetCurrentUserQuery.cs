@@ -3,4 +3,4 @@ using Application.AuthUsers.Dtos;
 
 namespace Application.AuthUsers.Queries.GetCurrentUser;
 
-public sealed record GetCurrentUserQuery(string UserId) : IQuery<CurrentUserDto>;
+public sealed record GetCurrentUserQuery(Guid UserId) : IQuery<CurrentUserDto>;
