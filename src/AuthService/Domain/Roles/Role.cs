@@ -1,4 +1,7 @@
+using Domain.Permissions;
+using Domain.Permissions.Errors;
 using Domain.Roles.Events;
+using Kernel;
 using SharedKernel;
 
 namespace Domain.Roles;
@@ -7,6 +10,9 @@ public class Role : Entity
 {
     public Guid Id { get; private set; }
     public string Name { get; private set; } = null!;
+
+    private readonly List<Permission> _permissions = new();
+    public IReadOnlyCollection<Permission> Permissions => _permissions.AsReadOnly();
 
     private Role() { }
 
@@ -18,8 +24,22 @@ public class Role : Entity
             Name = roleName,
         };
 
-        role.Raise(new RoleUpsertedDomainEvent(role.Id, role.Name));
+        role.Raise(new RoleUpsertedDomainEvent(role));
 
         return role;
     }
+
+    public Result AssignPermission(Permission permission)
+    {
+        if (_permissions.Any(p => p.Id == permission.Id))
+        {
+            return Result.Failure(PermissionErrors.PermissionAlreadyAssigned);
+        }
+
+        _permissions.Add(permission);
+        Raise(new RolePermissionAssignedDomainEvent(this));
+        return Result.Success();
+    }
 }
+
+public record RolePermissionAssignedDomainEvent(Role Role) : IDomainEvent;
