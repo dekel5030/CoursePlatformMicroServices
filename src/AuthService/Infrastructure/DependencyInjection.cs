@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Identity;
 using Application.Abstractions.Messaging;
+using CoursePlatform.ServiceDefaults.Auth;
 using Domain.AuthUsers;
 using Domain.Roles;
 using Infrastructure.Database;
@@ -10,6 +11,7 @@ using Infrastructure.Identity;
 using Infrastructure.Identity.Managers;
 using Infrastructure.Identity.Stores;
 using Infrastructure.MassTransit;
+using Kernel.Auth.Abstractions;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -57,12 +59,20 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
-            .ConfigureIdentities(configuration);
+            .ConfigureIdentities(configuration)
+            .AddUserContextProvider();
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
+        return services;
+    }
+
+    private static IServiceCollection AddUserContextProvider(this IServiceCollection services)
+    {
+        services.AddHttpContextAccessor();
+        services.AddScoped<IUserContext, UserContext>();
         return services;
     }
 
