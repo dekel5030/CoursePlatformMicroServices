@@ -38,19 +38,11 @@ public static partial class PermissionClaim
             EffectType effect,
             ActionType action,
             ResourceType resource,
-            string id)
+            ResourceId id)
     {
-        if (id != "*" && id.Contains(':'))
-        {
-            throw new ArgumentException("Resource ID cannot contain the claim delimiter ':'.", nameof(id));
-        }
+        var value = ToClaimValue(effect, action, resource, id);
 
-        var effectString = effect.ToString().ToLowerInvariant();
-        var actionString = action == ActionType.Wildcard ? "*" : action.ToString().ToLowerInvariant();
-        var resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
-        var idString = id == "*" ? "*" : id.ToLowerInvariant();
-        
-        return new Claim(ClaimType, $"{effectString}:{actionString}:{resourceString}:{idString}");
+        return new Claim(ClaimType, value);
     }
 
     /// <summary>
@@ -74,9 +66,9 @@ public static partial class PermissionClaim
         EffectType effect = ParseEffect(effectSegment);
         ActionType action = ParseAction(actionSegment);
         ResourceType resource = ParseResource(resourceSegment);
-        var id = ParseId(idSegment);
+        ResourceId resourceId = ResourceId.Create(idSegment);
 
-        return Create(effect, action, resource, id);
+        return Create(effect, action, resource, resourceId);
     }
 
     public static Claim? TryParse(string claimValue)
@@ -122,6 +114,24 @@ public static partial class PermissionClaim
         }
     }
 
+    /// <summary>
+    /// Generates the raw string value for a permission claim.
+    /// Format: effect:action:resource:id
+    /// This is the Single Source of Truth for formatting.
+    /// </summary>
+    public static string ToClaimValue(
+                EffectType effect,
+                ActionType action,
+                ResourceType resource,
+                ResourceId id)
+    {
+        var effectString = effect.ToString().ToLowerInvariant();
+        var actionString = action == ActionType.Wildcard ? "*" : action.ToString().ToLowerInvariant();
+        var resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
+
+        return $"{effectString}:{actionString}:{resourceString}:{id.Value}";
+    }
+
     private static EffectType ParseEffect(string effectSegment)
     {
         if (!Enum.TryParse(effectSegment, true, out EffectType effect))
@@ -160,15 +170,5 @@ public static partial class PermissionClaim
         }
 
         return resource;
-    }
-
-    private static string ParseId(string idSegment)
-    {
-        if (string.IsNullOrWhiteSpace(idSegment))
-        {
-            throw new ArgumentException("Invalid id value.");
-        }
-
-        return idSegment;
     }
 }

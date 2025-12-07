@@ -41,6 +41,8 @@ public class CurrentUserContext : ICurrentUserContext
     {
         if (User == null) return false;
 
-        return PermissionEvaluator.HasPermission(User, action, ResourceType.User, resourceId.ToString());
+        var resourceIdObj = ResourceId.Create(resourceId.ToString());
+
+        return PermissionEvaluator.HasPermission(User, action, ResourceType.User, resourceIdObj);
     }
 }

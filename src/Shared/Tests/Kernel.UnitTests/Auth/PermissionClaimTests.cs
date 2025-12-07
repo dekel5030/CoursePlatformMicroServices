@@ -10,11 +10,12 @@ public class PermissionClaimTests
     public void Create_ShouldNormalizeToLowercase()
     {
         // Arrange & Act
+        // תיקון: יצירת ResourceId באמצעות ה-Factory
         var claim = PermissionClaim.Create(
             EffectType.Allow,
             ActionType.Read,
             ResourceType.Course,
-            "ABC123");
+            ResourceId.Create("ABC123"));
 
         // Assert
         claim.Type.Should().Be("cp_permission");
@@ -29,7 +30,7 @@ public class PermissionClaimTests
             EffectType.Allow,
             ActionType.Wildcard,
             ResourceType.Course,
-            "123");
+            ResourceId.Create("123"));
 
         // Assert
         claim.Value.Should().Be("allow:*:course:123");
@@ -43,7 +44,7 @@ public class PermissionClaimTests
             EffectType.Allow,
             ActionType.Read,
             ResourceType.Wildcard,
-            "123");
+            ResourceId.Create("123"));
 
         // Assert
         claim.Value.Should().Be("allow:read:*:123");
@@ -53,30 +54,27 @@ public class PermissionClaimTests
     public void Create_ShouldHandleWildcardId()
     {
         // Arrange & Act
+        // תיקון: שימוש ב-ResourceId.Wildcard
         var claim = PermissionClaim.Create(
             EffectType.Allow,
             ActionType.Read,
             ResourceType.Course,
-            "*");
+            ResourceId.Wildcard);
 
         // Assert
         claim.Value.Should().Be("allow:read:course:*");
     }
 
     [Fact]
-    public void Create_ShouldThrowWhenIdContainsColon()
+    public void ResourceId_Create_ShouldThrowWhenIdContainsColon()
     {
         // Arrange & Act
-        var action = () => PermissionClaim.Create(
-            EffectType.Allow,
-            ActionType.Read,
-            ResourceType.Course,
-            "invalid:id");
+        // תיקון: הבדיקה עוברת ל-ResourceId.Create כי הוא זה שעושה את הוולידציה עכשיו
+        var action = () => ResourceId.Create("invalid:id");
 
         // Assert
         action.Should().Throw<ArgumentException>()
-            .WithMessage("Resource ID cannot contain the claim delimiter ':'.*")
-            .And.ParamName.Should().Be("id");
+            .WithMessage("Resource ID cannot contain the delimiter ':'.");
     }
 
     [Fact]
@@ -87,7 +85,7 @@ public class PermissionClaimTests
             EffectType.Deny,
             ActionType.Delete,
             ResourceType.User,
-            "*");
+            ResourceId.Wildcard);
 
         // Assert
         claim.Value.Should().Be("deny:delete:user:*");
@@ -150,7 +148,7 @@ public class PermissionClaimTests
     public void Parse_ShouldThrowOnInvalidSegmentCount()
     {
         // Arrange
-        var claimValue = "allow:read:course";
+        var claimValue = "allow:read:course"; // Missing ID segment entirely
 
         // Act
         var action = () => PermissionClaim.Parse(claimValue);
@@ -220,14 +218,15 @@ public class PermissionClaimTests
     public void Parse_ShouldThrowOnEmptyId()
     {
         // Arrange
-        var claimValue = "allow:read:course:";
+        var claimValue = "allow:read:course:"; // ID is empty string
 
         // Act
         var action = () => PermissionClaim.Parse(claimValue);
 
         // Assert
+        // ההודעה השתנתה כי הוולידציה בתוך ResourceId
         action.Should().Throw<ArgumentException>()
-            .WithMessage("Invalid id value.");
+            .WithMessage("Resource ID cannot be empty.");
     }
 
     [Fact]
@@ -240,8 +239,9 @@ public class PermissionClaimTests
         var action = () => PermissionClaim.Parse(claimValue);
 
         // Assert
+        // ההודעה השתנתה כי הוולידציה בתוך ResourceId
         action.Should().Throw<ArgumentException>()
-            .WithMessage("Invalid id value.");
+            .WithMessage("Resource ID cannot be empty.");
     }
 
     [Fact]
@@ -324,7 +324,7 @@ public class PermissionClaimTests
             EffectType.Allow,
             ActionType.Update,
             ResourceType.Lesson,
-            "789");
+            ResourceId.Create("789")); // תיקון
 
         // Act
         var parsed = PermissionClaim.Parse(original.Value);

@@ -1,4 +1,5 @@
 using Application;
+using Auth.Api.Extensions;
 using Infrastructure;
 using Infrastructure.Extensions;
 using User.Api.Endpoints;
@@ -30,6 +31,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseCors("LocalDev");
+    await app.ApplyMigrationsAsync();
 }
 
 app.UseHttpsRedirection();

@@ -36,18 +36,18 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, C
         RegisterRequestDto requestDto = request.Dto;
         AuthUser user = AuthUser.Create(requestDto.Email, requestDto.UserName, _defaultRole);
 
-        var result = await _userManager.CreateAsync(user, requestDto.Password);
+        var result = await _userManager.AddUserAsync(user, requestDto.Password);
 
         if (result.IsFailure)
         {
             return Result<CurrentUserDto>.Failure(result.Error);
         }
 
-        // await _signInManager.SignInAsync(user, true);
 
         var currentUserDto = new CurrentUserDto(user.Id, user.Email!, user.UserName);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _signInManager.SignInAsync(user, true);
 
         return Result<CurrentUserDto>.Success(currentUserDto);
     }
