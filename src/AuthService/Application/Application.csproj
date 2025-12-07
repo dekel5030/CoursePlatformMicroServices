@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\..\Contracts\Auth.Contracts\Auth.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Roles\RemoveRolePermission\" />
+  </ItemGroup>
+
 </Project>

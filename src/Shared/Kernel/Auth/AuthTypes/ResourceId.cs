@@ -13,16 +13,10 @@ public record ResourceId
 
     public static ResourceId Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException("Resource ID cannot be empty.");
-
         if (value == "*")
             return Wildcard;
 
-        if (value.Contains(':'))
-            throw new ArgumentException("Resource ID cannot contain the delimiter ':'.");
-
-        return new ResourceId(value.ToLowerInvariant());
+        return new ResourceId(value);
     }
 
     public bool IsWildcard => Value == "*";
