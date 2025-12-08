@@ -3,4 +3,4 @@ using SharedKernel;
 
 namespace Domain.Roles.Events;
 
-public record RolePermissionAssignedDomainEvent(Role Role, RolePermission Permission) : IDomainEvent;
+public record RolePermissionAssignedDomainEvent(Role Role, Permission Permission) : IDomainEvent;

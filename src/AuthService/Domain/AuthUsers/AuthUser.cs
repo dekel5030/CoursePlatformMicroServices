@@ -10,13 +10,13 @@ namespace Domain.AuthUsers;
 public class AuthUser : Entity
 {
     private readonly List<Role> _roles = new();
-    private readonly List<UserPermission> _permissions = new();
+    private readonly List<Permission> _permissions = new();
 
     public Guid Id { get; private set; }
     public string Email { get; private set; } = null!;
     public string UserName { get; private set; } = null!;
     public IReadOnlyCollection<Role> Roles => _roles.AsReadOnly();
-    public IReadOnlyCollection<UserPermission> Permissions => _permissions.AsReadOnly();
+    public IReadOnlyCollection<Permission> Permissions => _permissions.AsReadOnly();
 
     private AuthUser() { }
 
@@ -65,7 +65,7 @@ public class AuthUser : Entity
         return Result.Success();
     }
 
-    public Result AddPermission(UserPermission permission)
+    public Result AddPermission(Permission permission)
     {
         if (_permissions.Contains(permission))
         {
@@ -78,7 +78,7 @@ public class AuthUser : Entity
         return Result.Success();
     }
 
-    public Result RemovePermission(UserPermission permission)
+    public Result RemovePermission(Permission permission)
     {
         if (_permissions.Remove(permission))
         {

@@ -3,4 +3,4 @@ using SharedKernel;
 
 namespace Domain.AuthUsers.Events;
 
-public record UserPermissionAddedDomainEvent(AuthUser User, UserPermission Permission) : IDomainEvent;
+public record UserPermissionAddedDomainEvent(AuthUser User, Permission Permission) : IDomainEvent;

@@ -7,6 +7,7 @@ using Application.AuthUsers.Events;
 using Application.AuthUsers.Queries.GetCurrentUser;
 using Application.Roles.AddRolePermission;
 using Application.Roles.CreateRole;
+using Application.Roles.RemoveRolePermission;
 using Domain.AuthUsers.Events;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -38,6 +39,7 @@ public static class DependencyInjection
         services.AddScoped<ICommandHandler<LogoutCommand>, LogoutCommandHandler>();
         services.AddScoped<ICommandHandler<CreateRoleCommand, CreateRoleResponseDto>, CreateRoleCommandHandler>();
         services.AddScoped<ICommandHandler<AddRolePermissionCommand>, AddRolePermissionCommandHandler>();
+        services.AddScoped<ICommandHandler<RemoveRolePermissionCommand>, RemoveRolePermissionCommandHandler>();
 
         return services;
     }

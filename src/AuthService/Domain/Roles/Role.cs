@@ -3,6 +3,7 @@ using Domain.Permissions.Errors;
 using Domain.Roles.Errors;
 using Domain.Roles.Events;
 using Kernel;
+using Kernel.Auth.AuthTypes;
 using SharedKernel;
 
 namespace Domain.Roles;
@@ -12,8 +13,8 @@ public class Role : Entity
     public Guid Id { get; private set; }
     public string Name { get; private set; } = null!;
 
-    private readonly List<RolePermission> _permissions = new();
-    public IReadOnlyCollection<RolePermission> Permissions => _permissions.AsReadOnly();
+    private readonly List<Permission> _permissions = new();
+    public IReadOnlyCollection<Permission> Permissions => _permissions.AsReadOnly();
 
     private Role() { }
 
@@ -35,8 +36,13 @@ public class Role : Entity
         return Result.Success(role);
     }
 
-    public Result AddPermission(RolePermission permission)
+    public Result AddPermission(Permission permission)
     {
+        if (permission.Effect != EffectType.Allow)
+        {
+            return Result.Failure(RoleErrors.InvalidPermissionEffect);
+        }
+
         if (_permissions.Contains(permission))
         {
             return Result.Failure(PermissionErrors.PermissionAlreadyAssigned);
@@ -47,7 +53,7 @@ public class Role : Entity
         return Result.Success();
     }
 
-    public Result RemovePermission(RolePermission permission)
+    public Result RemovePermission(Permission permission)
     {
         if (_permissions.Remove(permission))
         {

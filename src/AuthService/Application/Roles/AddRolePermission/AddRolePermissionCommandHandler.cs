@@ -1,12 +1,8 @@
 ﻿using Application.Abstractions.Data;
-using Application.Abstractions.Identity;
 using Application.Abstractions.Messaging;
 using Domain.Permissions;
-using Domain.Permissions.Errors;
-using Domain.Roles;
 using Domain.Roles.Errors;
 using Kernel;
-using Kernel.Auth;
 using Kernel.Auth.AuthTypes;
 
 namespace Application.Roles.AddRolePermission;
@@ -15,6 +11,7 @@ public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermission
 {
     private readonly IWriteDbContext _writeDbContext;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly string _wildcard = ResourceId.Wildcard.Value;
 
     public AddRolePermissionCommandHandler(
         IUnitOfWork unitOfWork,
@@ -28,18 +25,6 @@ public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermission
         AddRolePermissionCommand request, 
         CancellationToken cancellationToken = default)
     {
-        if (PermissionParser.TryParseAction(request.Action, out var action) == false)
-        {
-            return Result.Failure(PermissionErrors.InvalidAction);
-        }
-        if (PermissionParser.TryParseResource(request.Resource, out var resource) == false)
-        {
-            return Result.Failure(PermissionErrors.InvalidResource);
-        }
-
-        ResourceId resourceId = request.ResourceId != null ? 
-            ResourceId.Create(request.ResourceId) : ResourceId.Wildcard;
-
         var role = await _writeDbContext.Roles.FindAsync(request.RoleId, cancellationToken);
 
         if (role is null)
@@ -47,8 +32,23 @@ public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermission
             return Result.Failure(RoleErrors.NotFound);
         }
 
-        RolePermission rolePermission = new(action, resource, resourceId);
-        role.AddPermission(rolePermission);
+        Result<Permission> permissionParseResult = Permission.Parse(
+            request.Effect, 
+            request.Action, 
+            request.Resource, 
+            request.ResourceId ?? _wildcard);
+
+        if (permissionParseResult.IsFailure)
+        {
+            return permissionParseResult;
+        }
+
+        var permissionAddResult = role.AddPermission(permissionParseResult.Value);
+
+        if (permissionAddResult.IsFailure)
+        {
+            return permissionAddResult;
+        }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
