@@ -12,7 +12,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, C
 {
     private readonly ISignInManager<AuthUser> _signInManager;
     private readonly IUserManager<AuthUser> _userManager;
-    private readonly IRoleManager<Role> _roleManager;
+    private readonly IRoleRepository<Role> _roleManager;
     private readonly IUnitOfWork _unitOfWork;
     private readonly Role _defaultRole = null!;
 
@@ -20,7 +20,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, C
         ISignInManager<AuthUser> signInManager,
         IUserManager<AuthUser> userManager,
         IUnitOfWork unitOfWork,
-        IRoleManager<Role> roleManager)
+        IRoleRepository<Role> roleManager)
     {
         _signInManager = signInManager;
         _userManager = userManager;

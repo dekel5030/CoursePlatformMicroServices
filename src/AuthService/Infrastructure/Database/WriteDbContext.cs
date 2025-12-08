@@ -4,7 +4,6 @@ using Domain.Roles;
 using Infrastructure.DomainEvents;
 using Infrastructure.Identity;
 using MassTransit;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -19,6 +18,10 @@ public class WriteDbContext
     public DbSet<AuthUser> DomainUsers { get; set; }
     public DbSet<Role> DomainRoles { get; set; }
 
+    DbSet<Role> IWriteDbContext.Roles => DomainRoles;
+
+    public DbSet<AuthUser> AuthUsers => DomainUsers;
+
     public WriteDbContext(
         DbContextOptions<WriteDbContext> options,
         IDomainEventsDispatcher domainEventsDispatcher) : base(options)
@@ -32,26 +35,6 @@ public class WriteDbContext
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DependencyInjection).Assembly);
         modelBuilder.AddTransactionalOutboxEntities();
-
-        modelBuilder.Entity<ApplicationIdentityUser>(identityUser =>
-        {
-            identityUser
-                .HasOne(x => x.DomainUser)
-                .WithOne()
-                .HasForeignKey<AuthUser>(x => x.Id)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<ApplicationIdentityRole>(identityRole =>
-        {
-            identityRole
-                .HasOne(x => x.DomainRole)
-                .WithOne()
-                .HasForeignKey<Role>(x => x.Id)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
-        });
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

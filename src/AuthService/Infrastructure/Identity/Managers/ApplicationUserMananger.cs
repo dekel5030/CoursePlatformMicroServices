@@ -44,11 +44,11 @@ public class ApplicationUserMananger : IUserManager<AuthUser>
     {
         var identityUser = new ApplicationIdentityUser(user);
 
-        foreach (var role in user.Roles)
-        {
-            identityUser.UserRoles.Add(
-                new IdentityUserRole<Guid>() { UserId = identityUser.Id, RoleId = role.Id });
-        }
+        //foreach (var role in user.Roles)
+        //{
+        //    identityUser.UserRoles.Add(
+        //        new IdentityUserRole<Guid>() { UserId = identityUser.Id, RoleId = role.Id });
+        //}
 
         IdentityResult result = await _aspUserManager.CreateAsync(identityUser, password);
         return result.ToApplicationResult();
