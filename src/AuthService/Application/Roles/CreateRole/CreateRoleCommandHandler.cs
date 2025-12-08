@@ -6,7 +6,7 @@ using Kernel;
 
 namespace Application.Roles.CreateRole;
 
-public class CreateRoleCommandHandler(IRoleManager<Role> roleManager, IUnitOfWork unitOfWork)
+public class CreateRoleCommandHandler(IRoleRepository<Role> roleManager, IUnitOfWork unitOfWork)
         : ICommandHandler<CreateRoleCommand, CreateRoleResponseDto>
 {
     public async Task<Result<CreateRoleResponseDto>> Handle(

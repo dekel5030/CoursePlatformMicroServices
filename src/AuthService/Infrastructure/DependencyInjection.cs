@@ -235,7 +235,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUserManager<AuthUser>, ApplicationUserMananger>();
         services.AddScoped<ISignInManager<AuthUser>, ApplicationSignInManager>();
-        services.AddScoped<IRoleManager<Role>, ApplicationRoleManger>();
+        services.AddScoped<IRoleRepository<Role>, RoleRepository>();
 
         return services;
     }

@@ -20,7 +20,7 @@ public static class MigrationExtensions
         using WriteDbContext dbContext = services.GetRequiredService<WriteDbContext>();
         await dbContext.Database.MigrateAsync();
 
-        var roleManager = services.GetRequiredService<IRoleManager<Role>>();
+        var roleManager = services.GetRequiredService<IRoleRepository<Role>>();
         if (!roleManager.Roles.Any())
         {
             var roleTypes = Enum.GetValues<RoleType>();

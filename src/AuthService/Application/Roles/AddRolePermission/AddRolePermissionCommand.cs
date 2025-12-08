@@ -6,4 +6,4 @@ public record AddRolePermissionCommand(
     Guid RoleId, 
     string Action, 
     string Resource, 
-    string ResourceId) : ICommand;
+    string? ResourceId = null) : ICommand;

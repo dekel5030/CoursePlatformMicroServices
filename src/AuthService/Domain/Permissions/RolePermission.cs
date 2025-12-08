@@ -2,10 +2,10 @@ using Kernel.Auth.AuthTypes;
 
 namespace Domain.Permissions;
 
-public record RolePermission(ResourceType Resource, ActionType Action, ResourceId ResourceId)
+public record RolePermission(ActionType Action, ResourceType Resource, ResourceId ResourceId)
 {
-    public RolePermission(ResourceType resource, ActionType action)
-        : this(resource, action, ResourceId.Wildcard)
+    public RolePermission(ActionType action, ResourceType resource)
+        : this(action, resource, ResourceId.Wildcard)
     {
     }
 
