@@ -8,21 +8,20 @@ using Domain.Roles.Errors;
 using Kernel;
 using Kernel.Auth;
 using Kernel.Auth.AuthTypes;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Roles.AddRolePermission;
 
 public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermissionCommand>
 {
-    private readonly IRoleRepository<Role> _roleManager;
+    private readonly IWriteDbContext _writeDbContext;
     private readonly IUnitOfWork _unitOfWork;
 
     public AddRolePermissionCommandHandler(
-        IRoleRepository<Role> roleManager, 
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IWriteDbContext writeDbContext)
     {
-        _roleManager = roleManager;
         _unitOfWork = unitOfWork;
+        _writeDbContext = writeDbContext;
     }
 
     public async Task<Result> Handle(
@@ -41,7 +40,7 @@ public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermission
         ResourceId resourceId = request.ResourceId != null ? 
             ResourceId.Create(request.ResourceId) : ResourceId.Wildcard;
 
-        var role = await _roleManager.GetByIdAsync(request.RoleId, cancellationToken);
+        var role = await _writeDbContext.Roles.FindAsync(request.RoleId, cancellationToken);
 
         if (role is null)
         {
@@ -51,7 +50,6 @@ public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermission
         RolePermission rolePermission = new(action, resource, resourceId);
         role.AddPermission(rolePermission);
 
-        await _roleManager.UpdateRoleAsync(role);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Application.Abstractions.Identity;
+﻿using Application.Abstractions.Identity;
 using Application.Extensions;
 using Domain.Roles;
 using Domain.Roles.Errors;
@@ -29,94 +28,99 @@ public class RoleRepository : IRoleRepository<Role>
         _readDbContext = readDbContext;
     }
 
-    public async Task<Result> AddRoleAsync(Role role, CancellationToken cancellationToken = default)
+    public async Task<Result> AddAsync(Role role, CancellationToken cancellationToken)
     {
-        ApplicationIdentityRole aspRole = new ApplicationIdentityRole(role);
-        IdentityResult result = await _aspRoleManager.CreateAsync(aspRole);
+        var identityRole = new ApplicationIdentityRole(role);
 
-        if (!result.Succeeded)
-        {
-            return result.ToApplicationResult();
-        }
+        IdentityResult identityResult = await _aspRoleManager.CreateAsync(identityRole);
+        if (!identityResult.Succeeded)
+            return identityResult.ToApplicationResult();
 
         foreach (var permission in role.Permissions)
         {
-            var permissionClaim = PermissionClaim.Create(
+            var claim = new IdentityRoleClaim<Guid>
+            {
+                RoleId = identityRole.Id,
+                ClaimType = PermissionClaim.ClaimType,
+                ClaimValue = PermissionClaim.Create(
                     permission.Effect,
                     permission.Action,
                     permission.Resource,
-                    permission.ResourceId);
+                    permission.ResourceId).Value
+            };
 
-            IdentityResult claimResult = await _aspRoleManager.AddClaimAsync(aspRole, permissionClaim);
-
-            if (!claimResult.Succeeded)
-            {
-                return claimResult.ToApplicationResult();
-            }
+            _writeDbContext.RoleClaims.Add(claim);
         }
 
-        return result.ToApplicationResult();
+        _writeDbContext.DomainRoles.Add(role);
+        return Result.Success();
     }
 
-    public async Task<Result> UpdateRoleAsync(Role role, CancellationToken cancellationToken = default)
+
+    public async Task<Result> UpdateAsync(Role role, CancellationToken cancellationToken)
     {
-        var aspRole = await _writeDbContext.Roles
-            .Include(r => r.DomainRole)
-            .Include(r => r.Claims)
-            .Include(r => r.DomainRole.Permissions)
+        var identityRole = await _aspRoleManager.FindByIdAsync(role.Id.ToString());
+        if (identityRole is null)
+            return Result.Failure(RoleErrors.NotFound);
+
+        if (identityRole.Name != role.Name)
+        {
+            identityRole.Name = role.Name;
+            identityRole.NormalizedName = _aspRoleManager.NormalizeKey(identityRole.Name);
+
+            var updateResult = await _aspRoleManager.UpdateAsync(identityRole);
+            if (!updateResult.Succeeded)
+                return updateResult.ToApplicationResult();
+        }
+
+        await SyncClaimsAsync(identityRole, role);
+
+        var domainRole = await _writeDbContext.DomainRoles
             .FirstOrDefaultAsync(r => r.Id == role.Id, cancellationToken);
 
-        if (aspRole is null)
-        {
+        if (domainRole is null)
             return Result.Failure(RoleErrors.NotFound);
-        }
 
-        if (aspRole.Name != role.Name)
-        {
-            aspRole.Name = role.Name;
-            var updateResult = await _aspRoleManager.UpdateAsync(aspRole);
-            if (!updateResult.Succeeded) return updateResult.ToApplicationResult();
-        }
-
-        var currentClaims = await _aspRoleManager.GetClaimsAsync(aspRole);
-        List<Claim> currentPermissionClaims = currentClaims
-            .Where(c => c.Type == PermissionClaim.ClaimType).ToList();
-
-
-        List<Claim> newPermissionClaims = role.Permissions.Select(p =>
-            PermissionClaim.Create(p.Effect, p.Action, p.Resource, p.ResourceId))
-            .ToList();
-
-        List<Claim> claimsToAdd = newPermissionClaims
-            .Where(newClaim => !currentPermissionClaims.Any(existing => existing.Value == newClaim.Value))
-            .ToList();
-
-        List<Claim> claimsToRemove = currentPermissionClaims
-            .Where(existing => !newPermissionClaims.Any(newClaim => newClaim.Value == existing.Value))
-            .ToList();
-
-        foreach (var claim in claimsToRemove)
-        {
-            var removeResult = await _aspRoleManager.RemoveClaimAsync(aspRole, claim);
-            if (!removeResult.Succeeded) return removeResult.ToApplicationResult();
-        }
-
-        foreach (var claim in claimsToAdd)
-        {
-            var addResult = await _aspRoleManager.AddClaimAsync(aspRole, claim);
-            if (!addResult.Succeeded) return addResult.ToApplicationResult();
-        }
-
-        _writeDbContext.Entry(aspRole.DomainRole).CurrentValues.SetValues(role);
+        _writeDbContext.Entry(domainRole).CurrentValues.SetValues(role);
 
         return Result.Success();
     }
 
+    private async Task<Result> SyncClaimsAsync(
+        ApplicationIdentityRole aspRole,
+        Role role)
+    {
+        var identityClaims = await _aspRoleManager.GetClaimsAsync(aspRole);
+
+        var identityPermissions = identityClaims
+            .Where(c => c.Type == PermissionClaim.ClaimType)
+            .ToDictionary(c => c.Value);
+
+        var domainPermissions = role.Permissions
+            .Select(p => PermissionClaim.Create(
+                p.Effect, p.Action, p.Resource, p.ResourceId))
+            .ToDictionary(c => c.Value);
+
+        foreach (var claim in identityPermissions.Values.Except(domainPermissions.Values))
+        {
+            var removeResult = await _aspRoleManager.RemoveClaimAsync(aspRole, claim);
+            if (!removeResult.Succeeded)
+                return removeResult.ToApplicationResult();
+        }
+
+        foreach (var claim in domainPermissions.Values.Except(identityPermissions.Values))
+        {
+            var addResult = await _aspRoleManager.AddClaimAsync(aspRole, claim);
+            if (!addResult.Succeeded)
+                return addResult.ToApplicationResult();
+        }
+
+        return Result.Success();
+    }
+
+
     public Task<Role?> GetByIdAsync(Guid roleId, CancellationToken cancellationToken = default)
     {
-        return _readDbContext
-            .Roles
-            .Include(r => r.Permissions)
-            .FirstOrDefaultAsync(r => r.Id == roleId, cancellationToken);
+        return _readDbContext.Roles.FindAsync(roleId, cancellationToken).AsTask();
     }
 }

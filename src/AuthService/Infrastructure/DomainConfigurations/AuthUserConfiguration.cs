@@ -1,5 +1,5 @@
 ﻿using Domain.AuthUsers;
-using Domain.Permissions;
+using Domain.Roles;
 using Kernel.Auth.AuthTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,44 +10,31 @@ internal sealed class AuthUserConfiguration : IEntityTypeConfiguration<AuthUser>
 {
     public void Configure(EntityTypeBuilder<AuthUser> user)
     {
-        user.ToTable("auth_users");
+        user.ToTable("domain_users");
+
         user.Property(u => u.Id).ValueGeneratedNever();
-        user.Ignore(u => u.DomainEvents);
-        //user.Ignore(u => u.Roles);
+
+        user
+            .HasMany(u => u.Roles)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+                "domain_user_roles",
+                r => r.HasOne<Role>().WithMany().HasForeignKey("RoleId"),
+                u => u.HasOne<AuthUser>().WithMany().HasForeignKey("UserId")
+            );
+
 
         user.OwnsMany(u => u.Permissions, permissionBuilder =>
         {
-            permissionBuilder.ToTable("user_permissions");
-
-            permissionBuilder.WithOwner().HasForeignKey("UserId");
-            permissionBuilder.HasKey(
-                "UserId",
-                nameof(UserPermission.Resource),
-                nameof(UserPermission.Action),
-                nameof(UserPermission.ResourceId));
-
-            permissionBuilder.Property(p => p.Effect)
-                .HasConversion<string>();
-
-            permissionBuilder.Property(p => p.Resource)
-                .HasConversion<string>()
-                .HasMaxLength(50)
-                .IsRequired();
-
-            permissionBuilder.Property(p => p.Action)
-                .HasConversion<string>()
-                .HasMaxLength(50)
-                .IsRequired();
+            permissionBuilder.ToJson();
+            permissionBuilder.Property(p => p.Effect).HasMaxLength(50);
+            permissionBuilder.Property(p => p.Action).HasMaxLength(100);
+            permissionBuilder.Property(p => p.Resource).HasMaxLength(100);
 
             permissionBuilder.Property(p => p.ResourceId)
-                .HasColumnName("resource_id")
-                .HasMaxLength(100)
-                .IsRequired()
-                .HasConversion(
-                    resourceId => resourceId.Value,
-                    value => ResourceId.Create(value)
-                );
+                .HasConversion(id => id.Value, val => ResourceId.Create(val));
         });
 
+        user.Ignore(u => u.DomainEvents);
     }
 }

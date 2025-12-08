@@ -20,22 +20,6 @@ public static class MigrationExtensions
         using WriteDbContext dbContext = services.GetRequiredService<WriteDbContext>();
         await dbContext.Database.MigrateAsync();
 
-        var roleManager = services.GetRequiredService<IRoleRepository<Role>>();
-        if (!roleManager.Roles.Any())
-        {
-            var roleTypes = Enum.GetValues<RoleType>();
-            foreach (var role in roleTypes)
-            {
-                var domainRole = Role.Create(role.ToString());
-
-                if (!domainRole.IsSuccess)
-                {
-                    throw new InvalidOperationException($"Failed to create role {role}: {domainRole.Error}");
-                }
-
-                await roleManager.AddRoleAsync(domainRole.Value);
-            }
-        }
         await dbContext.SaveChangesAsync();
 
         using DataProtectionKeysContext dataProtectionKeysContext = services.GetRequiredService<DataProtectionKeysContext>();

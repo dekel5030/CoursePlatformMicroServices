@@ -43,7 +43,7 @@ public class Role : Entity
         }
 
         _permissions.Add(permission);
-        Raise(new RolePermissionAssignedDomainEvent(this));
+        Raise(new RolePermissionAssignedDomainEvent(this, permission));
         return Result.Success();
     }
 
@@ -51,7 +51,7 @@ public class Role : Entity
     {
         if (_permissions.Remove(permission))
         {
-            Raise(new RolePermissionRemovedDomainEvent(this));
+            Raise(new RolePermissionRemovedDomainEvent(this, permission));
         }
 
         return Result.Success();

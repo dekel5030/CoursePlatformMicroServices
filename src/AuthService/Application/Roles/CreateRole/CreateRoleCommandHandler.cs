@@ -6,7 +6,7 @@ using Kernel;
 
 namespace Application.Roles.CreateRole;
 
-public class CreateRoleCommandHandler(IRoleRepository<Role> roleManager, IUnitOfWork unitOfWork)
+public class CreateRoleCommandHandler(IWriteDbContext dbContext, IUnitOfWork unitOfWork)
         : ICommandHandler<CreateRoleCommand, CreateRoleResponseDto>
 {
     public async Task<Result<CreateRoleResponseDto>> Handle(
@@ -22,17 +22,10 @@ public class CreateRoleCommandHandler(IRoleRepository<Role> roleManager, IUnitOf
 
         Role role = result.Value;
 
-        var response = new CreateRoleResponseDto(role.Id.ToString(), role.Name);
-
-        Result creationResult = await roleManager.AddRoleAsync(role);
-
-        if (creationResult.IsFailure)
-        {
-            return Result.Failure<CreateRoleResponseDto>(creationResult.Error);
-        }
-
+        await dbContext.Roles.AddAsync(role, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
+        var response = new CreateRoleResponseDto(role.Id.ToString(), role.Name);
         return Result.Success(response);
     }
 }

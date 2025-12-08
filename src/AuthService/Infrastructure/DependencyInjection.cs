@@ -8,6 +8,7 @@ using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.Extensions;
 using Infrastructure.Identity;
+using Infrastructure.Identity.Extensions;
 using Infrastructure.Identity.Managers;
 using Infrastructure.Identity.Stores;
 using Infrastructure.MassTransit;
@@ -53,14 +54,17 @@ public static class DependencyInjection
 
     private static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration) =>
-        services
+        IConfiguration configuration)
+    {
+        return services
             .AddServices()
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
             .ConfigureIdentities(configuration)
-            .AddUserContextProvider();
+            .AddUserContextProvider()
+            .AddIdentitySyncHandlers();
+    }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
