@@ -2,7 +2,7 @@
 using Application.Abstractions.Messaging;
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
-using Application.AuthUsers.Commands.AddRole;
+using Application.AuthUsers.Commands.UserAddRole;
 
 namespace Auth.Api.Endpoints.Users;
 

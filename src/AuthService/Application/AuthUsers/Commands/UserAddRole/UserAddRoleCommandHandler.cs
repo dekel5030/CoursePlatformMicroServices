@@ -7,7 +7,7 @@ using Domain.Roles.Errors;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.AuthUsers.Commands.AddRole;
+namespace Application.AuthUsers.Commands.UserAddRole;
 
 public class UserAddRoleCommandHandler : ICommandHandler<UserAddRoleCommand>
 {

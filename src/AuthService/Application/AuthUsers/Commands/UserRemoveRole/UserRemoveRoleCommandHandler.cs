@@ -7,7 +7,7 @@ using Domain.Roles.Errors;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.AuthUsers.Commands.RemoveRole;
+namespace Application.AuthUsers.Commands.UserRemoveRole;
 
 public class UserRemoveRoleCommandHandler : ICommandHandler<UserRemoveRoleCommand>
 {

@@ -1,3 +1,3 @@
-﻿namespace Application.AuthUsers.Commands.RemoveRole;
+﻿namespace Application.AuthUsers.Commands.UserRemoveRole;
 
 public record UserRemoveRoleRequestDto(string RoleName);
