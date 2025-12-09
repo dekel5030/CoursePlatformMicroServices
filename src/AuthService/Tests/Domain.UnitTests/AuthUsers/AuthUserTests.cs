@@ -1,62 +1,102 @@
 using Domain.AuthUsers;
+using Domain.AuthUsers.Errors;
 using Domain.AuthUsers.Events;
+using Domain.Permissions;
 using Domain.Roles;
 using FluentAssertions;
+using Kernel.Auth.AuthTypes;
 using Xunit;
 
 namespace Domain.UnitTests.AuthUsers;
 
 /// <summary>
-/// Unit tests for the AuthUser domain entity.
-/// Tests cover entity creation, domain event dispatching, and business logic.
+/// Unit tests for AuthUser domain entity.
+/// Tests cover user creation, role management, permission management, and domain events.
 /// </summary>
 public class AuthUserTests
 {
+    private readonly Role _defaultRole;
+
+    public AuthUserTests()
+    {
+        _defaultRole = Role.Create("User").Value;
+    }
+
+    #region Create Tests
+
     /// <summary>
-    /// Verifies that AuthUser.Create successfully creates a user with valid data and assigns the initial role.
+    /// Verifies that Create successfully creates an AuthUser with valid data.
     /// </summary>
     [Fact]
-    public void Create_WithValidData_ShouldCreateAuthUserSuccessfully()
+    public void Create_WithValidData_ShouldReturnSuccess()
     {
         // Arrange
         var email = "test@example.com";
         var userName = "testuser";
-        var role = Role.Create("User");
 
         // Act
-        var authUser = AuthUser.Create(email, userName, role);
+        var result = AuthUser.Create(email, userName, _defaultRole);
 
         // Assert
-        authUser.Should().NotBeNull();
-        authUser.Id.Should().NotBeEmpty();
-        authUser.Email.Should().Be(email);
-        authUser.UserName.Should().Be(userName);
-        authUser.Roles.Should().ContainSingle();
-        authUser.Roles.Should().Contain(role);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.Email.Should().Be(email);
+        result.Value.UserName.Should().Be(userName);
+        result.Value.Id.Should().NotBeEmpty();
     }
 
     /// <summary>
-    /// Verifies that when username is empty, the email is used as the username.
+    /// Verifies that Create assigns the initial role to the user.
     /// </summary>
-    [Theory]
-    [InlineData("")]
-    [InlineData(null)]
-    public void Create_WithEmptyUsername_ShouldUseEmailAsUsername(string? userName)
+    [Fact]
+    public void Create_ShouldAssignInitialRole()
     {
         // Arrange
         var email = "test@example.com";
-        var role = Role.Create("User");
+        var userName = "testuser";
 
         // Act
-        var authUser = AuthUser.Create(email, userName!, role);
+        var result = AuthUser.Create(email, userName, _defaultRole);
 
         // Assert
-        authUser.UserName.Should().Be(email);
+        result.Value.Roles.Should().ContainSingle();
+        result.Value.Roles.First().Should().Be(_defaultRole);
     }
 
     /// <summary>
-    /// Verifies that AuthUser.Create raises a UserRegisteredDomainEvent when a user is created.
-    /// This demonstrates domain event dispatching which is critical for event-driven architecture.
+    /// Verifies that Create uses email as username when username is empty.
+    /// </summary>
+    [Fact]
+    public void Create_WithEmptyUserName_ShouldUseEmailAsUserName()
+    {
+        // Arrange
+        var email = "test@example.com";
+
+        // Act
+        var result = AuthUser.Create(email, string.Empty, _defaultRole);
+
+        // Assert
+        result.Value.UserName.Should().Be(email);
+    }
+
+    /// <summary>
+    /// Verifies that Create uses email as username when username is null.
+    /// </summary>
+    [Fact]
+    public void Create_WithNullUserName_ShouldUseEmailAsUserName()
+    {
+        // Arrange
+        var email = "test@example.com";
+
+        // Act
+        var result = AuthUser.Create(email, null!, _defaultRole);
+
+        // Assert
+        result.Value.UserName.Should().Be(email);
+    }
+
+    /// <summary>
+    /// Verifies that Create raises UserRegisteredDomainEvent.
     /// </summary>
     [Fact]
     public void Create_ShouldRaiseUserRegisteredDomainEvent()
@@ -64,93 +104,445 @@ public class AuthUserTests
         // Arrange
         var email = "test@example.com";
         var userName = "testuser";
-        var role = Role.Create("User");
 
         // Act
-        var authUser = AuthUser.Create(email, userName, role);
+        var result = AuthUser.Create(email, userName, _defaultRole);
 
         // Assert
-        authUser.DomainEvents.Should().ContainSingle();
-        var domainEvent = authUser.DomainEvents.First();
-        domainEvent.Should().BeOfType<UserRegisteredDomainEvent>();
-        
-        var userRegisteredEvent = (UserRegisteredDomainEvent)domainEvent;
-        userRegisteredEvent.AuthUserId.Should().Be(authUser.Id);
-        userRegisteredEvent.Email.Should().Be(email);
-        userRegisteredEvent.RegisteredAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        result.Value.DomainEvents.Should().ContainSingle(e => e is UserRegisteredDomainEvent);
+        var domainEvent = result.Value.DomainEvents.OfType<UserRegisteredDomainEvent>().First();
+        domainEvent.User.Should().Be(result.Value);
     }
 
     /// <summary>
-    /// Verifies that multiple users can be created with different emails.
-    /// </summary>
-    [Theory]
-    [InlineData("user1@example.com", "user1")]
-    [InlineData("user2@example.com", "user2")]
-    [InlineData("admin@example.com", "admin")]
-    public void Create_WithDifferentEmails_ShouldCreateDifferentUsers(string email, string userName)
-    {
-        // Arrange
-        var role = Role.Create("User");
-
-        // Act
-        var authUser = AuthUser.Create(email, userName, role);
-
-        // Assert
-        authUser.Email.Should().Be(email);
-        authUser.UserName.Should().Be(userName);
-        authUser.Id.Should().NotBeEmpty();
-    }
-
-    /// <summary>
-    /// Verifies that each created user has a unique GUID identifier.
+    /// Verifies that Create raises UserRoleAddedDomainEvent for initial role.
     /// </summary>
     [Fact]
-    public void Create_ShouldGenerateUniqueIds()
+    public void Create_ShouldRaiseUserRoleAddedDomainEvent()
     {
         // Arrange
-        var role = Role.Create("User");
+        var email = "test@example.com";
+        var userName = "testuser";
 
         // Act
-        var user1 = AuthUser.Create("user1@example.com", "user1", role);
-        var user2 = AuthUser.Create("user2@example.com", "user2", role);
+        var result = AuthUser.Create(email, userName, _defaultRole);
+
+        // Assert
+        result.Value.DomainEvents.Should().Contain(e => e is UserRoleAddedDomainEvent);
+        var domainEvent = result.Value.DomainEvents.OfType<UserRoleAddedDomainEvent>().First();
+        domainEvent.User.Should().Be(result.Value);
+        domainEvent.Role.Should().Be(_defaultRole);
+    }
+
+    /// <summary>
+    /// Verifies that Create generates a unique ID for each user.
+    /// </summary>
+    [Fact]
+    public void Create_ShouldGenerateUniqueId()
+    {
+        // Arrange & Act
+        var user1 = AuthUser.Create("user1@example.com", "user1", _defaultRole).Value;
+        var user2 = AuthUser.Create("user2@example.com", "user2", _defaultRole).Value;
 
         // Assert
         user1.Id.Should().NotBe(user2.Id);
     }
 
+    #endregion
+
+    #region AddRole Tests
+
     /// <summary>
-    /// Verifies that the roles collection is read-only and properly initialized.
+    /// Verifies that AddRole successfully adds a new role to the user.
     /// </summary>
     [Fact]
-    public void Roles_ShouldBeReadOnlyCollection()
+    public void AddRole_WithNewRole_ShouldReturnSuccess()
     {
         // Arrange
-        var email = "test@example.com";
-        var userName = "testuser";
-        var role = Role.Create("User");
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var adminRole = Role.Create("Admin").Value;
 
         // Act
-        var authUser = AuthUser.Create(email, userName, role);
+        var result = user.AddRole(adminRole);
 
         // Assert
-        authUser.Roles.Should().NotBeNull();
-        authUser.Roles.Should().BeAssignableTo<IReadOnlyCollection<Role>>();
+        result.IsSuccess.Should().BeTrue();
+        user.Roles.Should().HaveCount(2);
+        user.Roles.Should().Contain(adminRole);
     }
 
     /// <summary>
-    /// Verifies that clearing domain events removes all raised events.
+    /// Verifies that AddRole returns failure when role already exists.
     /// </summary>
     [Fact]
-    public void ClearDomainEvents_ShouldRemoveAllEvents()
+    public void AddRole_WithExistingRole_ShouldReturnFailure()
     {
         // Arrange
-        var role = Role.Create("User");
-        var authUser = AuthUser.Create("test@example.com", "testuser", role);
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
 
         // Act
-        authUser.ClearDomainEvents();
+        var result = user.AddRole(_defaultRole);
 
         // Assert
-        authUser.DomainEvents.Should().BeEmpty();
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(AuthUserErrors.RoleAlreadyExists);
+        user.Roles.Should().ContainSingle();
     }
+
+    /// <summary>
+    /// Verifies that AddRole raises UserRoleAddedDomainEvent.
+    /// </summary>
+    [Fact]
+    public void AddRole_ShouldRaiseUserRoleAddedDomainEvent()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        user.ClearDomainEvents();
+        var adminRole = Role.Create("Admin").Value;
+
+        // Act
+        user.AddRole(adminRole);
+
+        // Assert
+        user.DomainEvents.Should().ContainSingle(e => e is UserRoleAddedDomainEvent);
+        var domainEvent = user.DomainEvents.OfType<UserRoleAddedDomainEvent>().First();
+        domainEvent.User.Should().Be(user);
+        domainEvent.Role.Should().Be(adminRole);
+    }
+
+    /// <summary>
+    /// Verifies that AddRole can add multiple different roles.
+    /// </summary>
+    [Fact]
+    public void AddRole_WithMultipleRoles_ShouldAddAll()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var adminRole = Role.Create("Admin").Value;
+        var moderatorRole = Role.Create("Moderator").Value;
+
+        // Act
+        user.AddRole(adminRole);
+        user.AddRole(moderatorRole);
+
+        // Assert
+        user.Roles.Should().HaveCount(3);
+        user.Roles.Should().Contain(new[] { _defaultRole, adminRole, moderatorRole });
+    }
+
+    #endregion
+
+    #region RemoveRole Tests
+
+    /// <summary>
+    /// Verifies that RemoveRole successfully removes an existing role.
+    /// </summary>
+    [Fact]
+    public void RemoveRole_WithExistingRole_ShouldReturnSuccess()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var adminRole = Role.Create("Admin").Value;
+        user.AddRole(adminRole);
+
+        // Act
+        var result = user.RemoveRole(adminRole);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.Roles.Should().ContainSingle();
+        user.Roles.Should().NotContain(adminRole);
+    }
+
+    /// <summary>
+    /// Verifies that RemoveRole returns success even when role doesn't exist.
+    /// </summary>
+    [Fact]
+    public void RemoveRole_WithNonExistingRole_ShouldReturnSuccess()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var adminRole = Role.Create("Admin").Value;
+
+        // Act
+        var result = user.RemoveRole(adminRole);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.Roles.Should().ContainSingle();
+    }
+
+    /// <summary>
+    /// Verifies that RemoveRole raises UserRoleRemovedDomainEvent when role exists.
+    /// </summary>
+    [Fact]
+    public void RemoveRole_WithExistingRole_ShouldRaiseUserRoleRemovedDomainEvent()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var adminRole = Role.Create("Admin").Value;
+        user.AddRole(adminRole);
+        user.ClearDomainEvents();
+
+        // Act
+        user.RemoveRole(adminRole);
+
+        // Assert
+        user.DomainEvents.Should().ContainSingle(e => e is UserRoleRemovedDomainEvent);
+        var domainEvent = user.DomainEvents.OfType<UserRoleRemovedDomainEvent>().First();
+        domainEvent.User.Should().Be(user);
+        domainEvent.Role.Should().Be(adminRole);
+    }
+
+    /// <summary>
+    /// Verifies that RemoveRole doesn't raise event when role doesn't exist.
+    /// </summary>
+    [Fact]
+    public void RemoveRole_WithNonExistingRole_ShouldNotRaiseDomainEvent()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        user.ClearDomainEvents();
+        var adminRole = Role.Create("Admin").Value;
+
+        // Act
+        user.RemoveRole(adminRole);
+
+        // Assert
+        user.DomainEvents.Should().BeEmpty();
+    }
+
+    #endregion
+
+    #region AddPermission Tests
+
+    /// <summary>
+    /// Verifies that AddPermission successfully adds a new permission to the user.
+    /// </summary>
+    [Fact]
+    public void AddPermission_WithNewPermission_ShouldReturnSuccess()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permission = Permission.CreateForRole(
+            ActionType.Read,
+            ResourceType.Course,
+            ResourceId.Create("course-123"));
+
+        // Act
+        var result = user.AddPermission(permission);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.Permissions.Should().ContainSingle();
+        user.Permissions.Should().Contain(permission);
+    }
+
+    /// <summary>
+    /// Verifies that AddPermission returns failure when permission already exists.
+    /// </summary>
+    [Fact]
+    public void AddPermission_WithExistingPermission_ShouldReturnFailure()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permission = Permission.CreateForRole(
+            ActionType.Read,
+            ResourceType.Course,
+            ResourceId.Create("course-123"));
+        user.AddPermission(permission);
+
+        // Act
+        var result = user.AddPermission(permission);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("AuthUser.PermissionAlreadyExists");
+        user.Permissions.Should().ContainSingle();
+    }
+
+    /// <summary>
+    /// Verifies that AddPermission raises UserPermissionAddedDomainEvent.
+    /// </summary>
+    [Fact]
+    public void AddPermission_ShouldRaiseUserPermissionAddedDomainEvent()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        user.ClearDomainEvents();
+        var permission = Permission.CreateForRole(
+            ActionType.Read,
+            ResourceType.Course,
+            ResourceId.Create("course-123"));
+
+        // Act
+        user.AddPermission(permission);
+
+        // Assert
+        user.DomainEvents.Should().ContainSingle(e => e is UserPermissionAddedDomainEvent);
+        var domainEvent = user.DomainEvents.OfType<UserPermissionAddedDomainEvent>().First();
+        domainEvent.User.Should().Be(user);
+        domainEvent.Permission.Should().Be(permission);
+    }
+
+    /// <summary>
+    /// Verifies that AddPermission can add multiple different permissions.
+    /// </summary>
+    [Fact]
+    public void AddPermission_WithMultiplePermissions_ShouldAddAll()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permission1 = Permission.CreateForRole(
+            ActionType.Read,
+            ResourceType.Course,
+            ResourceId.Create("course-123"));
+        var permission2 = Permission.CreateForRole(
+            ActionType.Update,
+            ResourceType.User,
+            ResourceId.Create("user-456"));
+
+        // Act
+        user.AddPermission(permission1);
+        user.AddPermission(permission2);
+
+        // Assert
+        user.Permissions.Should().HaveCount(2);
+        user.Permissions.Should().Contain(new[] { permission1, permission2 });
+    }
+
+    #endregion
+
+    #region RemovePermission Tests
+
+    /// <summary>
+    /// Verifies that RemovePermission successfully removes an existing permission.
+    /// </summary>
+    [Fact]
+    public void RemovePermission_WithExistingPermission_ShouldReturnSuccess()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permission = Permission.CreateForRole(
+            ActionType.Read,
+            ResourceType.Course,
+            ResourceId.Create("course-123"));
+        user.AddPermission(permission);
+
+        // Act
+        var result = user.RemovePermission(permission);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.Permissions.Should().BeEmpty();
+    }
+
+    /// <summary>
+    /// Verifies that RemovePermission returns success even when permission doesn't exist.
+    /// </summary>
+    [Fact]
+    public void RemovePermission_WithNonExistingPermission_ShouldReturnSuccess()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permission = Permission.CreateForRole(
+            ActionType.Read,
+            ResourceType.Course,
+            ResourceId.Create("course-123"));
+
+        // Act
+        var result = user.RemovePermission(permission);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.Permissions.Should().BeEmpty();
+    }
+
+    /// <summary>
+    /// Verifies that RemovePermission raises UserPermissionRemovedDomainEvent when permission exists.
+    /// </summary>
+    [Fact]
+    public void RemovePermission_WithExistingPermission_ShouldRaiseUserPermissionRemovedDomainEvent()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permission = Permission.CreateForRole(
+            ActionType.Read,
+            ResourceType.Course,
+            ResourceId.Create("course-123"));
+        user.AddPermission(permission);
+        user.ClearDomainEvents();
+
+        // Act
+        user.RemovePermission(permission);
+
+        // Assert
+        user.DomainEvents.Should().ContainSingle(e => e is UserPermissionRemovedDomainEvent);
+        var domainEvent = user.DomainEvents.OfType<UserPermissionRemovedDomainEvent>().First();
+        domainEvent.User.Should().Be(user);
+        domainEvent.Permission.Should().Be(permission);
+    }
+
+    /// <summary>
+    /// Verifies that RemovePermission doesn't raise event when permission doesn't exist.
+    /// </summary>
+    [Fact]
+    public void RemovePermission_WithNonExistingPermission_ShouldNotRaiseDomainEvent()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        user.ClearDomainEvents();
+        var permission = Permission.CreateForRole(
+            ActionType.Read,
+            ResourceType.Course,
+            ResourceId.Create("course-123"));
+
+        // Act
+        user.RemovePermission(permission);
+
+        // Assert
+        user.DomainEvents.Should().BeEmpty();
+    }
+
+    #endregion
+
+    #region Roles Collection Tests
+
+    /// <summary>
+    /// Verifies that Roles property returns read-only collection.
+    /// </summary>
+    [Fact]
+    public void Roles_ShouldBeReadOnly()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+
+        // Act
+        var roles = user.Roles;
+
+        // Assert
+        roles.Should().BeAssignableTo<IReadOnlyCollection<Role>>();
+    }
+
+    #endregion
+
+    #region Permissions Collection Tests
+
+    /// <summary>
+    /// Verifies that Permissions property returns read-only collection.
+    /// </summary>
+    [Fact]
+    public void Permissions_ShouldBeReadOnly()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+
+        // Act
+        var permissions = user.Permissions;
+
+        // Assert
+        permissions.Should().BeAssignableTo<IReadOnlyCollection<Permission>>();
+    }
+
+    #endregion
 }

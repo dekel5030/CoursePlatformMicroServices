@@ -36,8 +36,8 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
             .WithImage("rabbitmq:3-management")
             .WithUsername("guest")
             .WithPassword("guest")
-            //.WithPortBinding(5674, 5672)
-            //.WithPortBinding(15674, 15672)
+            .WithPortBinding(5674, 5672)
+            .WithPortBinding(15674, 15672)
             .Build();
     }
 
