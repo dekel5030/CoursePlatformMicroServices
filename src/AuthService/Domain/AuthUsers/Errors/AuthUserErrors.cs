@@ -47,6 +47,9 @@ public static class AuthUserErrors
     public static readonly Error RoleAlreadyExists = Error.Conflict(
         "AuthUser.RoleAlreadyExists",
         "User already has this role assigned.");
+    public static readonly Error UserOrEmailIsTaken = Error.Conflict(
+        "AuthUser.UserOrEmailIsTaken",
+        "User with this email or username already exists.");
 
     internal static readonly Error PermissionAlreadyExists = Error.Conflict(
         "AuthUser.PermissionAlreadyExists",

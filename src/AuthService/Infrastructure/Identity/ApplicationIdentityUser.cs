@@ -11,5 +11,8 @@ public class ApplicationIdentityUser : IdentityUser<Guid>
 
     public ApplicationIdentityUser(AuthUser user)
     {
+        Id = user.Id;
+        UserName = user.UserName;
+        Email = user.Email;
     }
 }

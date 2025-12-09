@@ -2,13 +2,15 @@
 using Application.AuthUsers.Commands.LoginUser;
 using Application.AuthUsers.Commands.Logout;
 using Application.AuthUsers.Commands.RegisterUser;
+using Application.AuthUsers.Commands.UserAddPermission;
+using Application.AuthUsers.Commands.UserAddRole;
+using Application.AuthUsers.Commands.UserRemovePermission;
+using Application.AuthUsers.Commands.UserRemoveRole;
 using Application.AuthUsers.Dtos;
-using Application.AuthUsers.Events;
 using Application.AuthUsers.Queries.GetCurrentUser;
-using Application.Roles.AddRolePermission;
-using Application.Roles.CreateRole;
-using Application.Roles.RemoveRolePermission;
-using Domain.AuthUsers.Events;
+using Application.Roles.Commands.AddRolePermission;
+using Application.Roles.Commands.CreateRole;
+using Application.Roles.Commands.RemoveRolePermission;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -19,7 +21,6 @@ public static class DependencyInjection
     {
         services.AddQueryHandlers();
         services.AddCommandHandlers();
-        services.AddDomainEventHandlers();
         services.AddIntegrationEventHandlers();
         //services.AddValidators();
 
@@ -40,14 +41,11 @@ public static class DependencyInjection
         services.AddScoped<ICommandHandler<CreateRoleCommand, CreateRoleResponseDto>, CreateRoleCommandHandler>();
         services.AddScoped<ICommandHandler<AddRolePermissionCommand>, AddRolePermissionCommandHandler>();
         services.AddScoped<ICommandHandler<RemoveRolePermissionCommand>, RemoveRolePermissionCommandHandler>();
-
-        return services;
-    }
-
-    private static IServiceCollection AddDomainEventHandlers(this IServiceCollection services)
-    {
-        services.AddScoped<IDomainEventHandler<UserRegisteredDomainEvent>, UserRegisteredDomainEventHandler>();
-
+        
+        services.AddScoped<ICommandHandler<UserAddRoleCommand>, UserAddRoleCommandHandler>();
+        services.AddScoped<ICommandHandler<UserRemoveRoleCommand>, UserRemoveRoleCommandHandler>();
+        services.AddScoped<ICommandHandler<UserAddPermissionCommand>, UserAddPermissionCommandHandler>();
+        services.AddScoped<ICommandHandler<UserRemovePermissionCommand>, UserRemovePermissionCommandHandler>();
         return services;
     }
 

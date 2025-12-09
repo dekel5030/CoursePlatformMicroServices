@@ -1,9 +1,7 @@
 ﻿using Application.Abstractions.Messaging;
-using Application.Roles.AddRolePermission;
-using Application.Roles.CreateRole;
+using Application.Roles.Commands.AddRolePermission;
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
-using Domain.Roles.Primitives;
 using Kernel;
 
 namespace Auth.Api.Endpoints.Roles;
