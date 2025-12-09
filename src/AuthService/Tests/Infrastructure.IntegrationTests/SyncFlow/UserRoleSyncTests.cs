@@ -1,3 +1,4 @@
+using Application.Abstractions.Identity;
 using Domain.AuthUsers;
 using Domain.Roles;
 using FluentAssertions;
@@ -17,11 +18,12 @@ namespace Infrastructure.IntegrationTests.SyncFlow;
 public class UserRoleSyncTests : IntegrationTestsBase
 {
     [Fact]
-    public async Task CreateAuthUser_ShouldSyncToIdentityUser()
+    public async Task RegisterUser_ShouldCreateIdentityUser()
     {
         // Arrange
         using var scope = CreateScope();
         var dbContext = GetWriteDbContext(scope);
+        var signService = scope.ServiceProvider.GetRequiredService<ISignService<AuthUser>>();
 
         var roleResult = Role.Create("TestUser");
         var role = roleResult.Value;
@@ -32,9 +34,12 @@ public class UserRoleSyncTests : IntegrationTestsBase
         var authUserResult = AuthUser.Create("test@example.com", "testuser", role);
         var authUser = authUserResult.Value;
 
-        // Act
-        dbContext.DomainUsers.Add(authUser);
+        // Act - Use SignService.RegisterAsync to create the identity user
+        var registerResult = await signService.RegisterAsync(authUser, "Password123!");
         await dbContext.SaveChangesAsync();
+
+        // Assert - Verify registration succeeded
+        registerResult.IsSuccess.Should().BeTrue();
 
         // Assert - Verify domain user was saved
         var savedAuthUser = await dbContext.DomainUsers
@@ -42,7 +47,7 @@ public class UserRoleSyncTests : IntegrationTestsBase
         savedAuthUser.Should().NotBeNull();
         savedAuthUser!.Email.Should().Be("test@example.com");
 
-        // Assert - Verify Identity user was created through sync
+        // Assert - Verify Identity user was created
         var identityUser = await dbContext.Users
             .FirstOrDefaultAsync(u => u.Id == authUser.Id);
         identityUser.Should().NotBeNull();
@@ -83,6 +88,7 @@ public class UserRoleSyncTests : IntegrationTestsBase
         // Arrange
         using var scope = CreateScope();
         var dbContext = GetWriteDbContext(scope);
+        var signService = scope.ServiceProvider.GetRequiredService<ISignService<AuthUser>>();
 
         var roleResult = Role.Create("User");
         var role = roleResult.Value;
@@ -91,7 +97,7 @@ public class UserRoleSyncTests : IntegrationTestsBase
 
         var authUserResult = AuthUser.Create("test@example.com", "testuser", role);
         var authUser = authUserResult.Value;
-        dbContext.DomainUsers.Add(authUser);
+        await signService.RegisterAsync(authUser, "Password123!");
         await dbContext.SaveChangesAsync();
 
         var adminRoleResult = Role.Create("Admin");
@@ -115,6 +121,7 @@ public class UserRoleSyncTests : IntegrationTestsBase
         // Arrange
         using var scope = CreateScope();
         var dbContext = GetWriteDbContext(scope);
+        var signService = scope.ServiceProvider.GetRequiredService<ISignService<AuthUser>>();
 
         var roleResult = Role.Create("User");
         var role = roleResult.Value;
@@ -123,7 +130,7 @@ public class UserRoleSyncTests : IntegrationTestsBase
 
         var authUserResult = AuthUser.Create("test@example.com", "testuser", role);
         var authUser = authUserResult.Value;
-        dbContext.DomainUsers.Add(authUser);
+        await signService.RegisterAsync(authUser, "Password123!");
         await dbContext.SaveChangesAsync();
 
         // Verify the role exists
@@ -142,11 +149,12 @@ public class UserRoleSyncTests : IntegrationTestsBase
     }
 
     [Fact]
-    public async Task MultipleUsers_ShouldSyncIndependently()
+    public async Task MultipleUsers_ShouldRegisterIndependently()
     {
         // Arrange
         using var scope = CreateScope();
         var dbContext = GetWriteDbContext(scope);
+        var signService = scope.ServiceProvider.GetRequiredService<ISignService<AuthUser>>();
 
         var roleResult = Role.Create("User");
         var role = roleResult.Value;
@@ -158,9 +166,9 @@ public class UserRoleSyncTests : IntegrationTestsBase
         var user2Result = AuthUser.Create("user2@example.com", "user2", role);
         var user2 = user2Result.Value;
 
-        // Act
-        dbContext.DomainUsers.Add(user1);
-        dbContext.DomainUsers.Add(user2);
+        // Act - Register both users
+        await signService.RegisterAsync(user1, "Password123!");
+        await signService.RegisterAsync(user2, "Password123!");
         await dbContext.SaveChangesAsync();
 
         // Assert

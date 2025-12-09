@@ -1,3 +1,4 @@
+using Application.Abstractions.Identity;
 using Domain.AuthUsers;
 using Domain.Permissions;
 using Domain.Roles;
@@ -23,6 +24,7 @@ public class PermissionSyncTests : IntegrationTestsBase
         // Arrange
         using var scope = CreateScope();
         var dbContext = GetWriteDbContext(scope);
+        var signService = scope.ServiceProvider.GetRequiredService<ISignService<AuthUser>>();
 
         var roleResult = Role.Create("User");
         var role = roleResult.Value;
@@ -31,7 +33,7 @@ public class PermissionSyncTests : IntegrationTestsBase
 
         var authUserResult = AuthUser.Create("test@example.com", "testuser", role);
         var authUser = authUserResult.Value;
-        dbContext.DomainUsers.Add(authUser);
+        await signService.RegisterAsync(authUser, "Password123!");
         await dbContext.SaveChangesAsync();
 
         var permission = Permission.CreateForRole(
@@ -59,6 +61,7 @@ public class PermissionSyncTests : IntegrationTestsBase
         // Arrange
         using var scope = CreateScope();
         var dbContext = GetWriteDbContext(scope);
+        var signService = scope.ServiceProvider.GetRequiredService<ISignService<AuthUser>>();
 
         var roleResult = Role.Create("User");
         var role = roleResult.Value;
@@ -67,7 +70,7 @@ public class PermissionSyncTests : IntegrationTestsBase
 
         var authUserResult = AuthUser.Create("test@example.com", "testuser", role);
         var authUser = authUserResult.Value;
-        dbContext.DomainUsers.Add(authUser);
+        await signService.RegisterAsync(authUser, "Password123!");
         await dbContext.SaveChangesAsync();
 
         var permission = Permission.CreateForRole(
@@ -182,6 +185,7 @@ public class PermissionSyncTests : IntegrationTestsBase
         // Arrange
         using var scope = CreateScope();
         var dbContext = GetWriteDbContext(scope);
+        var signService = scope.ServiceProvider.GetRequiredService<ISignService<AuthUser>>();
 
         var roleResult = Role.Create("User");
         var role = roleResult.Value;
@@ -190,7 +194,7 @@ public class PermissionSyncTests : IntegrationTestsBase
 
         var authUserResult = AuthUser.Create("test@example.com", "testuser", role);
         var authUser = authUserResult.Value;
-        dbContext.DomainUsers.Add(authUser);
+        await signService.RegisterAsync(authUser, "Password123!");
         await dbContext.SaveChangesAsync();
 
         var permission = Permission.CreateForRole(action, resource, ResourceId.Create(resourceId));
@@ -215,6 +219,7 @@ public class PermissionSyncTests : IntegrationTestsBase
         // Arrange
         using var scope = CreateScope();
         var dbContext = GetWriteDbContext(scope);
+        var signService = scope.ServiceProvider.GetRequiredService<ISignService<AuthUser>>();
 
         var roleResult = Role.Create("User");
         var role = roleResult.Value;
@@ -223,7 +228,7 @@ public class PermissionSyncTests : IntegrationTestsBase
 
         var authUserResult = AuthUser.Create("test@example.com", "testuser", role);
         var authUser = authUserResult.Value;
-        dbContext.DomainUsers.Add(authUser);
+        await signService.RegisterAsync(authUser, "Password123!");
         await dbContext.SaveChangesAsync();
 
         var permission1 = Permission.CreateForRole(ActionType.Read, ResourceType.Course, ResourceId.Create("*"));
