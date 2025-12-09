@@ -33,6 +33,8 @@ public class SignService : ISignService<AuthUser>
     {
         SignInResult result = await _aspSignInManager
             .PasswordSignInAsync(user.UserName, password, isPersistent, lockoutOnFailure);
+
+        _dbContext.AuthUsers.Add(user);
         return result.ToApplicationResult();
     }
 
