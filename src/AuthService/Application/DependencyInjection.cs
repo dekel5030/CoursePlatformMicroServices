@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
+using Application.AuthUsers.Commands.AddRole;
 using Application.AuthUsers.Commands.LoginUser;
 using Application.AuthUsers.Commands.Logout;
 using Application.AuthUsers.Commands.RegisterUser;
@@ -37,7 +38,7 @@ public static class DependencyInjection
         services.AddScoped<ICommandHandler<CreateRoleCommand, CreateRoleResponseDto>, CreateRoleCommandHandler>();
         services.AddScoped<ICommandHandler<AddRolePermissionCommand>, AddRolePermissionCommandHandler>();
         services.AddScoped<ICommandHandler<RemoveRolePermissionCommand>, RemoveRolePermissionCommandHandler>();
-
+        services.AddScoped<ICommandHandler<UserAddRoleCommand>, UserAddRoleCommandHandler>();
         return services;
     }
 
