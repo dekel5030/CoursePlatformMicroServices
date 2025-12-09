@@ -90,6 +90,8 @@ public class PermissionTests
 
     /// <summary>
     /// Verifies that Parse returns failure when effect is invalid.
+    /// Note: Current implementation returns InvalidAction for invalid effect,
+    /// which may be a bug that should return InvalidEffect instead.
     /// </summary>
     [Fact]
     public void Parse_WithInvalidEffect_ShouldReturnFailure()
