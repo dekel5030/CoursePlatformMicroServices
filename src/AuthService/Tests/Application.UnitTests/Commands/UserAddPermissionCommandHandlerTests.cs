@@ -136,7 +136,7 @@ public class UserAddPermissionCommandHandlerTests
         var role = Role.Create("User").Value;
         var user = AuthUser.Create("test@example.com", "testuser", role).Value;
         
-        var permission = Permission.Parse("allow", "read", "posts", "*").Value;
+        var permission = Permission.Parse("allow", "read", "course", "*").Value;
         user.AddPermission(permission);
 
         var command = new UserAddPermissionCommand(
