@@ -4,7 +4,7 @@ using Application.Abstractions.Messaging;
 using Domain.Roles;
 using Kernel;
 
-namespace Application.Roles.CreateRole;
+namespace Application.Roles.Commands.CreateRole;
 
 public class CreateRoleCommandHandler(IWriteDbContext dbContext, IUnitOfWork unitOfWork)
         : ICommandHandler<CreateRoleCommand, CreateRoleResponseDto>

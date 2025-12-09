@@ -1,7 +1,8 @@
 ﻿using Application.Abstractions.Messaging;
+using Domain.AuthUsers.Events;
 using Domain.Roles.Events;
-using Infrastructure.Identity.SyncEvents;
-using Infrastructure.Identity.SyncEventsHandlers;
+using Infrastructure.Identity.SyncEventsHandlers.Roles;
+using Infrastructure.Identity.SyncEventsHandlers.Users;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Identity.Extensions;
@@ -13,7 +14,7 @@ internal static class IdentityDependencyExtensions
         services.AddScoped<IDomainEventHandler<RoleCreatedDomainEvent>, RoleCreatedDomainEventHandler>();
         services.AddScoped<IDomainEventHandler<RolePermissionRemovedDomainEvent>, RolePermissionRemovedDomainEventHandler>();
         services.AddScoped<IDomainEventHandler<RolePermissionAssignedDomainEvent>, RolePermissionAssignedDomainEventHandler>();
-    
+        services.AddScoped<IDomainEventHandler<UserRoleAddedDomainEvent>, UserRoleAddedDomainEventHandler>();
         return services;
     }
 }

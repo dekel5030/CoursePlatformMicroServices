@@ -5,7 +5,7 @@ using Domain.Roles.Errors;
 using Kernel;
 using Kernel.Auth.AuthTypes;
 
-namespace Application.Roles.AddRolePermission;
+namespace Application.Roles.Commands.AddRolePermission;
 
 public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermissionCommand>
 {

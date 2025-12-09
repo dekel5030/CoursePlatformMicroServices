@@ -20,7 +20,7 @@ public class AuthUser : Entity
 
     private AuthUser() { }
 
-    public static AuthUser Create(string email, string userName, Role initialRole)
+    public static Result<AuthUser> Create(string email, string userName, Role initialRole)
     {
         var authUser = new AuthUser
         {
@@ -31,12 +31,10 @@ public class AuthUser : Entity
 
         authUser._roles.Add(initialRole);
 
-        authUser.Raise(new UserRegisteredDomainEvent(
-            authUser.Id,
-            email,
-            DateTime.UtcNow));
+        authUser.Raise(new UserRegisteredDomainEvent(authUser));
+        authUser.Raise(new UserRoleAddedDomainEvent(authUser, initialRole));
 
-        return authUser;
+        return Result.Success(authUser);
     }
 
     public Result AddRole(Role role)

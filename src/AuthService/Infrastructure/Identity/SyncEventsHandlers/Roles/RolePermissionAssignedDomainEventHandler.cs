@@ -4,7 +4,7 @@ using Infrastructure.Database;
 using Kernel.Auth;
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Identity.SyncEvents;
+namespace Infrastructure.Identity.SyncEventsHandlers.Roles;
 
 internal class RolePermissionAssignedDomainEventHandler : IDomainEventHandler<RolePermissionAssignedDomainEvent>
 {

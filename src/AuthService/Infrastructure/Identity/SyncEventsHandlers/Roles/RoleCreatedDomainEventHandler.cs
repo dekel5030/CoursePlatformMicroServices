@@ -2,7 +2,7 @@
 using Domain.Roles.Events;
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Identity.SyncEventsHandlers;
+namespace Infrastructure.Identity.SyncEventsHandlers.Roles;
 
 internal class RoleCreatedDomainEventHandler : IDomainEventHandler<RoleCreatedDomainEvent>
 {

@@ -4,7 +4,7 @@ using Infrastructure.Database;
 using Kernel.Auth;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Identity.SyncEventsHandlers;
+namespace Infrastructure.Identity.SyncEventsHandlers.Roles;
 
 internal class RolePermissionRemovedDomainEventHandler : IDomainEventHandler<RolePermissionRemovedDomainEvent>
 {

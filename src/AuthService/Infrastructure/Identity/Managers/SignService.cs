@@ -1,31 +1,38 @@
 ﻿using Application.Abstractions.Identity;
+using Application.Extensions;
 using Domain.AuthUsers;
+using Infrastructure.Database;
 using Infrastructure.Identity.Extensions;
 using Kernel;
 using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Identity.Managers;
 
-public class ApplicationSignInManager : ISignInManager<AuthUser>
+public class SignService : ISignService<AuthUser>
 {
+    private readonly WriteDbContext _dbContext;
     private readonly SignInManager<ApplicationIdentityUser> _aspSignInManager;
-    private readonly IUserManager<AuthUser> _userManager;
-
-    public ApplicationSignInManager(
-        SignInManager<ApplicationIdentityUser> signInManager, 
-        IUserManager<AuthUser> userManager)
+    public SignService(
+        SignInManager<ApplicationIdentityUser> signInManager,
+        WriteDbContext dbContext)
     {
         _aspSignInManager = signInManager;
-        _userManager = userManager;
+        _dbContext = dbContext;
     }
 
-    public IUserManager<AuthUser> UserManager => _userManager;
+    public async Task<Result> RegisterAsync(AuthUser user, string password)
+    {
+        var identityUser = new ApplicationIdentityUser(user);
+        IdentityResult creatingResult = await _aspSignInManager.UserManager.CreateAsync(identityUser, password);
+
+        _dbContext.AuthUsers.Add(user);
+        return creatingResult.ToApplicationResult();
+    }
 
     public async Task<Result> PasswordSignInAsync(AuthUser user, string password, bool isPersistent, bool lockoutOnFailure)
     {
         SignInResult result = await _aspSignInManager
             .PasswordSignInAsync(user.UserName, password, isPersistent, lockoutOnFailure);
-
         return result.ToApplicationResult();
     }
 

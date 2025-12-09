@@ -10,14 +10,11 @@ namespace Application.AuthUsers.Queries.GetCurrentUser;
 
 public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, CurrentUserDto>
 {
-    private readonly IUserManager<AuthUser> _userManager;
     private readonly IUserContext _userContext;
 
     public GetCurrentUserQueryHandler(
-        IUserManager<AuthUser> userManager,
         IUserContext userContext)
     {
-        _userManager = userManager;
         _userContext = userContext;
     }
 
@@ -27,20 +24,6 @@ public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, Cur
     {
         Guid? userId = _userContext.UserId;
 
-        if (userId is null)
-        {
-            return Result.Failure<CurrentUserDto>(AuthUserErrors.Unauthorized);
-        }
-
-        var user = await _userManager.FindByIdAsync(userId.Value);
-
-        if (user is null)
-        {
-            return Result.Failure<CurrentUserDto>(AuthUserErrors.NotFound);
-        }
-
-        var currentUserDTO = new CurrentUserDto(user.Id, user.Email, user.UserName);
-
-        return Result.Success(currentUserDTO);
+        return Result.Success(new CurrentUserDto(Guid.Empty, ""));
     }
 }

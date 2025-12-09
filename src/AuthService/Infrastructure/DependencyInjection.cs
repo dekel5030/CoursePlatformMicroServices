@@ -63,7 +63,8 @@ public static class DependencyInjection
             .AddHealthChecksInternal(configuration)
             .ConfigureIdentities(configuration)
             .AddUserContextProvider()
-            .AddIdentitySyncHandlers();
+            .AddIdentitySyncHandlers()
+            .AddDomainEventsHandlers();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -237,9 +238,7 @@ public static class DependencyInjection
             .SetApplicationName(applicationName)
             .PersistKeysToDbContext<DataProtectionKeysContext>();
 
-        services.AddScoped<IUserManager<AuthUser>, ApplicationUserMananger>();
-        services.AddScoped<ISignInManager<AuthUser>, ApplicationSignInManager>();
-        services.AddScoped<IRoleRepository<Role>, RoleRepository>();
+        services.AddScoped<ISignService<AuthUser>, SignService>();
 
         return services;
     }

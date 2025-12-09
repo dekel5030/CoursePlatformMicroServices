@@ -7,9 +7,9 @@ namespace Application.AuthUsers.Commands.Logout;
 
 public class LogoutCommandHandler : ICommandHandler<LogoutCommand>
 {
-    private readonly ISignInManager<AuthUser> _signInManager;
+    private readonly ISignService<AuthUser> _signInManager;
 
-    public LogoutCommandHandler(ISignInManager<AuthUser> signInManager)
+    public LogoutCommandHandler(ISignService<AuthUser> signInManager)
     {
         _signInManager = signInManager;
     }
