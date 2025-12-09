@@ -1,8 +1,9 @@
-using Application.Abstractions.Identity;
+using Application.Abstractions.Data;
 using Application.AuthUsers.Queries.GetCurrentUser;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
 using FluentAssertions;
+using Kernel.Auth.Abstractions;
 using Moq;
 using Xunit;
 
@@ -14,13 +15,15 @@ namespace Application.UnitTests.Queries;
 /// </summary>
 public class GetCurrentUserQueryHandlerTests
 {
-    private readonly Mock<IUserManager<AuthUser>> _userManagerMock;
+    private readonly Mock<IUserContext> _userContextMock;
+    private readonly Mock<IReadDbContext> _dbContextMock;
     private readonly GetCurrentUserQueryHandler _handler;
 
     public GetCurrentUserQueryHandlerTests()
     {
-        _userManagerMock = new Mock<IUserManager<AuthUser>>();
-        _handler = new GetCurrentUserQueryHandler(_userManagerMock.Object);
+        _userContextMock = new Mock<IUserContext>();
+        _dbContextMock = new Mock<IReadDbContext>();
+        _handler = new GetCurrentUserQueryHandler(_userContextMock.Object, _dbContextMock.Object);
     }
 
     /// <summary>
@@ -31,16 +34,17 @@ public class GetCurrentUserQueryHandlerTests
     public async Task Handle_WhenUserExists_ShouldReturnUser()
     {
         // Arrange
-        var userId = Guid.NewGuid();
         var email = "test@example.com";
         var userName = "testuser";
-        var user = AuthUser.Create(email, userName, Domain.Roles.Role.Create("User"));
+        var user = AuthUser.Create(email, userName, Domain.Roles.Role.Create("User").Value).Value;
+        var userId = user.Id;
 
-        var query = new GetCurrentUserQuery(userId);
+        var query = new GetCurrentUserQuery();
 
-        _userManagerMock
-            .Setup(x => x.FindByIdAsync(userId))
-            .ReturnsAsync(user);
+        _userContextMock.Setup(x => x.UserId).Returns(userId);
+        
+        _dbContextMock.Setup(x => x.AuthUsers)
+            .Returns(TestHelpers.CreateMockDbSet(new List<AuthUser> { user }).Object);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -50,34 +54,26 @@ public class GetCurrentUserQueryHandlerTests
         result.Value.Should().NotBeNull();
         result.Value.Email.Should().Be(email);
         result.Value.UserName.Should().Be(userName);
-        result.Value.Id.Should().Be(user.Id);
-
-        _userManagerMock.Verify(x => x.FindByIdAsync(userId), Times.Once);
     }
 
     /// <summary>
-    /// Verifies that Handle returns NotFound error when user doesn't exist.
-    /// Tests error handling for non-existent users.
+    /// Verifies that Handle returns Unauthorized error when user context has no user ID.
+    /// Tests error handling for non-authenticated users.
     /// </summary>
     [Fact]
-    public async Task Handle_WhenUserNotFound_ShouldReturnNotFoundError()
+    public async Task Handle_WhenUserIdIsNull_ShouldReturnUnauthorizedError()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var query = new GetCurrentUserQuery(userId);
+        var query = new GetCurrentUserQuery();
 
-        _userManagerMock
-            .Setup(x => x.FindByIdAsync(userId))
-            .ReturnsAsync((AuthUser?)null);
+        _userContextMock.Setup(x => x.UserId).Returns((Guid?)null);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(AuthUserErrors.NotFound);
-
-        _userManagerMock.Verify(x => x.FindByIdAsync(userId), Times.Once);
+        result.Error.Should().Be(AuthUserErrors.Unauthorized);
     }
 
     /// <summary>
@@ -87,23 +83,26 @@ public class GetCurrentUserQueryHandlerTests
     public async Task Handle_WithDifferentUserIds_ShouldReturnCorrectUsers()
     {
         // Arrange
-        var userId1 = Guid.NewGuid();
-        var userId2 = Guid.NewGuid();
+        var user1 = AuthUser.Create("user1@example.com", "user1", Domain.Roles.Role.Create("User").Value).Value;
+        var user2 = AuthUser.Create("user2@example.com", "user2", Domain.Roles.Role.Create("User").Value).Value;
+        
+        var userId1 = user1.Id;
+        var userId2 = user2.Id;
 
-        var user1 = AuthUser.Create("user1@example.com", "user1", Domain.Roles.Role.Create("User"));
-        var user2 = AuthUser.Create("user2@example.com", "user2", Domain.Roles.Role.Create("User"));
+        var query1 = new GetCurrentUserQuery();
+        var query2 = new GetCurrentUserQuery();
 
-        _userManagerMock
-            .Setup(x => x.FindByIdAsync(userId1))
-            .ReturnsAsync(user1);
+        _userContextMock.SetupSequence(x => x.UserId)
+            .Returns(userId1)
+            .Returns(userId2);
 
-        _userManagerMock
-            .Setup(x => x.FindByIdAsync(userId2))
-            .ReturnsAsync(user2);
+        _dbContextMock.SetupSequence(x => x.AuthUsers)
+            .Returns(TestHelpers.CreateMockDbSet(new List<AuthUser> { user1 }).Object)
+            .Returns(TestHelpers.CreateMockDbSet(new List<AuthUser> { user2 }).Object);
 
         // Act
-        var result1 = await _handler.Handle(new GetCurrentUserQuery(userId1), CancellationToken.None);
-        var result2 = await _handler.Handle(new GetCurrentUserQuery(userId2), CancellationToken.None);
+        var result1 = await _handler.Handle(query1, CancellationToken.None);
+        var result2 = await _handler.Handle(query2, CancellationToken.None);
 
         // Assert
         result1.IsSuccess.Should().BeTrue();
@@ -120,14 +119,14 @@ public class GetCurrentUserQueryHandlerTests
     public async Task Handle_WithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var user = AuthUser.Create("test@example.com", "testuser", Domain.Roles.Role.Create("User"));
-        var query = new GetCurrentUserQuery(userId);
+        var user = AuthUser.Create("test@example.com", "testuser", Domain.Roles.Role.Create("User").Value).Value;
+        var userId = user.Id;
+        var query = new GetCurrentUserQuery();
         var cancellationToken = new CancellationToken();
 
-        _userManagerMock
-            .Setup(x => x.FindByIdAsync(userId))
-            .ReturnsAsync(user);
+        _userContextMock.Setup(x => x.UserId).Returns(userId);
+        _dbContextMock.Setup(x => x.AuthUsers)
+            .Returns(TestHelpers.CreateMockDbSet(new List<AuthUser> { user }).Object);
 
         // Act
         var result = await _handler.Handle(query, cancellationToken);
@@ -143,16 +142,16 @@ public class GetCurrentUserQueryHandlerTests
     public async Task Handle_ShouldReturnCorrectDtoStructure()
     {
         // Arrange
-        var userId = Guid.NewGuid();
         var email = "detailed@example.com";
         var userName = "detaileduser";
-        var user = AuthUser.Create(email, userName, Domain.Roles.Role.Create("User"));
+        var user = AuthUser.Create(email, userName, Domain.Roles.Role.Create("User").Value).Value;
+        var userId = user.Id;
 
-        var query = new GetCurrentUserQuery(userId);
+        var query = new GetCurrentUserQuery();
 
-        _userManagerMock
-            .Setup(x => x.FindByIdAsync(userId))
-            .ReturnsAsync(user);
+        _userContextMock.Setup(x => x.UserId).Returns(userId);
+        _dbContextMock.Setup(x => x.AuthUsers)
+            .Returns(TestHelpers.CreateMockDbSet(new List<AuthUser> { user }).Object);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
