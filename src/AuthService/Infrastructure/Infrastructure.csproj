@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Infrastructure.UnitTests" />
+    <InternalsVisibleTo Include="Infrastructure.IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Aspire.StackExchange.Redis" Version="13.0.1" />
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
