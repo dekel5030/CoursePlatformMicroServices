@@ -4,13 +4,13 @@ using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Application.AuthUsers.Commands.RemoveRole;
 
-namespace Auth.Api.Endpoints.Auth;
+namespace Auth.Api.Endpoints.Users;
 
 public class UserRemoveRole : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("auth/user/{userId:guid}/roles/{roleName}", async (
+        app.MapDelete("user/{userId:guid}/roles/{roleName}", async (
             Guid userId,
             string roleName,
             ICommandHandler<UserRemoveRoleCommand> handler,

@@ -4,13 +4,13 @@ using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Application.AuthUsers.Commands.AddRole;
 
-namespace Auth.Api.Endpoints.Auth;
+namespace Auth.Api.Endpoints.Users;
 
 public class UserAddRole : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("auth/user/{userId:guid}/roles", async (
+        app.MapPost("user/{userId:guid}/roles", async (
             Guid userId,
             UserAddRoleRequestDto request,
             ICommandHandler<UserAddRoleCommand> handler,

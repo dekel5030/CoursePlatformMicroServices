@@ -17,6 +17,7 @@ internal static class IdentityDependencyExtensions
         
         services.AddScoped<IDomainEventHandler<UserRoleAddedDomainEvent>, UserRoleAddedDomainEventHandler>();
         services.AddScoped<IDomainEventHandler<UserRoleRemovedDomainEvent>, UserRoleRemovedDomainEventHandler>();
+        services.AddScoped<IDomainEventHandler<UserPermissionAddedDomainEvent>, UserPermissionAddedDomainEventHandler>();
         return services;
     }
 }
