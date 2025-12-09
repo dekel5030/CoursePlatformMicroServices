@@ -6,6 +6,7 @@ using Domain.Permissions;
 using Domain.Roles;
 using FluentAssertions;
 using Kernel;
+using Kernel.Auth.AuthTypes;
 using Moq;
 using Xunit;
 
@@ -43,7 +44,7 @@ public class UserAddPermissionCommandHandlerTests
             UserId: user.Id,
             Effect: "allow",
             Action: "read",
-            Resource: "posts",
+            Resource: "Course",
             ResourceId: "*"
         );
 
@@ -75,7 +76,7 @@ public class UserAddPermissionCommandHandlerTests
             UserId: Guid.NewGuid(),
             Effect: "allow",
             Action: "read",
-            Resource: "posts",
+            Resource: "Course",
             ResourceId: "*"
         );
 
@@ -108,7 +109,7 @@ public class UserAddPermissionCommandHandlerTests
             UserId: user.Id,
             Effect: "invalid_effect",
             Action: "read",
-            Resource: "posts",
+            Resource: "Course",
             ResourceId: "*"
         );
 
@@ -136,14 +137,15 @@ public class UserAddPermissionCommandHandlerTests
         var role = Role.Create("User").Value;
         var user = AuthUser.Create("test@example.com", "testuser", role).Value;
         
-        var permission = Permission.Parse("allow", "read", "course", "*").Value;
+        // Create permission using constructor with proper enum types - must match the command exactly
+        var permission = new Permission(EffectType.Allow, ActionType.Read, ResourceType.Course, ResourceId.Wildcard);
         user.AddPermission(permission);
 
         var command = new UserAddPermissionCommand(
             UserId: user.Id,
             Effect: "allow",
             Action: "read",
-            Resource: "posts",
+            Resource: "Course",
             ResourceId: "*"
         );
 
@@ -165,9 +167,9 @@ public class UserAddPermissionCommandHandlerTests
     /// Verifies that Handle works with different permission types.
     /// </summary>
     [Theory]
-    [InlineData("allow", "read", "posts", "*")]
-    [InlineData("deny", "write", "comments", "123")]
-    [InlineData("allow", "delete", "users", "456")]
+    [InlineData("allow", "read", "Course", "*")]
+    [InlineData("deny", "update", "Lesson", "123")]
+    [InlineData("allow", "delete", "User", "456")]
     public async Task Handle_WithDifferentPermissions_ShouldAddSuccessfully(
         string effect, string action, string resource, string resourceId)
     {
@@ -211,7 +213,7 @@ public class UserAddPermissionCommandHandlerTests
             UserId: user.Id,
             Effect: "allow",
             Action: "read",
-            Resource: "posts",
+            Resource: "Course",
             ResourceId: "*"
         );
 

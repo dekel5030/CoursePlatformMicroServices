@@ -5,6 +5,7 @@ using Domain.Roles;
 using Domain.Roles.Errors;
 using FluentAssertions;
 using Kernel;
+using Kernel.Auth.AuthTypes;
 using Moq;
 using Xunit;
 
@@ -32,9 +33,10 @@ public class RemoveRolePermissionCommandHandlerTests
     public async Task Handle_WithValidRoleAndPermission_ShouldRemovePermissionSuccessfully()
     {
         var role = Role.Create("Admin").Value;
-        var permission = Permission.Parse("allow", "read", "posts", "*").Value;
+        // Create permission using constructor with proper enum types - must match the command exactly
+        var permission = new Permission(EffectType.Allow, ActionType.Read, ResourceType.Course, ResourceId.Wildcard);
         role.AddPermission(permission);
-        var command = new RemoveRolePermissionCommand(role.Id, "allow", "read", "posts", "*");
+        var command = new RemoveRolePermissionCommand(role.Id, "allow", "read", "Course", "*");
 
         _dbContextMock.Setup(x => x.Roles)
             .Returns(TestHelpers.CreateMockDbSet(new List<Role> { role }).Object);
@@ -49,7 +51,7 @@ public class RemoveRolePermissionCommandHandlerTests
     [Fact]
     public async Task Handle_WhenRoleNotFound_ShouldReturnNotFoundError()
     {
-        var command = new RemoveRolePermissionCommand(Guid.NewGuid(), "allow", "read", "posts", "*");
+        var command = new RemoveRolePermissionCommand(Guid.NewGuid(), "allow", "read", "Course", "*");
 
         _dbContextMock.Setup(x => x.Roles)
             .Returns(TestHelpers.CreateMockDbSet(new List<Role>()).Object);
@@ -63,7 +65,7 @@ public class RemoveRolePermissionCommandHandlerTests
     [Fact]
     public async Task Handle_WithInvalidPermission_ShouldReturnFailure()
     {
-        var command = new RemoveRolePermissionCommand(Guid.NewGuid(), "invalid_effect", "read", "posts", "*");
+        var command = new RemoveRolePermissionCommand(Guid.NewGuid(), "invalid_effect", "read", "Course", "*");
 
         var result = await _handler.Handle(command, CancellationToken.None);
 

@@ -5,6 +5,7 @@ using Domain.Roles;
 using Domain.Roles.Errors;
 using FluentAssertions;
 using Kernel;
+using Kernel.Auth.AuthTypes;
 using Moq;
 using Xunit;
 
@@ -32,7 +33,7 @@ public class AddRolePermissionCommandHandlerTests
     public async Task Handle_WithValidRoleAndPermission_ShouldAddPermissionSuccessfully()
     {
         var role = Role.Create("Admin").Value;
-        var command = new AddRolePermissionCommand(role.Id, "allow", "read", "posts", "*");
+        var command = new AddRolePermissionCommand(role.Id, "allow", "read", "Course", "*");
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(role.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(role);
@@ -48,7 +49,7 @@ public class AddRolePermissionCommandHandlerTests
     [Fact]
     public async Task Handle_WhenRoleNotFound_ShouldReturnNotFoundError()
     {
-        var command = new AddRolePermissionCommand(Guid.NewGuid(), "allow", "read", "posts", "*");
+        var command = new AddRolePermissionCommand(Guid.NewGuid(), "allow", "read", "Course", "*");
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Role?)null);
@@ -63,7 +64,7 @@ public class AddRolePermissionCommandHandlerTests
     public async Task Handle_WithInvalidPermission_ShouldReturnFailure()
     {
         var role = Role.Create("Admin").Value;
-        var command = new AddRolePermissionCommand(role.Id, "invalid_effect", "read", "posts", "*");
+        var command = new AddRolePermissionCommand(role.Id, "invalid_effect", "read", "Course", "*");
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(role.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(role);
