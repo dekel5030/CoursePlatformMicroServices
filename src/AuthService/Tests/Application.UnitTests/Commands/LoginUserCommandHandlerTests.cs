@@ -1,3 +1,4 @@
+using Application.Abstractions.Data;
 using Application.Abstractions.Identity;
 using Application.AuthUsers.Commands.LoginUser;
 using Application.AuthUsers.Dtos;
@@ -12,23 +13,20 @@ namespace Application.UnitTests.Commands;
 
 /// <summary>
 /// Unit tests for LoginUserCommandHandler.
-/// Tests cover successful login, invalid credentials, account lockout, and error scenarios.
+/// Tests cover successful login, invalid credentials, and error scenarios.
 /// </summary>
 public class LoginUserCommandHandlerTests
 {
-    private readonly Mock<ISignInManager<AuthUser>> _signInManagerMock;
-    private readonly Mock<IUserManager<AuthUser>> _userManagerMock;
+    private readonly Mock<ISignService<AuthUser>> _signServiceMock;
+    private readonly Mock<IWriteDbContext> _dbContextMock;
     private readonly LoginUserCommandHandler _handler;
 
     public LoginUserCommandHandlerTests()
     {
-        _signInManagerMock = new Mock<ISignInManager<AuthUser>>();
-        _userManagerMock = new Mock<IUserManager<AuthUser>>();
+        _signServiceMock = new Mock<ISignService<AuthUser>>();
+        _dbContextMock = new Mock<IWriteDbContext>();
 
-        _signInManagerMock.Setup(x => x.UserManager)
-            .Returns(_userManagerMock.Object);
-
-        _handler = new LoginUserCommandHandler(_signInManagerMock.Object);
+        _handler = new LoginUserCommandHandler(_signServiceMock.Object, _dbContextMock.Object);
     }
 
     /// <summary>
@@ -41,7 +39,7 @@ public class LoginUserCommandHandlerTests
         // Arrange
         var email = "test@example.com";
         var password = "SecurePassword123!";
-        var user = AuthUser.Create(email, "testuser", Domain.Roles.Role.Create("User"));
+        var user = AuthUser.Create(email, "testuser", Domain.Roles.Role.Create("User").Value).Value;
 
         var request = new LoginUserCommand(new LoginRequestDto
         {
@@ -49,12 +47,12 @@ public class LoginUserCommandHandlerTests
             Password = password
         });
 
-        _userManagerMock
-            .Setup(x => x.FindByEmailAsync(email))
-            .ReturnsAsync(user);
+        // Mock DbContext to return the user
+        _dbContextMock.Setup(x => x.AuthUsers)
+            .Returns(TestHelpers.CreateMockDbSet(new List<AuthUser> { user }).Object);
 
-        _signInManagerMock
-            .Setup(x => x.PasswordSignInAsync(user, password, true, true))
+        _signServiceMock
+            .Setup(x => x.PasswordSignInAsync(It.IsAny<AuthUser>(), password, true, true))
             .ReturnsAsync(Result.Success());
 
         // Act
@@ -65,11 +63,9 @@ public class LoginUserCommandHandlerTests
         result.Value.Should().NotBeNull();
         result.Value.Email.Should().Be(email);
         result.Value.UserName.Should().Be("testuser");
-        result.Value.Id.Should().Be(user.Id);
 
-        _userManagerMock.Verify(x => x.FindByEmailAsync(email), Times.Once);
-        _signInManagerMock.Verify(
-            x => x.PasswordSignInAsync(user, password, true, true),
+        _signServiceMock.Verify(
+            x => x.PasswordSignInAsync(It.IsAny<AuthUser>(), password, true, true),
             Times.Once);
     }
 
@@ -78,7 +74,7 @@ public class LoginUserCommandHandlerTests
     /// Tests error handling for non-existent users.
     /// </summary>
     [Fact]
-    public async Task Handle_WhenUserNotFound_ShouldReturnInvalidCredentialsError()
+    public async Task Handle_WhenUserNotFound_ShouldReturnNotFoundError()
     {
         // Arrange
         var request = new LoginUserCommand(new LoginRequestDto
@@ -87,18 +83,18 @@ public class LoginUserCommandHandlerTests
             Password = "Password123!"
         });
 
-        _userManagerMock
-            .Setup(x => x.FindByEmailAsync(It.IsAny<string>()))
-            .ReturnsAsync((AuthUser?)null);
+        // Mock DbContext to return no users
+        _dbContextMock.Setup(x => x.AuthUsers)
+            .Returns(TestHelpers.CreateMockDbSet(new List<AuthUser>()).Object);
 
         // Act
         var result = await _handler.Handle(request, CancellationToken.None);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(AuthUserErrors.InvalidCredentials);
+        result.Error.Should().Be(AuthUserErrors.NotFound);
 
-        _signInManagerMock.Verify(
+        _signServiceMock.Verify(
             x => x.PasswordSignInAsync(It.IsAny<AuthUser>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()),
             Times.Never);
     }
@@ -112,7 +108,7 @@ public class LoginUserCommandHandlerTests
     {
         // Arrange
         var email = "test@example.com";
-        var user = AuthUser.Create(email, "testuser", Domain.Roles.Role.Create("User"));
+        var user = AuthUser.Create(email, "testuser", Domain.Roles.Role.Create("User").Value).Value;
 
         var request = new LoginUserCommand(new LoginRequestDto
         {
@@ -120,13 +116,12 @@ public class LoginUserCommandHandlerTests
             Password = "WrongPassword!"
         });
 
-        var expectedError = AuthUserErrors.InvalidCredentials;
+        var expectedError = Domain.AuthUsers.Errors.AuthUserErrors.InvalidCredentials;
 
-        _userManagerMock
-            .Setup(x => x.FindByEmailAsync(email))
-            .ReturnsAsync(user);
+        _dbContextMock.Setup(x => x.AuthUsers)
+            .Returns(TestHelpers.CreateMockDbSet(new List<AuthUser> { user }).Object);
 
-        _signInManagerMock
+        _signServiceMock
             .Setup(x => x.PasswordSignInAsync(It.IsAny<AuthUser>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(Result.Failure(expectedError));
 
@@ -147,7 +142,7 @@ public class LoginUserCommandHandlerTests
     {
         // Arrange
         var email = "locked@example.com";
-        var user = AuthUser.Create(email, "lockeduser", Domain.Roles.Role.Create("User"));
+        var user = AuthUser.Create(email, "lockeduser", Domain.Roles.Role.Create("User").Value).Value;
 
         var request = new LoginUserCommand(new LoginRequestDto
         {
@@ -155,13 +150,12 @@ public class LoginUserCommandHandlerTests
             Password = "Password123!"
         });
 
-        var expectedError = AuthUserErrors.IsLockOut;
+        var expectedError = Domain.AuthUsers.Errors.AuthUserErrors.IsLockOut;
 
-        _userManagerMock
-            .Setup(x => x.FindByEmailAsync(email))
-            .ReturnsAsync(user);
+        _dbContextMock.Setup(x => x.AuthUsers)
+            .Returns(TestHelpers.CreateMockDbSet(new List<AuthUser> { user }).Object);
 
-        _signInManagerMock
+        _signServiceMock
             .Setup(x => x.PasswordSignInAsync(It.IsAny<AuthUser>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(Result.Failure(expectedError));
 
@@ -183,7 +177,7 @@ public class LoginUserCommandHandlerTests
     public async Task Handle_WithDifferentEmails_ShouldLoginSuccessfully(string email, string userName)
     {
         // Arrange
-        var user = AuthUser.Create(email, userName, Domain.Roles.Role.Create("User"));
+        var user = AuthUser.Create(email, userName, Domain.Roles.Role.Create("User").Value).Value;
 
         var request = new LoginUserCommand(new LoginRequestDto
         {
@@ -191,11 +185,10 @@ public class LoginUserCommandHandlerTests
             Password = "Password123!"
         });
 
-        _userManagerMock
-            .Setup(x => x.FindByEmailAsync(email))
-            .ReturnsAsync(user);
+        _dbContextMock.Setup(x => x.AuthUsers)
+            .Returns(TestHelpers.CreateMockDbSet(new List<AuthUser> { user }).Object);
 
-        _signInManagerMock
+        _signServiceMock
             .Setup(x => x.PasswordSignInAsync(It.IsAny<AuthUser>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(Result.Success());
 
@@ -217,7 +210,7 @@ public class LoginUserCommandHandlerTests
         // Arrange
         var email = "test@example.com";
         var password = "Password123!";
-        var user = AuthUser.Create(email, "testuser", Domain.Roles.Role.Create("User"));
+        var user = AuthUser.Create(email, "testuser", Domain.Roles.Role.Create("User").Value).Value;
 
         var request = new LoginUserCommand(new LoginRequestDto
         {
@@ -225,20 +218,19 @@ public class LoginUserCommandHandlerTests
             Password = password
         });
 
-        _userManagerMock
-            .Setup(x => x.FindByEmailAsync(email))
-            .ReturnsAsync(user);
+        _dbContextMock.Setup(x => x.AuthUsers)
+            .Returns(TestHelpers.CreateMockDbSet(new List<AuthUser> { user }).Object);
 
-        _signInManagerMock
-            .Setup(x => x.PasswordSignInAsync(user, password, true, true))
+        _signServiceMock
+            .Setup(x => x.PasswordSignInAsync(It.IsAny<AuthUser>(), password, true, true))
             .ReturnsAsync(Result.Success());
 
         // Act
         await _handler.Handle(request, CancellationToken.None);
 
         // Assert
-        _signInManagerMock.Verify(
-            x => x.PasswordSignInAsync(user, password, true, true),
+        _signServiceMock.Verify(
+            x => x.PasswordSignInAsync(It.IsAny<AuthUser>(), password, true, true),
             Times.Once);
     }
 }

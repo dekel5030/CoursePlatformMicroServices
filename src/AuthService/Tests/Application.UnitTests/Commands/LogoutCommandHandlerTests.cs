@@ -13,13 +13,13 @@ namespace Application.UnitTests.Commands;
 /// </summary>
 public class LogoutCommandHandlerTests
 {
-    private readonly Mock<ISignInManager<AuthUser>> _signInManagerMock;
+    private readonly Mock<ISignService<AuthUser>> _signServiceMock;
     private readonly LogoutCommandHandler _handler;
 
     public LogoutCommandHandlerTests()
     {
-        _signInManagerMock = new Mock<ISignInManager<AuthUser>>();
-        _handler = new LogoutCommandHandler(_signInManagerMock.Object);
+        _signServiceMock = new Mock<ISignService<AuthUser>>();
+        _handler = new LogoutCommandHandler(_signServiceMock.Object);
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class LogoutCommandHandlerTests
         // Arrange
         var command = new LogoutCommand();
 
-        _signInManagerMock
+        _signServiceMock
             .Setup(x => x.SignOutAsync())
             .Returns(Task.CompletedTask);
 
@@ -42,7 +42,7 @@ public class LogoutCommandHandlerTests
         // Assert
         result.IsSuccess.Should().BeTrue();
 
-        _signInManagerMock.Verify(
+        _signServiceMock.Verify(
             x => x.SignOutAsync(),
             Times.Once);
     }
@@ -60,7 +60,7 @@ public class LogoutCommandHandlerTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        _signInManagerMock.Verify(x => x.SignOutAsync(), Times.Once);
+        _signServiceMock.Verify(x => x.SignOutAsync(), Times.Once);
     }
 
     /// <summary>
@@ -73,7 +73,7 @@ public class LogoutCommandHandlerTests
         var command = new LogoutCommand();
         var cancellationToken = new CancellationToken();
 
-        _signInManagerMock
+        _signServiceMock
             .Setup(x => x.SignOutAsync())
             .Returns(Task.CompletedTask);
 
@@ -93,7 +93,7 @@ public class LogoutCommandHandlerTests
         // Arrange
         var command = new LogoutCommand();
 
-        _signInManagerMock
+        _signServiceMock
             .Setup(x => x.SignOutAsync())
             .Returns(Task.CompletedTask);
 
@@ -105,7 +105,7 @@ public class LogoutCommandHandlerTests
         result1.IsSuccess.Should().BeTrue();
         result2.IsSuccess.Should().BeTrue();
 
-        _signInManagerMock.Verify(
+        _signServiceMock.Verify(
             x => x.SignOutAsync(),
             Times.Exactly(2));
     }
