@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Kernel.Auth.AuthTypes;
 
 namespace Kernel.Auth;
@@ -52,66 +51,36 @@ public static partial class PermissionClaim
     /// <returns>A Claim object representing the parsed permission.</returns>
     /// <exception cref="ArgumentException">Thrown if the claim format is invalid or any segment cannot be parsed.</exception>
 
-    public static Claim Parse(string claimValue)
+    public static bool TryParse(string claimValue, out Claim result)
     {
+        result = default!;
+
+        if (string.IsNullOrWhiteSpace(claimValue))
+            return false;
+
         var segments = claimValue.Split(':');
+
         if (segments.Length != 4)
-            throw new ArgumentException("Invalid permission claim format.");
+            return false;
 
         var effectSegment = segments[0];
         var actionSegment = segments[1];
         var resourceSegment = segments[2];
         var idSegment = segments[3];
 
-        EffectType effect = ParseEffect(effectSegment);
-        ActionType action = ParseAction(actionSegment);
-        ResourceType resource = ParseResource(resourceSegment);
-        ResourceId resourceId = ResourceId.Create(idSegment);
-
-        return Create(effect, action, resource, resourceId);
-    }
-
-    public static Claim? TryParse(string claimValue)
-    {
-        try
-        {
-            return Parse(claimValue);
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    /// <summary>
-    /// Attempts to parse a permission claim string into a Claim object.
-    /// Returns null if parsing fails.
-    /// </summary>
-    /// <param name="claimValue">The claim value to parse.</param>
-    /// <returns>A Claim object if parsing succeeds; otherwise, null.</returns>
-
-    /// <summary>
-    /// Attempts to parse a permission claim string into a Claim object using an out parameter.
-    /// </summary>
-    /// <param name="claimValue">The claim value to parse.</param>
-    /// <param name="parsedClaim">The parsed Claim if successful; otherwise null.</param>
-    /// <returns>True if parsing succeeded; otherwise false.</returns>
-
-    public static bool TryParse(
-            string claimValue,
-            [NotNullWhen(true)] out Claim? parsedClaim)
-    {
-        parsedClaim = null;
-
-        try
-        {
-            parsedClaim = Parse(claimValue);
-            return true;
-        }
-        catch
-        {
+        if (!PermissionParser.TryParseEffect(effectSegment, out var effect))
             return false;
-        }
+
+        if (!PermissionParser.TryParseAction(actionSegment, out var action))
+            return false;
+
+        if (!PermissionParser.TryParseResource(resourceSegment, out var resource))
+            return false;
+
+        ResourceId id = ResourceId.Create(idSegment);
+
+        result = Create(effect, action, resource, id);
+        return true;
     }
 
     /// <summary>
@@ -130,45 +99,5 @@ public static partial class PermissionClaim
         var resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
 
         return $"{effectString}:{actionString}:{resourceString}:{id.Value}";
-    }
-
-    private static EffectType ParseEffect(string effectSegment)
-    {
-        if (!Enum.TryParse(effectSegment, true, out EffectType effect))
-            throw new ArgumentException("Invalid effect value.");
-
-        return effect;
-    }
-
-    private static ActionType ParseAction(string actionSegment)
-    {
-        ActionType action;
-
-        if (actionSegment == "*")
-        {
-            return ActionType.Wildcard;
-        }
-        else if (!Enum.TryParse(actionSegment, ignoreCase: true, out action))
-        {
-            throw new ArgumentException("Invalid action value.");
-        }
-
-        return action;
-    }
-
-    private static ResourceType ParseResource(string resourceSegment)
-    {
-        ResourceType resource;
-
-        if (resourceSegment == "*")
-        {
-            return ResourceType.Wildcard;
-        }
-        else if (!Enum.TryParse(resourceSegment, ignoreCase: true, out resource))
-        {
-            throw new ArgumentException("Invalid resource value.");
-        }
-
-        return resource;
     }
 }

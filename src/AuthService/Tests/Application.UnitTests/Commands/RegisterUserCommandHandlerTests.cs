@@ -18,31 +18,28 @@ namespace Application.UnitTests.Commands;
 /// </summary>
 public class RegisterUserCommandHandlerTests
 {
-    private readonly Mock<ISignInManager<AuthUser>> _signInManagerMock;
-    private readonly Mock<IUserManager<AuthUser>> _userManagerMock;
-    private readonly Mock<IRoleManager<Role>> _roleManagerMock;
+    private readonly Mock<ISignService<AuthUser>> _signServiceMock;
+    private readonly Mock<IWriteDbContext> _dbContextMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly RegisterUserCommandHandler _handler;
     private readonly Role _defaultRole;
 
     public RegisterUserCommandHandlerTests()
     {
-        _signInManagerMock = new Mock<ISignInManager<AuthUser>>();
-        _userManagerMock = new Mock<IUserManager<AuthUser>>();
-        _roleManagerMock = new Mock<IRoleManager<Role>>();
+        _signServiceMock = new Mock<ISignService<AuthUser>>();
+        _dbContextMock = new Mock<IWriteDbContext>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
 
-        _defaultRole = Role.Create("User");
+        _defaultRole = Role.Create("Designer").Value;
 
-        // Setup role manager to return the default role
-        _roleManagerMock.Setup(x => x.Roles)
-            .Returns(new List<Role> { _defaultRole }.AsQueryable());
+        // Setup WriteDbContext to return the default role
+        _dbContextMock.Setup(x => x.Roles)
+            .Returns(TestHelpers.CreateMockDbSet(new List<Role> { _defaultRole }).Object);
 
         _handler = new RegisterUserCommandHandler(
-            _signInManagerMock.Object,
-            _userManagerMock.Object,
             _unitOfWorkMock.Object,
-            _roleManagerMock.Object);
+            _dbContextMock.Object,
+            _signServiceMock.Object);
     }
 
     /// <summary>
@@ -60,8 +57,8 @@ public class RegisterUserCommandHandlerTests
             UserName = "testuser"
         });
 
-        _userManagerMock
-            .Setup(x => x.CreateAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
+        _signServiceMock
+            .Setup(x => x.RegisterAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
             .ReturnsAsync(Result.Success());
 
         _unitOfWorkMock
@@ -77,8 +74,8 @@ public class RegisterUserCommandHandlerTests
         result.Value.Email.Should().Be("test@example.com");
         result.Value.UserName.Should().Be("testuser");
 
-        _userManagerMock.Verify(
-            x => x.CreateAsync(It.IsAny<AuthUser>(), "SecurePassword123!"),
+        _signServiceMock.Verify(
+            x => x.RegisterAsync(It.IsAny<AuthUser>(), "SecurePassword123!"),
             Times.Once);
 
         _unitOfWorkMock.Verify(
@@ -87,11 +84,11 @@ public class RegisterUserCommandHandlerTests
     }
 
     /// <summary>
-    /// Verifies that Handle returns failure when user manager fails to create user.
+    /// Verifies that Handle returns failure when sign service fails to register user.
     /// Tests error handling in the command handler.
     /// </summary>
     [Fact]
-    public async Task Handle_WhenUserManagerFails_ShouldReturnFailure()
+    public async Task Handle_WhenSignServiceFails_ShouldReturnFailure()
     {
         // Arrange
         var request = new RegisterUserCommand(new RegisterRequestDto
@@ -102,8 +99,8 @@ public class RegisterUserCommandHandlerTests
         });
 
         var expectedError = AuthUserErrors.DuplicateEmail;
-        _userManagerMock
-            .Setup(x => x.CreateAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
+        _signServiceMock
+            .Setup(x => x.RegisterAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
             .ReturnsAsync(Result.Failure(expectedError));
 
         // Act
@@ -133,8 +130,8 @@ public class RegisterUserCommandHandlerTests
         });
 
         AuthUser? createdUser = null;
-        _userManagerMock
-            .Setup(x => x.CreateAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
+        _signServiceMock
+            .Setup(x => x.RegisterAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
             .Callback<AuthUser, string>((user, _) => createdUser = user)
             .ReturnsAsync(Result.Success());
 
@@ -146,7 +143,7 @@ public class RegisterUserCommandHandlerTests
         createdUser!.Email.Should().Be("newuser@example.com");
         createdUser.UserName.Should().Be("newuser");
         createdUser.Roles.Should().ContainSingle();
-        createdUser.Roles.First().Name.Should().Be("User");
+        createdUser.Roles.First().Name.Should().Be("Designer");
     }
 
     /// <summary>
@@ -166,8 +163,8 @@ public class RegisterUserCommandHandlerTests
             UserName = userName
         });
 
-        _userManagerMock
-            .Setup(x => x.CreateAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
+        _signServiceMock
+            .Setup(x => x.RegisterAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
             .ReturnsAsync(Result.Success());
 
         // Act
@@ -195,8 +192,8 @@ public class RegisterUserCommandHandlerTests
 
         var cancellationToken = new CancellationToken();
 
-        _userManagerMock
-            .Setup(x => x.CreateAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
+        _signServiceMock
+            .Setup(x => x.RegisterAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
             .ReturnsAsync(Result.Success());
 
         // Act

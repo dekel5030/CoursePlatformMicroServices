@@ -43,4 +43,15 @@ public static class AuthUserErrors
     public static readonly Error Required2FA = Error.Validation(
         "AuthUser.Required2FA",
         "Two-factor authentication is required to sign in.");
+
+    public static readonly Error RoleAlreadyExists = Error.Conflict(
+        "AuthUser.RoleAlreadyExists",
+        "User already has this role assigned.");
+    public static readonly Error UserOrEmailIsTaken = Error.Conflict(
+        "AuthUser.UserOrEmailIsTaken",
+        "User with this email or username already exists.");
+
+    internal static readonly Error PermissionAlreadyExists = Error.Conflict(
+        "AuthUser.PermissionAlreadyExists",
+        "User already has this permission assigned.");
 }

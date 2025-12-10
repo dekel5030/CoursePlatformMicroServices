@@ -3,15 +3,15 @@ using Kernel;
 
 namespace Application.Abstractions.Identity;
 
-public interface ISignInManager<TUser>
+public interface ISignService<TUser>
     where TUser : AuthUser
 {
-    IUserManager<TUser> UserManager { get; }
     Task<Result> PasswordSignInAsync(
         TUser user,
         string password,
         bool isPersistent,
         bool lockoutOnFailure);
-    Task SignInAsync(AuthUser user, bool isPersistent);
+    Task SignInAsync(TUser user, bool isPersistent);
     Task SignOutAsync();
+    Task<Result> RegisterAsync(TUser user, string password);
 }

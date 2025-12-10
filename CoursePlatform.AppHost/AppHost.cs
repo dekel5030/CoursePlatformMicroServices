@@ -12,6 +12,7 @@ var rabbitMq = builder
 
 var authDb = builder
     .AddPostgres("authservice-db")
+    .WithPgAdmin()
     .WithBindMount(@"C:\AspireVolumes\AuthService", "/var/lib/postgresql/data")
     .AddDatabase("authdb");
 

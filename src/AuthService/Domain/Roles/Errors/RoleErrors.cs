@@ -15,4 +15,8 @@ public static class RoleErrors
     public static readonly Error NameCannotBeEmpty = Error.Validation(
         "Role.NameCannotBeEmpty",
         "Role name cannot be empty");
+
+    internal static readonly Error InvalidPermissionEffect = Error.Validation(
+        "Role.InvalidPermissionEffect",
+        "Role permission effect must be 'Allow'");
 }

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Application.Abstractions.Messaging;
 using Application.AuthUsers.Dtos;
 using Application.AuthUsers.Queries.GetCurrentUser;
@@ -12,18 +11,10 @@ public class Me : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("auth/me", async (
-            ClaimsPrincipal user,
             IQueryHandler<GetCurrentUserQuery, CurrentUserDto> handler,
             CancellationToken cancellationToken) =>
         {
-            var userIdString = user.FindFirstValue(ClaimTypes.NameIdentifier);
-            Guid.TryParse(userIdString, out Guid userId);
-
-            if (userId == Guid.Empty)
-            {
-                return Results.Unauthorized();
-            }
-            var query = new GetCurrentUserQuery(userId);
+            var query = new GetCurrentUserQuery();
             var result = await handler.Handle(query, cancellationToken);
 
             return result.Match(
