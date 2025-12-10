@@ -13,10 +13,10 @@ public class AddPermissionsToRole : IEndpoint
         app.MapPost("roles/{roleId:guid}/permissions/batch", async (
             Guid roleId,
             AddPermissionsToRoleRequestDto request,
-            ICommandHandler<AddPermissionsToRoleCommand> handler,
+            ICommandHandler<RoleAddPermissionsCommand> handler,
             CancellationToken cancellationToken) =>
         {
-            var command = new AddPermissionsToRoleCommand(
+            var command = new RoleAddPermissionsCommand(
                 roleId,
                 request.Permissions.Select(p => new Application.Roles.Commands.AddPermissionsToRole.PermissionDto(
                     p.Effect,

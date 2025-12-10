@@ -16,14 +16,14 @@ public class AddPermissionsToRoleCommandHandlerTests
 {
     private readonly Mock<IWriteDbContext> _dbContextMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly AddPermissionsToRoleCommandHandler _handler;
+    private readonly RoleAddPermissionsCommandHandler _handler;
 
     public AddPermissionsToRoleCommandHandlerTests()
     {
         _dbContextMock = new Mock<IWriteDbContext>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
 
-        _handler = new AddPermissionsToRoleCommandHandler(_unitOfWorkMock.Object, _dbContextMock.Object);
+        _handler = new RoleAddPermissionsCommandHandler(_unitOfWorkMock.Object, _dbContextMock.Object);
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class AddPermissionsToRoleCommandHandlerTests
             new("allow", "update", "User", "*"),
             new("allow", "delete", "Lesson", "*")
         };
-        var command = new AddPermissionsToRoleCommand(role.Id, permissions);
+        var command = new RoleAddPermissionsCommand(role.Id, permissions);
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(role.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(role);
@@ -61,7 +61,7 @@ public class AddPermissionsToRoleCommandHandlerTests
         {
             new("allow", "read", "Course", "*")
         };
-        var command = new AddPermissionsToRoleCommand(Guid.NewGuid(), permissions);
+        var command = new RoleAddPermissionsCommand(Guid.NewGuid(), permissions);
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Role?)null);
@@ -83,7 +83,7 @@ public class AddPermissionsToRoleCommandHandlerTests
         {
             new("invalid_effect", "read", "Course", "*")
         };
-        var command = new AddPermissionsToRoleCommand(role.Id, permissions);
+        var command = new RoleAddPermissionsCommand(role.Id, permissions);
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(role.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(role);
@@ -104,7 +104,7 @@ public class AddPermissionsToRoleCommandHandlerTests
         {
             new("deny", "read", "Course", "*")
         };
-        var command = new AddPermissionsToRoleCommand(role.Id, permissions);
+        var command = new RoleAddPermissionsCommand(role.Id, permissions);
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(role.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(role);

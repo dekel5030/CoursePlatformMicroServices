@@ -13,10 +13,10 @@ public class RemovePermissionsFromRole : IEndpoint
         app.MapDelete("roles/{roleId:guid}/permissions/batch", async (
             Guid roleId,
             RemovePermissionsFromRoleRequestDto request,
-            ICommandHandler<RemovePermissionsFromRoleCommand> handler,
+            ICommandHandler<RoleRemovePermissionsCommand> handler,
             CancellationToken cancellationToken) =>
         {
-            var command = new RemovePermissionsFromRoleCommand(
+            var command = new RoleRemovePermissionsCommand(
                 roleId,
                 request.Permissions.Select(p => new Application.Roles.Commands.RemovePermissionsFromRole.PermissionDto(
                     p.Effect,

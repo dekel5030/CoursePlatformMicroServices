@@ -6,15 +6,15 @@ using Domain.Roles.Errors;
 using Kernel;
 using Kernel.Auth.AuthTypes;
 
-namespace Application.Roles.Commands.RemovePermissionsFromRole;
+namespace Application.Roles.Commands.AddPermissionsToRole;
 
-public class RemovePermissionsFromRoleCommandHandler : ICommandHandler<RemovePermissionsFromRoleCommand>
+public class AddPermissionsToRoleCommandHandler : ICommandHandler<RoleAddPermissionsCommand>
 {
     private readonly IWriteDbContext _writeDbContext;
     private readonly IUnitOfWork _unitOfWork;
     private readonly string _wildcard = ResourceId.Wildcard.Value;
 
-    public RemovePermissionsFromRoleCommandHandler(
+    public AddPermissionsToRoleCommandHandler(
         IUnitOfWork unitOfWork,
         IWriteDbContext writeDbContext)
     {
@@ -23,7 +23,7 @@ public class RemovePermissionsFromRoleCommandHandler : ICommandHandler<RemovePer
     }
 
     public async Task<Result> Handle(
-        RemovePermissionsFromRoleCommand request, 
+        RoleAddPermissionsCommand request, 
         CancellationToken cancellationToken = default)
     {
         var role = await _writeDbContext.Roles.FindAsync(request.RoleId, cancellationToken);
@@ -51,11 +51,11 @@ public class RemovePermissionsFromRoleCommandHandler : ICommandHandler<RemovePer
             permissions.Add(permissionParseResult.Value);
         }
 
-        var permissionRemoveResult = role.RemovePermissions(permissions);
+        var permissionAddResult = role.AddPermissions(permissions);
 
-        if (permissionRemoveResult.IsFailure)
+        if (permissionAddResult.IsFailure)
         {
-            return permissionRemoveResult;
+            return permissionAddResult;
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);

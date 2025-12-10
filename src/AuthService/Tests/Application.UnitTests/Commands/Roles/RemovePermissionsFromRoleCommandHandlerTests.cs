@@ -16,14 +16,14 @@ public class RemovePermissionsFromRoleCommandHandlerTests
 {
     private readonly Mock<IWriteDbContext> _dbContextMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly RemovePermissionsFromRoleCommandHandler _handler;
+    private readonly RoleRemovePermissionsCommandHandler _handler;
 
     public RemovePermissionsFromRoleCommandHandlerTests()
     {
         _dbContextMock = new Mock<IWriteDbContext>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
 
-        _handler = new RemovePermissionsFromRoleCommandHandler(_unitOfWorkMock.Object, _dbContextMock.Object);
+        _handler = new RoleRemovePermissionsCommandHandler(_unitOfWorkMock.Object, _dbContextMock.Object);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class RemovePermissionsFromRoleCommandHandlerTests
             role.AddPermission(parseResult.Value);
         }
 
-        var command = new RemovePermissionsFromRoleCommand(role.Id, permissions);
+        var command = new RoleRemovePermissionsCommand(role.Id, permissions);
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(role.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(role);
@@ -69,7 +69,7 @@ public class RemovePermissionsFromRoleCommandHandlerTests
         {
             new("allow", "read", "Course", "*")
         };
-        var command = new RemovePermissionsFromRoleCommand(Guid.NewGuid(), permissions);
+        var command = new RoleRemovePermissionsCommand(Guid.NewGuid(), permissions);
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Role?)null);
