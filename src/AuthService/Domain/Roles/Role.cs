@@ -49,7 +49,7 @@ public class Role : Entity
         }
 
         _permissions.Add(permission);
-        Raise(new RolePermissionAssignedDomainEvent(this, permission));
+        Raise(new RolePermissionAddedDomainEvent(this, permission));
         return Result.Success();
     }
 

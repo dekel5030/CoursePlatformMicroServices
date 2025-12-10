@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions.Identity;
-using Application.Extensions;
 using Domain.AuthUsers;
 using Infrastructure.Database;
 using Infrastructure.Identity.Extensions;

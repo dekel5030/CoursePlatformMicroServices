@@ -12,6 +12,7 @@ using Infrastructure.Identity.Extensions;
 using Infrastructure.Identity.Managers;
 using Infrastructure.Identity.Stores;
 using Infrastructure.MassTransit;
+using Infrastructure.Redis.Extensions;
 using Kernel.Auth.Abstractions;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -38,7 +39,7 @@ public static class DependencyInjection
     {
         builder.AddInfrastructureDefaults();
         builder.Services.AddInfrastructure(builder.Configuration);
-        builder.AddRedisClient(RedisConnectionName);
+        builder.AddDistributedPermissionStore(RedisConnectionName);
 
         return builder;
     }

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Identity.SyncEventsHandlers.Roles;
 
-internal class RolePermissionAssignedDomainEventHandler : IDomainEventHandler<RolePermissionAssignedDomainEvent>
+internal class RolePermissionAssignedDomainEventHandler : IDomainEventHandler<RolePermissionAddedDomainEvent>
 {
     private readonly WriteDbContext _dbContext;
 
@@ -15,7 +15,7 @@ internal class RolePermissionAssignedDomainEventHandler : IDomainEventHandler<Ro
         _dbContext = dbContext;
     }
 
-    public Task Handle(RolePermissionAssignedDomainEvent @event, CancellationToken cancellationToken = default)
+    public Task Handle(RolePermissionAddedDomainEvent @event, CancellationToken cancellationToken = default)
     {
         var claim = new IdentityRoleClaim<Guid>
         {
