@@ -18,12 +18,7 @@ public class UserRemovePermissions : IEndpoint
         {
             var command = new UserRemovePermissionsCommand(
                 userId,
-                request.Permissions.Select(p => new Application.AuthUsers.Commands.UserRemovePermissions.PermissionDto(
-                    p.Effect,
-                    p.Action,
-                    p.Resource,
-                    p.ResourceId
-                )).ToList()
+                request.Permissions
             );
 
             Result result = await handler.Handle(command, cancellationToken);
@@ -40,11 +35,3 @@ public class UserRemovePermissions : IEndpoint
         .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }
-
-public record UserRemovePermissionsRequestDto(List<UserRemovePermissionItemDto> Permissions);
-
-public record UserRemovePermissionItemDto(
-    string Effect,
-    string Action,
-    string Resource,
-    string? ResourceId = null);

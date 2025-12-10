@@ -18,12 +18,7 @@ public class UserAddPermissions : IEndpoint
         {
             var command = new UserAddPermissionsCommand(
                 userId,
-                request.Permissions.Select(p => new Application.AuthUsers.Commands.UserAddPermissions.PermissionDto(
-                    p.Effect,
-                    p.Action,
-                    p.Resource,
-                    p.ResourceId
-                )).ToList()
+                request.Permissions
             );
 
             Result result = await handler.Handle(command, cancellationToken);
@@ -40,11 +35,3 @@ public class UserAddPermissions : IEndpoint
         .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }
-
-public record UserAddPermissionsRequestDto(List<UserAddPermissionItemDto> Permissions);
-
-public record UserAddPermissionItemDto(
-    string Effect,
-    string Action,
-    string Resource,
-    string? ResourceId = null);
