@@ -1,5 +1,5 @@
 using Application.Abstractions.Data;
-using Application.Roles.Commands.RemovePermissionsFromRole;
+using Application.Roles.Commands.RoleRemovePermissions;
 using Domain.Roles;
 using Domain.Roles.Errors;
 using FluentAssertions;

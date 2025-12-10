@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
 
-namespace Application.Roles.Commands.RemoveRolePermission;
+namespace Application.Roles.Commands.RoleRemovePermission;
 
 public record RemoveRolePermissionCommand(
     Guid RoleId,

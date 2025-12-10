@@ -1,4 +1,4 @@
-﻿namespace Application.Roles.Commands.AddRolePermission;
+﻿namespace Application.Roles.Commands.RoleAddPermission;
 
 public record AddRolePermissionRequestDto(
     string Effect,

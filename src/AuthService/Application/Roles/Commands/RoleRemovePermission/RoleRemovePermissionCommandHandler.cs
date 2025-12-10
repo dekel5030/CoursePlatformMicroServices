@@ -7,7 +7,7 @@ using Kernel;
 using Kernel.Auth.AuthTypes;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Roles.Commands.RemoveRolePermission;
+namespace Application.Roles.Commands.RoleRemovePermission;
 
 public class RemoveRolePermissionCommandHandler : ICommandHandler<RoleRemovePermissionCommand>
 {

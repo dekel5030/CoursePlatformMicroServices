@@ -6,7 +6,7 @@ using Domain.Roles.Errors;
 using Kernel;
 using Kernel.Auth.AuthTypes;
 
-namespace Application.Roles.Commands.RemovePermissionsFromRole;
+namespace Application.Roles.Commands.RoleRemovePermissions;
 
 public class RoleRemovePermissionsCommandHandler : ICommandHandler<RoleRemovePermissionsCommand>
 {

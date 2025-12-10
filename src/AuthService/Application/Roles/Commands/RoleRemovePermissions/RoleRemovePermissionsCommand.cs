@@ -1,13 +1,7 @@
 using Application.Abstractions.Messaging;
 
-namespace Application.Roles.Commands.RemovePermissionsFromRole;
+namespace Application.Roles.Commands.RoleRemovePermissions;
 
-public record RemovePermissionsFromRoleCommand(
+public record RoleRemovePermissionsCommand(
     Guid RoleId,
     List<PermissionDto> Permissions) : ICommand;
-
-public record PermissionDto(
-    string Effect,
-    string Action,
-    string Resource,
-    string? ResourceId = null);

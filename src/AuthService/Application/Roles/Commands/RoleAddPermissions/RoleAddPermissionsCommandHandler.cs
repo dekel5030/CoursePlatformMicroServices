@@ -1,10 +1,8 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Permissions;
-using Domain.Roles;
 using Domain.Roles.Errors;
 using Kernel;
-using Kernel.Auth.AuthTypes;
 
 namespace Application.Roles.Commands.AddPermissionsToRole;
 
@@ -12,7 +10,6 @@ public class AddPermissionsToRoleCommandHandler : ICommandHandler<RoleAddPermiss
 {
     private readonly IWriteDbContext _writeDbContext;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly string _wildcard = ResourceId.Wildcard.Value;
 
     public AddPermissionsToRoleCommandHandler(
         IUnitOfWork unitOfWork,
@@ -41,7 +38,7 @@ public class AddPermissionsToRoleCommandHandler : ICommandHandler<RoleAddPermiss
                 permissionDto.Effect, 
                 permissionDto.Action, 
                 permissionDto.Resource, 
-                permissionDto.ResourceId ?? _wildcard);
+                permissionDto.ResourceId);
 
             if (permissionParseResult.IsFailure)
             {

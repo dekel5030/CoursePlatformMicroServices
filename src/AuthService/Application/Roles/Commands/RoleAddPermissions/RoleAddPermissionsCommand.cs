@@ -1,13 +1,7 @@
 using Application.Abstractions.Messaging;
 
-namespace Application.Roles.Commands.AddPermissionsToRole;
+namespace Application.Roles.Commands.RoleAddPermissions;
 
-public record AddPermissionsToRoleCommand(
+public record RoleAddPermissionsCommand(
     Guid RoleId,
     List<PermissionDto> Permissions) : ICommand;
-
-public record PermissionDto(
-    string Effect,
-    string Action,
-    string Resource,
-    string? ResourceId = null);
