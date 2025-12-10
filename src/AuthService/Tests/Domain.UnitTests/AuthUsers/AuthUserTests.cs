@@ -506,6 +506,213 @@ public class AuthUserTests
 
     #endregion
 
+    #region AddPermissions (Batch) Tests
+
+    /// <summary>
+    /// Verifies that AddPermissions successfully adds multiple permissions at once.
+    /// </summary>
+    [Fact]
+    public void AddPermissions_WithMultipleValidPermissions_ShouldReturnSuccess()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permissions = new[]
+        {
+            Permission.CreateForRole(ActionType.Read, ResourceType.Course, ResourceId.Create("course-123")),
+            Permission.CreateForRole(ActionType.Update, ResourceType.User, ResourceId.Create("user-456")),
+            Permission.CreateForRole(ActionType.Delete, ResourceType.Lesson, ResourceId.Create("lesson-789"))
+        };
+
+        // Act
+        var result = user.AddPermissions(permissions);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.Permissions.Should().HaveCount(3);
+        user.Permissions.Should().Contain(permissions);
+    }
+
+    /// <summary>
+    /// Verifies that AddPermissions raises a single UserPermissionsUpdatedDomainEvent.
+    /// </summary>
+    [Fact]
+    public void AddPermissions_ShouldRaiseSingleUserPermissionsUpdatedDomainEvent()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        user.ClearDomainEvents();
+        var permissions = new[]
+        {
+            Permission.CreateForRole(ActionType.Read, ResourceType.Course, ResourceId.Create("course-123")),
+            Permission.CreateForRole(ActionType.Update, ResourceType.User, ResourceId.Create("user-456")),
+            Permission.CreateForRole(ActionType.Delete, ResourceType.Lesson, ResourceId.Create("lesson-789"))
+        };
+
+        // Act
+        user.AddPermissions(permissions);
+
+        // Assert
+        user.DomainEvents.Should().ContainSingle(e => e is UserPermissionsUpdatedDomainEvent);
+        var domainEvent = user.DomainEvents.OfType<UserPermissionsUpdatedDomainEvent>().First();
+        domainEvent.User.Should().Be(user);
+        domainEvent.AddedPermissions.Should().HaveCount(3);
+        domainEvent.RemovedPermissions.Should().BeEmpty();
+    }
+
+    /// <summary>
+    /// Verifies that AddPermissions skips duplicate permissions.
+    /// </summary>
+    [Fact]
+    public void AddPermissions_WithDuplicatePermissions_ShouldSkipDuplicates()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permission1 = Permission.CreateForRole(ActionType.Read, ResourceType.Course, ResourceId.Create("course-123"));
+        user.AddPermission(permission1);
+        user.ClearDomainEvents();
+
+        var permissions = new[]
+        {
+            permission1, // duplicate
+            Permission.CreateForRole(ActionType.Update, ResourceType.User, ResourceId.Create("user-456"))
+        };
+
+        // Act
+        var result = user.AddPermissions(permissions);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.Permissions.Should().HaveCount(2);
+        var domainEvent = user.DomainEvents.OfType<UserPermissionsUpdatedDomainEvent>().FirstOrDefault();
+        domainEvent?.AddedPermissions.Should().HaveCount(1);
+    }
+
+    /// <summary>
+    /// Verifies that AddPermissions doesn't raise event when no permissions are added.
+    /// </summary>
+    [Fact]
+    public void AddPermissions_WithAllDuplicates_ShouldNotRaiseEvent()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permission = Permission.CreateForRole(ActionType.Read, ResourceType.Course, ResourceId.Create("course-123"));
+        user.AddPermission(permission);
+        user.ClearDomainEvents();
+
+        // Act
+        user.AddPermissions(new[] { permission });
+
+        // Assert
+        user.DomainEvents.Should().BeEmpty();
+    }
+
+    #endregion
+
+    #region RemovePermissions (Batch) Tests
+
+    /// <summary>
+    /// Verifies that RemovePermissions successfully removes multiple permissions at once.
+    /// </summary>
+    [Fact]
+    public void RemovePermissions_WithMultipleExistingPermissions_ShouldReturnSuccess()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permissions = new[]
+        {
+            Permission.CreateForRole(ActionType.Read, ResourceType.Course, ResourceId.Create("course-123")),
+            Permission.CreateForRole(ActionType.Update, ResourceType.User, ResourceId.Create("user-456")),
+            Permission.CreateForRole(ActionType.Delete, ResourceType.Lesson, ResourceId.Create("lesson-789"))
+        };
+        user.AddPermissions(permissions);
+        user.ClearDomainEvents();
+
+        // Act
+        var result = user.RemovePermissions(permissions);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.Permissions.Should().BeEmpty();
+    }
+
+    /// <summary>
+    /// Verifies that RemovePermissions raises a single UserPermissionsUpdatedDomainEvent.
+    /// </summary>
+    [Fact]
+    public void RemovePermissions_ShouldRaiseSingleUserPermissionsUpdatedDomainEvent()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permissions = new[]
+        {
+            Permission.CreateForRole(ActionType.Read, ResourceType.Course, ResourceId.Create("course-123")),
+            Permission.CreateForRole(ActionType.Update, ResourceType.User, ResourceId.Create("user-456"))
+        };
+        user.AddPermissions(permissions);
+        user.ClearDomainEvents();
+
+        // Act
+        user.RemovePermissions(permissions);
+
+        // Assert
+        user.DomainEvents.Should().ContainSingle(e => e is UserPermissionsUpdatedDomainEvent);
+        var domainEvent = user.DomainEvents.OfType<UserPermissionsUpdatedDomainEvent>().First();
+        domainEvent.User.Should().Be(user);
+        domainEvent.RemovedPermissions.Should().HaveCount(2);
+        domainEvent.AddedPermissions.Should().BeEmpty();
+    }
+
+    /// <summary>
+    /// Verifies that RemovePermissions skips non-existing permissions.
+    /// </summary>
+    [Fact]
+    public void RemovePermissions_WithNonExistingPermissions_ShouldSkipNonExisting()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        var permission1 = Permission.CreateForRole(ActionType.Read, ResourceType.Course, ResourceId.Create("course-123"));
+        user.AddPermission(permission1);
+        user.ClearDomainEvents();
+
+        var permissions = new[]
+        {
+            permission1,
+            Permission.CreateForRole(ActionType.Update, ResourceType.User, ResourceId.Create("user-456")) // doesn't exist
+        };
+
+        // Act
+        var result = user.RemovePermissions(permissions);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.Permissions.Should().BeEmpty();
+        var domainEvent = user.DomainEvents.OfType<UserPermissionsUpdatedDomainEvent>().FirstOrDefault();
+        domainEvent?.RemovedPermissions.Should().HaveCount(1);
+    }
+
+    /// <summary>
+    /// Verifies that RemovePermissions doesn't raise event when no permissions are removed.
+    /// </summary>
+    [Fact]
+    public void RemovePermissions_WithAllNonExisting_ShouldNotRaiseEvent()
+    {
+        // Arrange
+        var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
+        user.ClearDomainEvents();
+        var permissions = new[]
+        {
+            Permission.CreateForRole(ActionType.Read, ResourceType.Course, ResourceId.Create("course-123"))
+        };
+
+        // Act
+        user.RemovePermissions(permissions);
+
+        // Assert
+        user.DomainEvents.Should().BeEmpty();
+    }
+
+    #endregion
+
     #region Roles Collection Tests
 
     /// <summary>
