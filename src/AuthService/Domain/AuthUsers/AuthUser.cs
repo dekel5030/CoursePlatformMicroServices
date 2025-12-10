@@ -88,27 +88,14 @@ public class AuthUser : Entity
 
     public Result AddPermissions(IEnumerable<Permission> permissions)
     {
-        var errors = new List<Error>();
-
         foreach (var permission in permissions)
         {
-            if (_permissions.Contains(permission))
+            if (!_permissions.Contains(permission))
             {
-                errors.Add(AuthUserErrors.PermissionAlreadyExistsWithValue(permission.ToString()));
+                _permissions.Add(permission);
+                Raise(new UserPermissionAddedDomainEvent(this, permission));
             }
         }
-
-        if (errors.Any())
-        {
-            return Result.Failure(new ValidationError(errors));
-        }
-
-        foreach (var permission in permissions)
-        {
-            _permissions.Add(permission);
-            Raise(new UserPermissionAddedDomainEvent(this, permission));
-        }
-
         return Result.Success();
     }
 
