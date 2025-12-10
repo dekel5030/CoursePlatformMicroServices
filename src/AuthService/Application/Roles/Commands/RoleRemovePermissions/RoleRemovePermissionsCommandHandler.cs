@@ -1,10 +1,9 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Permissions;
-using Domain.Roles;
 using Domain.Roles.Errors;
 using Kernel;
-using Kernel.Auth.AuthTypes;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Roles.Commands.RoleRemovePermissions;
 
@@ -12,7 +11,6 @@ public class RoleRemovePermissionsCommandHandler : ICommandHandler<RoleRemovePer
 {
     private readonly IWriteDbContext _writeDbContext;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly string _wildcard = ResourceId.Wildcard.Value;
 
     public RoleRemovePermissionsCommandHandler(
         IUnitOfWork unitOfWork,
@@ -26,7 +24,9 @@ public class RoleRemovePermissionsCommandHandler : ICommandHandler<RoleRemovePer
         RoleRemovePermissionsCommand request, 
         CancellationToken cancellationToken = default)
     {
-        var role = await _writeDbContext.Roles.FindAsync(request.RoleId, cancellationToken);
+        var role = await _writeDbContext.Roles
+                    .Include(r => r.Permissions)
+                    .FirstOrDefaultAsync(r => r.Id == request.RoleId, cancellationToken);
 
         if (role is null)
         {
@@ -34,6 +34,7 @@ public class RoleRemovePermissionsCommandHandler : ICommandHandler<RoleRemovePer
         }
 
         var permissions = new List<Permission>();
+        var errors = new List<Error>();
 
         foreach (var permissionDto in request.Permissions)
         {
@@ -41,14 +42,21 @@ public class RoleRemovePermissionsCommandHandler : ICommandHandler<RoleRemovePer
                 permissionDto.Effect, 
                 permissionDto.Action, 
                 permissionDto.Resource, 
-                permissionDto.ResourceId ?? _wildcard);
+                permissionDto.ResourceId);
 
             if (permissionParseResult.IsFailure)
             {
-                return permissionParseResult;
+                errors.Add(permissionParseResult.Error);
             }
+            else
+            {
+                permissions.Add(permissionParseResult.Value);
+            }
+        }
 
-            permissions.Add(permissionParseResult.Value);
+        if (errors.Count > 0)
+        {
+            return Result.Failure(new ValidationError(errors));
         }
 
         var permissionRemoveResult = role.RemovePermissions(permissions);
