@@ -12,11 +12,11 @@ public class AddRolePermission : IEndpoint
     {
         app.MapPost("roles/{roleId:guid}/permissions", async (
             Guid roleId,
-            AddRolePermissionRequestDto request,
-            ICommandHandler<AddRolePermissionCommand> handler,
+            RoleAddPermissionRequestDto request,
+            ICommandHandler<RoleAddPermissionCommand> handler,
             CancellationToken cancellationToken) =>
         {
-            var command = new AddRolePermissionCommand(
+            var command = new RoleAddPermissionCommand(
                 roleId,
                 request.Effect,
                 request.Action,

@@ -39,8 +39,8 @@ public static class DependencyInjection
         services.AddScoped<ICommandHandler<LoginUserCommand, CurrentUserDto>, LoginUserCommandHandler>();
         services.AddScoped<ICommandHandler<LogoutCommand>, LogoutCommandHandler>();
         services.AddScoped<ICommandHandler<CreateRoleCommand, CreateRoleResponseDto>, CreateRoleCommandHandler>();
-        services.AddScoped<ICommandHandler<AddRolePermissionCommand>, AddRolePermissionCommandHandler>();
-        services.AddScoped<ICommandHandler<RemoveRolePermissionCommand>, RemoveRolePermissionCommandHandler>();
+        services.AddScoped<ICommandHandler<RoleAddPermissionCommand>, RoleAddPermissionCommandHandler>();
+        services.AddScoped<ICommandHandler<RoleRemovePermissionCommand>, RoleRemovePermissionCommandHandler>();
         
         services.AddScoped<ICommandHandler<UserAddRoleCommand>, UserAddRoleCommandHandler>();
         services.AddScoped<ICommandHandler<UserRemoveRoleCommand>, UserRemoveRoleCommandHandler>();

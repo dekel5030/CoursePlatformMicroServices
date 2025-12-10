@@ -19,14 +19,14 @@ public class RemoveRolePermissionCommandHandlerTests
 {
     private readonly Mock<IWriteDbContext> _dbContextMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly RemoveRolePermissionCommandHandler _handler;
+    private readonly RoleRemovePermissionCommandHandler _handler;
 
     public RemoveRolePermissionCommandHandlerTests()
     {
         _dbContextMock = new Mock<IWriteDbContext>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
 
-        _handler = new RemoveRolePermissionCommandHandler(_dbContextMock.Object, _unitOfWorkMock.Object);
+        _handler = new RoleRemovePermissionCommandHandler(_dbContextMock.Object, _unitOfWorkMock.Object);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class RemoveRolePermissionCommandHandlerTests
         // Create permission using constructor with proper enum types - must match the command exactly
         var permission = new Permission(EffectType.Allow, ActionType.Read, ResourceType.Course, ResourceId.Wildcard);
         role.AddPermission(permission);
-        var command = new RemoveRolePermissionCommand(role.Id, "allow", "read", "Course", "*");
+        var command = new RoleRemovePermissionCommand(role.Id, "allow", "read", "Course", "*");
 
         _dbContextMock.Setup(x => x.Roles)
             .Returns(TestHelpers.CreateMockDbSet(new List<Role> { role }).Object);
@@ -51,7 +51,7 @@ public class RemoveRolePermissionCommandHandlerTests
     [Fact]
     public async Task Handle_WhenRoleNotFound_ShouldReturnNotFoundError()
     {
-        var command = new RemoveRolePermissionCommand(Guid.NewGuid(), "allow", "read", "Course", "*");
+        var command = new RoleRemovePermissionCommand(Guid.NewGuid(), "allow", "read", "Course", "*");
 
         _dbContextMock.Setup(x => x.Roles)
             .Returns(TestHelpers.CreateMockDbSet(new List<Role>()).Object);
@@ -65,7 +65,7 @@ public class RemoveRolePermissionCommandHandlerTests
     [Fact]
     public async Task Handle_WithInvalidPermission_ShouldReturnFailure()
     {
-        var command = new RemoveRolePermissionCommand(Guid.NewGuid(), "invalid_effect", "read", "Course", "*");
+        var command = new RoleRemovePermissionCommand(Guid.NewGuid(), "invalid_effect", "read", "Course", "*");
 
         var result = await _handler.Handle(command, CancellationToken.None);
 

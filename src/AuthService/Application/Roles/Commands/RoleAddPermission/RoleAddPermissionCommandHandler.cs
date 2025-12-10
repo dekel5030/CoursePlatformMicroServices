@@ -7,7 +7,7 @@ using Kernel.Auth.AuthTypes;
 
 namespace Application.Roles.Commands.AddRolePermission;
 
-public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermissionCommand>
+public class AddRolePermissionCommandHandler : ICommandHandler<RoleAddPermissionCommand>
 {
     private readonly IWriteDbContext _writeDbContext;
     private readonly IUnitOfWork _unitOfWork;
@@ -22,7 +22,7 @@ public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermission
     }
 
     public async Task<Result> Handle(
-        AddRolePermissionCommand request, 
+        RoleAddPermissionCommand request, 
         CancellationToken cancellationToken = default)
     {
         var role = await _writeDbContext.Roles.FindAsync(request.RoleId, cancellationToken);

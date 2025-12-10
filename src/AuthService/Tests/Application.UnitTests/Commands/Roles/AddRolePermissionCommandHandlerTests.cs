@@ -19,21 +19,21 @@ public class AddRolePermissionCommandHandlerTests
 {
     private readonly Mock<IWriteDbContext> _dbContextMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly AddRolePermissionCommandHandler _handler;
+    private readonly RoleAddPermissionCommandHandler _handler;
 
     public AddRolePermissionCommandHandlerTests()
     {
         _dbContextMock = new Mock<IWriteDbContext>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
 
-        _handler = new AddRolePermissionCommandHandler(_unitOfWorkMock.Object, _dbContextMock.Object);
+        _handler = new RoleAddPermissionCommandHandler(_unitOfWorkMock.Object, _dbContextMock.Object);
     }
 
     [Fact]
     public async Task Handle_WithValidRoleAndPermission_ShouldAddPermissionSuccessfully()
     {
         var role = Role.Create("Admin").Value;
-        var command = new AddRolePermissionCommand(role.Id, "allow", "read", "Course", "*");
+        var command = new RoleAddPermissionCommand(role.Id, "allow", "read", "Course", "*");
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(role.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(role);
@@ -49,7 +49,7 @@ public class AddRolePermissionCommandHandlerTests
     [Fact]
     public async Task Handle_WhenRoleNotFound_ShouldReturnNotFoundError()
     {
-        var command = new AddRolePermissionCommand(Guid.NewGuid(), "allow", "read", "Course", "*");
+        var command = new RoleAddPermissionCommand(Guid.NewGuid(), "allow", "read", "Course", "*");
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Role?)null);
@@ -64,7 +64,7 @@ public class AddRolePermissionCommandHandlerTests
     public async Task Handle_WithInvalidPermission_ShouldReturnFailure()
     {
         var role = Role.Create("Admin").Value;
-        var command = new AddRolePermissionCommand(role.Id, "invalid_effect", "read", "Course", "*");
+        var command = new RoleAddPermissionCommand(role.Id, "invalid_effect", "read", "Course", "*");
 
         _dbContextMock.Setup(x => x.Roles.FindAsync(role.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(role);

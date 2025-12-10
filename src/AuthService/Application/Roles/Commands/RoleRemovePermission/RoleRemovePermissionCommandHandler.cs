@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Roles.Commands.RemoveRolePermission;
 
-public class RemoveRolePermissionCommandHandler : ICommandHandler<RemoveRolePermissionCommand>
+public class RemoveRolePermissionCommandHandler : ICommandHandler<RoleRemovePermissionCommand>
 {
     private readonly IWriteDbContext _dbContext;
     private readonly IUnitOfWork _unitOfWork;
@@ -23,7 +23,7 @@ public class RemoveRolePermissionCommandHandler : ICommandHandler<RemoveRolePerm
     }
 
     public async Task<Result> Handle(
-        RemoveRolePermissionCommand request, 
+        RoleRemovePermissionCommand request, 
         CancellationToken cancellationToken = default)
     {
         var permissionResult = Permission.Parse(
