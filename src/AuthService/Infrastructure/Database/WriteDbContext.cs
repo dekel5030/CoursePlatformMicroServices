@@ -1,5 +1,6 @@
 using Application.Abstractions.Data;
 using Domain.AuthUsers;
+using Domain.Permissions;
 using Domain.Roles;
 using Infrastructure.DomainEvents;
 using Infrastructure.Identity;
@@ -18,6 +19,7 @@ public class WriteDbContext
 
     public DbSet<AuthUser> DomainUsers { get; set; }
     public DbSet<Role> DomainRoles { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
 
     DbSet<Role> IWriteDbContext.Roles => DomainRoles;
 

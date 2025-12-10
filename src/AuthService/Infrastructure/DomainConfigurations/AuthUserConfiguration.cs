@@ -1,4 +1,5 @@
-﻿using Domain.AuthUsers;
+using Domain.AuthUsers;
+using Domain.Permissions;
 using Domain.Roles;
 using Kernel.Auth.AuthTypes;
 using Microsoft.EntityFrameworkCore;
@@ -23,17 +24,10 @@ internal sealed class AuthUserConfiguration : IEntityTypeConfiguration<AuthUser>
                 u => u.HasOne<AuthUser>().WithMany().HasForeignKey("UserId")
             );
 
-
-        user.OwnsMany(u => u.Permissions, permissionBuilder =>
-        {
-            permissionBuilder.ToJson();
-            permissionBuilder.Property(p => p.Effect).HasMaxLength(50);
-            permissionBuilder.Property(p => p.Action).HasMaxLength(100);
-            permissionBuilder.Property(p => p.Resource).HasMaxLength(100);
-
-            permissionBuilder.Property(p => p.ResourceId)
-                .HasConversion(id => id.Value, val => ResourceId.Create(val));
-        });
+        user.HasMany(u => u.Permissions)
+            .WithOne()
+            .HasForeignKey("AuthUserId")
+            .OnDelete(DeleteBehavior.Cascade);
 
         user.Ignore(u => u.DomainEvents);
     }
