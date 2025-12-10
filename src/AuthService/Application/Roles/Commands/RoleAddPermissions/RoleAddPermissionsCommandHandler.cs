@@ -1,19 +1,18 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.Roles.Commands.RoleAddPermissions;
 using Domain.Permissions;
 using Domain.Roles.Errors;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Roles.Commands.AddPermissionsToRole;
+namespace Application.Roles.Commands.RoleAddPermissions;
 
-public class AddPermissionsToRoleCommandHandler : ICommandHandler<RoleAddPermissionsCommand>
+public class RoleAddPermissionsCommandHandler : ICommandHandler<RoleAddPermissionsCommand>
 {
     private readonly IWriteDbContext _writeDbContext;
     private readonly IUnitOfWork _unitOfWork;
 
-    public AddPermissionsToRoleCommandHandler(
+    public RoleAddPermissionsCommandHandler(
         IUnitOfWork unitOfWork,
         IWriteDbContext writeDbContext)
     {

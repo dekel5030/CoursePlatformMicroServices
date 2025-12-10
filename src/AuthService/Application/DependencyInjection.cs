@@ -8,9 +8,9 @@ using Application.AuthUsers.Commands.UserRemovePermission;
 using Application.AuthUsers.Commands.UserRemoveRole;
 using Application.AuthUsers.Dtos;
 using Application.AuthUsers.Queries.GetCurrentUser;
-using Application.Roles.Commands.AddRolePermission;
 using Application.Roles.Commands.CreateRole;
-using Application.Roles.Commands.RemoveRolePermission;
+using Application.Roles.Commands.RoleAddPermission;
+using Application.Roles.Commands.RoleRemovePermission;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;

@@ -7,13 +7,13 @@ using Kernel.Auth.AuthTypes;
 
 namespace Application.Roles.Commands.RoleAddPermission;
 
-public class AddRolePermissionCommandHandler : ICommandHandler<RoleAddPermissionCommand>
+public class RoleAddPermissionCommandHandler : ICommandHandler<RoleAddPermissionCommand>
 {
     private readonly IWriteDbContext _writeDbContext;
     private readonly IUnitOfWork _unitOfWork;
     private readonly string _wildcard = ResourceId.Wildcard.Value;
 
-    public AddRolePermissionCommandHandler(
+    public RoleAddPermissionCommandHandler(
         IUnitOfWork unitOfWork,
         IWriteDbContext writeDbContext)
     {
