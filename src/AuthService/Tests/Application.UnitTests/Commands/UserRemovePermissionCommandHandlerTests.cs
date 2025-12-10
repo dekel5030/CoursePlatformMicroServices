@@ -40,8 +40,8 @@ public class UserRemovePermissionCommandHandlerTests
         var role = Role.Create("User").Value;
         var user = AuthUser.Create("test@example.com", "testuser", role).Value;
         
-        // Create permission using constructor with proper enum types - must match the command exactly
-        var permission = new Permission(EffectType.Allow, ActionType.Read, ResourceType.Course, ResourceId.Wildcard);
+        // Create permission using Parse method
+        var permission = Permission.Parse("allow", "read", "Course", "*").Value;
         user.AddPermission(permission);
 
         var command = new UserRemovePermissionCommand(
@@ -137,18 +137,14 @@ public class UserRemovePermissionCommandHandlerTests
     /// The Include(u => u.Permissions) in the handler doesn't work properly with mocked DbSets,
     /// so this test may not accurately reflect production behavior.
     /// </summary>
-    [Fact] // дешгъй аъ д-Skip, диси джд йтбеш тлщйе
+    [Fact] // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅ-Skip, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     public async Task Handle_WhenPermissionDoesNotExist_ShouldReturnSuccess()
     {
         // Arrange
         var role = Role.Create("User").Value;
         var user = AuthUser.Create("test@example.com", "testuser", role).Value;
 
-        var existingPermission = new Permission(
-            EffectType.Allow,
-            ActionType.Read,
-            ResourceType.Course,
-            ResourceId.Create("123")); 
+        var existingPermission = Permission.Parse("allow", "read", "Course", "123").Value;
 
         user.AddPermission(existingPermission);
 
@@ -223,8 +219,8 @@ public class UserRemovePermissionCommandHandlerTests
         var role = Role.Create("User").Value;
         var user = AuthUser.Create("test@example.com", "testuser", role).Value;
         
-        // Create permission using constructor with proper enum types
-        var permission = new Permission(EffectType.Allow, ActionType.Read, ResourceType.Course, ResourceId.Wildcard);
+        // Create permission using Parse method
+        var permission = Permission.Parse("allow", "read", "Course", "*").Value;
         user.AddPermission(permission);
         
         var cancellationToken = new CancellationToken();

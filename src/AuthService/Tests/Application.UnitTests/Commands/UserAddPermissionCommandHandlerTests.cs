@@ -137,8 +137,8 @@ public class UserAddPermissionCommandHandlerTests
         var role = Role.Create("User").Value;
         var user = AuthUser.Create("test@example.com", "testuser", role).Value;
         
-        // Create permission using constructor with proper enum types - must match the command exactly
-        var permission = new Permission(EffectType.Allow, ActionType.Read, ResourceType.Course, ResourceId.Wildcard);
+        // Create permission using Parse method
+        var permission = Permission.Parse("allow", "read", "Course", "*").Value;
         user.AddPermission(permission);
 
         var command = new UserAddPermissionCommand(

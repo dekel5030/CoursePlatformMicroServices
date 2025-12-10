@@ -33,8 +33,8 @@ public class RemoveRolePermissionCommandHandlerTests
     public async Task Handle_WithValidRoleAndPermission_ShouldRemovePermissionSuccessfully()
     {
         var role = Role.Create("Admin").Value;
-        // Create permission using constructor with proper enum types - must match the command exactly
-        var permission = new Permission(EffectType.Allow, ActionType.Read, ResourceType.Course, ResourceId.Wildcard);
+        // Create permission using Parse method
+        var permission = Permission.Parse("allow", "read", "Course", "*").Value;
         role.AddPermission(permission);
         var command = new RemoveRolePermissionCommand(role.Id, "allow", "read", "Course", "*");
 
