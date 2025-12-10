@@ -3,6 +3,7 @@ using Domain.AuthUsers;
 using Domain.Roles;
 using Infrastructure.DomainEvents;
 using Infrastructure.Identity;
+using Infrastructure.Redis.EventCollector;
 using MassTransit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ public class WriteDbContext
     : IdentityDbContext<ApplicationIdentityUser, ApplicationIdentityRole, Guid>, IWriteDbContext, IUnitOfWork
 {
     private readonly IDomainEventsDispatcher _domainEventsDispatcher;
+    private readonly IRoleEventsCollector _roleEventsCollector;
 
     public DbSet<AuthUser> DomainUsers { get; set; }
     public DbSet<Role> DomainRoles { get; set; }
@@ -24,9 +26,11 @@ public class WriteDbContext
 
     public WriteDbContext(
         DbContextOptions<WriteDbContext> options,
-        IDomainEventsDispatcher domainEventsDispatcher) : base(options)
+        IDomainEventsDispatcher domainEventsDispatcher,
+        IRoleEventsCollector roleEventsCollector) : base(options)
     {
         _domainEventsDispatcher = domainEventsDispatcher;
+        _roleEventsCollector = roleEventsCollector;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -40,6 +44,9 @@ public class WriteDbContext
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         await DispatchDomainEvents(this, cancellationToken);
+
+        await _roleEventsCollector.FlushAsync(cancellationToken);
+
         return await base.SaveChangesAsync(cancellationToken);
     }
 
