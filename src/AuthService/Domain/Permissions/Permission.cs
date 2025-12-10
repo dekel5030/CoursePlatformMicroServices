@@ -19,15 +19,15 @@ public record Permission(
     {
         if (PermissionParser.TryParseEffect(effectSegment, out var effect) == false)
         {
-            return Result<Permission>.Failure(PermissionErrors.InvalidAction);
+            return Result<Permission>.Failure(PermissionErrors.InvalidEffectWithValue(effectSegment));
         }
         if (PermissionParser.TryParseAction(actionSegment, out var action) == false)
         {
-            return Result<Permission>.Failure(PermissionErrors.InvalidAction);
+            return Result<Permission>.Failure(PermissionErrors.InvalidActionWithValue(actionSegment));
         }
         if (PermissionParser.TryParseResource(resourceSegment, out var resource) == false)
         {
-            return Result<Permission>.Failure(PermissionErrors.InvalidResource);
+            return Result<Permission>.Failure(PermissionErrors.InvalidResourceWithValue(resourceSegment));
         }
 
         ResourceId resourceId = ResourceId.Create(resourceIdSegment);
