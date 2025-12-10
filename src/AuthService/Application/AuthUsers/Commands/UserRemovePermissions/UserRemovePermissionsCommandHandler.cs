@@ -37,6 +37,7 @@ public class UserRemovePermissionsCommandHandler : ICommandHandler<UserRemovePer
         }
 
         var permissions = new List<Permission>();
+        var errors = new List<Error>();
 
         foreach (var permissionDto in request.Permissions)
         {
@@ -48,10 +49,17 @@ public class UserRemovePermissionsCommandHandler : ICommandHandler<UserRemovePer
 
             if (permissionResult.IsFailure)
             {
-                return Result.Failure(permissionResult.Error);
+                errors.Add(permissionResult.Error);
             }
+            else
+            {
+                permissions.Add(permissionResult.Value);
+            }
+        }
 
-            permissions.Add(permissionResult.Value);
+        if (errors.Count > 0)
+        {
+            return Result.Failure(new ValidationError(errors));
         }
 
         Result removePermissionsResult = user.RemovePermissions(permissions);
