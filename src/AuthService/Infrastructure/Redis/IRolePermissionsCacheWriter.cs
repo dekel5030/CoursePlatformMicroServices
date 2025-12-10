@@ -1,4 +1,5 @@
 ﻿namespace Infrastructure.Redis;
+
 public interface IRolePermissionsCacheWriter
 {
     Task UpdateAsync(

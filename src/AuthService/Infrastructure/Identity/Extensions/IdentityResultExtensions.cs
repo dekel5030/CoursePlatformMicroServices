@@ -1,7 +1,7 @@
 ﻿using Kernel;
 using Microsoft.AspNetCore.Identity;
 
-namespace Application.Extensions;
+namespace Infrastructure.Identity.Extensions;
 
 public static class IdentityResultExtensions
 {
