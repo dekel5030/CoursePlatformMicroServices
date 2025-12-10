@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
+using Auth.Contracts.Redis.Events;
 using Domain.Roles.Events;
-using Infrastructure.Redis.EventCollector;
 
 namespace Infrastructure.Redis.EventHandlers;
 
@@ -9,11 +9,11 @@ internal class RoleCacheInvalidationHandler :
     IDomainEventHandler<RolePermissionAddedDomainEvent>,
     IDomainEventHandler<RolePermissionRemovedDomainEvent>
 {
-    private readonly IRoleEventsCollector _collector;
+    private readonly IEventPublisher _publisher;
 
-    public RoleCacheInvalidationHandler(IRoleEventsCollector roleEventsCollector)
+    public RoleCacheInvalidationHandler(IEventPublisher publisher)
     {
-        _collector = roleEventsCollector;
+        _publisher = publisher;
     }
 
     public Task Handle(
@@ -41,7 +41,8 @@ internal class RoleCacheInvalidationHandler :
         string roleName,
         CancellationToken cancellationToken = default)
     {
-        _collector.MarkRoleForRefresh(roleName);
-        return Task.CompletedTask;
+        return _publisher.PublishAsync(
+            new RolePermissionsChangedEvent(roleName),
+            cancellationToken);
     }
 }

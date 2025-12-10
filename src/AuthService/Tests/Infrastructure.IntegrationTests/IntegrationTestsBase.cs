@@ -1,12 +1,15 @@
 using DotNet.Testcontainers.Builders;
 using Infrastructure.Database;
 using MassTransit;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
+using Testcontainers.Redis;
 using Xunit;
 
 namespace Infrastructure.IntegrationTests;
@@ -19,6 +22,7 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgres;
     private readonly RabbitMqContainer _rabbitMq;
+    private readonly RedisContainer _redis;
 
     protected WebApplicationFactory<Program> Factory { get; private set; } = null!;
     protected HttpClient Client { get; private set; } = null!;
@@ -39,12 +43,16 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
             //.WithPortBinding(5674, 5672)
             //.WithPortBinding(15674, 15672)
             .Build();
+
+        _redis = new RedisBuilder()
+            .Build();
     }
 
     public async Task InitializeAsync()
     {
         await _postgres.StartAsync();
         await _rabbitMq.StartAsync();
+        await _redis.StartAsync();
 
         Factory = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
@@ -56,6 +64,7 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
                         ["ConnectionStrings:WriteDatabase"] = _postgres.GetConnectionString(),
                         ["ConnectionStrings:ReadDatabase"] = _postgres.GetConnectionString(),
                         ["ConnectionStrings:RabbitMq"] = _rabbitMq.GetConnectionString(),
+                        ["ConnectionStrings:redis"] = _redis.GetConnectionString()
                     };
 
                     config.AddInMemoryCollection(dict);
@@ -82,6 +91,7 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
         await _postgres.DisposeAsync();
         await _rabbitMq.DisposeAsync();
         await Factory.DisposeAsync();
+        await _redis.DisposeAsync();
     }
 
     /// <summary>
