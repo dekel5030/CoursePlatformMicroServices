@@ -6,24 +6,19 @@ using Kernel;
 
 namespace Auth.Api.Endpoints.Roles;
 
-public class AddPermissionsToRole : IEndpoint
+public class RoleAddPermissions : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("roles/{roleId:guid}/permissions/batch", async (
             Guid roleId,
-            AddPermissionsToRoleRequestDto request,
+            RoleAddPermissionsRequestDto request,
             ICommandHandler<RoleAddPermissionsCommand> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new RoleAddPermissionsCommand(
                 roleId,
-                request.Permissions.Select(p => new Application.Roles.Commands.AddPermissionsToRole.PermissionDto(
-                    p.Effect,
-                    p.Action,
-                    p.Resource,
-                    p.ResourceId
-                )).ToList()
+                request.Permissions
             );
 
             Result result = await handler.Handle(command, cancellationToken);
@@ -40,11 +35,3 @@ public class AddPermissionsToRole : IEndpoint
         .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }
-
-public record AddPermissionsToRoleRequestDto(List<RolePermissionItemDto> Permissions);
-
-public record RolePermissionItemDto(
-    string Effect,
-    string Action,
-    string Resource,
-    string? ResourceId = null);
