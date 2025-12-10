@@ -42,4 +42,14 @@ public record Permission(
     {
         return new Permission(EffectType.Allow, action, resource, resourceId);
     }
+
+    public override string ToString()
+    {
+        string effectString = Effect.ToString().ToLower();
+        string actionString = Action.ToString().ToLower();
+        string resourceString = Resource.ToString().ToLower();
+        string resourceIdString = ResourceId.ToString();
+
+        return $"{effectString}:{actionString}:{resourceString}:{resourceIdString}";
+    }
 };

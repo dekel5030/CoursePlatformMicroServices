@@ -88,20 +88,25 @@ public class AuthUser : Entity
 
     public Result AddPermissions(IEnumerable<Permission> permissions)
     {
-        var permissionsToAdd = new List<Permission>();
+        IEnumerable<Error> errors = Enumerable.Empty<Error>();
 
         foreach (var permission in permissions)
         {
-            if (!_permissions.Contains(permission))
+            if (_permissions.Contains(permission))
             {
-                _permissions.Add(permission);
-                permissionsToAdd.Add(permission);
+                errors = errors.Append(AuthUserErrors.PermissionAlreadyExistsWithValue(permission.ToString()));
             }
         }
 
-        if (permissionsToAdd.Count > 0)
+        if (errors.Any())
         {
-            Raise(new UserPermissionsUpdatedDomainEvent(this, permissionsToAdd, Array.Empty<Permission>()));
+            return Result.Failure(new ValidationError(errors));
+        }
+
+        foreach (var permission in permissions)
+        {
+            _permissions.Add(permission);
+            Raise(new UserPermissionAddedDomainEvent(this, permission));
         }
 
         return Result.Success();
@@ -109,19 +114,13 @@ public class AuthUser : Entity
 
     public Result RemovePermissions(IEnumerable<Permission> permissions)
     {
-        var permissionsToRemove = new List<Permission>();
-
         foreach (var permission in permissions)
         {
-            if (_permissions.Remove(permission))
+            Result result = RemovePermission(permission);
+            if (result.IsFailure)
             {
-                permissionsToRemove.Add(permission);
+                return result;
             }
-        }
-
-        if (permissionsToRemove.Count > 0)
-        {
-            Raise(new UserPermissionsUpdatedDomainEvent(this, Array.Empty<Permission>(), permissionsToRemove));
         }
 
         return Result.Success();
