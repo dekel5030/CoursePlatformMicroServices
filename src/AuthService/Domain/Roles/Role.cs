@@ -65,25 +65,23 @@ public class Role : Entity
 
     public Result AddPermissions(IEnumerable<Permission> permissions)
     {
-        var permissionsToAdd = new List<Permission>();
+        List<Permission > permissionList = permissions.ToList();
 
-        foreach (var permission in permissions)
+        foreach (var permission in permissionList)
         {
             if (permission.Effect != EffectType.Allow)
             {
                 return Result.Failure(RoleErrors.InvalidPermissionEffect);
             }
+        }
 
+        foreach (var permission in permissionList)
+        {
             if (!_permissions.Contains(permission))
             {
                 _permissions.Add(permission);
-                permissionsToAdd.Add(permission);
+                Raise(new RolePermissionAddedDomainEvent(this, permission));
             }
-        }
-
-        if (permissionsToAdd.Count > 0)
-        {
-            Raise(new RolePermissionsUpdatedDomainEvent(this, permissionsToAdd, Array.Empty<Permission>()));
         }
 
         return Result.Success();
@@ -91,19 +89,12 @@ public class Role : Entity
 
     public Result RemovePermissions(IEnumerable<Permission> permissions)
     {
-        var permissionsToRemove = new List<Permission>();
-
         foreach (var permission in permissions)
         {
             if (_permissions.Remove(permission))
             {
-                permissionsToRemove.Add(permission);
+                Raise(new RolePermissionRemovedDomainEvent(this, permission));
             }
-        }
-
-        if (permissionsToRemove.Count > 0)
-        {
-            Raise(new RolePermissionsUpdatedDomainEvent(this, Array.Empty<Permission>(), permissionsToRemove));
         }
 
         return Result.Success();

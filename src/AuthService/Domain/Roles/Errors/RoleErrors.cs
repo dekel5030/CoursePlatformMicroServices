@@ -19,4 +19,11 @@ public static class RoleErrors
     internal static readonly Error InvalidPermissionEffect = Error.Validation(
         "Role.InvalidPermissionEffect",
         "Role permission effect must be 'Allow'");
+
+    internal static Error InvalidPermissionEffectWithValue(string permissionValue)
+    {
+        return Error.Validation(
+            "Role.InvalidPermissionEffect",
+            $"Role permission effect must be 'Allow', but got '{permissionValue}'");
+    }
 }
