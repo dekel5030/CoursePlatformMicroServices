@@ -10,4 +10,4 @@ public record PermissionDto(
     string Effect,
     string Action,
     string Resource,
-    string ResourceId);
+    string? ResourceId = null);

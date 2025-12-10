@@ -4,6 +4,7 @@ using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
 using Domain.Permissions;
 using Kernel;
+using Kernel.Auth.AuthTypes;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.AuthUsers.Commands.UserAddPermissions;
@@ -12,6 +13,7 @@ public class UserAddPermissionsCommandHandler : ICommandHandler<UserAddPermissio
 {
     private readonly IWriteDbContext _dbContext;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly string _wildcard = ResourceId.Wildcard.Value;
 
     public UserAddPermissionsCommandHandler(
         IUnitOfWork unitOfWork, 
@@ -42,7 +44,7 @@ public class UserAddPermissionsCommandHandler : ICommandHandler<UserAddPermissio
                 permissionDto.Effect,
                 permissionDto.Action,
                 permissionDto.Resource,
-                permissionDto.ResourceId);
+                permissionDto.ResourceId ?? _wildcard);
 
             if (permissionResult.IsFailure)
             {
