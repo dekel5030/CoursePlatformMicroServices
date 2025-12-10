@@ -6,7 +6,7 @@ using SharedKernel;
 
 namespace Domain.Permissions;
 
-public class Permission : Entity
+public class Permission : Entity, IEquatable<Permission>
 {
     public Guid Id { get; private set; }
     public EffectType Effect { get; private set; }
@@ -64,17 +64,27 @@ public class Permission : Entity
 
     // Implement value-based equality to maintain business logic behavior
     // Two permissions are equal if they have the same Effect, Action, Resource, and ResourceId
-    public override bool Equals(object? obj)
+    public bool Equals(Permission? other)
     {
-        if (obj is not Permission other)
+        if (other is null)
         {
             return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
         }
 
         return Effect == other.Effect
             && Action == other.Action
             && Resource == other.Resource
             && ResourceId.Equals(other.ResourceId);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as Permission);
     }
 
     public override int GetHashCode()
