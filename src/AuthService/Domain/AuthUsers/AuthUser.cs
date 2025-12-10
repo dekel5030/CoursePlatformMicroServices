@@ -85,4 +85,45 @@ public class AuthUser : Entity
 
         return Result.Success();
     }
+
+    public Result AddPermissions(IEnumerable<Permission> permissions)
+    {
+        var permissionsToAdd = new List<Permission>();
+
+        foreach (var permission in permissions)
+        {
+            if (!_permissions.Contains(permission))
+            {
+                _permissions.Add(permission);
+                permissionsToAdd.Add(permission);
+            }
+        }
+
+        if (permissionsToAdd.Count > 0)
+        {
+            Raise(new UserPermissionsUpdatedDomainEvent(this, permissionsToAdd, Array.Empty<Permission>()));
+        }
+
+        return Result.Success();
+    }
+
+    public Result RemovePermissions(IEnumerable<Permission> permissions)
+    {
+        var permissionsToRemove = new List<Permission>();
+
+        foreach (var permission in permissions)
+        {
+            if (_permissions.Remove(permission))
+            {
+                permissionsToRemove.Add(permission);
+            }
+        }
+
+        if (permissionsToRemove.Count > 0)
+        {
+            Raise(new UserPermissionsUpdatedDomainEvent(this, Array.Empty<Permission>(), permissionsToRemove));
+        }
+
+        return Result.Success();
+    }
 }
