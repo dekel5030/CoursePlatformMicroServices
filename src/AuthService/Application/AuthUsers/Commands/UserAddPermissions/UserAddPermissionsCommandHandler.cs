@@ -4,7 +4,6 @@ using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
 using Domain.Permissions;
 using Kernel;
-using Kernel.Auth.AuthTypes;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.AuthUsers.Commands.UserAddPermissions;
@@ -13,7 +12,6 @@ public class UserAddPermissionsCommandHandler : ICommandHandler<UserAddPermissio
 {
     private readonly IWriteDbContext _dbContext;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly string _wildcard = ResourceId.Wildcard.Value;
 
     public UserAddPermissionsCommandHandler(
         IUnitOfWork unitOfWork, 
@@ -24,8 +22,8 @@ public class UserAddPermissionsCommandHandler : ICommandHandler<UserAddPermissio
     }
 
     public async Task<Result> Handle(
-        UserAddPermissionsCommand request, 
-        CancellationToken cancellationToken = default)
+    UserAddPermissionsCommand request,
+    CancellationToken cancellationToken = default)
     {
         AuthUser? user = await _dbContext.AuthUsers
             .Include(u => u.Permissions)
@@ -37,6 +35,7 @@ public class UserAddPermissionsCommandHandler : ICommandHandler<UserAddPermissio
         }
 
         var permissions = new List<Permission>();
+        var parsingErrors = new List<Error>();
 
         foreach (var permissionDto in request.Permissions)
         {
@@ -44,14 +43,21 @@ public class UserAddPermissionsCommandHandler : ICommandHandler<UserAddPermissio
                 permissionDto.Effect,
                 permissionDto.Action,
                 permissionDto.Resource,
-                permissionDto.ResourceId ?? _wildcard);
+                permissionDto.ResourceId);
 
             if (permissionResult.IsFailure)
             {
-                return Result.Failure(permissionResult.Error);
+                parsingErrors.Add(permissionResult.Error);
             }
+            else
+            {
+                permissions.Add(permissionResult.Value);
+            }
+        }
 
-            permissions.Add(permissionResult.Value);
+        if (parsingErrors.Count > 0)
+        {
+            return Result.Failure(new ValidationError(parsingErrors));
         }
 
         Result addPermissionsResult = user.AddPermissions(permissions);
