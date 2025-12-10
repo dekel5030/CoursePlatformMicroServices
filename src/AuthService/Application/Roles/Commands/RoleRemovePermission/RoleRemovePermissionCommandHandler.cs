@@ -9,12 +9,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Roles.Commands.RoleRemovePermission;
 
-public class RemoveRolePermissionCommandHandler : ICommandHandler<RoleRemovePermissionCommand>
+public class RoleRemovePermissionCommandHandler : ICommandHandler<RoleRemovePermissionCommand>
 {
     private readonly IWriteDbContext _dbContext;
     private readonly IUnitOfWork _unitOfWork;
 
-    public RemoveRolePermissionCommandHandler(
+    public RoleRemovePermissionCommandHandler(
         IWriteDbContext dbContext, 
         IUnitOfWork unitOfWork)
     {

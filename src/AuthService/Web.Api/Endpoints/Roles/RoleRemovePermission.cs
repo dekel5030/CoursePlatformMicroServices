@@ -1,5 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
-using Application.Roles.Commands.RemoveRolePermission;
+using Application.Roles.Commands.RoleRemovePermission;
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Kernel;
@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Auth.Api.Endpoints.Roles;
 
-public class RemoveRolePermission : IEndpoint
+public class RoleRemovePermission : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

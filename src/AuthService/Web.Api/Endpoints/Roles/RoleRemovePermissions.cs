@@ -1,29 +1,24 @@
 using Application.Abstractions.Messaging;
-using Application.Roles.Commands.RemovePermissionsFromRole;
+using Application.Roles.Commands.RoleRemovePermissions;
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Kernel;
 
 namespace Auth.Api.Endpoints.Roles;
 
-public class RemovePermissionsFromRole : IEndpoint
+public class RoleRemovePermissions : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete("roles/{roleId:guid}/permissions/batch", async (
             Guid roleId,
-            RemovePermissionsFromRoleRequestDto request,
+            RoleRemovePermissionsRequestDto request,
             ICommandHandler<RoleRemovePermissionsCommand> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new RoleRemovePermissionsCommand(
                 roleId,
-                request.Permissions.Select(p => new Application.Roles.Commands.RemovePermissionsFromRole.PermissionDto(
-                    p.Effect,
-                    p.Action,
-                    p.Resource,
-                    p.ResourceId
-                )).ToList()
+                request.Permissions
             );
 
             Result result = await handler.Handle(command, cancellationToken);
@@ -40,11 +35,3 @@ public class RemovePermissionsFromRole : IEndpoint
         .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }
-
-public record RemovePermissionsFromRoleRequestDto(List<RoleRemovePermissionItemDto> Permissions);
-
-public record RoleRemovePermissionItemDto(
-    string Effect,
-    string Action,
-    string Resource,
-    string? ResourceId = null);

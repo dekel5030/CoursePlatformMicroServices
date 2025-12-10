@@ -2,7 +2,7 @@
 
 namespace Application.Roles.Commands.RoleRemovePermission;
 
-public record RemoveRolePermissionCommand(
+public record RoleRemovePermissionCommand(
     Guid RoleId,
     string Effect,
     string Action,

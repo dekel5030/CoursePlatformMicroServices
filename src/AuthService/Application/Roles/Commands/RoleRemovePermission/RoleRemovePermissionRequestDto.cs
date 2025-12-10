@@ -1,6 +1,6 @@
 ﻿namespace Application.Roles.Commands.RoleRemovePermission;
 
-public record RemoveRolePermissionRequestDto(
+public record RoleRemovePermissionRequestDto(
     string Effect,
     string Action,
     string Resource,

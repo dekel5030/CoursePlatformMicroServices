@@ -1,19 +1,19 @@
 ﻿using Application.Abstractions.Messaging;
-using Application.Roles.Commands.AddRolePermission;
+using Application.Roles.Commands.RoleAddPermission;
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Kernel;
 
 namespace Auth.Api.Endpoints.Roles;
 
-public class AddRolePermission : IEndpoint
+public class RoleAddPermission : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("roles/{roleId:guid}/permissions", async (
             Guid roleId,
             RoleAddPermissionRequestDto request,
-            ICommandHandler<RoleAddPermissionCommand> handler,
+            ICommandHandler< RoleAddPermissionCommand> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new RoleAddPermissionCommand(

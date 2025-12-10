@@ -2,7 +2,7 @@
 
 namespace Application.Roles.Commands.RoleAddPermission;
 
-public record AddRolePermissionCommand(
+public record RoleAddPermissionCommand(
     Guid RoleId,
     string Effect,
     string Action, 

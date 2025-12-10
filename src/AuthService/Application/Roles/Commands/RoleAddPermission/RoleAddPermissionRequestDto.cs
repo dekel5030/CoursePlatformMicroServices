@@ -1,6 +1,6 @@
 ﻿namespace Application.Roles.Commands.RoleAddPermission;
 
-public record AddRolePermissionRequestDto(
+public record RoleAddPermissionRequestDto(
     string Effect,
     string Action,
     string Resource,
