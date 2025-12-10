@@ -1,3 +1,3 @@
 namespace Domain.Permissions.Primitives;
 
-public record PermissionId(int Value);
+public record PermissionId(Guid Value);
