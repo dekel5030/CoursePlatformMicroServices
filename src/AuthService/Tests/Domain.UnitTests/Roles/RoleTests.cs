@@ -227,8 +227,8 @@ public class RoleTests
         role.AddPermission(permission);
 
         // Assert
-        role.DomainEvents.Should().ContainSingle(e => e is RolePermissionAssignedDomainEvent);
-        var domainEvent = role.DomainEvents.OfType<RolePermissionAssignedDomainEvent>().First();
+        role.DomainEvents.Should().ContainSingle(e => e is RolePermissionAddedDomainEvent);
+        var domainEvent = role.DomainEvents.OfType<RolePermissionAddedDomainEvent>().First();
         domainEvent.Role.Should().Be(role);
         domainEvent.Permission.Should().Be(permission);
     }
