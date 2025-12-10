@@ -427,16 +427,8 @@ public class PermissionTests
     public void Equals_WithDifferentEffects_ShouldNotBeEqual()
     {
         // Arrange
-        var permission1 = new Permission(
-            EffectType.Allow,
-            ActionType.Read,
-            ResourceType.Course,
-            ResourceId.Create("course-123"));
-        var permission2 = new Permission(
-            EffectType.Deny,
-            ActionType.Read,
-            ResourceType.Course,
-            ResourceId.Create("course-123"));
+        var permission1 = Permission.Parse("Allow", "Read", "Course", "course-123").Value;
+        var permission2 = Permission.Parse("Deny", "Read", "Course", "course-123").Value;
 
         // Assert
         permission1.Should().NotBe(permission2);

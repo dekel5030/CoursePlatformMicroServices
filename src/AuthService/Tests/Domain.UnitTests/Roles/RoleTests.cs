@@ -171,11 +171,7 @@ public class RoleTests
     {
         // Arrange
         var role = Role.Create("Admin").Value;
-        var permission = new Permission(
-            EffectType.Deny,
-            ActionType.Read,
-            ResourceType.Course,
-            ResourceId.Create("course-123"));
+        var permission = Permission.Parse("Deny", "Read", "Course", "course-123").Value;
 
         // Act
         var result = role.AddPermission(permission);
