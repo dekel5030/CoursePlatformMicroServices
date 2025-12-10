@@ -88,13 +88,13 @@ public class AuthUser : Entity
 
     public Result AddPermissions(IEnumerable<Permission> permissions)
     {
-        IEnumerable<Error> errors = Enumerable.Empty<Error>();
+        var errors = new List<Error>();
 
         foreach (var permission in permissions)
         {
             if (_permissions.Contains(permission))
             {
-                errors = errors.Append(AuthUserErrors.PermissionAlreadyExistsWithValue(permission.ToString()));
+                errors.Add(AuthUserErrors.PermissionAlreadyExistsWithValue(permission.ToString()));
             }
         }
 
@@ -117,10 +117,6 @@ public class AuthUser : Entity
         foreach (var permission in permissions)
         {
             Result result = RemovePermission(permission);
-            if (result.IsFailure)
-            {
-                return result;
-            }
         }
 
         return Result.Success();
