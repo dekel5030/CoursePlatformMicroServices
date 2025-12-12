@@ -8,6 +8,21 @@ var rabbitMq = builder
     .WithManagementPlugin(15672)
     .WithDataVolume();
 
+// Keycloak configuration
+
+var keycloak = builder.AddContainer("keycloak", "quay.io/keycloak/keycloak", "26.4.7")
+    .WithEnvironment("KC_BOOTSTRAP_ADMIN_USERNAME", "admin")
+    .WithEnvironment("KC_BOOTSTRAP_ADMIN_PASSWORD", "admin")
+    .WithEnvironment("KC_HTTP_MANAGEMENT_HEALTH_ENABLED", "false")
+    .WithEnvironment("KC_TRACING_ENABLED", "true")
+    .WithEnvironment("OTEL_SERVICE_NAME", "keycloak")
+    .WithEnvironment("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
+    .WithEnvironment("OTEL_TRACES_SAMPLER", "always_on")
+    .WithHttpEndpoint(port: 8080, targetPort: 8080, name: "http")
+    .WithBindMount(@"C:\AspireVolumes\keycloak-data", "/opt/keycloak/data")
+    .WithArgs("start-dev", "--health-enabled=true", "--metrics-enabled=true")
+    .WithHttpHealthCheck("/health/ready");
+
 // AuthService configuration
 
 var authDb = builder
