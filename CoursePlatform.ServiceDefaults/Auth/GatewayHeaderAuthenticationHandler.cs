@@ -22,7 +22,7 @@ public class GatewayHeaderAuthenticationHandler : AuthenticationHandler<Authenti
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.TryGetValue(HeaderNames.UserIdHeader, out StringValues userIdValues))
+        if (!Request.Headers.TryGetValue(HeaderNames.UserId, out StringValues userIdValues))
         {
             return Task.FromResult(AuthenticateResult.NoResult());
         }
@@ -39,7 +39,7 @@ public class GatewayHeaderAuthenticationHandler : AuthenticationHandler<Authenti
             new Claim("sub", userId),
         };
 
-        if (Request.Headers.TryGetValue(HeaderNames.UserRoleHeader, out StringValues roleValues))
+        if (Request.Headers.TryGetValue(HeaderNames.UserRoles, out StringValues roleValues))
         {
             foreach (var role in roleValues.Where(r => !string.IsNullOrEmpty(r)))
             {
@@ -47,7 +47,7 @@ public class GatewayHeaderAuthenticationHandler : AuthenticationHandler<Authenti
             }
         }
 
-        if (Request.Headers.TryGetValue(HeaderNames.UserPermissionsHeader, out StringValues permissionValues))
+        if (Request.Headers.TryGetValue(HeaderNames.UserPermissions, out StringValues permissionValues))
         {
             foreach (var permission in permissionValues.Where(p => !string.IsNullOrEmpty(p)))
             {
