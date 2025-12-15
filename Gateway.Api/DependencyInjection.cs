@@ -1,23 +1,21 @@
-﻿using System.Security.Claims;
-using CoursePlatform.ServiceDefaults;
-using CoursePlatform.ServiceDefaults.Auth;
+﻿using CoursePlatform.ServiceDefaults;
 using Gateway.Api.Jwt;
 using Gateway.Api.Middleware;
-using Gateway.Api.Services.PermissionsCache;
-using Gateway.Api.Services.PermissionsSource;
-using Gateway.Api.Services.UserPermissionsService;
-using Kernel.Auth;
+using Gateway.Api.Services.AuthCacheRepository;
+using Gateway.Api.Services.AuthSource;
+using Gateway.Api.Services.UserEnrichmentService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Yarp.ReverseProxy.Transforms;
 
 namespace Gateway.Api;
 
 public static class DependencyInjection
 {
+    private const string RedisConnectionString = "redis";
     public const string AuthServiceName = "authservice";
     public static IHostApplicationBuilder AddGateway(this IHostApplicationBuilder builder)
     {
         builder.AddServiceDefaults();
+        builder.AddRedisClient(RedisConnectionString);
         builder.Services.AddGatewayInternalServices();
         builder.Services.AddAuth(builder.Configuration);
         builder.Services.AddYarp(builder.Configuration);
@@ -60,10 +58,10 @@ public static class DependencyInjection
 
     private static IServiceCollection AddGatewayInternalServices(this IServiceCollection services)
     {
-        services.AddTransient<IPermissionsCache, RedisPermissionsCache>();
-        services.AddTransient<IPermissionsSource, AuthHttpPermissionsSource>();
+        services.AddTransient<IAuthCacheRepository, AuthRedisRepository>();
+        services.AddTransient<IAuthSourceAdapter, AuthHttpAdapter>();
 
-        services.AddTransient<IUserPermissionsService, UserPermissionsService>();
+        services.AddTransient<IUserEnrichmentService, UserEnrichmentService>();
 
         services
             .AddHttpClient(AuthServiceName, client =>

@@ -1,17 +1,18 @@
 ﻿using System.Security.Claims;
 using CoursePlatform.ServiceDefaults.Auth;
-using Gateway.Api.Services.UserPermissionsService;
-
+using Gateway.Api.Models;
+using Gateway.Api.Services.UserEnrichmentService;
+    
 namespace Gateway.Api.Middleware;
 
 public class UserEnrichmentMiddleware : IMiddleware
 {
-    private readonly IUserPermissionsService _userPermissionsService;
+    private readonly IUserEnrichmentService _userEnrichmentService;
 
     public UserEnrichmentMiddleware(
-        IUserPermissionsService userPermissionsService)
+        IUserEnrichmentService userPermissionsService)
     {
-        _userPermissionsService = userPermissionsService;
+        _userEnrichmentService = userPermissionsService;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -29,23 +30,30 @@ public class UserEnrichmentMiddleware : IMiddleware
             return;
         }
 
-        var permissionsDto = await _userPermissionsService
+        UserEnrichmentModel userModel = await _userEnrichmentService
             .GetUserPermissionsAsync(userId, context.RequestAborted);
 
-        context.Request.Headers.Append(HeaderNames.UserId, userId);
+        context.Request.Headers[HeaderNames.UserId] = userId;
 
-        if (permissionsDto.Permissions != null && permissionsDto.Permissions.Count > 0)
+        if (userModel.Permissions != null && userModel.Permissions.Count > 0)
         {
-            var permissionsHeaderValue = string.Join(",", permissionsDto.Permissions);
+            var permissionsHeaderValue = string.Join(",", userModel.Permissions);
 
-            context.Request.Headers.Append(HeaderNames.UserPermissions, permissionsHeaderValue);
+            context.Request.Headers[HeaderNames.UserPermissions] = permissionsHeaderValue;
+        }
+        else
+        {
+            context.Request.Headers.Remove(HeaderNames.UserPermissions);
         }
 
-        if (permissionsDto.Roles != null && permissionsDto.Roles.Count > 0)
+        if (userModel.Roles != null && userModel.Roles.Count > 0)
         {
-            var rolesHeaderValue = string.Join(",", permissionsDto.Roles);
-
-            context.Request.Headers.Append(HeaderNames.UserRoles, rolesHeaderValue);
+            var rolesHeaderValue = string.Join(",", userModel.Roles);
+            context.Request.Headers[HeaderNames.UserRoles] = rolesHeaderValue;
+        }
+        else
+        {
+            context.Request.Headers.Remove(HeaderNames.UserRoles);
         }
 
         await next(context);
