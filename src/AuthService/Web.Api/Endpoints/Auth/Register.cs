@@ -10,16 +10,30 @@ public class Register : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("auth/register", async (
-            RegisterRequestDto request,
-            ICommandHandler<RegisterUserCommand, CurrentUserDto> handler,
+        app.MapGet("auth/register", async (
+            IConfiguration configuration,
+            //RegisterRequestDto request,
+            //ICommandHandler<RegisterUserCommand, CurrentUserDto> handler,
             CancellationToken cancellationToken) =>
         {
-            var command = new RegisterUserCommand(request);
+            //var command = new RegisterUserCommand(request);
 
-            var result = await handler.Handle(command, cancellationToken);
+            //var result = await handler.Handle(command, cancellationToken);
 
-            return result.Match(Results.Ok, CustomResults.Problem);
+            //return result.Match(Results.Ok, CustomResults.Problem);
+
+            var keycloakUrl = configuration["Keycloak:BaseUrl"] ?? "http://localhost:8080";
+            var realm = "course-platform";
+            var clientId = "frontend";
+            var redirectUri = "http://localhost:5067";
+
+            var targetUrl = $"{keycloakUrl}/realms/{realm}/protocol/openid-connect/registrations" +
+                            $"?client_id={clientId}" +
+                            $"&redirect_uri={redirectUri}" +
+                            $"&response_type=code" +
+                            $"&scope=openid email profile";
+
+            return Results.Redirect(targetUrl);
         })
         .WithTags(Tags.Auth)
         .WithName("Register")

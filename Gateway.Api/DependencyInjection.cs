@@ -1,24 +1,23 @@
-﻿using System.Security.Claims;
-using CoursePlatform.ServiceDefaults;
-using CoursePlatform.ServiceDefaults.Auth;
-using Gateway.Api.Database;
-using Kernel.Auth;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Yarp.ReverseProxy.Transforms;
+﻿using CoursePlatform.ServiceDefaults;
+using Gateway.Api.Jwt;
+using Gateway.Api.Middleware;
+using Gateway.Api.Services.AuthCacheRepository;
+using Gateway.Api.Services.AuthSource;
+using Gateway.Api.Services.UserEnrichmentService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Gateway.Api;
 
 public static class DependencyInjection
 {
-    internal const string AuthServiceName = "CoursePlatform.Auth";
-
+    private const string RedisConnectionString = "redis";
+    public const string AuthServiceName = "authservice";
     public static IHostApplicationBuilder AddGateway(this IHostApplicationBuilder builder)
     {
         builder.AddServiceDefaults();
-        builder.Services.AddKeysDb(builder.Configuration);
-        builder.Services.AddAuth();
+        builder.AddRedisClient(RedisConnectionString);
+        builder.Services.AddGatewayInternalServices();
+        builder.Services.AddAuth(builder.Configuration);
         builder.Services.AddYarp(builder.Configuration);
 
         return builder;
@@ -29,54 +28,19 @@ public static class DependencyInjection
         app.MapDefaultEndpoints();
         app.UseAuthentication();
         app.UseAuthorization();
+
+        app.UseMiddleware<UserEnrichmentMiddleware>();
+
         app.MapReverseProxy();
 
         return app;
     }
 
-    private static IServiceCollection AddKeysDb(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
     {
-        var authDbConnectionString = configuration.GetConnectionString("authdb");
-
-        services.AddDbContext<DataProtectionKeysContext>(options =>
-        {
-            options
-                .UseNpgsql(authDbConnectionString)
-                .UseSnakeCaseNamingConvention();
-
-        });
-
-        services.AddDataProtection()
-            .SetApplicationName(AuthServiceName)
-            .PersistKeysToDbContext<DataProtectionKeysContext>();
-
-        return services;
-    }
-
-    private static IServiceCollection AddAuth(this IServiceCollection services)
-    {
-        services.AddAuthentication(options =>
-        {
-            options.DefaultScheme = IdentityConstants.ApplicationScheme;
-        })
-            .AddCookie(IdentityConstants.ApplicationScheme, options =>
-            {
-                options.Cookie.Name = AuthServiceName;
-
-                options.Events.OnRedirectToLogin = context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Task.CompletedTask;
-                };
-
-                options.Events.OnRedirectToAccessDenied = context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    return Task.CompletedTask;
-                };
-            });
-
-        services.AddAuthorization();
+        services.ConfigureJwtAuthentication(configuration);
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
+        services.AddAuthorizationBuilder();
 
         return services;
     }
@@ -86,40 +50,28 @@ public static class DependencyInjection
         services.AddServiceDiscovery();
 
         services.AddReverseProxy()
-            .LoadFromConfig(configuration.GetSection("ReverseProxy"))
-            .AddServiceDiscoveryDestinationResolver()
-            .AddTransforms(builderContext =>
+                .LoadFromConfig(configuration.GetSection("ReverseProxy"))
+                .AddServiceDiscoveryDestinationResolver();
+      
+        return services;
+    }
+
+    private static IServiceCollection AddGatewayInternalServices(this IServiceCollection services)
+    {
+        services.AddTransient<IAuthCacheRepository, AuthRedisRepository>();
+        services.AddTransient<IAuthSourceAdapter, AuthHttpAdapter>();
+
+        services.AddTransient<IUserEnrichmentService, UserEnrichmentService>();
+
+        services
+            .AddHttpClient(AuthServiceName, client =>
             {
-                builderContext.AddRequestTransform(transformContext =>
-                {
-                    var user = transformContext.HttpContext.User;
+                client.Timeout = TimeSpan.FromSeconds(5);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("CoursePlatform-Gateway");
+            })
+            .AddStandardResilienceHandler();
 
-                    if (user?.Identity?.IsAuthenticated == true)
-                    {
-                        var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                        if (!string.IsNullOrEmpty(userId))
-                        {
-                            transformContext.ProxyRequest.Headers.Add(HeaderNames.UserIdHeader, userId);
-                        }
-
-                        var roles = user.FindAll(ClaimTypes.Role).Select(c => c.Value);
-
-                        foreach (var role in roles)
-                        {
-                            transformContext.ProxyRequest.Headers.Add(HeaderNames.UserRoleHeader, role);
-                        }
-
-                        var permissions = user.FindAll(PermissionClaim.ClaimType).Select(c => c.Value);
-
-                        foreach (var perrmission in permissions)
-                        {
-                            transformContext.ProxyRequest.Headers.Add(HeaderNames.UserPermissionsHeader, perrmission);
-                        }
-                    }
-
-                    return ValueTask.CompletedTask;
-                });
-            });
+        services.AddTransient<UserEnrichmentMiddleware>();
 
         return services;
     }
