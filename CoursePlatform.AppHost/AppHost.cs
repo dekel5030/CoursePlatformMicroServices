@@ -1,3 +1,5 @@
+using Aspire.Hosting;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var redis = builder.AddRedis("redis").WithDataVolume();
@@ -36,9 +38,11 @@ var authService = builder
     .WithReference(authDb)
     .WithReference(rabbitMq)
     .WithReference(redis)
+    .WaitFor(keycloak)
     .WaitFor(authDb)
     .WaitFor(rabbitMq)
     .WaitFor(redis)
+    .WithEnvironment("Keycloak:BaseUrl", keycloak.GetEndpoint("http"))
     .WithEnvironment("ConnectionStrings:ReadDatabase", authDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:WriteDatabase", authDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression)
@@ -85,6 +89,7 @@ var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
     .WithReference(authService)
     .WithReference(usersService)
     .WithReference(coursesService)
+    .WithReference(redis)
     .WaitFor(authDb)
     .WaitFor(authService)
     .WaitFor(usersService)

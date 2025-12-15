@@ -53,30 +53,44 @@ public static class DependencyInjection
         return services;
     }
 
+    //private static IServiceCollection AddAuth(this IServiceCollection services)
+    //{
+    //    services.AddAuthentication(options =>
+    //    {
+    //        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    //    })
+    //        .AddCookie(IdentityConstants.ApplicationScheme, options =>
+    //        {
+    //            options.Cookie.Name = AuthServiceName;
+
+    //            options.Events.OnRedirectToLogin = context =>
+    //            {
+    //                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+    //                return Task.CompletedTask;
+    //            };
+
+    //            options.Events.OnRedirectToAccessDenied = context =>
+    //            {
+    //                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+    //                return Task.CompletedTask;
+    //            };
+    //        });
+
+    //    services.AddAuthorization();
+
+    //    return services;
+    //}
+
     private static IServiceCollection AddAuth(this IServiceCollection services)
     {
-        services.AddAuthentication(options =>
-        {
-            options.DefaultScheme = IdentityConstants.ApplicationScheme;
-        })
-            .AddCookie(IdentityConstants.ApplicationScheme, options =>
-            {
-                options.Cookie.Name = AuthServiceName;
-
-                options.Events.OnRedirectToLogin = context =>
+        services.AddAuthentication()
+                .AddJwtBearer(options =>
                 {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Task.CompletedTask;
-                };
+                    options.Authority = "http://localhost:8080/realms/course-platform";
+                    options.Audience = "gateway-api";
+                });
 
-                options.Events.OnRedirectToAccessDenied = context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    return Task.CompletedTask;
-                };
-            });
-
-        services.AddAuthorization();
+        services.AddAuthorizationBuilder();
 
         return services;
     }
@@ -111,9 +125,9 @@ public static class DependencyInjection
 
                         var permissions = user.FindAll(PermissionClaim.ClaimType).Select(c => c.Value);
 
-                        foreach (var perrmission in permissions)
+                        foreach (var permission in permissions)
                         {
-                            transformContext.ProxyRequest.Headers.Add(HeaderNames.UserPermissionsHeader, perrmission);
+                            transformContext.ProxyRequest.Headers.Add(HeaderNames.UserPermissionsHeader, permission);
                         }
                     }
 
