@@ -73,6 +73,8 @@ public static class DependencyInjection
             })
             .AddStandardResilienceHandler();
 
+        services.AddTransient<UserEnrichmentMiddleware>();
+
         return services;
     }
 }
