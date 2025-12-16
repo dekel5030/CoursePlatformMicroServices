@@ -149,7 +149,7 @@ public class RoleTests
     {
         // Arrange
         var role = Role.Create("Admin").Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -194,7 +194,7 @@ public class RoleTests
     {
         // Arrange
         var role = Role.Create("Admin").Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -218,7 +218,7 @@ public class RoleTests
         // Arrange
         var role = Role.Create("Admin").Value;
         role.ClearDomainEvents();
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -241,15 +241,15 @@ public class RoleTests
     {
         // Arrange
         var role = Role.Create("Admin").Value;
-        var permission1 = Permission.CreateForRole(
+        var permission1 = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
-        var permission2 = Permission.CreateForRole(
+        var permission2 = Permission.CreateRolePermission(
             ActionType.Update,
             ResourceType.User,
             ResourceId.Create("user-456"));
-        var permission3 = Permission.CreateForRole(
+        var permission3 = Permission.CreateRolePermission(
             ActionType.Delete,
             ResourceType.Lesson,
             ResourceId.Create("lesson-789"));
@@ -272,7 +272,7 @@ public class RoleTests
     {
         // Arrange
         var role = Role.Create("SuperAdmin").Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Wildcard,
             ResourceType.Wildcard,
             ResourceId.Wildcard);
@@ -298,7 +298,7 @@ public class RoleTests
     {
         // Arrange
         var role = Role.Create("Admin").Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -320,7 +320,7 @@ public class RoleTests
     {
         // Arrange
         var role = Role.Create("Admin").Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -341,7 +341,7 @@ public class RoleTests
     {
         // Arrange
         var role = Role.Create("Admin").Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -367,7 +367,7 @@ public class RoleTests
         // Arrange
         var role = Role.Create("Admin").Value;
         role.ClearDomainEvents();
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -387,11 +387,11 @@ public class RoleTests
     {
         // Arrange
         var role = Role.Create("Admin").Value;
-        var permission1 = Permission.CreateForRole(
+        var permission1 = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
-        var permission2 = Permission.CreateForRole(
+        var permission2 = Permission.CreateRolePermission(
             ActionType.Update,
             ResourceType.User,
             ResourceId.Create("user-456"));

@@ -324,7 +324,7 @@ public class AuthUserTests
     {
         // Arrange
         var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -346,7 +346,7 @@ public class AuthUserTests
     {
         // Arrange
         var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -370,7 +370,7 @@ public class AuthUserTests
         // Arrange
         var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
         user.ClearDomainEvents();
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -393,11 +393,11 @@ public class AuthUserTests
     {
         // Arrange
         var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
-        var permission1 = Permission.CreateForRole(
+        var permission1 = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
-        var permission2 = Permission.CreateForRole(
+        var permission2 = Permission.CreateRolePermission(
             ActionType.Update,
             ResourceType.User,
             ResourceId.Create("user-456"));
@@ -423,7 +423,7 @@ public class AuthUserTests
     {
         // Arrange
         var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -445,7 +445,7 @@ public class AuthUserTests
     {
         // Arrange
         var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -466,7 +466,7 @@ public class AuthUserTests
     {
         // Arrange
         var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -492,7 +492,7 @@ public class AuthUserTests
         // Arrange
         var user = AuthUser.Create("test@example.com", "testuser", _defaultRole).Value;
         user.ClearDomainEvents();
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));

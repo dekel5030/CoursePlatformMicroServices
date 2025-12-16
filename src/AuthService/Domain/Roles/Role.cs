@@ -10,7 +10,7 @@ namespace Domain.Roles;
 
 public class Role : Entity
 {
-    public Guid Id { get; private set; }
+    public int Id { get; private set; }
     public string Name { get; private set; } = null!;
 
     private readonly List<Permission> _permissions = new();
@@ -27,8 +27,7 @@ public class Role : Entity
 
         var role = new Role
         {
-            Id = Guid.CreateVersion7(),
-            Name = roleName,
+            Name = roleName.Trim().ToLowerInvariant(),
         };
 
         role.Raise(new RoleCreatedDomainEvent(role));

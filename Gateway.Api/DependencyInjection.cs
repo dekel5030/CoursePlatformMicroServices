@@ -15,7 +15,7 @@ public static class DependencyInjection
     public static IHostApplicationBuilder AddGateway(this IHostApplicationBuilder builder)
     {
         builder.AddServiceDefaults();
-        builder.AddRedisClient(RedisConnectionString);
+        builder.AddRedisDistributedCache(RedisConnectionString);
         builder.Services.AddGatewayInternalServices();
         builder.Services.AddAuth(builder.Configuration);
         builder.Services.AddYarp(builder.Configuration);

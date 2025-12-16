@@ -252,7 +252,7 @@ public class PermissionTests
         var resourceId = ResourceId.Create("course-123");
 
         // Act
-        var permission = Permission.CreateForRole(action, resource, resourceId);
+        var permission = Permission.CreateRolePermission(action, resource, resourceId);
 
         // Assert
         permission.Effect.Should().Be(EffectType.Allow);
@@ -273,7 +273,7 @@ public class PermissionTests
     public void CreateForRole_WithAllActionTypes_ShouldCreateSuccessfully(ActionType action)
     {
         // Act
-        var permission = Permission.CreateForRole(action, ResourceType.Course, ResourceId.Create("course-123"));
+        var permission = Permission.CreateRolePermission(action, ResourceType.Course, ResourceId.Create("course-123"));
 
         // Assert
         permission.Effect.Should().Be(EffectType.Allow);
@@ -292,7 +292,7 @@ public class PermissionTests
     public void CreateForRole_WithAllResourceTypes_ShouldCreateSuccessfully(ResourceType resource)
     {
         // Act
-        var permission = Permission.CreateForRole(ActionType.Read, resource, ResourceId.Create("resource-123"));
+        var permission = Permission.CreateRolePermission(ActionType.Read, resource, ResourceId.Create("resource-123"));
 
         // Assert
         permission.Effect.Should().Be(EffectType.Allow);
@@ -306,7 +306,7 @@ public class PermissionTests
     public void CreateForRole_WithWildcardResourceId_ShouldCreateSuccessfully()
     {
         // Act
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Wildcard);
@@ -324,7 +324,7 @@ public class PermissionTests
     public void CreateForRole_WithAllWildcards_ShouldCreateSuccessfully()
     {
         // Act
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Wildcard,
             ResourceType.Wildcard,
             ResourceId.Wildcard);
@@ -347,11 +347,11 @@ public class PermissionTests
     public void Equals_WithSameValues_ShouldBeEqual()
     {
         // Arrange
-        var permission1 = Permission.CreateForRole(
+        var permission1 = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
-        var permission2 = Permission.CreateForRole(
+        var permission2 = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -367,11 +367,11 @@ public class PermissionTests
     public void Equals_WithDifferentActions_ShouldNotBeEqual()
     {
         // Arrange
-        var permission1 = Permission.CreateForRole(
+        var permission1 = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
-        var permission2 = Permission.CreateForRole(
+        var permission2 = Permission.CreateRolePermission(
             ActionType.Update,
             ResourceType.Course,
             ResourceId.Create("course-123"));
@@ -387,11 +387,11 @@ public class PermissionTests
     public void Equals_WithDifferentResources_ShouldNotBeEqual()
     {
         // Arrange
-        var permission1 = Permission.CreateForRole(
+        var permission1 = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
-        var permission2 = Permission.CreateForRole(
+        var permission2 = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.User,
             ResourceId.Create("course-123"));
@@ -407,11 +407,11 @@ public class PermissionTests
     public void Equals_WithDifferentResourceIds_ShouldNotBeEqual()
     {
         // Arrange
-        var permission1 = Permission.CreateForRole(
+        var permission1 = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-123"));
-        var permission2 = Permission.CreateForRole(
+        var permission2 = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("course-456"));
