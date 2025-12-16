@@ -49,7 +49,7 @@ public class RoleCacheInvalidationHandlerTests
         // Arrange
         var roleResult = Role.Create("Moderator");
         var role = roleResult.Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("*"));
@@ -71,7 +71,7 @@ public class RoleCacheInvalidationHandlerTests
         // Arrange
         var roleResult = Role.Create("User");
         var role = roleResult.Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Delete,
             ResourceType.Lesson,
             ResourceId.Create("123"));
@@ -131,7 +131,7 @@ public class RoleCacheInvalidationHandlerTests
         // Arrange
         var roleResult = Role.Create("Editor");
         var role = roleResult.Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Update,
             ResourceType.Course,
             ResourceId.Create("*"));
@@ -151,7 +151,7 @@ public class RoleCacheInvalidationHandlerTests
         // Arrange
         var roleResult = Role.Create("Viewer");
         var role = roleResult.Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.User,
             ResourceId.Create("*"));
@@ -200,9 +200,9 @@ public class RoleCacheInvalidationHandlerTests
 
         var permissions = new[]
         {
-            Permission.CreateForRole(ActionType.Create, ResourceType.Course, ResourceId.Create("*")),
-            Permission.CreateForRole(ActionType.Read, ResourceType.User, ResourceId.Create("123")),
-            Permission.CreateForRole(ActionType.Delete, ResourceType.Lesson, ResourceId.Create("*"))
+            Permission.CreateRolePermission(ActionType.Create, ResourceType.Course, ResourceId.Create("*")),
+            Permission.CreateRolePermission(ActionType.Read, ResourceType.User, ResourceId.Create("123")),
+            Permission.CreateRolePermission(ActionType.Delete, ResourceType.Lesson, ResourceId.Create("*"))
         };
 
         // Act
@@ -228,8 +228,8 @@ public class RoleCacheInvalidationHandlerTests
 
         var permissions = new[]
         {
-            Permission.CreateForRole(ActionType.Update, ResourceType.Course, ResourceId.Create("456")),
-            Permission.CreateForRole(ActionType.Delete, ResourceType.User, ResourceId.Create("*"))
+            Permission.CreateRolePermission(ActionType.Update, ResourceType.Course, ResourceId.Create("456")),
+            Permission.CreateRolePermission(ActionType.Delete, ResourceType.User, ResourceId.Create("*"))
         };
 
         // Act
@@ -251,7 +251,7 @@ public class RoleCacheInvalidationHandlerTests
         // Arrange
         var roleResult = Role.Create("Admin");
         var role = roleResult.Value;
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("*"));

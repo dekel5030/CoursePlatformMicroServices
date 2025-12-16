@@ -36,7 +36,7 @@ public class PermissionSyncTests : IntegrationTestsBase
         await signService.RegisterAsync(authUser, "Password123!");
         await dbContext.SaveChangesAsync();
 
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("*"));
@@ -73,7 +73,7 @@ public class PermissionSyncTests : IntegrationTestsBase
         await signService.RegisterAsync(authUser, "Password123!");
         await dbContext.SaveChangesAsync();
 
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Read,
             ResourceType.Course,
             ResourceId.Create("*"));
@@ -114,7 +114,7 @@ public class PermissionSyncTests : IntegrationTestsBase
         dbContext.DomainRoles.Add(role);
         await dbContext.SaveChangesAsync();
 
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Update,
             ResourceType.User,
             ResourceId.Create("*"));
@@ -145,7 +145,7 @@ public class PermissionSyncTests : IntegrationTestsBase
         dbContext.DomainRoles.Add(role);
         await dbContext.SaveChangesAsync();
 
-        var permission = Permission.CreateForRole(
+        var permission = Permission.CreateRolePermission(
             ActionType.Update,
             ResourceType.User,
             ResourceId.Create("*"));
@@ -197,7 +197,7 @@ public class PermissionSyncTests : IntegrationTestsBase
         await signService.RegisterAsync(authUser, "Password123!");
         await dbContext.SaveChangesAsync();
 
-        var permission = Permission.CreateForRole(action, resource, ResourceId.Create(resourceId));
+        var permission = Permission.CreateRolePermission(action, resource, ResourceId.Create(resourceId));
 
         // Act
         authUser.AddPermission(permission);
@@ -231,9 +231,9 @@ public class PermissionSyncTests : IntegrationTestsBase
         await signService.RegisterAsync(authUser, "Password123!");
         await dbContext.SaveChangesAsync();
 
-        var permission1 = Permission.CreateForRole(ActionType.Read, ResourceType.Course, ResourceId.Create("*"));
-        var permission2 = Permission.CreateForRole(ActionType.Update, ResourceType.Course, ResourceId.Create("123"));
-        var permission3 = Permission.CreateForRole(ActionType.Delete, ResourceType.Lesson, ResourceId.Create("*"));
+        var permission1 = Permission.CreateRolePermission(ActionType.Read, ResourceType.Course, ResourceId.Create("*"));
+        var permission2 = Permission.CreateRolePermission(ActionType.Update, ResourceType.Course, ResourceId.Create("123"));
+        var permission3 = Permission.CreateRolePermission(ActionType.Delete, ResourceType.Lesson, ResourceId.Create("*"));
 
         // Act
         authUser.AddPermission(permission1);

@@ -1,5 +1,6 @@
 using Domain.AuthUsers.Errors;
 using Domain.AuthUsers.Events;
+using Domain.AuthUsers.Primitives;
 using Domain.Permissions;
 using Domain.Roles;
 using Kernel;
@@ -12,27 +13,43 @@ public class AuthUser : Entity
     private readonly List<Role> _roles = new();
     private readonly List<Permission> _permissions = new();
 
-    public Guid Id { get; private set; }
-    public string Email { get; private set; } = null!;
-    public string UserName { get; private set; } = null!;
+    public AuthUserId Id { get; private set; }
+    public IdentityProviderId IdentityId { get; private set; }
+    public FullName FullName { get; private set; }
+    public Email Email { get; private set; }
     public IReadOnlyCollection<Role> Roles => _roles.AsReadOnly();
     public IReadOnlyCollection<Permission> Permissions => _permissions.AsReadOnly();
 
+    #pragma warning disable CS8618
     private AuthUser() { }
+    #pragma warning restore CS8618
 
-    public static Result<AuthUser> Create(string email, string userName, Role initialRole)
+    private AuthUser(
+        AuthUserId id,
+        IdentityProviderId identityProviderId,
+        FullName fullName,
+        Email email) 
     {
-        var authUser = new AuthUser
-        {
-            Id = Guid.CreateVersion7(),
-            Email = email,
-            UserName = string.IsNullOrEmpty(userName) ? email : userName
-        };
+        Id = id;
+        IdentityId = identityProviderId;
+        FullName = fullName;
+        Email = email;
+    }
 
-        authUser._roles.Add(initialRole);
+    public static Result<AuthUser> Create(
+        IdentityProviderId identityId,
+        FullName fullName,
+        Email email,
+        Role initialRole)
+    {
+        var authUser = new AuthUser(
+            new AuthUserId(Guid.CreateVersion7()),
+            identityId,
+            fullName,
+            email);
 
         authUser.Raise(new UserRegisteredDomainEvent(authUser));
-        authUser.Raise(new UserRoleAddedDomainEvent(authUser, initialRole));
+        authUser.AddRole(initialRole);
 
         return Result.Success(authUser);
     }
