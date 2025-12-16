@@ -1,13 +1,10 @@
 ﻿using Application.Abstractions.Messaging;
-using Application.AuthUsers.Commands.LoginUser;
-using Application.AuthUsers.Commands.Logout;
-using Application.AuthUsers.Commands.RegisterUser;
 using Application.AuthUsers.Commands.UserAddPermission;
 using Application.AuthUsers.Commands.UserAddRole;
 using Application.AuthUsers.Commands.UserRemovePermission;
 using Application.AuthUsers.Commands.UserRemoveRole;
 using Application.AuthUsers.Dtos;
-using Application.AuthUsers.Queries.GetCurrentUser;
+using Application.AuthUsers.Queries.GetUserAuthData;
 using Application.Roles.Commands.AddRolePermission;
 using Application.Roles.Commands.CreateRole;
 using Application.Roles.Commands.RemoveRolePermission;
@@ -29,15 +26,12 @@ public static class DependencyInjection
 
     private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
     {
-        services.AddScoped<IQueryHandler<GetCurrentUserQuery, CurrentUserDto>, GetCurrentUserQueryHandler>();
+        services.AddScoped<IQueryHandler<GetUserAuthDataQuery, CurrentUserDto>, GetUserAuthDataQueryHandler>();
         return services;
     }
 
     private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
     {
-        services.AddScoped<ICommandHandler<RegisterUserCommand, CurrentUserDto>, RegisterUserCommandHandler>();
-        services.AddScoped<ICommandHandler<LoginUserCommand, CurrentUserDto>, LoginUserCommandHandler>();
-        services.AddScoped<ICommandHandler<LogoutCommand>, LogoutCommandHandler>();
         services.AddScoped<ICommandHandler<CreateRoleCommand, CreateRoleResponseDto>, CreateRoleCommandHandler>();
         services.AddScoped<ICommandHandler<AddRolePermissionCommand>, AddRolePermissionCommandHandler>();
         services.AddScoped<ICommandHandler<RemoveRolePermissionCommand>, RemoveRolePermissionCommandHandler>();

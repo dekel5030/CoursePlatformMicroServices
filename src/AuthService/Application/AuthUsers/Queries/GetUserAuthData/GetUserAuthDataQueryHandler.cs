@@ -1,19 +1,21 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.AuthUsers.Dtos;
+using Application.AuthUsers.Queries.GetCurrentUser;
+using Auth.Contracts.Dtos;
 using Domain.AuthUsers.Errors;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.AuthUsers.Queries.GetCurrentUser;
+namespace Application.AuthUsers.Queries.GetUserAuthData;
 
-public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, CurrentUserDto>
+public class GetUserAuthDataQueryHandler : IQueryHandler<GetUserAuthDataQuery, UserAuthDataDto>
 {
     private readonly IUserContext _userContext;
     private readonly IReadDbContext _dbContext;
 
-    public GetCurrentUserQueryHandler(
+    public GetUserAuthDataQueryHandler(
         IUserContext userContext,
         IReadDbContext dbContext)
     {
@@ -21,15 +23,15 @@ public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, Cur
         _dbContext = dbContext;
     }
 
-    public async Task<Result<CurrentUserDto>> Handle(
-        GetCurrentUserQuery request,
+    public async Task<Result<UserAuthDataDto>> Handle(
+        GetUserAuthDataQuery request,
         CancellationToken cancellationToken)
     {
         Guid? userId = _userContext.UserId;
 
         if (userId == null)
         {
-            return Result.Failure<CurrentUserDto>(AuthUserErrors.Unauthorized);
+            return Result.Failure<UserAuthDataDto>(AuthUserErrors.Unauthorized);
         }
 
         var user = await _dbContext.AuthUsers.FirstOrDefaultAsync(
