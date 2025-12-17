@@ -2,6 +2,7 @@ using Domain.Permissions;
 using Domain.Permissions.Errors;
 using Domain.Roles.Errors;
 using Domain.Roles.Events;
+using Domain.Roles.Primitives;
 using Kernel;
 using Kernel.Auth.AuthTypes;
 using SharedKernel;
@@ -10,7 +11,7 @@ namespace Domain.Roles;
 
 public class Role : Entity
 {
-    public int Id { get; private set; }
+    public RoleId Id { get; private set; } = null!;
     public string Name { get; private set; } = null!;
 
     private readonly List<Permission> _permissions = new();
@@ -28,6 +29,7 @@ public class Role : Entity
         var role = new Role
         {
             Name = roleName.Trim().ToLowerInvariant(),
+            Id = new(Guid.CreateVersion7())
         };
 
         role.Raise(new RoleCreatedDomainEvent(role));

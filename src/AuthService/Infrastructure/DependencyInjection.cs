@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Identity;
-using Application.Abstractions.Messaging;
+using Application.Abstractions.MessageQueue;
 using CoursePlatform.ServiceDefaults.Auth;
 using Domain.AuthUsers;
 using Domain.Roles;

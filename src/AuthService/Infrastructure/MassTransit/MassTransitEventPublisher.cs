@@ -1,4 +1,4 @@
-using Application.Abstractions.Messaging;
+using Application.Abstractions.MessageQueue;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 

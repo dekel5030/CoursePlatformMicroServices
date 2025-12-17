@@ -13,6 +13,10 @@ public class Permission : IEquatable<Permission>
     public ResourceType Resource { get; private set; }
     public ResourceId ResourceId { get; private set; }
 
+    #pragma warning disable CS8618 
+    private Permission() { }
+    #pragma warning restore CS8618 
+
     public Permission(
         EffectType effect,
         ActionType action,
@@ -79,5 +83,10 @@ public class Permission : IEquatable<Permission>
     public override int GetHashCode()
     {
         return HashCode.Combine(Action, Resource, ResourceId, Effect);
+    }
+
+    public override string ToString()
+    {
+        return PermissionClaim.ToClaimValue(Effect, Action, Resource, ResourceId);
     }
 };
