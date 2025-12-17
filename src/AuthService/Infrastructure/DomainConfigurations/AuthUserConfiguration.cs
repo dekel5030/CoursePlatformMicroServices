@@ -1,4 +1,5 @@
 ﻿using Domain.AuthUsers;
+using Domain.AuthUsers.Primitives;
 using Domain.Roles;
 using Kernel.Auth.AuthTypes;
 using Microsoft.EntityFrameworkCore;
@@ -8,33 +9,63 @@ namespace Infrastructure.DomainConfigurations;
 
 internal sealed class AuthUserConfiguration : IEntityTypeConfiguration<AuthUser>
 {
-    public void Configure(EntityTypeBuilder<AuthUser> user)
+    public void Configure(EntityTypeBuilder<AuthUser> builder)
     {
-        user.ToTable("domain_users");
+        builder.ToTable("users");
 
-        user.Property(u => u.Id).ValueGeneratedNever();
+        builder.HasKey(user => user.Id);
+        builder.HasIndex(user => user.IdentityId).IsUnique();
+        builder.HasIndex(user => user.Email).IsUnique();
+        builder.Property(user => user.Id).ValueGeneratedNever();
 
-        user
-            .HasMany(u => u.Roles)
+        builder.Property(user => user.Id).HasConversion(
+            id => id.Value,
+            value => new AuthUserId(value));
+
+        builder.Property(user => user.IdentityId).HasConversion(
+            id => id.ProviderId, 
+            value => new IdentityProviderId(value));
+
+        builder.Property(user => user.Email).HasConversion(
+            email => email.Address,
+            value => new Email(value));
+
+        builder.OwnsOne(user => user.FullName, nameBuilder =>
+        {
+            nameBuilder.Property(name => name.FirstName)
+                .HasColumnName("first_name")
+                .HasConversion(
+                    firstName => firstName.Name,
+                    value => new FirstName(value));
+
+            nameBuilder.Property(name => name.LastName)
+                .HasColumnName("last_name")
+                .HasConversion(
+                    lastName => lastName.Name,
+                    value => new LastName(value));
+        });
+
+        builder
+            .HasMany(user => user.Roles)
             .WithMany()
             .UsingEntity<Dictionary<string, object>>(
-                "domain_user_roles",
-                r => r.HasOne<Role>().WithMany().HasForeignKey("RoleId"),
-                u => u.HasOne<AuthUser>().WithMany().HasForeignKey("UserId")
+                "user_roles",
+                r => r.HasOne<Role>().WithMany().HasForeignKey("role_id"),
+                u => u.HasOne<AuthUser>().WithMany().HasForeignKey("user_id")
             );
 
 
-        user.OwnsMany(u => u.Permissions, permissionBuilder =>
+        builder.OwnsMany(u => u.Permissions, permissionBuilder =>
         {
-            permissionBuilder.ToJson();
-            permissionBuilder.Property(p => p.Effect).HasMaxLength(50);
-            permissionBuilder.Property(p => p.Action).HasMaxLength(100);
-            permissionBuilder.Property(p => p.Resource).HasMaxLength(100);
+            permissionBuilder.ToJson("permissions");
+            permissionBuilder.Property(p => p.Effect).HasConversion<string>();
+            permissionBuilder.Property(p => p.Action).HasConversion<string>();
+            permissionBuilder.Property(p => p.Resource).HasConversion<string>();
 
             permissionBuilder.Property(p => p.ResourceId)
                 .HasConversion(id => id.Value, val => ResourceId.Create(val));
         });
 
-        user.Ignore(u => u.DomainEvents);
+        builder.Ignore(u => u.DomainEvents);
     }
 }
