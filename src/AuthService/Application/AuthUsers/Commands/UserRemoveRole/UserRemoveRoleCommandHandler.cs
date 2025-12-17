@@ -2,6 +2,7 @@
 using Application.Abstractions.Messaging;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
+using Domain.AuthUsers.Primitives;
 using Domain.Roles;
 using Domain.Roles.Errors;
 using Kernel;
@@ -27,7 +28,7 @@ public class UserRemoveRoleCommandHandler : ICommandHandler<UserRemoveRoleComman
         CancellationToken cancellationToken = default)
     {
         AuthUser? user = await _dbContext.AuthUsers.Include(u => u.Roles)
-            .FirstOrDefaultAsync(u => u.Id == request.UserId);
+            .FirstOrDefaultAsync(u => u.Id == new AuthUserId(request.UserId));
 
         if (user is null)
         {

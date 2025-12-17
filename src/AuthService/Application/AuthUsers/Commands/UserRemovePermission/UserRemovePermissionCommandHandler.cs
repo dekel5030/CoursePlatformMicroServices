@@ -2,6 +2,7 @@
 using Application.Abstractions.Messaging;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
+using Domain.AuthUsers.Primitives;
 using Domain.Permissions;
 using Kernel;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,7 @@ public class UserRemovePermissionCommandHandler : ICommandHandler<UserRemovePerm
         CancellationToken cancellationToken = default)
     {
         AuthUser? user = await _dbContext.AuthUsers.Include(u => u.Permissions)
-            .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Id == new AuthUserId(request.UserId), cancellationToken);
 
         if (user is null)
         {
