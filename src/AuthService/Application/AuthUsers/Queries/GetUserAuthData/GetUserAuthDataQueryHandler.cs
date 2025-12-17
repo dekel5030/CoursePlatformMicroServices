@@ -42,11 +42,16 @@ public class GetUserAuthDataQueryHandler : IQueryHandler<GetUserAuthDataQuery, U
                 user => user.Id == authUserId,
                 cancellationToken);
 
+        if (user == null)
+        {
+            return Result.Failure<UserAuthDataDto>(AuthUserErrors.NotFound);
+        }
+
         var distinctPermissions = user.Permissions
-            .Concat(user.Roles.SelectMany(r => r.Permissions))
-            .Distinct() 
-            .Select(p => p.ToString())
-            .ToList();
+        .Concat(user.Roles.SelectMany(r => r.Permissions))
+        .Distinct() 
+        .Select(p => p.ToString())
+        .ToList();
 
         var response = new UserAuthDataDto(
             user.Id.Value.ToString(),

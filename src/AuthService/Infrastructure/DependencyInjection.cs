@@ -36,8 +36,6 @@ public static class DependencyInjection
 
     public static WebApplication UseInfrastructure(this WebApplication app)
     {
-        app.UseAuthentication();
-        app.UseAuthorization();
         app.UseInfrastructureDefaultEndpoints();
 
         return app;

@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
+using Application.Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -16,6 +17,8 @@ public static class DependencyInjection
 
         services.AddIntegrationEventHandlers();
         //services.AddValidators();
+
+        services.AddScoped<IMediator, Mediator.Mediator>();
 
         return services;
     }

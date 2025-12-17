@@ -21,7 +21,7 @@ public class AuthHttpAdapter : IAuthSourceAdapter
         CancellationToken cancellationToken = default)
     {
         var safeUserId = Uri.EscapeDataString(userId);
-        var path = $"api/internal/users/{safeUserId}/auth-data";
+        var path = $"internal/users/{safeUserId}/auth-data";
 
         try
         {

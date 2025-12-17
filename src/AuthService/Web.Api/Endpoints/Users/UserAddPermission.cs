@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.AuthUsers.Commands.UserAddPermission;
+using Application.Mediator;
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Kernel;
@@ -13,7 +14,7 @@ public class UserAddPermission : IEndpoint
         app.MapPost("user/{userId:guid}/permissions", async (
             Guid userId,
             UserAddPermissionRequestDto request,
-            ICommandHandler<UserAddPermissionCommand> handler,
+            IMediator mediator,
             CancellationToken cancellationToken) =>
         {
             var command = new UserAddPermissionCommand(
@@ -24,7 +25,7 @@ public class UserAddPermission : IEndpoint
                 request.ResourceId
             );
 
-            Result result = await handler.Handle(command, cancellationToken);
+            Result result = await mediator.Send(command, cancellationToken);
             return result.Match(
                 onSuccess: () => Results.Ok(),
                 onFailure: error => CustomResults.Problem(error));

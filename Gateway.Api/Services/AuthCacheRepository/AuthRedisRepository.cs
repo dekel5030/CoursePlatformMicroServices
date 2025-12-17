@@ -19,7 +19,7 @@ public class AuthRedisRepository : IAuthCacheRepository
         string userId, 
         CancellationToken cancellationToken = default)
     {
-        var key = string.Format(AuthCacheKeys.UserAuthData, userId);
+        var key = string.Format(AuthCacheKeys.UserAuthDataPattern, userId);
         var json = await _cache.GetStringAsync(key, token: cancellationToken);
 
         if (string.IsNullOrEmpty(json)) return null;
