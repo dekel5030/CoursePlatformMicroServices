@@ -1,27 +1,13 @@
 using Application.Abstractions.Data;
-using Domain.AuthUsers;
-using Domain.Roles;
 using Infrastructure.DomainEvents;
-using Infrastructure.Identity;
-using MassTransit;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using SharedKernel;
 
 namespace Infrastructure.Database;
 
-public class WriteDbContext
-    : IdentityDbContext<ApplicationIdentityUser, ApplicationIdentityRole, Guid>, IWriteDbContext, IUnitOfWork
+public class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfWork
 {
     private readonly IDomainEventsDispatcher _domainEventsDispatcher;
-
-    public DbSet<AuthUser> DomainUsers { get; set; }
-    public DbSet<Role> DomainRoles { get; set; }
-
-    DbSet<Role> IWriteDbContext.Roles => DomainRoles;
-
-    public DbSet<AuthUser> AuthUsers => DomainUsers;
 
     public WriteDbContext(
         DbContextOptions<WriteDbContext> options,
@@ -30,14 +16,6 @@ public class WriteDbContext
         : base(options)
     {
         _domainEventsDispatcher = domainEventsDispatcher;
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DependencyInjection).Assembly);
-        modelBuilder.AddTransactionalOutboxEntities();
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

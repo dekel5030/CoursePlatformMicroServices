@@ -2,10 +2,10 @@ using Kernel;
 
 namespace Application.Abstractions.Messaging;
 
-public interface ICommandHandler<TCommand> : IHandler<TCommand, Result>
+public interface ICommandHandler<TCommand> : IRequestHandler<TCommand, Result>
     where TCommand : ICommand
 { }
 
-public interface ICommandHandler<TCommand, TResponse> : IHandler<TCommand, Result<TResponse>>
+public interface ICommandHandler<TCommand, TResponse> : IRequestHandler<TCommand, Result<TResponse>>
     where TCommand : ICommand<TResponse>
 { }

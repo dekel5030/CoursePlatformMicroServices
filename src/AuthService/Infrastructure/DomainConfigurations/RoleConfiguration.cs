@@ -1,4 +1,5 @@
 ﻿using Domain.Roles;
+using Domain.Roles.Primitives;
 using Kernel.Auth.AuthTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -7,15 +8,24 @@ internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
 { 
     public void Configure(EntityTypeBuilder<Role> builder) 
     { 
-        builder.ToTable("domain_roles");
+        builder.ToTable("roles");
 
-        builder.Property(r => r.Id).ValueGeneratedNever();
+        builder.HasKey(r => r.Id);
+
+        builder.HasIndex(r => r.Name).IsUnique();
+
+        builder.Property(r => r.Id)
+            .HasConversion(
+                id => id.Value,
+                value => new RoleId(value))
+            .ValueGeneratedNever();
 
         builder.OwnsMany(r => r.Permissions, permissionBuilder => 
         { 
-            permissionBuilder.ToJson();
-            permissionBuilder.Property(p => p.Action).HasMaxLength(100);
-            permissionBuilder.Property(p => p.Resource).HasMaxLength(100);
+            permissionBuilder.ToJson("permissions");
+            permissionBuilder.Property(p => p.Effect).HasConversion<string>();
+            permissionBuilder.Property(p => p.Action).HasConversion<string>();
+            permissionBuilder.Property(p => p.Resource).HasConversion<string>();
             permissionBuilder.Property(p => p.ResourceId)
                 .HasConversion(id => id.Value, val => ResourceId.Create(val));
         });

@@ -1,24 +1,14 @@
 ﻿using Application.Abstractions.Data;
-using Application.Abstractions.Identity;
-using Application.Abstractions.Messaging;
+using Application.Abstractions.MessageQueue;
 using CoursePlatform.ServiceDefaults.Auth;
-using Domain.AuthUsers;
-using Domain.Roles;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.Extensions;
-using Infrastructure.Identity;
-using Infrastructure.Identity.Extensions;
-using Infrastructure.Identity.Managers;
-using Infrastructure.Identity.Stores;
 using Infrastructure.MassTransit;
 using Infrastructure.Redis.Extensions;
 using Kernel.Auth.Abstractions;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -46,8 +36,6 @@ public static class DependencyInjection
 
     public static WebApplication UseInfrastructure(this WebApplication app)
     {
-        app.UseAuthentication();
-        app.UseAuthorization();
         app.UseInfrastructureDefaultEndpoints();
 
         return app;
@@ -62,10 +50,7 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
-            .ConfigureIdentities(configuration)
-            .AddUserContextProvider()
-            .AddIdentitySyncHandlers()
-            .AddDomainEventsHandlers();
+            .AddUserContextProvider();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -111,19 +96,6 @@ public static class DependencyInjection
                 })
                 .UseSnakeCaseNamingConvention()
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-        });
-
-        services.AddDbContext<DataProtectionKeysContext>((serviceProvider, options) =>
-        {
-            string connectionString = configuration.GetConnectionString(WriteDbSectionName)
-                ?? throw new InvalidOperationException("Database connection string not found");
-            options
-                .UseNpgsql(connectionString, npgsqlOptions =>
-                {
-                    npgsqlOptions.MigrationsHistoryTable(
-                        HistoryRepository.DefaultTableName);
-                })
-                .UseSnakeCaseNamingConvention();
         });
 
         services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
@@ -186,60 +158,6 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
-
-        return services;
-    }
-
-    private static IServiceCollection ConfigureIdentities(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        const string applicationName = "CoursePlatform.Auth";
-
-        services.AddIdentity<ApplicationIdentityUser, ApplicationIdentityRole>(options =>
-        {
-            options.Password.RequireDigit = false;
-            options.Password.RequiredLength = 6;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequireLowercase = false;
-
-            options.User.RequireUniqueEmail = true;
-        })
-        .AddEntityFrameworkStores<WriteDbContext>()
-        .AddUserStore<NoAutoSaveUserStore>()
-        .AddRoleStore<NoAutoSaveRoleStore>()
-        .AddDefaultTokenProviders();
-
-        services.AddAuthorization();
-
-        services.ConfigureApplicationCookie(options =>
-        {
-            options.Cookie.Name = applicationName;
-            options.Cookie.HttpOnly = true;
-            options.Cookie.SameSite = SameSiteMode.Strict;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-            options.ExpireTimeSpan = TimeSpan.FromDays(14);
-            options.SlidingExpiration = true;
-
-            options.Events.OnRedirectToLogin = context =>
-            {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return Task.CompletedTask;
-            };
-
-            options.Events.OnRedirectToAccessDenied = context =>
-            {
-                context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                return Task.CompletedTask;
-            };
-        });
-
-        services.AddDataProtection()
-            .SetApplicationName(applicationName)
-            .PersistKeysToDbContext<DataProtectionKeysContext>();
-
-        services.AddScoped<ISignService<AuthUser>, SignService>();
 
         return services;
     }

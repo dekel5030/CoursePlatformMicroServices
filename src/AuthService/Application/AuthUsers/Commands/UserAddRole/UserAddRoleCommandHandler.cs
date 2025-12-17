@@ -2,6 +2,7 @@
 using Application.Abstractions.Messaging;
 using Domain.AuthUsers;
 using Domain.AuthUsers.Errors;
+using Domain.AuthUsers.Primitives;
 using Domain.Roles;
 using Domain.Roles.Errors;
 using Kernel;
@@ -26,8 +27,8 @@ public class UserAddRoleCommandHandler : ICommandHandler<UserAddRoleCommand>
         UserAddRoleCommand request, 
         CancellationToken cancellationToken = default)
     {
-        AuthUser? user = await _dbContext.AuthUsers.Include(u => u.Roles)
-            .FirstOrDefaultAsync(u => u.Id == request.UserId);
+        AuthUser? user = await _dbContext.Users.Include(u => u.Roles)
+            .FirstOrDefaultAsync(u => u.Id == new AuthUserId(request.UserId));
 
         if (user is null)
         {

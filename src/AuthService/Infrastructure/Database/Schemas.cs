@@ -2,6 +2,5 @@
 
 internal static class Schemas
 {
-    public const string Default = "public";
-    public const string Keys = "keys";
+    public const string Default = "auth";
 }

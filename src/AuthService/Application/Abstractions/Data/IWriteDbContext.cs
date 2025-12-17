@@ -7,5 +7,5 @@ namespace Application.Abstractions.Data;
 public interface IWriteDbContext
 {
     DbSet<Role> Roles { get; }
-    DbSet<AuthUser> AuthUsers { get; }
+    DbSet<AuthUser> Users { get; }
 }
