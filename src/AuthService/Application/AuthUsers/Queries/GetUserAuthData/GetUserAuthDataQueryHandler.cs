@@ -34,7 +34,7 @@ public class GetUserAuthDataQueryHandler : IQueryHandler<GetUserAuthDataQuery, U
         }
 
         var authUserId = new AuthUserId(userId.Value);
-        var user = await _dbContext.AuthUsers
+        var user = await _dbContext.Users
             .Include(user => user.Permissions)
             .Include(user => user.Roles)
             .ThenInclude(role => role.Permissions)

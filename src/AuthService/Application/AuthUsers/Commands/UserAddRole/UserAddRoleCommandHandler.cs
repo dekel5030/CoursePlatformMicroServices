@@ -27,7 +27,7 @@ public class UserAddRoleCommandHandler : ICommandHandler<UserAddRoleCommand>
         UserAddRoleCommand request, 
         CancellationToken cancellationToken = default)
     {
-        AuthUser? user = await _dbContext.AuthUsers.Include(u => u.Roles)
+        AuthUser? user = await _dbContext.Users.Include(u => u.Roles)
             .FirstOrDefaultAsync(u => u.Id == new AuthUserId(request.UserId));
 
         if (user is null)

@@ -27,7 +27,7 @@ public class UserAddPermissionCommandHandler : ICommandHandler<UserAddPermission
         CancellationToken cancellationToken = default)
     {
 
-        AuthUser? user = await _dbContext.AuthUsers.Include(u => u.Permissions)
+        AuthUser? user = await _dbContext.Users.Include(u => u.Permissions)
             .FirstOrDefaultAsync(u => u.Id == new AuthUserId(request.UserId), cancellationToken);
 
         if (user is null)
