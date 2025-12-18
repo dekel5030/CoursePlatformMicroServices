@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import type { Course } from "../../types/course";
 import Lesson from "../../features/lessons/components/Lesson";
 import { fetchCourseById } from "../../services/CoursesAPI";
+import { useAuthenticatedFetch } from "../../utils/useAuthenticatedFetch";
 import styles from "./CoursePage.module.css";
 
 export default function CoursePage() {
@@ -11,15 +12,16 @@ export default function CoursePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const authFetch = useAuthenticatedFetch();
+
   useEffect(() => {
     if (!id) return;
-
     setLoading(true);
-    fetchCourseById(id)
+    fetchCourseById(id, authFetch)
       .then(setCourse)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, authFetch]);
 
   if (loading) return <div className={styles.status}>Loading course...</div>;
   if (error) return <div className={styles.statusError}>Error: {error}</div>;
@@ -47,11 +49,7 @@ export default function CoursePage() {
           </div>
         </div>
       </div>
-
-      {/* Description */}
       <p className={styles.description}>{course.description}</p>
-
-      {/* Lessons */}
       <section className={styles.lessons}>
         <h2>Lessons</h2>
         {course.lessons && course.lessons.length > 0 ? (

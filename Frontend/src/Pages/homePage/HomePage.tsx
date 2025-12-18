@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchFeaturedCourses } from "../../services/CoursesAPI";
 import type { Course } from "../../types/course";
 import CourseCard from "../../features/courses/components/CourseCard";
-import { Link } from "react-router-dom";
+import { useAuth } from "react-oidc-context";
+import { useAuthenticatedFetch } from "../../utils/useAuthenticatedFetch";
 import styles from "./HomePage.module.css";
 
 export default function HomePage() {
@@ -11,13 +12,16 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
+  const auth = useAuth();
+  const authFetch = useAuthenticatedFetch();
+
   useEffect(() => {
     setLoading(true);
-    fetchFeaturedCourses()
+    fetchFeaturedCourses(authFetch)
       .then(setCourses)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [authFetch]);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -39,9 +43,14 @@ export default function HomePage() {
           </p>
         </div>
         <div>
-          <Link to="/login" className={styles.loginButton}>
-            Log in
-          </Link>
+          {!auth.isAuthenticated && (
+            <button
+              className={styles.loginButton}
+              onClick={() => void auth.signinRedirect()}
+            >
+              Log in
+            </button>
+          )}
         </div>
       </header>
 

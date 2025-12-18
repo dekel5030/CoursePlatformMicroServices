@@ -1,23 +1,21 @@
-import { useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import Dropdown from "../Dropdown/Dropdown";
 import Button from "../Button/Button";
 import SearchBox from "../SearchBox/SearchBox";
 import ProfileMenu from "../ProfileMenu/ProfileMenu";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "react-oidc-context";
 
 export default function Navbar() {
-  const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) return null;
+  const auth = useAuth();
 
   const handleLoginClick = () => {
-    navigate("/login");
+    void auth.signinRedirect();
   };
 
   const handleSignUpClick = () => {
-    navigate("/signup");
+    void auth.signinRedirect({
+      extraQueryParams: { kc_action: "register" },
+    });
   };
 
   return (
@@ -43,7 +41,7 @@ export default function Navbar() {
       </nav>
 
       <div className={styles.authButtons}>
-        {isAuthenticated ? (
+        {auth.isAuthenticated ? (
           <ProfileMenu />
         ) : (
           <>

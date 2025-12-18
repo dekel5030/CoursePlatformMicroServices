@@ -1,35 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ProfileMenu.module.css";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "react-oidc-context";
 
 export default function ProfileMenu() {
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
+  const auth = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
+  const userProfile = auth.user?.profile;
+
   const handleProfileClick = () => {
-    if (currentUser) {
-      navigate(`/users/${currentUser.id}`);
+    if (userProfile?.sub) {
+      navigate(`/users/${userProfile.sub}`);
       setIsOpen(false);
     }
   };
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await auth.signoutRedirect();
       setIsOpen(false);
-      navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
-      // Navigate anyway since client state is cleared
-      setIsOpen(false);
-      navigate("/");
     }
   };
 
   const getInitial = () => {
-    if (currentUser?.email) return currentUser.email.charAt(0).toUpperCase();
+    if (userProfile?.given_name)
+      return userProfile.given_name.charAt(0).toUpperCase();
+    if (userProfile?.email) return userProfile.email.charAt(0).toUpperCase();
     return "U";
   };
 

@@ -1,6 +1,9 @@
-import { getAuthenticatedFetch } from "../utils/authenticatedFetch";
-
 const API_USERS_URL = "/api";
+
+export type Fetcher = (
+  input: RequestInfo | URL,
+  init?: RequestInit
+) => Promise<Response>;
 
 export interface User {
   id: string;
@@ -18,31 +21,29 @@ export interface UpdateUserRequest {
   dateOfBirth?: string | null;
 }
 
-export async function fetchUserById(id: string): Promise<User> {
-  const authFetch = getAuthenticatedFetch();
-  const response = await authFetch(`${API_USERS_URL}/users/${id}`, {
-    credentials: "include",
-  });
+// קבלת fetcher כפרמטר שני
+export async function fetchUserById(
+  id: string,
+  fetcher: Fetcher
+): Promise<User> {
+  const response = await fetcher(`${API_USERS_URL}/users/${id}`);
   if (!response.ok) throw new Error("Failed to fetch user");
-
   return await response.json();
 }
 
 export async function updateUser(
   id: string,
-  data: UpdateUserRequest
+  data: UpdateUserRequest,
+  fetcher: Fetcher
 ): Promise<User> {
-  const authFetch = getAuthenticatedFetch();
-  const response = await authFetch(`${API_USERS_URL}/users/${id}`, {
+  const response = await fetcher(`${API_USERS_URL}/users/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
     body: JSON.stringify(data),
   });
 
   if (!response.ok) throw new Error("Failed to update user");
-
   return await response.json();
 }

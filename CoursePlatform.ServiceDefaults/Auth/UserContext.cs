@@ -33,6 +33,12 @@ public class UserContext : IUserContext
         }
     }
 
+    public string? UserEmail => User?.FindFirst(ClaimTypes.Email)?.Value;
+
+    public string? FirstName => User?.FindFirst(ClaimTypes.GivenName)?.Value;
+
+    public string? LastName => User?.FindFirst(ClaimTypes.Surname)?.Value;
+
     public bool HasRole(RoleType role)
     {
         return User?.IsInRole(role.ToString()) ?? false;
