@@ -37,6 +37,8 @@ public static class DependencyInjection
     public static WebApplication UseInfrastructure(this WebApplication app)
     {
         app.UseInfrastructureDefaultEndpoints();
+        app.UseAuthentication();
+        app.UseAuthorization();
 
         return app;
     }
@@ -50,7 +52,8 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
-            .AddUserContextProvider();
+            .AddUserContextProvider()
+            .AddGatewayAuth();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)

@@ -30,6 +30,10 @@ public class UserEnrichmentMiddleware : IMiddleware
             return;
         }
 
+        context.Request.Headers[HeaderNames.Email] = context.User.FindFirst(ClaimTypes.Email)?.Value;
+        context.Request.Headers[HeaderNames.FirstName] = context.User.FindFirst(ClaimTypes.GivenName)?.Value;
+        context.Request.Headers[HeaderNames.LastName] = context.User.FindFirst(ClaimTypes.Surname)?.Value;
+
         UserEnrichmentModel userModel = await _userEnrichmentService
             .GetUserPermissionsAsync(userId, context.RequestAborted);
 

@@ -9,8 +9,8 @@ public interface ICacheService
         CancellationToken cancellationToken);
 
     Task SetAsync<TResponse>(
-        string cacheKey, 
-        TResponse result, 
-        TimeSpan? expiration, 
-        CancellationToken cancellationToken) where TResponse : Result;
+        string cacheKey,
+        TResponse result,
+        TimeSpan? expiration,
+        CancellationToken cancellationToken);
 }

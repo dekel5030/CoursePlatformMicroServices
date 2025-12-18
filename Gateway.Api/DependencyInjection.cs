@@ -39,7 +39,7 @@ public static class DependencyInjection
     private static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
     {
         services.ConfigureJwtAuthentication(configuration);
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => options.RequireHttpsMetadata = false);
         services.AddAuthorizationBuilder();
 
         return services;
@@ -66,10 +66,14 @@ public static class DependencyInjection
         services
             .AddHttpClient(AuthServiceName, client =>
             {
-                client.Timeout = TimeSpan.FromSeconds(5);
+                client.BaseAddress = new Uri($"https://{AuthServiceName}");
+                client.Timeout = TimeSpan.FromSeconds(50000);
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("CoursePlatform-Gateway");
             })
-            .AddStandardResilienceHandler();
+            .AddStandardResilienceHandler(options =>
+            {
+                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(600);
+            });
 
         services.AddTransient<UserEnrichmentMiddleware>();
 
