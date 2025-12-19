@@ -1,6 +1,6 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var redis = builder.AddRedis("redis").WithDataVolume();
+var redis = builder.AddRedis("redis").WithDataVolume().WithRedisInsight();
 
 // RabbitMq configuration
 var rabbitMq = builder
