@@ -29,6 +29,7 @@ public class JwksEndpoint : IEndpoint
             };
 
             return Results.Json(jwk);
-        });
+        })
+        .AllowAnonymous();
     }
 }
