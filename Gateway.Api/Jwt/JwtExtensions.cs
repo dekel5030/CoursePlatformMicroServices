@@ -2,7 +2,7 @@
 
 public static class JwtExtensions
 {
-    public static IServiceCollection ConfigureJwtAuthentication(
+    public static IServiceCollection ConfigureKeycloakAuthentication(
         this IServiceCollection services,
         IConfiguration configuration)
     {

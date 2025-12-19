@@ -38,7 +38,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
     {
-        services.ConfigureJwtAuthentication(configuration);
+        services.ConfigureKeycloakAuthentication(configuration);
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => options.RequireHttpsMetadata = false);
         services.AddAuthorizationBuilder();
 
