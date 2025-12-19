@@ -14,6 +14,7 @@ internal static class HostApplicationExtensions
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.AddSingleton<KeyManager>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
+        services.AddSingleton<IPermissionResolver, PermissionResolver>();
 
         return services;
     }
