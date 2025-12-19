@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.MessageQueue;
 using CoursePlatform.ServiceDefaults.Auth;
+using Infrastructure.Auth;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.Extensions;
@@ -44,11 +45,11 @@ public static class DependencyInjection
     }
 
     private static IServiceCollection AddInfrastructure(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services, IConfiguration configuration)
     {
         return services
             .AddServices()
+            .AddAuthServices(configuration)
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
