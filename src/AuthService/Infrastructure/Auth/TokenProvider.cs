@@ -11,9 +11,9 @@ namespace Infrastructure.Auth;
 internal class TokenProvider : ITokenProvider
 {
     private readonly KeyManager _keyManager;
-    private readonly IOptions<JwtOptions> _options;
+    private readonly IOptions<InternalTokenOptions> _options;
 
-    public TokenProvider(KeyManager keyManager, IOptions<JwtOptions> options)
+    public TokenProvider(KeyManager keyManager, IOptions<InternalTokenOptions> options)
     {
         _keyManager = keyManager;
         _options = options;
