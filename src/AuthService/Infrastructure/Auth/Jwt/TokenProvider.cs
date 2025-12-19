@@ -2,24 +2,23 @@
 using System.Security.Claims;
 using Application.Abstractions.Auth;
 using Domain.AuthUsers;
-using Infrastructure.Auth.Jwt;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Infrastructure.Auth;
+namespace Infrastructure.Auth.Jwt;
 
 internal class TokenProvider : ITokenProvider
 {
     private readonly KeyManager _keyManager;
-    private readonly IOptions<JwtOptions> _options;
+    private readonly IOptions<InternalTokenOptions> _options;
 
-    public TokenProvider(KeyManager keyManager, IOptions<JwtOptions> options)
+    public TokenProvider(KeyManager keyManager, IOptions<InternalTokenOptions> options)
     {
         _keyManager = keyManager;
         _options = options;
     }
 
-    public string GenerateInternalToken(
+    public string GenerateToken(
         AuthUser user, 
         IEnumerable<string> effectivePermissions, 
         DateTime expiration)

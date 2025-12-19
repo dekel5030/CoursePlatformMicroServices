@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Application.Abstractions.Caching;
-using Kernel;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace Infrastructure.Redis;

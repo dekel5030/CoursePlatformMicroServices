@@ -38,8 +38,7 @@ public static class DependencyInjection
     public static WebApplication UseInfrastructure(this WebApplication app)
     {
         app.UseInfrastructureDefaultEndpoints();
-        app.UseAuthentication();
-        app.UseAuthorization();
+        app.UseAuth();
 
         return app;
     }
@@ -60,7 +59,7 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
-
+        services.AddHttpContextAccessor();
         return services;
     }
 

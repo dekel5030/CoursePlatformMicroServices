@@ -14,7 +14,12 @@ public class KeyManager
 
     public RsaSecurityKey GetPrivateKey() => new RsaSecurityKey(_rsa);
 
-    public RsaSecurityKey GetPublicKey() => new RsaSecurityKey(_rsa.ExportParameters(false));
+    public RsaSecurityKey GetPublicKey()
+    {
+        var publicRsa = RSA.Create();
+        publicRsa.ImportParameters(_rsa.ExportParameters(false));
+        return new RsaSecurityKey(publicRsa);
+    }
 
     public string GetKeyId() => "internal-auth-key-v1";
 }
