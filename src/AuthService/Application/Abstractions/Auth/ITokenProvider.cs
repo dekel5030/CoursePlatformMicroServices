@@ -6,6 +6,6 @@ public interface ITokenProvider
 {
     string GenerateInternalToken(
         AuthUser user,
-        IEnumerable<string> permissions, 
+        IEnumerable<string> effectivePermissions, 
         DateTime expiration);
 }
