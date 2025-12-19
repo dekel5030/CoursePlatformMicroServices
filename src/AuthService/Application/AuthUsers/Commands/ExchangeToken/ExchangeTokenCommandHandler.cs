@@ -51,13 +51,13 @@ internal class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenComman
         }
 
         var effectivePermissions = _permissionResolver.ResolveEffectivePermissions(user);
-        DateTime tokenExpiration = DateTime.UtcNow.Add(_externalUserContext.TokenExpiration);
 
-        string token = _tokenProvider.GenerateInternalToken(user, effectivePermissions, tokenExpiration);
+        string token = _tokenProvider.GenerateToken(user, effectivePermissions, _externalUserContext.ExpiryUtc);
+
         await _cacheService.SetAsync(
             AuthCacheKeys.UserInternalJwt(externalId.ProviderId),
             token,
-            _externalUserContext.TokenExpiration,
+            _externalUserContext.ExpiryUtc - DateTime.UtcNow,
             cancellationToken);
 
         return Result.Success(new TokenResponse(token));

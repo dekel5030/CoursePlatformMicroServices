@@ -4,7 +4,7 @@ namespace Application.Abstractions.Auth;
 
 public interface ITokenProvider
 {
-    string GenerateInternalToken(
+    string GenerateToken(
         AuthUser user,
         IEnumerable<string> effectivePermissions, 
         DateTime expiration);

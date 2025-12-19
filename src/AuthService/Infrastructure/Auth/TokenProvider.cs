@@ -19,7 +19,7 @@ internal class TokenProvider : ITokenProvider
         _options = options;
     }
 
-    public string GenerateInternalToken(
+    public string GenerateToken(
         AuthUser user, 
         IEnumerable<string> effectivePermissions, 
         DateTime expiration)

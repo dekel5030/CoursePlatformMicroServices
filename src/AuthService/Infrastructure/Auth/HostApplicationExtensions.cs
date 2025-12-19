@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Auth;
 using Gateway.Api.Jwt;
+using Infrastructure.Auth.Context;
 using Infrastructure.Auth.Jwt;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +10,7 @@ namespace Infrastructure.Auth;
 internal static class HostApplicationExtensions
 {
     public static IServiceCollection AddAuthServices(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration)
     {
         services.Configure<InternalTokenOptions>(configuration.GetSection(InternalTokenOptions.SectionName));
@@ -24,14 +25,23 @@ internal static class HostApplicationExtensions
 
         services.AddAuthorization();
 
+        services.AddUserContext();
+
         return services;
     }
 
     private static IServiceCollection ConfigureKeycloakJwtAuth(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration)
     {
         services.Configure<KeycloakJwtOptions>(configuration.GetSection(KeycloakJwtOptions.SectionName));
+
+        return services;
+    }
+
+    private static IServiceCollection AddUserContext(this IServiceCollection services)
+    {
+        services.AddScoped<IExternalUserContext, ExternalUserContext>();
 
         return services;
     }

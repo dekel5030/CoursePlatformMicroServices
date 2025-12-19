@@ -6,6 +6,5 @@ public interface IExternalUserContext
     string Email { get; }
     string FirstName { get; }
     string LastName { get; }
-    bool IsAuthenticated { get; }
-    TimeSpan TokenExpiration { get; }
+    DateTime ExpiryUtc { get; }
 }
