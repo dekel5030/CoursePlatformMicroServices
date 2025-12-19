@@ -6,8 +6,8 @@ public static class JwtExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
-        services.ConfigureOptions<JwtBearerOptionsSetup>();
+        services.Configure<KeycloakJwtOptions>(configuration.GetSection(KeycloakJwtOptions.SectionName));
+        services.ConfigureOptions<KeyCloakOptionsSetup>();
 
         return services;
     }

@@ -1,9 +1,8 @@
 ﻿using CoursePlatform.ServiceDefaults;
 using Gateway.Api.Jwt;
 using Gateway.Api.Middleware;
-using Gateway.Api.Services.AuthCacheRepository;
 using Gateway.Api.Services.AuthSource;
-using Gateway.Api.Services.UserEnrichmentService;
+using Gateway.Api.Services.CacheService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Gateway.Api;
@@ -16,6 +15,7 @@ public static class DependencyInjection
     {
         builder.AddServiceDefaults();
         builder.AddRedisDistributedCache(RedisConnectionString);
+        builder.Services.AddSingleton<ICacheService, RedisCache>();
         builder.Services.AddGatewayInternalServices();
         builder.Services.AddAuth(builder.Configuration);
         builder.Services.AddYarp(builder.Configuration);
@@ -58,10 +58,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddGatewayInternalServices(this IServiceCollection services)
     {
-        services.AddTransient<IAuthCacheRepository, AuthRedisRepository>();
-        services.AddTransient<IAuthSourceAdapter, AuthHttpAdapter>();
-
-        services.AddTransient<IUserEnrichmentService, UserEnrichmentService>();
+        services.AddTransient<IAuthClient, AuthHttpClient>();
 
         services
             .AddHttpClient(AuthServiceName, client =>

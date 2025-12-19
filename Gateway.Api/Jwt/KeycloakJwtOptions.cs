@@ -1,6 +1,6 @@
 namespace Gateway.Api.Jwt;
 
-public class JwtOptions
+public class KeycloakJwtOptions
 {
     public const string SectionName = "Jwt";
 

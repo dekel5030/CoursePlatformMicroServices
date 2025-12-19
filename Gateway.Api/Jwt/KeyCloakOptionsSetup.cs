@@ -4,11 +4,11 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Gateway.Api.Jwt;
 
-public class JwtBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
+public class KeyCloakOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
 {
-    private readonly JwtOptions _jwtOptions;
+    private readonly KeycloakJwtOptions _jwtOptions;
 
-    public JwtBearerOptionsSetup(IOptions<JwtOptions> options)
+    public KeyCloakOptionsSetup(IOptions<KeycloakJwtOptions> options)
     {
         _jwtOptions = options.Value;
     }
@@ -29,6 +29,6 @@ public class JwtBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
 
     public void Configure(JwtBearerOptions options)
     {
-        Configure(JwtBearerDefaults.AuthenticationScheme, options);
+        return;
     }
 }
