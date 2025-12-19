@@ -2,6 +2,7 @@
 using Gateway.Api.Jwt;
 using Infrastructure.Auth.Context;
 using Infrastructure.Auth.Jwt;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,11 +24,26 @@ internal static class HostApplicationExtensions
             .AddJwtBearer(AuthSchemes.Internal)
             .AddJwtBearer(AuthSchemes.Keycloak);
 
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(AuthSchemes.Keycloak, policy =>
+            {
+                policy.AddAuthenticationSchemes(AuthSchemes.Keycloak);
+                policy.RequireAuthenticatedUser();
+            });
+        });
 
         services.AddUserContext();
 
         return services;
+    }
+
+    public static IApplicationBuilder UseAuth(this IApplicationBuilder app)
+    {
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        return app;
     }
 
     private static IServiceCollection ConfigureKeycloakJwtAuth(
@@ -35,6 +51,7 @@ internal static class HostApplicationExtensions
         IConfiguration configuration)
     {
         services.Configure<KeycloakJwtOptions>(configuration.GetSection(KeycloakJwtOptions.SectionName));
+        services.ConfigureOptions<KeycloakBearerOptionsSetup>();
 
         return services;
     }

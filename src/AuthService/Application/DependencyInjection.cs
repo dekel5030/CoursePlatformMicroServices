@@ -8,11 +8,21 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        //services.Scan(selector => selector
+        //        .FromAssemblies(typeof(DependencyInjection).Assembly)
+        //        .AddClasses(classes => classes
+        //        .AssignableTo(typeof(IRequestHandler<,>)))
+        //        .AsImplementedInterfaces()
+        //        .WithScopedLifetime());
+
         services.Scan(selector => selector
                 .FromAssemblies(typeof(DependencyInjection).Assembly)
                 .AddClasses(classes => classes
-                .AssignableTo(typeof(IRequestHandler<,>)))
-                .AsImplementedInterfaces() 
+                    .Where(t => t.GetInterfaces().Any(i =>
+                        i.IsGenericType &&
+                        i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>))),
+                    publicOnly: false)
+                .AsImplementedInterfaces()
                 .WithScopedLifetime());
 
         services.AddIntegrationEventHandlers();

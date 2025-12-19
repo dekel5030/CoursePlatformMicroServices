@@ -10,9 +10,7 @@ internal static class HostApplicationExtensions
         this IHostApplicationBuilder builder, 
         string redisConnectionString)
     {
-        builder.AddRedisClient(redisConnectionString);
-
-        builder.Services.AddStackExchangeRedisCache(options => { });
+        builder.AddRedisDistributedCache(redisConnectionString);
 
         builder.Services.AddSingleton<ICacheService, RedisCache>();
 

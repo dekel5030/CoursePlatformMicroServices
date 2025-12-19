@@ -2,11 +2,10 @@
 using System.Security.Claims;
 using Application.Abstractions.Auth;
 using Domain.AuthUsers;
-using Infrastructure.Auth.Jwt;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Infrastructure.Auth;
+namespace Infrastructure.Auth.Jwt;
 
 internal class TokenProvider : ITokenProvider
 {
