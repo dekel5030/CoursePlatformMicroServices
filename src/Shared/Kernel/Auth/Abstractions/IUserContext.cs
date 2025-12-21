@@ -5,8 +5,8 @@ namespace Kernel.Auth.Abstractions;
 public interface IUserContext
 {
     bool IsAuthenticated { get; }
-    Guid? UserId { get; }
-    string? UserEmail { get; }
+    Guid? Id { get; }
+    string? Email { get; }
     string? FirstName { get; }
     string? LastName { get; }
     bool HasRole(RoleType role);

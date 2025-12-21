@@ -26,7 +26,7 @@ public class GetUserAuthDataQueryHandler : IQueryHandler<GetUserAuthDataQuery, U
         GetUserAuthDataQuery request,
         CancellationToken cancellationToken)
     {
-        Guid? userId = _userContext.UserId;
+        Guid? userId = _userContext.Id;
 
         if (userId == null)
         {
