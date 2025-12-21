@@ -52,8 +52,7 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
-            .AddUserContextProvider()
-            .AddGatewayAuth();
+            .AddUserContextProvider();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)

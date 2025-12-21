@@ -32,7 +32,6 @@ public static class DependencyInjection
         services.AddScoped<IDomainEventHandler<UserProfileCreatedDomainEvent>, UserProfileCreatedDomainEventHandler>();
 
         //services.ConfigureJwtAuthentication(configuration);
-        services.AddGatewayAuth();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 
