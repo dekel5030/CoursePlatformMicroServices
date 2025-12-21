@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Application.Abstractions.Auth;
 using Domain.AuthUsers;
+using Kernel.Auth;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 

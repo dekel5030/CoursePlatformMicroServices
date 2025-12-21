@@ -22,9 +22,6 @@ namespace Kernel.Auth;
 /// </summary>
 public static partial class PermissionClaim
 {
-    public const string ClaimType = "cp_permission";
-
-
     /// <summary>
     /// Creates a new permission claim string with all required segments (Effect, Action, Resource, ID).
     /// </summary>
@@ -41,7 +38,7 @@ public static partial class PermissionClaim
     {
         var value = ToClaimValue(effect, action, resource, id);
 
-        return new Claim(ClaimType, value);
+        return new Claim(CoursePlatformClaims.Permission, value);
     }
 
     /// <summary>

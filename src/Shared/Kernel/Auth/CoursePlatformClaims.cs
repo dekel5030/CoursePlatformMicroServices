@@ -30,6 +30,9 @@ public static class CoursePlatformClaims
     public static Claim CreatePermissionClaim(string value)
         => new Claim(Permission, value);
 
+    public static Claim CreateIdentityIdClaim(string identityId)
+        => new Claim(IdentityId, identityId);
+
     public static IEnumerable<string> GetPermissions(this ClaimsPrincipal user)
         => user.FindAll(Permission).Select(c => c.Value);
 
