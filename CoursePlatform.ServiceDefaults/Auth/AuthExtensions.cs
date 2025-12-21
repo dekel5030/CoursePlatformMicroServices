@@ -1,31 +1,53 @@
-﻿using Kernel.Auth.Abstractions;
+﻿using Kernel.Auth;
+using Kernel.Auth.Abstractions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CoursePlatform.ServiceDefaults.Auth;
 
 public static class AuthExtensions
 {
-    public static IServiceCollection AddInternalAuth(this IServiceCollection services, string authority, string audience)
+    public const string InternalIssuer = "course-platform-auth";
+    public const string InternalAudience = "course-platform-internal";
+
+    public static IServiceCollection AddInternalAuth(
+        this IServiceCollection services, 
+        string authServiceUrl)
     {
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                // הכתובת של ה-AuthService (ממנה הוא מושך את ה-Well-known/JWKS)
-                options.Authority = authority;
-                options.Audience = audience;
-                options.RequireHttpsMetadata = false; // בשביבת פיתוח פנימית
+                options.MetadataAddress = $"{authServiceUrl}/.well-known/openid-configuration";
+
+                options.RequireHttpsMetadata = false;
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
+                    ValidIssuer = InternalIssuer,
+
                     ValidateAudience = true,
+                    ValidAudience = InternalAudience,
+
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    // מיפוי נכון של Claims לזהויות ASP.NET
-                    NameClaimType = "sub",
-                    RoleClaimType = "role"
+
+                    NameClaimType = CoursePlatformClaims.UserId,
+                    RoleClaimType = CoursePlatformClaims.Role,
+                    ClockSkew = TimeSpan.Zero,
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<JwtBearerHandler>>();
+                        logger.LogError(context.Exception, "Internal Authentication failed.");
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
