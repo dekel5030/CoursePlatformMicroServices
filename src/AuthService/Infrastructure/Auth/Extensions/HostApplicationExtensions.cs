@@ -1,7 +1,10 @@
 ﻿using Application.Abstractions.Auth;
-using Gateway.Api.Jwt;
+using CoursePlatform.ServiceDefaults.Auth;
 using Infrastructure.Auth.Context;
 using Infrastructure.Auth.Jwt;
+using Infrastructure.Auth.Jwt.External;
+using Infrastructure.Auth.Jwt.Internal;
+using Kernel.Auth.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,11 +17,12 @@ internal static class HostApplicationExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.Configure<InternalTokenOptions>(configuration.GetSection(InternalTokenOptions.SectionName));
         services.AddSingleton<KeyManager>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
         services.AddSingleton<IPermissionResolver, PermissionResolver>();
+
         services.ConfigureKeycloakJwtAuth(configuration);
+        services.ConfigureInternalJwtAuth(configuration);
 
         services.AddAuthentication(AuthSchemes.Internal)
             .AddJwtBearer(AuthSchemes.Internal)
@@ -31,9 +35,15 @@ internal static class HostApplicationExtensions
                 policy.AddAuthenticationSchemes(AuthSchemes.Keycloak);
                 policy.RequireAuthenticatedUser();
             });
-        });
 
-        services.AddUserContext();
+            options.AddPolicy(AuthSchemes.Internal, policy =>
+            {
+                policy.AddAuthenticationSchemes(AuthSchemes.Internal);
+                policy.RequireAuthenticatedUser();
+            });
+
+            options.DefaultPolicy = options.GetPolicy(AuthSchemes.Internal)!;
+        });
 
         return services;
     }
@@ -52,13 +62,18 @@ internal static class HostApplicationExtensions
     {
         services.Configure<KeycloakJwtOptions>(configuration.GetSection(KeycloakJwtOptions.SectionName));
         services.ConfigureOptions<KeycloakBearerOptionsSetup>();
+        services.AddScoped<IExternalUserContext, ExternalUserContext>();
 
         return services;
     }
 
-    private static IServiceCollection AddUserContext(this IServiceCollection services)
+    private static IServiceCollection ConfigureInternalJwtAuth(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddScoped<IExternalUserContext, ExternalUserContext>();
+        services.Configure<InternalTokenOptions>(configuration.GetSection(InternalTokenOptions.SectionName));
+        services.ConfigureOptions<InternalJwtOptionsSetup>();
+        services.AddScoped<IUserContext, UserContext>();
 
         return services;
     }
