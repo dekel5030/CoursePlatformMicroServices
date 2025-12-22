@@ -24,9 +24,14 @@ internal static class HostApplicationExtensions
         services.ConfigureKeycloakJwtAuth(configuration);
         services.ConfigureInternalJwtAuth(configuration);
 
-        services.AddAuthentication(AuthSchemes.Internal)
-            .AddJwtBearer(AuthSchemes.Internal)
-            .AddJwtBearer(AuthSchemes.Keycloak);
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = AuthSchemes.Internal;
+            options.DefaultChallengeScheme = AuthSchemes.Internal;
+            options.DefaultScheme = AuthSchemes.Internal;
+        })
+        .AddJwtBearer(AuthSchemes.Internal)
+        .AddJwtBearer(AuthSchemes.Keycloak);
 
         services.AddAuthorization(options =>
         {
@@ -35,14 +40,6 @@ internal static class HostApplicationExtensions
                 policy.AddAuthenticationSchemes(AuthSchemes.Keycloak);
                 policy.RequireAuthenticatedUser();
             });
-
-            options.AddPolicy(AuthSchemes.Internal, policy =>
-            {
-                policy.AddAuthenticationSchemes(AuthSchemes.Internal);
-                policy.RequireAuthenticatedUser();
-            });
-
-            options.DefaultPolicy = options.GetPolicy(AuthSchemes.Internal)!;
         });
 
         return services;
