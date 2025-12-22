@@ -82,12 +82,14 @@ public class AuthUser : Entity
 
     public Result AddPermission(Permission permission)
     {
-        if (_permissions.Contains(permission))
+        if (_permissions.Any(p => p.Covers(permission)))
         {
-            return Result.Failure(AuthUserErrors.PermissionAlreadyExists);
+            return Result.Success();
         }
 
+        _permissions.RemoveAll(p => permission.Covers(p));
         _permissions.Add(permission);
+
         Raise(new UserPermissionAddedDomainEvent(this, permission));
 
         return Result.Success();
