@@ -1,20 +1,12 @@
-﻿using Auth.Application.Abstractions.Data;
-using Auth.Application.Abstractions.MessageQueue;
-using Auth.Infrastructure.Auth.Extensions;
+﻿using Auth.Infrastructure.Auth.Extensions;
 using Auth.Infrastructure.Database;
 using Auth.Infrastructure.DomainEvents;
 using Auth.Infrastructure.Extensions;
 using Auth.Infrastructure.MassTransit;
 using Auth.Infrastructure.Redis.Extensions;
-using CoursePlatform.ServiceDefaults.Auth;
-using Kernel.Auth.Abstractions;
-using MassTransit;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 
 namespace Auth.Infrastructure;
@@ -51,59 +43,12 @@ public static class DependencyInjection
             .AddAuthServices(configuration)
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
-            .AddHealthChecksInternal(configuration)
-            .AddUserContextProvider();
+            .AddHealthChecksInternal(configuration);
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
-        services.AddHttpContextAccessor();
-        return services;
-    }
-
-    private static IServiceCollection AddUserContextProvider(this IServiceCollection services)
-    {
-        services.AddHttpContextAccessor();
-        services.AddScoped<IUserContext, UserContext>();
-        return services;
-    }
-
-    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
-        {
-            var connectionString = configuration.GetConnectionString(WriteDbSectionName)
-                ?? throw new InvalidOperationException("Database connection string not found");
-
-            options
-                .UseNpgsql(connectionString, npgsqlOptions =>
-                {
-                    npgsqlOptions.MigrationsHistoryTable(
-                        HistoryRepository.DefaultTableName);
-                })
-                .UseSnakeCaseNamingConvention();
-        });
-
-        services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
-        {
-            var connectionString = configuration.GetConnectionString(ReadDbSectionName)
-                ?? throw new InvalidOperationException("Database connection string not found");
-
-            options
-                .UseNpgsql(connectionString, npgsqlOptions =>
-                {
-                    npgsqlOptions.MigrationsHistoryTable(
-                        HistoryRepository.DefaultTableName);
-                })
-                .UseSnakeCaseNamingConvention()
-                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-        });
-
-        services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
-        services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<ReadDbContext>());
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<WriteDbContext>());
-
         return services;
     }
 
@@ -111,56 +56,6 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        return services;
-    }
-
-    private static IServiceCollection AddMassTransitInternal(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        services.AddMassTransit(config =>
-        {
-            config.AddConsumers(typeof(DependencyInjection).Assembly);
-
-            config.AddEntityFrameworkOutbox<WriteDbContext>(o =>
-            {
-                o.UsePostgres();
-                o.UseBusOutbox();
-                o.QueryDelay = TimeSpan.FromSeconds(30);
-            });
-
-            config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
-            {
-                endpointCfg.UseEntityFrameworkOutbox<WriteDbContext>(ctx);
-                endpointCfg.UseMessageRetry(r =>
-                {
-                    r.Handle<InvalidOperationException>();
-                    r.Intervals(
-                        TimeSpan.FromSeconds(10),
-                        TimeSpan.FromSeconds(20),
-                        TimeSpan.FromSeconds(40));
-                });
-            });
-
-            config.UsingRabbitMq((context, busConfig) =>
-            {
-                var connectionString = configuration.GetConnectionString(RabbitMqSectionName)
-                    ?? throw new InvalidOperationException("RabbitMQ connection string not found");
-
-                busConfig.Host(new Uri(connectionString), h => { });
-                busConfig.ConfigureEndpoints(context);
-            });
-
-            config.ConfigureHealthCheckOptions(options =>
-            {
-                options.Name = "masstransit";
-                options.MinimalFailureStatus = HealthStatus.Unhealthy;
-                options.Tags.Add("ready");
-            });
-        });
-
-        services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
-
         return services;
     }
 }

@@ -1,10 +1,10 @@
-using Auth.Application.Abstractions.MessageQueue;
+using Kernel.EventBus;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Auth.Infrastructure.MassTransit;
 
-internal sealed class MassTransitEventPublisher : IEventPublisher
+internal sealed class MassTransitEventPublisher : IEventBus
 {
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly ILogger<MassTransitEventPublisher> _logger;

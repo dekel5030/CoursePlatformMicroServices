@@ -1,5 +1,4 @@
 ﻿using Auth.Application.Abstractions.Auth;
-using Auth.Infrastructure.Auth;
 using Auth.Infrastructure.Auth.Context;
 using Auth.Infrastructure.Auth.Jwt;
 using Auth.Infrastructure.Auth.Jwt.External;
@@ -12,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Auth.Infrastructure.Auth.Extensions;
 
-internal static class HostApplicationExtensions
+internal static class AuthExtensions
 {
     public static IServiceCollection AddAuthServices(
         this IServiceCollection services,
@@ -21,6 +20,7 @@ internal static class HostApplicationExtensions
         services.AddSingleton<KeyManager>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
         services.AddSingleton<IPermissionResolver, PermissionResolver>();
+        services.AddHttpContextAccessor();
 
         services.ConfigureKeycloakJwtAuth(configuration);
         services.ConfigureInternalJwtAuth(configuration);
