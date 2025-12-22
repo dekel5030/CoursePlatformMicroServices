@@ -1,6 +1,6 @@
-﻿using Application.AuthUsers.Commands.UserRemovePermission;
-using Auth.Api.Extensions;
+﻿using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
+using Auth.Application.AuthUsers.Commands.UserRemovePermission;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

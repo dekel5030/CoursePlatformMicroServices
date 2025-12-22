@@ -1,12 +1,12 @@
-﻿using Application.Users.Commands.CreateUser;
-using Application.Users.Commands.UpdateUser;
-using Application.Users.Queries.Dtos;
-using Application.Users.Queries.GetUserByid;
-using Application.Users.Queries.GetUsers;
-using Kernel.Messaging.Abstractions;
+﻿using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using Users.Application.Users.Commands.CreateUser;
+using Users.Application.Users.Commands.UpdateUser;
+using Users.Application.Users.Queries.Dtos;
+using Users.Application.Users.Queries.GetUserByid;
+using Users.Application.Users.Queries.GetUsers;
 
-namespace Application;
+namespace Users.Application;
 
 public static class DependencyInjection
 {

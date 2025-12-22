@@ -1,3 +1,3 @@
-namespace Domain.AuthUsers.Primitives;
+namespace Auth.Domain.AuthUsers.Primitives;
 
 public record FullName(FirstName FirstName, LastName LastName);

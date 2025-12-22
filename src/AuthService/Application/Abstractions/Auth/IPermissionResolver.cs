@@ -1,6 +1,6 @@
-﻿using Domain.AuthUsers;
+﻿using Auth.Domain.AuthUsers;
 
-namespace Application.Abstractions.Auth;
+namespace Auth.Application.Abstractions.Auth;
 
 public interface IPermissionResolver
 {

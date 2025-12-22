@@ -1,6 +1,6 @@
 ﻿using Kernel.Auth.AuthTypes;
 
-namespace Application.Abstractions.Context;
+namespace Users.Application.Abstractions.Context;
 
 public interface ICurrentUserContext
 {

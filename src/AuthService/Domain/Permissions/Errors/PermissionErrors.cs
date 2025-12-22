@@ -1,7 +1,7 @@
 ﻿using Kernel;
 using Kernel.Auth.AuthTypes;
 
-namespace Domain.Permissions.Errors;
+namespace Auth.Domain.Permissions.Errors;
 
 public class PermissionErrors
 {

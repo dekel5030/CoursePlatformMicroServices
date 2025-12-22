@@ -1,9 +1,9 @@
-using Application.Abstractions.Data;
-using Domain.AuthUsers;
-using Domain.Roles;
+using Auth.Application.Abstractions.Data;
+using Auth.Domain.AuthUsers;
+using Auth.Domain.Roles;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Database;
+namespace Auth.Infrastructure.Database;
 
 public class ReadDbContext : AppDbContextBase, IReadDbContext
 {

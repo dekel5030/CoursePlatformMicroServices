@@ -1,8 +1,8 @@
-using Application;
-using Course.Api.Endpoints;
-using Course.Api.Extensions;
-using Infrastructure;
-using Infrastructure.Extensions;
+using Courses.Api.Endpoints;
+using Courses.Api.Extensions;
+using Courses.Infrastructure;
+using Courses.Application;
+using Courses.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

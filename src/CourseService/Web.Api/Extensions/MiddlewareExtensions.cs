@@ -1,6 +1,6 @@
-﻿using Course.Api.Middleware;
+﻿using Courses.Api.Middleware;
 
-namespace Course.Api.Extensions;
+namespace Courses.Api.Extensions;
 
 public static class MiddlewareExtensions
 {

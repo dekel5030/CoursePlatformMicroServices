@@ -1,7 +1,7 @@
-using Application.Courses.Queries.Dtos;
-using Domain.Lessons.Primitives;
+using Courses.Application.Courses.Queries.Dtos;
+using Courses.Domain.Lessons.Primitives;
 using Kernel.Messaging.Abstractions;
 
-namespace Application.Lessons.Queries.GetById;
+namespace Courses.Application.Lessons.Queries.GetById;
 
 public record GetLessonByIdQuery(LessonId Id) : IQuery<LessonReadDto>;

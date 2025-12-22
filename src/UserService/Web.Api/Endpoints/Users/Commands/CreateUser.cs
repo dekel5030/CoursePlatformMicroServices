@@ -1,11 +1,11 @@
-﻿using Application.Users.Commands.CreateUser;
-using Kernel;
+﻿using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
-using User.Api.Extensions;
-using User.Api.Infrastructure;
+using Users.Api.Extensions;
+using Users.Api.Infrastructure;
+using Users.Application.Users.Commands.CreateUser;
 
-namespace User.Api.Endpoints.Users.Commands;
+namespace Users.Api.Endpoints.Users.Commands;
 
 public class CreateUser : IEndpoint
 {

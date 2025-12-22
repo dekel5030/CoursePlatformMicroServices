@@ -1,16 +1,16 @@
-﻿using Application.Courses.Commands.CreateCourse;
-using Application.Courses.Queries.Dtos;
-using Application.Courses.Queries.GetById;
-using Application.Courses.Queries.GetCourses;
-using Application.Courses.Queries.GetFeatured;
-using Application.Lessons.Commands.CreateLesson;
-using Application.Lessons.Queries.GetById;
-using Domain.Courses.Primitives;
-using Domain.Lessons.Primitives;
+﻿using Courses.Application.Courses.Commands.CreateCourse;
+using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Courses.Queries.GetById;
+using Courses.Application.Courses.Queries.GetCourses;
+using Courses.Application.Courses.Queries.GetFeatured;
+using Courses.Application.Lessons.Commands.CreateLesson;
+using Courses.Application.Lessons.Queries.GetById;
+using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons.Primitives;
 using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Application;
+namespace Courses.Application;
 
 public static class DependencyInjection
 {

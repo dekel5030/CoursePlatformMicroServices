@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Infrastructure.Auth;
+namespace Auth.Infrastructure.Auth;
 
 public class KeyManager
 {

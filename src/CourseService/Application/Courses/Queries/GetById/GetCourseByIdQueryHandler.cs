@@ -1,11 +1,11 @@
-﻿using Application.Abstractions.Data;
-using Application.Courses.Queries.Dtos;
-using Domain.Courses.Errors;
+﻿using Courses.Application.Abstractions.Data;
+using Courses.Application.Courses.Queries.Dtos;
+using Courses.Domain.Courses.Errors;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Courses.Queries.GetById;
+namespace Courses.Application.Courses.Queries.GetById;
 
 public class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CourseReadDto>
 {

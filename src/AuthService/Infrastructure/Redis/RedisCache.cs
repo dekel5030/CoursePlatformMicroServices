@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
-using Application.Abstractions.Caching;
+using Auth.Application.Abstractions.Caching;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace Infrastructure.Redis;
+namespace Auth.Infrastructure.Redis;
 
 internal class RedisCache : ICacheService
 {
@@ -19,7 +19,7 @@ internal class RedisCache : ICacheService
 
     public async Task<T?> GetAsync<T>(string cacheKey, CancellationToken cancellationToken)
     {
-        string? cachedValue = await _distributedCache.GetStringAsync(cacheKey, cancellationToken);
+        var cachedValue = await _distributedCache.GetStringAsync(cacheKey, cancellationToken);
 
         if (string.IsNullOrEmpty(cachedValue))
         {
@@ -40,7 +40,7 @@ internal class RedisCache : ICacheService
             AbsoluteExpirationRelativeToNow = expiration ?? TimeSpan.FromMinutes(5)
         };
 
-        byte[] serializedData = JsonSerializer.SerializeToUtf8Bytes(value, _serializerOptions);
+        var serializedData = JsonSerializer.SerializeToUtf8Bytes(value, _serializerOptions);
 
         await _distributedCache.SetAsync(cacheKey, serializedData, options, cancellationToken);
     }

@@ -1,6 +1,6 @@
-﻿using Application.Users.Queries.Dtos;
-using Kernel.Messaging.Abstractions;
+﻿using Kernel.Messaging.Abstractions;
+using Users.Application.Users.Queries.Dtos;
 
-namespace Application.Users.Queries.GetUserByid;
+namespace Users.Application.Users.Queries.GetUserByid;
 
 public sealed record GetUserByIdQuery(Guid UserId) : IQuery<UserReadDto>;

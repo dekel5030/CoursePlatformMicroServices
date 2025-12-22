@@ -1,8 +1,8 @@
-﻿using Application.Abstractions.Data;
-using Domain.Users;
+﻿using Domain.Users;
 using Microsoft.EntityFrameworkCore;
+using Users.Application.Abstractions.Data;
 
-namespace Infrastructure.Database;
+namespace Users.Infrastructure.Database;
 
 public class ReadDbContext : DbContext, IReadDbContext
 {

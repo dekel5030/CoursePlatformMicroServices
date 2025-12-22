@@ -1,9 +1,9 @@
-﻿using Domain.Lessons;
-using Domain.Lessons.Primitives;
+﻿using Courses.Domain.Lessons;
+using Courses.Domain.Lessons.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Lessons;
+namespace Courses.Infrastructure.Lessons;
 
 public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
 {

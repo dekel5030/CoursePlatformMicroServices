@@ -1,6 +1,6 @@
 using Kernel;
 
-namespace Domain.Roles.Errors;
+namespace Auth.Domain.Roles.Errors;
 
 public static class RoleErrors
 {

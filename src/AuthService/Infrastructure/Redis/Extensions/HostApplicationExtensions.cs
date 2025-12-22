@@ -1,8 +1,8 @@
-﻿using Application.Abstractions.Caching;
+﻿using Auth.Application.Abstractions.Caching;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Infrastructure.Redis.Extensions;
+namespace Auth.Infrastructure.Redis.Extensions;
 
 internal static class HostApplicationExtensions
 {

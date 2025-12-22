@@ -1,7 +1,7 @@
 using Domain.Users.Primitives;
 using Kernel.Messaging.Abstractions;
 
-namespace Application.Users.Commands.UpdateUser;
+namespace Users.Application.Users.Commands.UpdateUser;
 
 public sealed record UpdateUserCommand(
     Guid UserId,

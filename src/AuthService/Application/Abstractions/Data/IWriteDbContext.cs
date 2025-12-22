@@ -1,8 +1,8 @@
-using Domain.AuthUsers;
-using Domain.Roles;
+using Auth.Domain.AuthUsers;
+using Auth.Domain.Roles;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Abstractions.Data;
+namespace Auth.Application.Abstractions.Data;
 
 public interface IWriteDbContext
 {

@@ -1,6 +1,6 @@
-using Domain.Lessons.Primitives;
+using Courses.Domain.Lessons.Primitives;
 
-namespace Application.Courses.Queries.Dtos;
+namespace Courses.Application.Courses.Queries.Dtos;
 
 public record LessonReadDto(
     LessonId Id,

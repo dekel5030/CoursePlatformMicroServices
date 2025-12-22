@@ -1,12 +1,11 @@
-﻿
-using Application.Users.Queries.Dtos;
-using Application.Users.Queries.GetUsers;
-using Kernel;
+﻿using Kernel;
 using Kernel.Messaging.Abstractions;
-using User.Api.Extensions;
-using User.Api.Infrastructure;
+using Users.Api.Extensions;
+using Users.Api.Infrastructure;
+using Users.Application.Users.Queries.Dtos;
+using Users.Application.Users.Queries.GetUsers;
 
-namespace User.Api.Endpoints.Users.Queries;
+namespace Users.Api.Endpoints.Users.Queries;
 
 public class GetUser : IEndpoint
 {

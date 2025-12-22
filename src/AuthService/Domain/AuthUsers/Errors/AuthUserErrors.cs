@@ -1,6 +1,6 @@
 using Kernel;
 
-namespace Domain.AuthUsers.Errors;
+namespace Auth.Domain.AuthUsers.Errors;
 
 public static class AuthUserErrors
 {

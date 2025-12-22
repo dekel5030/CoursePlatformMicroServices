@@ -1,13 +1,13 @@
-﻿using Application.Abstractions.Data;
-using Domain.Permissions;
-using Domain.Roles;
-using Domain.Roles.Errors;
-using Domain.Roles.Primitives;
+﻿using Auth.Application.Abstractions.Data;
+using Auth.Domain.Permissions;
+using Auth.Domain.Roles;
+using Auth.Domain.Roles.Errors;
+using Auth.Domain.Roles.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Roles.Commands.RemoveRolePermission;
+namespace Auth.Application.Roles.Commands.RemoveRolePermission;
 
 public class RemoveRolePermissionCommandHandler : ICommandHandler<RemoveRolePermissionCommand>
 {

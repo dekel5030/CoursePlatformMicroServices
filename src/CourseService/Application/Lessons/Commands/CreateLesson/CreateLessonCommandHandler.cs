@@ -1,13 +1,13 @@
-using Application.Abstractions.Data;
-using Domain.Courses.Errors;
-using Domain.Courses.Primitives;
-using Domain.Lessons;
-using Domain.Lessons.Primitives;
+using Courses.Application.Abstractions.Data;
+using Courses.Domain.Courses.Errors;
+using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons;
+using Courses.Domain.Lessons.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Lessons.Commands.CreateLesson;
+namespace Courses.Application.Lessons.Commands.CreateLesson;
 
 public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, LessonId>
 {

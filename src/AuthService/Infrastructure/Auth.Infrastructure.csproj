@@ -35,9 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\CoursePlatform.ServiceDefaults\CoursePlatform.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\Application\Application.csproj" />
-    <ProjectReference Include="..\..\..\Contracts\Auth.Contracts\Auth.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Contracts\Users.Contracts\Users.Contracts.csproj" />
+    <ProjectReference Include="..\Application\Auth.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

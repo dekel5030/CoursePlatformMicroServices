@@ -1,7 +1,7 @@
-﻿using Infrastructure.Database;
+﻿using Courses.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace Course.Api.Extensions;
+namespace Courses.Api.Extensions;
 
 public static class MigrationExtensions
 {

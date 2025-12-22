@@ -1,7 +1,7 @@
-using Application;
 using Auth.Api.Endpoints;
 using Auth.Api.Extensions;
-using Infrastructure;
+using Auth.Application;
+using Auth.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 

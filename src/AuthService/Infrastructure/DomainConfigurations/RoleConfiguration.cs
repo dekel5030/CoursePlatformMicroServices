@@ -1,5 +1,5 @@
-﻿using Domain.Roles;
-using Domain.Roles.Primitives;
+﻿using Auth.Domain.Roles;
+using Auth.Domain.Roles.Primitives;
 using Kernel.Auth.AuthTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

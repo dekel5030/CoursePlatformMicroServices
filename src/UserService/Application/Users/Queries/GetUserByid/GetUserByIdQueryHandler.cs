@@ -1,12 +1,12 @@
-﻿using Application.Abstractions.Data;
-using Application.Users.Queries.Dtos;
-using Domain.Users.Errors;
+﻿using Domain.Users.Errors;
 using Domain.Users.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using Users.Application.Abstractions.Data;
+using Users.Application.Users.Queries.Dtos;
 
-namespace Application.Users.Queries.GetUserByid;
+namespace Users.Application.Users.Queries.GetUserByid;
 
 public class GetUserByIdQueryHandler(IReadDbContext DbContext) : IQueryHandler<GetUserByIdQuery, UserReadDto>
 {

@@ -1,4 +1,4 @@
-namespace Infrastructure.Auth.Jwt.External;
+namespace Auth.Infrastructure.Auth.Jwt.External;
 
 public class KeycloakJwtOptions
 {

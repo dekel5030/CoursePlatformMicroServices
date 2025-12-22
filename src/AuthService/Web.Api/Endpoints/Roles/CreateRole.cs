@@ -1,6 +1,6 @@
-using Application.Roles.Commands.CreateRole;
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
+using Auth.Application.Roles.Commands.CreateRole;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

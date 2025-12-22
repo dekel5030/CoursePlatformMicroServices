@@ -1,6 +1,6 @@
 ﻿using Kernel.Messaging.Abstractions;
 
-namespace Infrastructure.DomainEvents;
+namespace Courses.Infrastructure.DomainEvents;
 
 public interface IDomainEventsDispatcher
 {

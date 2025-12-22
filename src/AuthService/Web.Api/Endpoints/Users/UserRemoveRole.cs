@@ -1,8 +1,8 @@
-﻿using Application.AuthUsers.Dtos;
-using Auth.Api.Extensions;
+﻿using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
-using Application.AuthUsers.Commands.UserRemoveRole;
 using Kernel.Messaging.Abstractions;
+using Auth.Application.AuthUsers.Dtos;
+using Auth.Application.AuthUsers.Commands.UserRemoveRole;
 
 namespace Auth.Api.Endpoints.Users;
 

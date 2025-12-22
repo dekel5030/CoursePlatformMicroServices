@@ -1,4 +1,4 @@
-﻿namespace Application.Abstractions.Data;
+﻿namespace Auth.Application.Abstractions.Data;
 
 public interface IUnitOfWork
 {

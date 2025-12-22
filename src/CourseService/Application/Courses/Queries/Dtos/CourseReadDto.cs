@@ -1,7 +1,7 @@
-﻿using Domain.Courses.Primitives;
+﻿using Courses.Domain.Courses.Primitives;
 using Kernel;
 
-namespace Application.Courses.Queries.Dtos;
+namespace Courses.Application.Courses.Queries.Dtos;
 
 public record CourseReadDto(
     CourseId Id,

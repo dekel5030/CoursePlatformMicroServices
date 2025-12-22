@@ -1,9 +1,9 @@
-﻿using Application.Abstractions.Data;
-using Domain.Courses;
-using Domain.Lessons;
+﻿using Courses.Application.Abstractions.Data;
+using Courses.Domain.Courses;
+using Courses.Domain.Lessons;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Database;
+namespace Courses.Infrastructure.Database;
 
 public class ReadDbContext : DbContext, IReadDbContext
 {

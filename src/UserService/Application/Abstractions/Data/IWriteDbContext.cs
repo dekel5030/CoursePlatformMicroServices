@@ -1,7 +1,7 @@
 ﻿using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Abstractions.Data;
+namespace Users.Application.Abstractions.Data;
 
 public interface IWriteDbContext
 {

@@ -1,11 +1,11 @@
-using Domain.AuthUsers.Errors;
-using Domain.AuthUsers.Events;
-using Domain.AuthUsers.Primitives;
-using Domain.Permissions;
-using Domain.Roles;
+using Auth.Domain.AuthUsers.Errors;
+using Auth.Domain.AuthUsers.Events;
+using Auth.Domain.AuthUsers.Primitives;
+using Auth.Domain.Permissions;
+using Auth.Domain.Roles;
 using Kernel;
 
-namespace Domain.AuthUsers;
+namespace Auth.Domain.AuthUsers;
 
 public class AuthUser : Entity
 {

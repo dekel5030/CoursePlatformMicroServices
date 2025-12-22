@@ -1,15 +1,15 @@
-﻿using Application.Abstractions.Auth;
-using Application.Abstractions.Caching;
-using Application.Abstractions.Data;
-using Domain.AuthUsers;
-using Domain.AuthUsers.Primitives;
-using Domain.Roles;
+﻿using Auth.Application.Abstractions.Auth;
+using Auth.Application.Abstractions.Caching;
+using Auth.Application.Abstractions.Data;
+using Auth.Domain.AuthUsers;
+using Auth.Domain.AuthUsers.Primitives;
+using Auth.Domain.Roles;
 using Kernel;
 using Kernel.Auth;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.AuthUsers.Commands.ExchangeToken;
+namespace Auth.Application.AuthUsers.Commands.ExchangeToken;
 
 internal class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenCommand, TokenResponse>
 {
@@ -52,7 +52,7 @@ internal class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenComman
 
         var effectivePermissions = _permissionResolver.ResolveEffectivePermissions(user);
 
-        string token = _tokenProvider.GenerateToken(user, effectivePermissions, _externalUserContext.ExpiryUtc);
+        var token = _tokenProvider.GenerateToken(user, effectivePermissions, _externalUserContext.ExpiryUtc);
 
         await _cacheService.SetAsync(
             AuthCacheKeys.UserInternalJwt(externalId.ProviderId),

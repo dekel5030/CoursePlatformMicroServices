@@ -1,4 +1,4 @@
-﻿using Infrastructure.Auth;
+﻿using Auth.Infrastructure.Auth;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Auth.Api.Endpoints.Auth;

@@ -2,7 +2,7 @@
 using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Application;
+namespace Auth.Application;
 
 public static class DependencyInjection
 {

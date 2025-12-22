@@ -1,9 +1,9 @@
-using Domain.AuthUsers;
-using Domain.Roles;
+using Auth.Domain.AuthUsers;
+using Auth.Domain.Roles;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Database;
+namespace Auth.Infrastructure.Database;
 
 public abstract class AppDbContextBase : DbContext
 {

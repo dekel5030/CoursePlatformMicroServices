@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Jwt;
+namespace Users.Infrastructure.Jwt;
 
 public static class JwtExtensions
 {

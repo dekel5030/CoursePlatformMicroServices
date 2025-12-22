@@ -1,11 +1,11 @@
-﻿using Domain.AuthUsers;
-using Domain.AuthUsers.Primitives;
-using Domain.Roles;
+﻿using Auth.Domain.AuthUsers;
+using Auth.Domain.AuthUsers.Primitives;
+using Auth.Domain.Roles;
 using Kernel.Auth.AuthTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.DomainConfigurations;
+namespace Auth.Infrastructure.DomainConfigurations;
 
 internal sealed class AuthUserConfiguration : IEntityTypeConfiguration<AuthUser>
 {

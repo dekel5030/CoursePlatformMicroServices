@@ -1,11 +1,9 @@
-﻿using System.Threading;
-using Domain.AuthUsers;
-using Domain.AuthUsers.Primitives;
-using Domain.Permissions;
-using Domain.Roles;
-using Infrastructure.Database;
+﻿using Auth.Domain.AuthUsers;
+using Auth.Domain.AuthUsers.Primitives;
+using Auth.Domain.Permissions;
+using Auth.Domain.Roles;
+using Auth.Infrastructure.Database;
 using Kernel.Auth.AuthTypes;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Api.Extensions;

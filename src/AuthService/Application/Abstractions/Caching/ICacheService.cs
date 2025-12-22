@@ -1,6 +1,6 @@
 ﻿using Kernel;
 
-namespace Application.Abstractions.Caching;
+namespace Auth.Application.Abstractions.Caching;
 
 public interface ICacheService
 {

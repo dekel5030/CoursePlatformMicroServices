@@ -13,8 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\CoursePlatform.ServiceDefaults\CoursePlatform.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\..\..\Contracts\Auth.Contracts\Auth.Contracts.csproj" />
+    <ProjectReference Include="..\Domain\Auth.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

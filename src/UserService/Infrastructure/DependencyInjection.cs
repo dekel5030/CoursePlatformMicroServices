@@ -1,25 +1,22 @@
-﻿using Application.Abstractions.Context;
-using Application.Abstractions.Data;
-using Domain.Users.Events;
-using Infrastructure.Auth;
-using Infrastructure.Database;
-using Infrastructure.DomainEvents;
-using Infrastructure.MassTransit;
-using Kernel.Messaging.Abstractions;
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Users.Application.Abstractions.Context;
+using Users.Application.Abstractions.Data;
+using Users.Infrastructure.Auth;
+using Users.Infrastructure.Database;
+using Users.Infrastructure.DomainEvents;
 
-namespace Infrastructure;
+namespace Users.Infrastructure;
 
 public static class DependencyInjection
 {
-    internal const string _readDatabaseConnectionStringName = "ReadDatabase";
-    internal const string _writeDatabaseConnectionStringName = "WriteDatabase";
-    internal const string _rabbitMqConnectionStringName = "RabbitMq";
+    internal const string ReadDatabaseConnectionStringName = "ReadDatabase";
+    internal const string WriteDatabaseConnectionStringName = "WriteDatabase";
+    internal const string RabbitMqConnectionStringName = "RabbitMq";
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
@@ -54,7 +51,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(_readDatabaseConnectionStringName)!;
+            var connectionString = configuration.GetConnectionString(ReadDatabaseConnectionStringName)!;
 
             options.UseNpgsql(connectionString);
         });
@@ -68,7 +65,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(_writeDatabaseConnectionStringName)!;
+            var connectionString = configuration.GetConnectionString(WriteDatabaseConnectionStringName)!;
 
             options.UseNpgsql(connectionString);
         });
@@ -107,7 +104,7 @@ public static class DependencyInjection
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                string connectionString = configuration.GetConnectionString(_rabbitMqConnectionStringName)!;
+                var connectionString = configuration.GetConnectionString(RabbitMqConnectionStringName)!;
 
                 busConfig.Host(new Uri(connectionString!), h => { });
                 busConfig.ConfigureEndpoints(context);

@@ -1,9 +1,9 @@
-﻿using Application.Abstractions.Data;
-using Domain.Roles;
+﻿using Auth.Application.Abstractions.Data;
+using Auth.Domain.Roles;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
-namespace Application.Roles.Commands.CreateRole;
+namespace Auth.Application.Roles.Commands.CreateRole;
 
 public class CreateRoleCommandHandler(IWriteDbContext dbContext, IUnitOfWork unitOfWork)
         : ICommandHandler<CreateRoleCommand, CreateRoleResponseDto>

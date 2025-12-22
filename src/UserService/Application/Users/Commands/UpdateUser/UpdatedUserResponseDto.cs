@@ -1,4 +1,4 @@
-namespace Application.Users.Commands.UpdateUser;
+namespace Users.Application.Users.Commands.UpdateUser;
 
 public sealed record UpdatedUserResponseDto(
     Guid Id,

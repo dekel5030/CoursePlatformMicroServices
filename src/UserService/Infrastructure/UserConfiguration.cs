@@ -3,7 +3,7 @@ using Domain.Users.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure;
+namespace Users.Infrastructure;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {

@@ -1,14 +1,14 @@
-﻿using Application.Abstractions.Data;
-using Domain.AuthUsers;
-using Domain.AuthUsers.Errors;
-using Domain.AuthUsers.Primitives;
-using Domain.Roles;
-using Domain.Roles.Errors;
+﻿using Auth.Application.Abstractions.Data;
+using Auth.Domain.AuthUsers;
+using Auth.Domain.AuthUsers.Errors;
+using Auth.Domain.AuthUsers.Primitives;
+using Auth.Domain.Roles;
+using Auth.Domain.Roles.Errors;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.AuthUsers.Commands.UserRemoveRole;
+namespace Auth.Application.AuthUsers.Commands.UserRemoveRole;
 
 public class UserRemoveRoleCommandHandler : ICommandHandler<UserRemoveRoleCommand>
 {

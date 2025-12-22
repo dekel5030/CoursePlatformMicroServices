@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 
-namespace Infrastructure.Extensions;
+namespace Users.Infrastructure.Extensions;
 
 public static class HostingExtensions
 {
@@ -15,7 +15,7 @@ public static class HostingExtensions
         builder.AddServiceDefaults();
         var healthChecks = builder.Services.AddHealthChecks();
 
-        var writeDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection._writeDatabaseConnectionStringName);
+        var writeDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.WriteDatabaseConnectionStringName);
         if (!string.IsNullOrEmpty(writeDbConnectionString))
         {
             healthChecks.AddNpgSql(
@@ -25,7 +25,7 @@ public static class HostingExtensions
                 timeout: TimeSpan.FromSeconds(3));
         }
 
-        var readDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection._readDatabaseConnectionStringName);
+        var readDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.ReadDatabaseConnectionStringName);
         if (!string.IsNullOrEmpty(readDbConnectionString)
             && !string.Equals(readDbConnectionString, writeDbConnectionString))
         {

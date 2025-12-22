@@ -1,4 +1,4 @@
-namespace Application.Abstractions.MessageQueue;
+namespace Auth.Application.Abstractions.MessageQueue;
 
 public interface IEventPublisher
 {

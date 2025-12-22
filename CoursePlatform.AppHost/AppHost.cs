@@ -55,7 +55,7 @@ var usersDb = builder
     .WithBindMount(@"C:\AspireVolumes\UsersService", "/var/lib/postgresql/data")
     .AddDatabase("usersdb");
 
-var usersService = builder.AddProject<Projects.User_Api>("userservice")
+var usersService = builder.AddProject<Projects.Users_Api>("userservice")
     .WithReference(usersDb)
     .WithReference(rabbitMq)
     .WaitFor(usersDb)
@@ -72,7 +72,7 @@ var coursesDb = builder
     .WithBindMount(@"C:\AspireVolumes\CoursesService", "/var/lib/postgresql/data")
     .AddDatabase("coursesdb");
 
-var coursesService = builder.AddProject<Projects.Course_Api>("courseservice")
+var coursesService = builder.AddProject<Projects.Courses_Api>("courseservice")
     .WithReference(coursesDb)
     .WithReference(rabbitMq)
     .WaitFor(coursesDb)

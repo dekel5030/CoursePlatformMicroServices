@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Infrastructure.Extensions;
+namespace Auth.Infrastructure.Extensions;
 
 public static class HostingExtensions
 {

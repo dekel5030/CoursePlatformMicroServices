@@ -1,6 +1,6 @@
 ﻿using Kernel;
 
-namespace Course.Api.Extensions;
+namespace Courses.Api.Extensions;
 
 public static class ResultExtensions
 {
