@@ -65,4 +65,17 @@ public record Permission
     {
         return PermissionClaim.ToClaimValue(Effect, Action, Resource, ResourceId);
     }
+
+    public bool Covers(Permission other)
+    {
+        if (Effect != other.Effect) return false;
+
+        bool actionMatches = Action == ActionType.Wildcard || Action == other.Action;
+
+        bool resourceMatches = Resource == ResourceType.Wildcard || Resource == other.Resource;
+
+        bool idMatches = ResourceId.IsWildcard || ResourceId.Value == other.ResourceId.Value;
+
+        return actionMatches && resourceMatches && idMatches;
+    }
 };
