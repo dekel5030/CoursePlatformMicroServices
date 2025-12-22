@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.MessageQueue;
 using CoursePlatform.ServiceDefaults.Auth;
-using Infrastructure.Auth;
+using Infrastructure.Auth.Extensions;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.Extensions;
@@ -52,8 +52,7 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
-            .AddUserContextProvider()
-            .AddGatewayAuth();
+            .AddUserContextProvider();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)

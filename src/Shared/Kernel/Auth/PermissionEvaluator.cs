@@ -43,7 +43,7 @@ public static class PermissionEvaluator
         {
             var claimValue = PermissionClaim.ToClaimValue(effect, checkAction, checkResource, checkResourceId);
 
-            if (user.HasClaim(PermissionClaim.ClaimType, claimValue))
+            if (user.HasClaim(CoursePlatformClaims.Permission, claimValue))
             {
                 return true;
             }

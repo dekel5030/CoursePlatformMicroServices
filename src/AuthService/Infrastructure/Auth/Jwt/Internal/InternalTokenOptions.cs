@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Auth.Jwt;
+﻿namespace Infrastructure.Auth.Jwt.Internal;
 
 internal class InternalTokenOptions
 {
