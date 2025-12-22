@@ -44,12 +44,14 @@ public class Role : Entity
             return Result.Failure(RoleErrors.InvalidPermissionEffect);
         }
 
-        if (_permissions.Contains(permission))
+        if (_permissions.Any(p => p.Covers(permission)))
         {
-            return Result.Failure(PermissionErrors.PermissionAlreadyAssigned);
+            return Result.Success();
         }
 
+        _permissions.RemoveAll(p => permission.Covers(p));
         _permissions.Add(permission);
+
         Raise(new RolePermissionAddedDomainEvent(this, permission));
         return Result.Success();
     }
