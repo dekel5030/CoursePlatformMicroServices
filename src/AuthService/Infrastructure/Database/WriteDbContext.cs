@@ -1,31 +1,30 @@
 using Auth.Application.Abstractions.Data;
-using Auth.Infrastructure.DomainEvents;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Infrastructure.Database;
 
 public class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfWork
 {
-    private readonly IDomainEventsDispatcher _domainEventsDispatcher;
+    private readonly IMediator _mediator;
 
     public WriteDbContext(
         DbContextOptions<WriteDbContext> options,
-        IDomainEventsDispatcher domainEventsDispatcher,
-        IServiceProvider serviceProvider)
+        IMediator mediator)
         : base(options)
     {
-        _domainEventsDispatcher = domainEventsDispatcher;
+        _mediator = mediator;
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        await DispatchDomainEvents(this, cancellationToken);
+        await DispatchDomainEventsAsync(this, cancellationToken);
 
         return await base.SaveChangesAsync(cancellationToken);
     }
 
-    private Task DispatchDomainEvents(
+    private async Task DispatchDomainEventsAsync(
         DbContext dbContext,
         CancellationToken cancellationToken = default)
     {
@@ -41,6 +40,10 @@ public class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfWork
             entity.ClearDomainEvents();
         }
 
-        return _domainEventsDispatcher.DispatchAsync(domainEvents, cancellationToken);
+        //return _domainEventsDispatcher.DispatchAsync(domainEvents, cancellationToken);
+        foreach (var domainEvent in domainEvents)
+        {
+            await _mediator.Publish(domainEvent, cancellationToken);
+        }
     }
 }

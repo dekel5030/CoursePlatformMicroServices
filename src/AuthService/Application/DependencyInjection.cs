@@ -35,7 +35,13 @@ public static class DependencyInjection
 
     private static IServiceCollection AddIntegrationEventHandlers(this IServiceCollection services)
     {
-        // Integration event handlers will be added here
+
+        services.Scan(selector => selector
+            .FromAssemblies(typeof(DependencyInjection).Assembly)
+            .AddClasses(filter => filter.AssignableTo(typeof(IDomainEventHandler<>)), publicOnly: false)
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
+
         return services;
     }
 

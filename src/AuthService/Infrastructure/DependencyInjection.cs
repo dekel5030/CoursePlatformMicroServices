@@ -1,6 +1,5 @@
 ﻿using Auth.Infrastructure.Auth.Extensions;
 using Auth.Infrastructure.Database;
-using Auth.Infrastructure.DomainEvents;
 using Auth.Infrastructure.Extensions;
 using Auth.Infrastructure.MassTransit;
 using Auth.Infrastructure.Redis.Extensions;
@@ -39,17 +38,10 @@ public static class DependencyInjection
         this IServiceCollection services, IConfiguration configuration)
     {
         return services
-            .AddServices()
             .AddAuthServices(configuration)
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration);
-    }
-
-    private static IServiceCollection AddServices(this IServiceCollection services)
-    {
-        services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
-        return services;
     }
 
     private static IServiceCollection AddHealthChecksInternal(
