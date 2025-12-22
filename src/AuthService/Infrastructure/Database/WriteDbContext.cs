@@ -1,10 +1,9 @@
-using Application.Abstractions.Data;
-using Infrastructure.DomainEvents;
+using Auth.Application.Abstractions.Data;
+using Auth.Infrastructure.DomainEvents;
 using Kernel;
-using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Database;
+namespace Auth.Infrastructure.Database;
 
 public class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfWork
 {
@@ -33,7 +32,7 @@ public class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfWork
         IEnumerable<Entity> entities = dbContext.ChangeTracker.Entries<Entity>()
             .Select(entry => entry.Entity);
 
-        List<IDomainEvent> domainEvents = entities
+        var domainEvents = entities
             .SelectMany(entity => entity.DomainEvents)
             .ToList();
 

@@ -1,9 +1,9 @@
-﻿using Application.Abstractions.Caching;
+﻿using Auth.Application.Abstractions.Caching;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Behaviors;
+namespace Auth.Application.Behaviors;
 
 internal sealed class QueryCachingBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
@@ -41,7 +41,7 @@ internal sealed class QueryCachingBehavior<TRequest, TResponse>
 
         if (result.IsSuccess)
         {
-            string cacheKey = request.CacheKey;
+            var cacheKey = request.CacheKey;
 
             await _cacheService.SetAsync(
                 cacheKey,

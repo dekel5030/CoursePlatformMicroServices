@@ -1,4 +1,4 @@
-namespace Application.AuthUsers.Dtos;
+namespace Auth.Application.AuthUsers.Dtos;
 
 public record CurrentUserDto(
     Guid Id,

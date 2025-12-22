@@ -1,4 +1,4 @@
-﻿namespace Course.Api.Endpoints;
+﻿namespace Courses.Api.Endpoints;
 
 public interface IEndpoint
 {

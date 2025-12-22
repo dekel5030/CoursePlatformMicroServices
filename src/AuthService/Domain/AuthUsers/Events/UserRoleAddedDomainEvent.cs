@@ -1,6 +1,7 @@
-using Domain.Roles;
+using Auth.Domain.AuthUsers;
+using Auth.Domain.Roles;
 using Kernel.Messaging.Abstractions;
 
-namespace Domain.AuthUsers.Events;
+namespace Auth.Domain.AuthUsers.Events;
 
 public record UserRoleAddedDomainEvent(AuthUser User, Role Role) : IDomainEvent;

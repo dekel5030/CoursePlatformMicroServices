@@ -1,12 +1,11 @@
-using Domain.Permissions;
-using Domain.Permissions.Errors;
-using Domain.Roles.Errors;
-using Domain.Roles.Events;
-using Domain.Roles.Primitives;
+using Auth.Domain.Permissions;
+using Auth.Domain.Roles.Errors;
+using Auth.Domain.Roles.Events;
+using Auth.Domain.Roles.Primitives;
 using Kernel;
 using Kernel.Auth.AuthTypes;
 
-namespace Domain.Roles;
+namespace Auth.Domain.Roles;
 
 public class Role : Entity
 {

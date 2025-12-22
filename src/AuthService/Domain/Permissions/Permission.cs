@@ -1,9 +1,9 @@
-using Domain.Permissions.Errors;
+using Auth.Domain.Permissions.Errors;
 using Kernel;
 using Kernel.Auth;
 using Kernel.Auth.AuthTypes;
 
-namespace Domain.Permissions;
+namespace Auth.Domain.Permissions;
 
 public record Permission
 {
@@ -70,11 +70,11 @@ public record Permission
     {
         if (Effect != other.Effect) return false;
 
-        bool actionMatches = Action == ActionType.Wildcard || Action == other.Action;
+        var actionMatches = Action == ActionType.Wildcard || Action == other.Action;
 
-        bool resourceMatches = Resource == ResourceType.Wildcard || Resource == other.Resource;
+        var resourceMatches = Resource == ResourceType.Wildcard || Resource == other.Resource;
 
-        bool idMatches = ResourceId.IsWildcard || ResourceId.Value == other.ResourceId.Value;
+        var idMatches = ResourceId.IsWildcard || ResourceId.Value == other.ResourceId.Value;
 
         return actionMatches && resourceMatches && idMatches;
     }

@@ -1,6 +1,6 @@
-﻿using Application.AuthUsers.Commands.UserAddPermission;
-using Auth.Api.Extensions;
+﻿using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
+using Auth.Application.AuthUsers.Commands.UserAddPermission;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

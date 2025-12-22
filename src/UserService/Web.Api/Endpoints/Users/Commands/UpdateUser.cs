@@ -1,12 +1,12 @@
-using Application.Users.Commands.UpdateUser;
 using Domain.Users.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
-using User.Api.Extensions;
-using User.Api.Infrastructure;
+using Users.Api.Extensions;
+using Users.Api.Infrastructure;
+using Users.Application.Users.Commands.UpdateUser;
 
-namespace User.Api.Endpoints.Users.Commands;
+namespace Users.Api.Endpoints.Users.Commands;
 
 public class UpdateUser : IEndpoint
 {

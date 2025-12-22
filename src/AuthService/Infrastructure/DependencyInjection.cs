@@ -1,12 +1,12 @@
-﻿using Application.Abstractions.Data;
-using Application.Abstractions.MessageQueue;
+﻿using Auth.Application.Abstractions.Data;
+using Auth.Application.Abstractions.MessageQueue;
+using Auth.Infrastructure.Auth.Extensions;
+using Auth.Infrastructure.Database;
+using Auth.Infrastructure.DomainEvents;
+using Auth.Infrastructure.Extensions;
+using Auth.Infrastructure.MassTransit;
+using Auth.Infrastructure.Redis.Extensions;
 using CoursePlatform.ServiceDefaults.Auth;
-using Infrastructure.Auth.Extensions;
-using Infrastructure.Database;
-using Infrastructure.DomainEvents;
-using Infrastructure.Extensions;
-using Infrastructure.MassTransit;
-using Infrastructure.Redis.Extensions;
 using Kernel.Auth.Abstractions;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -17,7 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 
-namespace Infrastructure;
+namespace Auth.Infrastructure;
 
 public static class DependencyInjection
 {
@@ -73,7 +73,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(WriteDbSectionName)
+            var connectionString = configuration.GetConnectionString(WriteDbSectionName)
                 ?? throw new InvalidOperationException("Database connection string not found");
 
             options
@@ -87,7 +87,7 @@ public static class DependencyInjection
 
         services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(ReadDbSectionName)
+            var connectionString = configuration.GetConnectionString(ReadDbSectionName)
                 ?? throw new InvalidOperationException("Database connection string not found");
 
             options
@@ -144,7 +144,7 @@ public static class DependencyInjection
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                string connectionString = configuration.GetConnectionString(RabbitMqSectionName)
+                var connectionString = configuration.GetConnectionString(RabbitMqSectionName)
                     ?? throw new InvalidOperationException("RabbitMQ connection string not found");
 
                 busConfig.Host(new Uri(connectionString), h => { });

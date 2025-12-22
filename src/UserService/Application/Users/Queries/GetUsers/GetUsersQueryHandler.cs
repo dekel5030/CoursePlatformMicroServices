@@ -1,10 +1,10 @@
-﻿using Application.Abstractions.Data;
-using Application.Users.Queries.Dtos;
-using Kernel;
+﻿using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using Users.Application.Abstractions.Data;
+using Users.Application.Users.Queries.Dtos;
 
-namespace Application.Users.Queries.GetUsers;
+namespace Users.Application.Users.Queries.GetUsers;
 
 public class GetUsersQueryHandler(IReadDbContext DbContext) : IQueryHandler<GetUsersQuery, CollectionDto<UserReadDto>>
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 
-namespace Course.Api.Extensions;
+namespace Courses.Api.Extensions;
 
 internal static class ServiceCollectionExtensions
 {

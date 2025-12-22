@@ -1,12 +1,12 @@
-﻿using Application.Abstractions.Data;
-using Domain.Users;
+﻿using Domain.Users;
 using Domain.Users.Errors;
 using Domain.Users.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using Users.Application.Abstractions.Data;
 
-namespace Application.Users.Commands.CreateUser;
+namespace Users.Application.Users.Commands.CreateUser;
 
 public class CreateUserCommandHandler(IWriteDbContext dbContext) : ICommandHandler<CreateUserCommand, CreatedUserRespondDto>
 {

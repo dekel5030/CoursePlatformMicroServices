@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
-using Application.Abstractions.Auth;
+using Auth.Application.Abstractions.Auth;
 using Microsoft.AspNetCore.Http;
 
-namespace Infrastructure.Auth.Context;
+namespace Auth.Infrastructure.Auth.Context;
 
 internal sealed class ExternalUserContext(IHttpContextAccessor httpContextAccessor)
         : IExternalUserContext

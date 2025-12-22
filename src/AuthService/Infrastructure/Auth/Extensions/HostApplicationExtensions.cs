@@ -1,15 +1,16 @@
-﻿using Application.Abstractions.Auth;
+﻿using Auth.Application.Abstractions.Auth;
+using Auth.Infrastructure.Auth;
+using Auth.Infrastructure.Auth.Context;
+using Auth.Infrastructure.Auth.Jwt;
+using Auth.Infrastructure.Auth.Jwt.External;
+using Auth.Infrastructure.Auth.Jwt.Internal;
 using CoursePlatform.ServiceDefaults.Auth;
-using Infrastructure.Auth.Context;
-using Infrastructure.Auth.Jwt;
-using Infrastructure.Auth.Jwt.External;
-using Infrastructure.Auth.Jwt.Internal;
 using Kernel.Auth.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Auth.Extensions;
+namespace Auth.Infrastructure.Auth.Extensions;
 
 internal static class HostApplicationExtensions
 {

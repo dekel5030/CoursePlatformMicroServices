@@ -1,6 +1,6 @@
 using Kernel;
 
-namespace Domain.Lessons.Errors;
+namespace Courses.Domain.Lessons.Errors;
 
 public static class LessonErrors
 {

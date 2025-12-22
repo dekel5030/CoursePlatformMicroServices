@@ -1,10 +1,10 @@
-﻿using Application.Courses.Commands.CreateCourse;
-using Course.Api.Extensions;
-using Course.Api.Infrastructure;
-using Domain.Courses.Primitives;
+﻿using Courses.Api.Extensions;
+using Courses.Api.Infrastructure;
+using Courses.Application.Courses.Commands.CreateCourse;
+using Courses.Domain.Courses.Primitives;
 using Kernel.Messaging.Abstractions;
 
-namespace Course.Api.Endpoints.Courses;
+namespace Courses.Api.Endpoints.Courses;
 
 public class CreateCourse : IEndpoint
 {

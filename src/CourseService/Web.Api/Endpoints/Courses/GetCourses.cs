@@ -1,10 +1,10 @@
-﻿using Application.Courses.Queries.Dtos;
-using Application.Courses.Queries.GetCourses;
-using Course.Api.Extensions;
-using Course.Api.Infrastructure;
+﻿using Courses.Api.Extensions;
+using Courses.Api.Infrastructure;
+using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Courses.Queries.GetCourses;
 using Kernel.Messaging.Abstractions;
 
-namespace Course.Api.Endpoints.Courses;
+namespace Courses.Api.Endpoints.Courses;
 
 public class GetCourses : IEndpoint
 {

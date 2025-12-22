@@ -1,13 +1,12 @@
-﻿using Application.Abstractions.Data;
-using Domain.Courses;
-using Domain.Lessons;
-using Infrastructure.DomainEvents;
+﻿using Courses.Application.Abstractions.Data;
+using Courses.Domain.Courses;
+using Courses.Domain.Lessons;
+using Courses.Infrastructure.DomainEvents;
 using Kernel;
-using Kernel.Messaging.Abstractions;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Database;
+namespace Courses.Infrastructure.Database;
 
 public sealed class WriteDbContext(
     DbContextOptions<WriteDbContext> options,
@@ -41,7 +40,7 @@ public sealed class WriteDbContext(
         IEnumerable<Entity> entities = dbContext.ChangeTracker.Entries<Entity>()
             .Select(entry => entry.Entity);
 
-        List<IDomainEvent> domainEvents = entities
+        var domainEvents = entities
             .SelectMany(entity => entity.DomainEvents)
             .ToList();
 

@@ -1,4 +1,4 @@
-﻿namespace Application.AuthUsers.Commands.UserAddPermission;
+﻿namespace Auth.Application.AuthUsers.Commands.UserAddPermission;
 
 public record UserAddPermissionRequestDto(
     string Effect,

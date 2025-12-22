@@ -1,10 +1,10 @@
-﻿using Application.Abstractions.Data;
-using Application.Courses.Queries.Dtos;
+﻿using Courses.Application.Abstractions.Data;
+using Courses.Application.Courses.Queries.Dtos;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Courses.Queries.GetCourses;
+namespace Courses.Application.Courses.Queries.GetCourses;
 
 public class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, PagedResponseDto<CourseReadDto>>
 {

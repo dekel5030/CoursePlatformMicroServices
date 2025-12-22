@@ -1,6 +1,6 @@
 ﻿using Kernel;
 
-namespace Course.Api.Infrastructure;
+namespace Courses.Api.Infrastructure;
 
 public static class CustomResults
 {

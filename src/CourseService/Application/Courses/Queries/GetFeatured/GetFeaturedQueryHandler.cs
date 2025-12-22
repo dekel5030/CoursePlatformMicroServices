@@ -1,11 +1,11 @@
-﻿using Application.Abstractions.Data;
-using Application.Courses.Queries.Dtos;
-using Domain.Courses.Primitives;
+﻿using Courses.Application.Abstractions.Data;
+using Courses.Application.Courses.Queries.Dtos;
+using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Courses.Queries.GetFeatured;
+namespace Courses.Application.Courses.Queries.GetFeatured;
 
 public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResponseDto<CourseReadDto>>
 {

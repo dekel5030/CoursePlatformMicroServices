@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Auth.Jwt;
+﻿namespace Auth.Infrastructure.Auth.Jwt;
 
 public class AuthSchemes
 {

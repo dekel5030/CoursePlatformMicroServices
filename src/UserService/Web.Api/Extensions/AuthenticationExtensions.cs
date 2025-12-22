@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-namespace User.Api.Extensions;
+namespace Users.Api.Extensions;
 
 public static class AuthenticationExtensions
 {

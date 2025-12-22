@@ -1,8 +1,8 @@
-﻿using Domain.Courses;
-using Domain.Lessons;
+﻿using Courses.Domain.Courses;
+using Courses.Domain.Lessons;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Abstractions.Data;
+namespace Courses.Application.Abstractions.Data;
 
 public interface IReadDbContext
 {

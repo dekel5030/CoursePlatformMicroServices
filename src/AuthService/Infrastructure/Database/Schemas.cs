@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Database;
+﻿namespace Auth.Infrastructure.Database;
 
 internal static class Schemas
 {

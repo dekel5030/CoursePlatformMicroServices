@@ -1,4 +1,4 @@
-﻿namespace Application.Courses.Commands.CreateCourse;
+﻿namespace Courses.Application.Courses.Commands.CreateCourse;
 
 public record CreateCourseDto(
     string? Title,

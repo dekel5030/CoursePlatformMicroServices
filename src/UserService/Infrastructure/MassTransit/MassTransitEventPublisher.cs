@@ -1,7 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.MassTransit;
+namespace Users.Infrastructure.MassTransit;
 
 internal sealed class MassTransitEventPublisher 
 {

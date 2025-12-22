@@ -1,11 +1,11 @@
-﻿using Application.Abstractions.Data;
-using Domain.Permissions;
-using Domain.Roles.Errors;
+﻿using Auth.Application.Abstractions.Data;
+using Auth.Domain.Permissions;
+using Auth.Domain.Roles.Errors;
 using Kernel;
 using Kernel.Auth.AuthTypes;
 using Kernel.Messaging.Abstractions;
 
-namespace Application.Roles.Commands.AddRolePermission;
+namespace Auth.Application.Roles.Commands.AddRolePermission;
 
 public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermissionCommand>
 {

@@ -1,7 +1,6 @@
-﻿using Application.Abstractions.Data;
-using Infrastructure.Database;
-using Infrastructure.DomainEvents;
-using Infrastructure.MassTransit;
+﻿using Courses.Application.Abstractions.Data;
+using Courses.Infrastructure.Database;
+using Courses.Infrastructure.DomainEvents;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -9,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Infrastructure;
+namespace Courses.Infrastructure;
 
 public static class DependencyInjection
 {
@@ -46,7 +45,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(ReadDatabaseConnectionSection)!;
+            var connectionString = configuration.GetConnectionString(ReadDatabaseConnectionSection)!;
 
             options
                 .UseNpgsql(connectionString, npgsqlOptions =>
@@ -66,7 +65,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
-            string connectionString = configuration.GetConnectionString(WriteDatabaseConnectionSection)!;
+            var connectionString = configuration.GetConnectionString(WriteDatabaseConnectionSection)!;
 
             options
                 .UseNpgsql(connectionString, npgsqlOptions =>
@@ -132,7 +131,7 @@ public static class DependencyInjection
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                string connectionString = configuration.GetConnectionString(RabbitMqConnectionSection)!;
+                var connectionString = configuration.GetConnectionString(RabbitMqConnectionSection)!;
 
                 busConfig.Host(new Uri(connectionString!), h => { });
                 busConfig.ConfigureEndpoints(context);

@@ -1,4 +1,4 @@
-namespace Infrastructure.Jwt;
+namespace Users.Infrastructure.Jwt;
 
 public class JwtOptions
 {

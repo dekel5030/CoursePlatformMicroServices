@@ -1,11 +1,11 @@
 ﻿
-using Application.Courses.Queries.Dtos;
-using Application.Courses.Queries.GetFeatured;
-using Course.Api.Extensions;
-using Course.Api.Infrastructure;
+using Courses.Api.Extensions;
+using Courses.Api.Infrastructure;
+using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Courses.Queries.GetFeatured;
 using Kernel.Messaging.Abstractions;
 
-namespace Course.Api.Endpoints.Courses;
+namespace Courses.Api.Endpoints.Courses;
 
 public class GetFeatured : IEndpoint
 {

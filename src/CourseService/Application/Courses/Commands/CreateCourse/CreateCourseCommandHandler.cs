@@ -1,10 +1,10 @@
-﻿using Application.Abstractions.Data;
-using Domain.Courses;
-using Domain.Courses.Primitives;
+﻿using Courses.Application.Abstractions.Data;
+using Courses.Domain.Courses;
+using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
-namespace Application.Courses.Commands.CreateCourse;
+namespace Courses.Application.Courses.Commands.CreateCourse;
 
 public class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand, CourseId>
 {

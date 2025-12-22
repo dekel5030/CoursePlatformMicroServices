@@ -2,7 +2,7 @@
 using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.DomainEvents;
+namespace Courses.Infrastructure.DomainEvents;
 
 internal sealed class DomainEventsDispatcher(IServiceProvider serviceProvider) : IDomainEventsDispatcher
 {
@@ -25,7 +25,7 @@ internal sealed class DomainEventsDispatcher(IServiceProvider serviceProvider) :
             //IEnumerable<object?> handlers = scope.ServiceProvider.GetServices(handlerType);
             IEnumerable<object?> handlers = serviceProvider.GetServices(handlerType);
 
-            foreach (object? handler in handlers)
+            foreach (var handler in handlers)
             {
                 if (handler is null)
                 {

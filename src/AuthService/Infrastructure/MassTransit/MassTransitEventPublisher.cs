@@ -1,8 +1,8 @@
-using Application.Abstractions.MessageQueue;
+using Auth.Application.Abstractions.MessageQueue;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.MassTransit;
+namespace Auth.Infrastructure.MassTransit;
 
 internal sealed class MassTransitEventPublisher : IEventPublisher
 {

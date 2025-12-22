@@ -1,4 +1,4 @@
-﻿namespace Application.Users.Queries.Dtos;
+﻿namespace Users.Application.Users.Queries.Dtos;
 
 public record CollectionDto<T>
 {

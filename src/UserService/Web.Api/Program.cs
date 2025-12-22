@@ -1,8 +1,8 @@
-using Application;
-using Infrastructure;
-using Infrastructure.Extensions;
-using User.Api.Endpoints;
-using User.Api.Extensions;
+using Users.Api.Endpoints;
+using Users.Api.Extensions;
+using Users.Infrastructure;
+using Users.Infrastructure.Extensions;
+using Users.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -23,10 +23,10 @@
         <ProjectReference Include="..\src\AuthService\Web.Api\Auth.Api.csproj">
         </ProjectReference>
 
-        <ProjectReference Include="..\src\CourseService\Web.Api\Course.Api.csproj">
+        <ProjectReference Include="..\src\CourseService\Web.Api\Courses.Api.csproj">
         </ProjectReference>
 
-        <ProjectReference Include="..\src\UserService\Web.Api\User.Api.csproj">
+        <ProjectReference Include="..\src\UserService\Web.Api\Users.Api.csproj">
         </ProjectReference>
     </ItemGroup>
 

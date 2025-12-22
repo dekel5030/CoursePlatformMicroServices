@@ -1,6 +1,6 @@
 ﻿using Kernel.Messaging.Abstractions;
 
-namespace Application.Roles.Commands.AddRolePermission;
+namespace Auth.Application.Roles.Commands.AddRolePermission;
 
 public record AddRolePermissionCommand(
     Guid RoleId,

@@ -12,7 +12,7 @@ using Testcontainers.RabbitMq;
 using Testcontainers.Redis;
 using Xunit;
 
-namespace Infrastructure.IntegrationTests;
+namespace Auth.Infrastructure.IntegrationTests;
 
 /// <summary>
 /// Base class for infrastructure integration tests.

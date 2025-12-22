@@ -1,6 +1,6 @@
 ﻿using Kernel;
 
-namespace User.Api.Infrastructure;
+namespace Users.Api.Infrastructure;
 
 public static class CustomResults
 {

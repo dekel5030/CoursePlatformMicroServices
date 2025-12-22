@@ -1,10 +1,10 @@
-﻿using Application.Abstractions.Context;
-using Kernel.Auth;
+﻿using Kernel.Auth;
 using Kernel.Auth.AuthTypes;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using Users.Application.Abstractions.Context;
 
-namespace Infrastructure.Auth;
+namespace Users.Infrastructure.Auth;
 
 public class CurrentUserContext : ICurrentUserContext
 {
@@ -27,7 +27,7 @@ public class CurrentUserContext : ICurrentUserContext
                 return null;
             }
 
-            string? idValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var idValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return Guid.TryParse(idValue, out var userId) ? userId : null;
         }
     }

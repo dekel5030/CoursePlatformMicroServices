@@ -1,3 +1,3 @@
-﻿namespace Application.Users.Commands.CreateUser;
+﻿namespace Users.Application.Users.Commands.CreateUser;
 
 public record CreatedUserRespondDto(Guid Id);

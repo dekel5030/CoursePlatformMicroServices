@@ -1,8 +1,7 @@
-﻿using Infrastructure.Database;
-using Kernel.Auth.AuthTypes;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Users.Infrastructure.Database;
 
-namespace User.Api.Extensions;
+namespace Users.Api.Extensions;
 
 public static class MigrationExtensions
 {

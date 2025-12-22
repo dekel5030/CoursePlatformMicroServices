@@ -1,6 +1,6 @@
-using Domain.Roles;
+using Auth.Domain.Roles;
 using Kernel.Messaging.Abstractions;
 
-namespace Domain.AuthUsers.Events;
+namespace Auth.Domain.AuthUsers.Events;
 
 public record UserRoleRemovedDomainEvent(AuthUser User, Role Role) : IDomainEvent;

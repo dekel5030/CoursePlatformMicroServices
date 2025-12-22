@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
 
-namespace Application.UnitTests;
+namespace Auth.Application.UnitTests;
 
 /// <summary>
 /// Helper methods for unit tests

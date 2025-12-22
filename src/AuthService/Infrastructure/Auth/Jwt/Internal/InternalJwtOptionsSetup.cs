@@ -1,9 +1,11 @@
-﻿using Kernel.Auth;
+﻿using Auth.Infrastructure.Auth;
+using Auth.Infrastructure.Auth.Jwt;
+using Kernel.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Infrastructure.Auth.Jwt.Internal;
+namespace Auth.Infrastructure.Auth.Jwt.Internal;
 
 internal class InternalJwtOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
 {

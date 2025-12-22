@@ -1,10 +1,10 @@
-﻿using Application.Abstractions.Auth;
-using Domain.AuthUsers;
-using Domain.Permissions;
+﻿using Auth.Application.Abstractions.Auth;
+using Auth.Domain.AuthUsers;
+using Auth.Domain.Permissions;
 using Kernel.Auth;
 using Kernel.Auth.AuthTypes;
 
-namespace Infrastructure.Auth;
+namespace Auth.Infrastructure.Auth;
 public class PermissionResolver : IPermissionResolver
 {
     public IEnumerable<string> ResolveEffectivePermissions(AuthUser user)
@@ -63,9 +63,9 @@ public class PermissionResolver : IPermissionResolver
 
     private static bool PermissionWiderThan(Permission container, Permission target)
     {
-        bool actionMatch = container.Action == ActionType.Wildcard || container.Action == target.Action;
-        bool resourceMatch = container.Resource == ResourceType.Wildcard || container.Resource == target.Resource;
-        bool idMatch = container.ResourceId == ResourceId.Wildcard || container.ResourceId == target.ResourceId;
+        var actionMatch = container.Action == ActionType.Wildcard || container.Action == target.Action;
+        var resourceMatch = container.Resource == ResourceType.Wildcard || container.Resource == target.Resource;
+        var idMatch = container.ResourceId == ResourceId.Wildcard || container.ResourceId == target.ResourceId;
 
         return actionMatch && resourceMatch && idMatch;
     }

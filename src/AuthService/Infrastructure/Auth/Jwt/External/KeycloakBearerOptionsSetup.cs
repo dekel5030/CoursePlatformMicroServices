@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Auth.Infrastructure.Auth.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Infrastructure.Auth.Jwt.External;
+namespace Auth.Infrastructure.Auth.Jwt.External;
 internal class KeycloakBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
 {
     private readonly KeycloakJwtOptions _options;

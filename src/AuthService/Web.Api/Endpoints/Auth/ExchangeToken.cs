@@ -1,7 +1,7 @@
-﻿using Application.AuthUsers.Commands.ExchangeToken;
-using Auth.Api.Extensions;
+﻿using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
-using Infrastructure.Auth.Jwt;
+using Auth.Application.AuthUsers.Commands.ExchangeToken;
+using Auth.Infrastructure.Auth.Jwt;
 using Kernel.Messaging.Abstractions;
 
 namespace Auth.Api.Endpoints.Auth;

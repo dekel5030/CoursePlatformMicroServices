@@ -1,6 +1,6 @@
 ﻿using Kernel.Messaging.Abstractions;
 
-namespace Application.AuthUsers.Commands.UserRemovePermission;
+namespace Auth.Application.AuthUsers.Commands.UserRemovePermission;
 
 public record UserRemovePermissionCommand(
     Guid UserId,

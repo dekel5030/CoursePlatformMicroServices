@@ -1,6 +1,6 @@
 ﻿using Kernel.Messaging.Abstractions;
 
-namespace Application.AuthUsers.Commands.UserAddPermission;
+namespace Auth.Application.AuthUsers.Commands.UserAddPermission;
 
 public record UserAddPermissionCommand(
     Guid UserId,

@@ -1,13 +1,13 @@
-﻿using Application.Abstractions.Data;
-using Domain.AuthUsers;
-using Domain.AuthUsers.Errors;
-using Domain.AuthUsers.Primitives;
-using Domain.Permissions;
+﻿using Auth.Application.Abstractions.Data;
+using Auth.Domain.AuthUsers;
+using Auth.Domain.AuthUsers.Errors;
+using Auth.Domain.AuthUsers.Primitives;
+using Auth.Domain.Permissions;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.AuthUsers.Commands.UserAddPermission;
+namespace Auth.Application.AuthUsers.Commands.UserAddPermission;
 
 public class UserAddPermissionCommandHandler : ICommandHandler<UserAddPermissionCommand>
 {

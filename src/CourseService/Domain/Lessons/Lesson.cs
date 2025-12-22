@@ -1,9 +1,9 @@
-﻿using Domain.Courses;
-using Domain.Courses.Primitives;
-using Domain.Lessons.Primitives;
-using Kernel;
+﻿using Kernel;
+using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Courses;
 
-namespace Domain.Lessons;
+namespace Courses.Domain.Lessons;
 
 public class Lesson : Entity
 {

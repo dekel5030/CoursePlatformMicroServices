@@ -1,4 +1,4 @@
-﻿namespace Application.Abstractions.Auth;
+﻿namespace Auth.Application.Abstractions.Auth;
 
 public interface IExternalUserContext
 {
