@@ -1,4 +1,4 @@
-namespace Application.Abstractions.Messaging;
+namespace Kernel.Messaging.Abstractions;
 
 public interface IRequestHandler<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

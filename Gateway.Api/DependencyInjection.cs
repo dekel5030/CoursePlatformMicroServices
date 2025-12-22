@@ -1,7 +1,7 @@
 ﻿using CoursePlatform.ServiceDefaults;
 using Gateway.Api.Jwt;
 using Gateway.Api.Middleware;
-using Gateway.Api.Services.AuthSource;
+using Gateway.Api.Services.AuthClient;
 using Gateway.Api.Services.CacheService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 

@@ -1,6 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Domain.Courses.Primitives;
-using SharedKernel;
+﻿using Domain.Courses.Primitives;
+using Kernel.Messaging.Abstractions;
 
 namespace Application.Courses.Commands.CreateCourse;
 

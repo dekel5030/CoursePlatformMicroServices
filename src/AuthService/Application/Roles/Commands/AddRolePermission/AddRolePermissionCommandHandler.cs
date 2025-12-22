@@ -1,9 +1,9 @@
 ﻿using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
 using Domain.Permissions;
 using Domain.Roles.Errors;
 using Kernel;
 using Kernel.Auth.AuthTypes;
+using Kernel.Messaging.Abstractions;
 
 namespace Application.Roles.Commands.AddRolePermission;
 

@@ -1,8 +1,8 @@
-using Application.Abstractions.Messaging;
 using Application.Lessons.Commands.CreateLesson;
 using Course.Api.Extensions;
 using Course.Api.Infrastructure;
 using Domain.Lessons.Primitives;
+using Kernel.Messaging.Abstractions;
 
 namespace Course.Api.Endpoints.Lessons;
 

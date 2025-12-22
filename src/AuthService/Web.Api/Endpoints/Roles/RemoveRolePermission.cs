@@ -1,8 +1,8 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Roles.Commands.RemoveRolePermission;
+﻿using Application.Roles.Commands.RemoveRolePermission;
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Auth.Api.Endpoints.Roles;

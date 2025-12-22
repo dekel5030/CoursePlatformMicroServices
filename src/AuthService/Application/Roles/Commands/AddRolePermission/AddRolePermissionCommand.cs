@@ -1,4 +1,4 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Kernel.Messaging.Abstractions;
 
 namespace Application.Roles.Commands.AddRolePermission;
 

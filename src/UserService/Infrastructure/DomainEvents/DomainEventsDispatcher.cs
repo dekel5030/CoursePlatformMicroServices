@@ -1,6 +1,5 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using SharedKernel;
 using System.Collections.Concurrent;
 
 namespace Infrastructure.DomainEvents;

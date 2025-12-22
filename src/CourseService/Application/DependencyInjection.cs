@@ -1,5 +1,4 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Courses.Commands.CreateCourse;
+﻿using Application.Courses.Commands.CreateCourse;
 using Application.Courses.Queries.Dtos;
 using Application.Courses.Queries.GetById;
 using Application.Courses.Queries.GetCourses;
@@ -8,6 +7,7 @@ using Application.Lessons.Commands.CreateLesson;
 using Application.Lessons.Queries.GetById;
 using Domain.Courses.Primitives;
 using Domain.Lessons.Primitives;
+using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;

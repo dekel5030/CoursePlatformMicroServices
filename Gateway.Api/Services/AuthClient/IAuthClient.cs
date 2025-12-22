@@ -1,4 +1,4 @@
-﻿namespace Gateway.Api.Services.AuthSource;
+﻿namespace Gateway.Api.Services.AuthClient;
 
 public interface IAuthClient
 {

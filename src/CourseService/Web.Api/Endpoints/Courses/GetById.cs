@@ -1,11 +1,10 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Courses.Queries.Dtos;
+﻿using Application.Courses.Queries.Dtos;
 using Application.Courses.Queries.GetById;
-using Course.Api.Endpoints;
 using Course.Api.Extensions;
 using Course.Api.Infrastructure;
 using Domain.Courses.Primitives;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 
 namespace Course.Api.Endpoints.Courses;
 

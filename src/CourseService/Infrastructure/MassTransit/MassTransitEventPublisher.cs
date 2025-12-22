@@ -1,10 +1,9 @@
-﻿using Application.Abstractions.Messaging;
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.MassTransit;
 
-internal sealed class MassTransitEventPublisher : IEventPublisher
+internal sealed class MassTransitEventPublisher 
 {
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly ILogger<MassTransitEventPublisher> _logger;

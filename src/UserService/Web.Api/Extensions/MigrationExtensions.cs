@@ -2,7 +2,7 @@
 using Kernel.Auth.AuthTypes;
 using Microsoft.EntityFrameworkCore;
 
-namespace Auth.Api.Extensions;
+namespace User.Api.Extensions;
 
 public static class MigrationExtensions
 {

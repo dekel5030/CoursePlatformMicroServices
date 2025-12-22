@@ -1,5 +1,5 @@
 using Domain.Permissions;
-using SharedKernel;
+using Kernel.Messaging.Abstractions;
 
 namespace Domain.Roles.Events;
 

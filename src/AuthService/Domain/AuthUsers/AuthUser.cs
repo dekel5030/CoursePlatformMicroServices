@@ -4,7 +4,6 @@ using Domain.AuthUsers.Primitives;
 using Domain.Permissions;
 using Domain.Roles;
 using Kernel;
-using SharedKernel;
 
 namespace Domain.AuthUsers;
 

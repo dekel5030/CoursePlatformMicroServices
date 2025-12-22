@@ -1,5 +1,5 @@
-using Application.Abstractions.Messaging;
 using Domain.Users.Primitives;
+using Kernel.Messaging.Abstractions;
 
 namespace Application.Users.Commands.UpdateUser;
 

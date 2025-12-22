@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
 using Domain.Roles;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 
 namespace Application.Roles.Commands.CreateRole;
 

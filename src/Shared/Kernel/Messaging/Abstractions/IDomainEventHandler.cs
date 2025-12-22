@@ -1,6 +1,4 @@
-using SharedKernel;
-
-namespace Application.Abstractions.Messaging;
+namespace Kernel.Messaging.Abstractions;
 
 public interface IDomainEventHandler<TEvent>
     where TEvent : IDomainEvent

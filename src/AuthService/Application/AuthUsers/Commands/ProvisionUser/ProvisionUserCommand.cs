@@ -1,7 +1,7 @@
 using Application.Abstractions.Caching;
-using Application.Abstractions.Messaging;
 using Auth.Contracts.Dtos;
 using Kernel.Auth;
+using Kernel.Messaging.Abstractions;
 
 namespace Application.AuthUsers.Commands.ProvisionUser;
 

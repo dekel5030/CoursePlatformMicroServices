@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Caching;
-using Application.Abstractions.Pipeline;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Behaviors;

@@ -1,4 +1,4 @@
-﻿namespace Application.Abstractions.Pipeline;
+﻿namespace Kernel.Messaging.Abstractions;
 
 public interface IPipelineBehavior<TRequest, TResponse>
 {

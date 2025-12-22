@@ -1,5 +1,5 @@
 using Domain.Users.Primitives;
-using SharedKernel;
+using Kernel.Messaging.Abstractions;
 
 namespace Domain.Users.Events;
 

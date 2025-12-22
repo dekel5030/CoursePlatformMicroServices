@@ -1,10 +1,10 @@
 using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
 using Domain.Courses.Errors;
 using Domain.Courses.Primitives;
 using Domain.Lessons;
 using Domain.Lessons.Primitives;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Lessons.Commands.CreateLesson;

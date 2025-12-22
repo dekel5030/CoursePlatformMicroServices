@@ -1,8 +1,7 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Abstractions.Pipeline;
+﻿using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Application.Mediator;
+namespace CoursePlatform.ServiceDefaults.Messaging;
 
 public sealed class Mediator : IMediator
 {
@@ -21,7 +20,7 @@ public sealed class Mediator : IMediator
 
         Type handlerType = typeof(IRequestHandler<,>).MakeGenericType(requestType, typeof(TResponse));
 
-        object? handler = _serviceProvider.GetService(handlerType);
+        var handler = _serviceProvider.GetService(handlerType);
 
         if (handler is null)
         {

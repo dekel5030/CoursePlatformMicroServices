@@ -1,5 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Users.Queries.Dtos;
+﻿using Application.Users.Queries.Dtos;
+using Kernel.Messaging.Abstractions;
 
 namespace Application.Users.Queries.GetUsers;
 

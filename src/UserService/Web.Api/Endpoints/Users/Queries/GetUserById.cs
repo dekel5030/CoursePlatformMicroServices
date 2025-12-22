@@ -1,9 +1,7 @@
-﻿
-using Application.Abstractions.Messaging;
-using Application.Users.Queries.Dtos;
+﻿using Application.Users.Queries.Dtos;
 using Application.Users.Queries.GetUserByid;
 using Kernel;
-using User.Api.Endpoints;
+using Kernel.Messaging.Abstractions;
 using User.Api.Extensions;
 using User.Api.Infrastructure;
 
