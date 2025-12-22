@@ -1,8 +1,7 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Users.Commands.CreateUser;
+﻿using Application.Users.Commands.CreateUser;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
-using User.Api.Endpoints;
 using User.Api.Extensions;
 using User.Api.Infrastructure;
 

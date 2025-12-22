@@ -1,5 +1,4 @@
 using Application;
-using Auth.Api.Extensions;
 using Infrastructure;
 using Infrastructure.Extensions;
 using User.Api.Endpoints;

@@ -1,7 +1,7 @@
 ﻿using Domain.Courses;
 using Domain.Courses.Primitives;
 using Domain.Lessons.Primitives;
-using SharedKernel;
+using Kernel;
 
 namespace Domain.Lessons;
 

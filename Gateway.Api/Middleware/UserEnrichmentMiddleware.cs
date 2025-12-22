@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Gateway.Api.Services.AuthSource;
+using Gateway.Api.Services.AuthClient;
 using Gateway.Api.Services.CacheService;
 using Kernel.Auth;
 

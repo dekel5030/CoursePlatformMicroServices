@@ -1,9 +1,8 @@
-﻿using Application.Abstractions.Messaging;
-using Application.AuthUsers.Commands.UserAddPermission;
-using Application.Mediator;
+﻿using Application.AuthUsers.Commands.UserAddPermission;
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 
 namespace Auth.Api.Endpoints.Users;
 

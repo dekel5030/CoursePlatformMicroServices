@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.MassTransit;
@@ -147,7 +146,6 @@ public static class DependencyInjection
             });
         });
 
-        services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
 
         return services;
     }

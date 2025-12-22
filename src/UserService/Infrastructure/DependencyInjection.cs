@@ -1,13 +1,11 @@
 ﻿using Application.Abstractions.Context;
 using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
-using CoursePlatform.ServiceDefaults.Auth;
 using Domain.Users.Events;
 using Infrastructure.Auth;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
-using Infrastructure.Jwt;
 using Infrastructure.MassTransit;
+using Kernel.Messaging.Abstractions;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -28,8 +26,6 @@ public static class DependencyInjection
         services.AddDatabase(configuration);
         services.AddMassTransitInternal(configuration);
         services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
-
-        services.AddScoped<IDomainEventHandler<UserProfileCreatedDomainEvent>, UserProfileCreatedDomainEventHandler>();
 
         //services.ConfigureJwtAuthentication(configuration);
         services.AddHttpContextAccessor();
@@ -125,7 +121,6 @@ public static class DependencyInjection
             });
         });
 
-        services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
 
         return services;
     }

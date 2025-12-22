@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
 using Application.Courses.Queries.Dtos;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Courses.Queries.GetCourses;

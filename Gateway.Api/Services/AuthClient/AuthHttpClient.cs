@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Headers;
 
-namespace Gateway.Api.Services.AuthSource;
+namespace Gateway.Api.Services.AuthClient;
 
 public class AuthHttpClient : IAuthClient
 {
@@ -29,7 +29,7 @@ public class AuthHttpClient : IAuthClient
 
             if (!response.IsSuccessStatusCode) return null;
 
-            string? internalToken = await response.Content
+            var internalToken = await response.Content
                .ReadFromJsonAsync<string>(cancellationToken: cancellationToken);
 
             return internalToken;

@@ -1,7 +1,6 @@
 using Domain.Users.Events;
 using Domain.Users.Primitives;
 using Kernel;
-using SharedKernel;
 
 namespace Domain.Users;
 

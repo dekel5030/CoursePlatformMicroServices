@@ -1,8 +1,8 @@
 ﻿
-using Application.Abstractions.Messaging;
 using Application.Users.Queries.Dtos;
 using Application.Users.Queries.GetUsers;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using User.Api.Extensions;
 using User.Api.Infrastructure;
 

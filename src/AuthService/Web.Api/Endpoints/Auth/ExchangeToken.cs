@@ -1,8 +1,8 @@
 ﻿using Application.AuthUsers.Commands.ExchangeToken;
-using Application.Mediator;
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Infrastructure.Auth.Jwt;
+using Kernel.Messaging.Abstractions;
 
 namespace Auth.Api.Endpoints.Auth;
 

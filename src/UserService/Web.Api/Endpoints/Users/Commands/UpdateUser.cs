@@ -1,7 +1,7 @@
-using Application.Abstractions.Messaging;
 using Application.Users.Commands.UpdateUser;
 using Domain.Users.Primitives;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using User.Api.Extensions;
 using User.Api.Infrastructure;

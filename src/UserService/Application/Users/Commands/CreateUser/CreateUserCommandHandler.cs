@@ -1,9 +1,9 @@
 ﻿using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
 using Domain.Users;
 using Domain.Users.Errors;
 using Domain.Users.Primitives;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.Commands.CreateUser;

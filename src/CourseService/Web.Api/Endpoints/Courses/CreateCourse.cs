@@ -1,10 +1,8 @@
-﻿
-using Application.Abstractions.Messaging;
-using Application.Courses.Commands.CreateCourse;
-using Course.Api.Endpoints;
+﻿using Application.Courses.Commands.CreateCourse;
 using Course.Api.Extensions;
 using Course.Api.Infrastructure;
 using Domain.Courses.Primitives;
+using Kernel.Messaging.Abstractions;
 
 namespace Course.Api.Endpoints.Courses;
 

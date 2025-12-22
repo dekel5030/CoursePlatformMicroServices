@@ -1,5 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Mediator;
+﻿using CoursePlatform.ServiceDefaults.Messaging;
+using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -28,7 +28,7 @@ public static class DependencyInjection
         services.AddIntegrationEventHandlers();
         //services.AddValidators();
 
-        services.AddScoped<IMediator, Mediator.Mediator>();
+        services.AddScoped<IMediator, Mediator>();
 
         return services;
     }

@@ -1,10 +1,10 @@
 using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
 using Auth.Contracts.Dtos;
 using Domain.AuthUsers.Errors;
 using Domain.AuthUsers.Primitives;
 using Kernel;
 using Kernel.Auth.Abstractions;
+using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.AuthUsers.Queries.GetUserAuthData;

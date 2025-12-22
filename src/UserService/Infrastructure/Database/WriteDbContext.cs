@@ -1,9 +1,10 @@
 ﻿using Application.Abstractions.Data;
 using Domain.Users;
 using Infrastructure.DomainEvents;
+using Kernel;
+using Kernel.Messaging.Abstractions;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 
 namespace Infrastructure.Database;
 

@@ -1,8 +1,8 @@
 ﻿using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
 using Domain.Courses;
 using Domain.Courses.Primitives;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 
 namespace Application.Courses.Commands.CreateCourse;
 

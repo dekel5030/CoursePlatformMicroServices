@@ -1,4 +1,4 @@
-using SharedKernel;
+using Kernel.Messaging.Abstractions;
 
 namespace Infrastructure.DomainEvents;
 

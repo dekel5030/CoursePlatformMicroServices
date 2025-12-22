@@ -5,7 +5,6 @@ using Domain.Roles.Events;
 using Domain.Roles.Primitives;
 using Kernel;
 using Kernel.Auth.AuthTypes;
-using SharedKernel;
 
 namespace Domain.Roles;
 

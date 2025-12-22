@@ -1,8 +1,8 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Courses.Queries.Dtos;
+﻿using Application.Courses.Queries.Dtos;
 using Application.Courses.Queries.GetCourses;
 using Course.Api.Extensions;
 using Course.Api.Infrastructure;
+using Kernel.Messaging.Abstractions;
 
 namespace Course.Api.Endpoints.Courses;
 

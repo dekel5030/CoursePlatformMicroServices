@@ -1,5 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Courses.Queries.Dtos;
+﻿using Application.Courses.Queries.Dtos;
+using Kernel.Messaging.Abstractions;
 
 namespace Application.Courses.Queries.GetFeatured;
 

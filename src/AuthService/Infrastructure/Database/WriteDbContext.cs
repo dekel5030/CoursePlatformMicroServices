@@ -1,7 +1,8 @@
 using Application.Abstractions.Data;
 using Infrastructure.DomainEvents;
+using Kernel;
+using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 
 namespace Infrastructure.Database;
 
@@ -29,14 +30,14 @@ public class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfWork
         DbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        IEnumerable<IHasDomainEvents> entities = dbContext.ChangeTracker.Entries<IHasDomainEvents>()
+        IEnumerable<Entity> entities = dbContext.ChangeTracker.Entries<Entity>()
             .Select(entry => entry.Entity);
 
         List<IDomainEvent> domainEvents = entities
             .SelectMany(entity => entity.DomainEvents)
             .ToList();
 
-        foreach (IHasDomainEvents entity in entities)
+        foreach (Entity entity in entities)
         {
             entity.ClearDomainEvents();
         }

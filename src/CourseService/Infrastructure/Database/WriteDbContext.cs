@@ -3,9 +3,9 @@ using Domain.Courses;
 using Domain.Lessons;
 using Infrastructure.DomainEvents;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 
 namespace Infrastructure.Database;
 

@@ -1,10 +1,10 @@
 ﻿using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
 using Domain.Permissions;
 using Domain.Roles;
 using Domain.Roles.Errors;
 using Domain.Roles.Primitives;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Roles.Commands.RemoveRolePermission;
