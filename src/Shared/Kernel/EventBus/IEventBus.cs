@@ -1,6 +1,6 @@
-namespace Auth.Application.Abstractions.MessageQueue;
+namespace Kernel.EventBus;
 
-public interface IEventPublisher
+public interface IEventBus
 {
     Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
         where TEvent : class;
