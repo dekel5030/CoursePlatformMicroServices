@@ -5,8 +5,8 @@
 /// </summary>
 public enum EffectType
 {
-    /// <summary>Permission is allowed.</summary>
-    Allow = 0,
     /// <summary>Permission is denied.</summary>
-    Deny = 1
+    Deny = 0,
+    /// <summary>Permission is allowed.</summary>
+    Allow = 1
 }
