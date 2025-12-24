@@ -6,6 +6,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ServiceDiscovery;
+using Microsoft.OpenApi.Models;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -128,5 +129,43 @@ public static class Extensions
         });
 
         return app;
+    }
+
+    public static TBuilder AddDefaultOpenApi<TBuilder>(
+        this TBuilder builder, 
+        string securitySchemeId = "Keycloak")
+            where TBuilder : IHostApplicationBuilder
+    {
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.CustomSchemaIds(id => id.FullName!.Replace('+', '-'));
+
+            var scheme = new OpenApiSecurityScheme
+            {
+                Name = securitySchemeId,
+                Description = $"Enter {securitySchemeId} JWT token",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT"
+            };
+
+            options.AddSecurityDefinition(securitySchemeId, scheme);
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference { 
+                        Type = ReferenceType.SecurityScheme, 
+                        Id = securitySchemeId }
+                },
+                new List<string>()
+            }
+        });
+        });
+
+        return builder;
     }
 }
