@@ -1,19 +1,19 @@
 ﻿using Auth.Application.Abstractions.Data;
 using Auth.Domain.Permissions;
 using Auth.Domain.Roles.Errors;
+using Auth.Domain.Roles.Primitives;
 using Kernel;
-using Kernel.Auth.AuthTypes;
 using Kernel.Messaging.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
-namespace Auth.Application.Roles.Commands.AddRolePermission;
+namespace Auth.Application.Roles.Commands.RoleAddPermission;
 
-public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermissionCommand>
+public class RoleAddPermissionCommandHandler : ICommandHandler<RoleAddPermissionCommand>
 {
     private readonly IWriteDbContext _writeDbContext;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly string _wildcard = ResourceId.Wildcard.Value;
 
-    public AddRolePermissionCommandHandler(
+    public RoleAddPermissionCommandHandler(
         IUnitOfWork unitOfWork,
         IWriteDbContext writeDbContext)
     {
@@ -22,10 +22,11 @@ public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermission
     }
 
     public async Task<Result> Handle(
-        AddRolePermissionCommand request, 
+        RoleAddPermissionCommand request, 
         CancellationToken cancellationToken = default)
     {
-        var role = await _writeDbContext.Roles.FindAsync(request.RoleId, cancellationToken);
+        var role = await _writeDbContext.Roles
+            .FirstOrDefaultAsync(role => role.Name == new RoleName(request.RoleName));
 
         if (role is null)
         {
@@ -36,7 +37,7 @@ public class AddRolePermissionCommandHandler : ICommandHandler<AddRolePermission
             request.Effect, 
             request.Action, 
             request.Resource, 
-            request.ResourceId ?? _wildcard);
+            request.ResourceId);
 
         if (permissionParseResult.IsFailure)
         {
