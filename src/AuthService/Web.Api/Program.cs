@@ -16,12 +16,10 @@ builder.Services.AddCors(options =>
     );
 });
 
-builder.Services.AddOpenApi();
-
+builder.AddSwaggerGenWithAuth();
 builder.AddInfrastructure();
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
-builder.Services.AddSwaggerGenWithAuth();
 
 var app = builder.Build();
 
@@ -32,7 +30,6 @@ if (app.Environment.IsDevelopment())
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth Service API V1");
     });
-    app.MapOpenApi();
     app.UseCors("LocalDev");
     await app.ApplyMigrationsAsync();
 }

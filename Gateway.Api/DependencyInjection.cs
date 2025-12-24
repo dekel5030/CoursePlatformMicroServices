@@ -13,13 +13,14 @@ public static class DependencyInjection
     public const string AuthServiceName = "authservice";
     public static IHostApplicationBuilder AddGateway(this IHostApplicationBuilder builder)
     {
-        builder.AddServiceDefaults();
+        builder.AddServiceDefaults();   
         builder.AddRedisDistributedCache(RedisConnectionString);
         builder.Services.AddSingleton<ICacheService, RedisCache>();
         builder.Services.AddGatewayInternalServices();
         builder.Services.AddAuth(builder.Configuration);
         builder.Services.AddYarp(builder.Configuration);
 
+        builder.AddDefaultOpenApi(JwtBearerDefaults.AuthenticationScheme);
         return builder;
     }
 
@@ -28,6 +29,15 @@ public static class DependencyInjection
         app.MapDefaultEndpoints();
         app.UseAuthentication();
         app.UseAuthorization();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/api/auth/swagger/v1/swagger.json", "Auth Service API");
+            });
+        }
 
         app.UseMiddleware<UserEnrichmentMiddleware>();
 
@@ -39,7 +49,8 @@ public static class DependencyInjection
     private static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
     {
         services.ConfigureKeycloakAuthentication(configuration);
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => options.RequireHttpsMetadata = false);
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options => options.RequireHttpsMetadata = false);
         services.AddAuthorizationBuilder();
 
         return services;
