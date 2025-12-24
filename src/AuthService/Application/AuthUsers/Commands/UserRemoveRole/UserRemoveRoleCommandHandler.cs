@@ -4,6 +4,7 @@ using Auth.Domain.AuthUsers.Errors;
 using Auth.Domain.AuthUsers.Primitives;
 using Auth.Domain.Roles;
 using Auth.Domain.Roles.Errors;
+using Auth.Domain.Roles.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +37,7 @@ public class UserRemoveRoleCommandHandler : ICommandHandler<UserRemoveRoleComman
         }
 
         Role? role = await _dbContext.Roles
-            .FirstOrDefaultAsync(r => r.Name == request.RoleName, cancellationToken);
+            .FirstOrDefaultAsync(r => r.Name == new RoleName(request.RoleName), cancellationToken);
 
         if (role is null)
         {

@@ -4,6 +4,7 @@ using Auth.Application.Abstractions.Data;
 using Auth.Domain.AuthUsers;
 using Auth.Domain.AuthUsers.Primitives;
 using Auth.Domain.Roles;
+using Auth.Domain.Roles.Primitives;
 using Kernel;
 using Kernel.Auth;
 using Kernel.Messaging.Abstractions;
@@ -71,7 +72,7 @@ internal class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenComman
         FullName fullName = new(firstName, lastName);
         Email email = new(_externalUserContext.Email);
 
-        Role? defaultRole = await _dbContext.Roles.FirstOrDefaultAsync(role => role.Name == "user", cancellationToken);
+        Role? defaultRole = await _dbContext.Roles.FirstOrDefaultAsync(role => role.Name == new RoleName("user"), cancellationToken);
         Result<AuthUser> userCreationResult = AuthUser.Create(externalId, fullName, email, defaultRole!);
         AuthUser newUser = userCreationResult.Value!;
 
