@@ -42,7 +42,7 @@ public class CreateRoleCommandHandler
         await _dbContext.Roles.AddAsync(role, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var response = new CreateRoleResponseDto(role.Id.ToString(), role.Name);
+        var response = new CreateRoleResponseDto(role.Id.ToString(), role.Name.Value);
         return Result.Success(response);
     }
 }
