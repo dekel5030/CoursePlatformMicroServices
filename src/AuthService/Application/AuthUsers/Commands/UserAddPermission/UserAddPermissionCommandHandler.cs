@@ -26,8 +26,7 @@ public class UserAddPermissionCommandHandler : ICommandHandler<UserAddPermission
         UserAddPermissionCommand request, 
         CancellationToken cancellationToken = default)
     {
-
-        AuthUser? user = await _dbContext.Users.Include(u => u.Permissions)
+        AuthUser? user = await _dbContext.Users
             .FirstOrDefaultAsync(u => u.Id == new AuthUserId(request.UserId), cancellationToken);
 
         if (user is null)
@@ -47,11 +46,11 @@ public class UserAddPermissionCommandHandler : ICommandHandler<UserAddPermission
         }
 
         Permission permission = permissionResult.Value;
-        Result addPermissionResultt = user.AddPermission(permission);
+        Result addPermissionResult = user.AddPermission(permission);
 
-        if (addPermissionResultt.IsFailure)
+        if (addPermissionResult.IsFailure)
         {
-            return addPermissionResultt;
+            return addPermissionResult;
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
