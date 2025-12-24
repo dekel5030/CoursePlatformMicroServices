@@ -40,4 +40,30 @@ public static class EndpointExtensions
     {
         return app.RequireAuthorization(permission);
     }
+
+    public static RouteHandlerBuilder WithMetadata<TResponse>(
+        this RouteHandlerBuilder builder,
+        string tag,
+        string name,
+        string summary,
+        string description,
+        bool requiresAuth = true)
+    {
+        var result = builder
+            .WithTags(tag)
+            .WithName(name)
+            .WithSummary(summary)
+            .WithDescription(description)
+            .Produces<TResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest);
+
+        if (requiresAuth)
+        {
+            result = result
+                .RequireAuthorization()
+                .ProducesProblem(StatusCodes.Status401Unauthorized);
+        }
+
+        return result.ProducesProblem(StatusCodes.Status409Conflict);
+    }
 }

@@ -17,6 +17,10 @@ public class OpenIdConfigurationEndpoint : IEndpoint
             });
         })
         .AllowAnonymous()
-        .WithTags(Tags.Auth);
+        .WithTags(Tags.Auth)
+        .WithName("GetOpenIdConfiguration")
+        .WithSummary("Get OpenID configuration")
+        .WithDescription("Retrieves the OpenID Connect discovery document for authentication configuration")
+        .Produces<object>(StatusCodes.Status200OK);
     }
 }

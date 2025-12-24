@@ -20,8 +20,10 @@ public class GetRoleByName : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Roles)
-        .WithName("GetRoleByName")
-        .WithSummary("Get role by name");
+        .WithMetadata<RoleDto>(
+            Tags.Roles,
+            "GetRoleByName",
+            "Get role by name",
+            "Retrieves a specific security role by its unique name identifier");
     }
 }
