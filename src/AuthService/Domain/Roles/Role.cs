@@ -1,4 +1,5 @@
 using Auth.Domain.Permissions;
+using Auth.Domain.Permissions.Errors;
 using Auth.Domain.Roles.Errors;
 using Auth.Domain.Roles.Events;
 using Auth.Domain.Roles.Primitives;
@@ -62,5 +63,17 @@ public class Role : Entity
         }
 
         return Result.Success();
+    }
+
+    public Result RemovePermission(string permissionKey)
+    {
+        Permission? permission = _permissions.FirstOrDefault(p => p.Key == permissionKey);
+
+        if (permission is null)
+        {
+            return Result.Failure(PermissionErrors.PermissionNotAssigned);
+        }
+
+        return RemovePermission(permission);
     }
 }

@@ -1,9 +1,8 @@
 ﻿using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
-using Auth.Application.Roles.Commands.RemoveRolePermission;
+using Auth.Application.Roles.Commands.RoleRemovePermission;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Auth.Api.Endpoints.Roles;
 
@@ -11,19 +10,13 @@ public class RoleRemovePermission : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("roles/{roleId:guid}/permissions", async (
-            Guid roleId,
-            [FromBody] RemoveRolePermissionRequestDto request,
+        app.MapDelete("roles/{roleName}/permissions/{permissionKey}", async (
+            string roleName,
+            string permissionKey,
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var command = new RemoveRolePermissionCommand(
-                roleId,
-                request.Effect,
-                request.Action,
-                request.Resource,
-                request.ResourceId
-            );
+            var command = new RoleRemovePermissionCommand(roleName, permissionKey);
 
             Result result = await mediator.Send(command, cancellationToken);
             return result.Match(
