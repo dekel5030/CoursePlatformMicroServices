@@ -45,7 +45,7 @@ public record Permission
     {
         if (PermissionParser.TryParseEffect(effectSegment, out var effect) == false)
         {
-            return Result<Permission>.Failure(PermissionErrors.InvalidAction);
+            return Result<Permission>.Failure(PermissionErrors.InvalidEffect);
         }
         if (PermissionParser.TryParseAction(actionSegment, out var action) == false)
         {
