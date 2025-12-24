@@ -20,6 +20,11 @@ internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
                 value => new RoleId(value))
             .ValueGeneratedNever();
 
+        builder.Property(r => r.Name)
+            .HasConversion(
+                name => name.Value,
+                value => new RoleName(value));
+
         builder.OwnsMany(r => r.Permissions, permissionBuilder => 
         { 
             permissionBuilder.ToJson("permissions");
