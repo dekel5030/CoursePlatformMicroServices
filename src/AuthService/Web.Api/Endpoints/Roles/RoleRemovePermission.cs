@@ -7,14 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Auth.Api.Endpoints.Roles;
 
-public class RemoveRolePermission : IEndpoint
+public class RoleRemovePermission : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete("roles/{roleId:guid}/permissions", async (
             Guid roleId,
             [FromBody] RemoveRolePermissionRequestDto request,
-            ICommandHandler<RemoveRolePermissionCommand> handler,
+            IMediator mediator,
             CancellationToken cancellationToken) =>
         {
             var command = new RemoveRolePermissionCommand(
@@ -25,7 +25,7 @@ public class RemoveRolePermission : IEndpoint
                 request.ResourceId
             );
 
-            Result result = await handler.Handle(command, cancellationToken);
+            Result result = await mediator.Send(command, cancellationToken);
             return result.Match(
                 onSuccess: () => Results.NoContent(),
                 onFailure: error => CustomResults.Problem(error));

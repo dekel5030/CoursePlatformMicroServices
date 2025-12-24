@@ -1,6 +1,6 @@
 ﻿using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
-using Auth.Application.Roles.Commands.AddRolePermission;
+using Auth.Application.Roles.Commands.RoleAddPermission;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -10,21 +10,21 @@ public class AddRolePermission : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("roles/{roleId:guid}/permissions", async (
-            Guid roleId,
-            AddRolePermissionRequestDto request,
-            ICommandHandler<AddRolePermissionCommand> handler,
+        app.MapPost("roles/{roleName}/permissions", async (
+            string roleName,
+            RoleAddPermissionRequestDto request,
+            IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var command = new AddRolePermissionCommand(
-                roleId,
+            var command = new RoleAddPermissionCommand(
+                roleName,
                 request.Effect,
                 request.Action,
                 request.Resource,
                 request.ResourceId
             );
 
-            Result result = await handler.Handle(command, cancellationToken);
+            Result result = await mediator.Send(command, cancellationToken);
             return result.Match(
                 onSuccess: () => Results.Ok(),
                 onFailure: error => CustomResults.Problem(error));
