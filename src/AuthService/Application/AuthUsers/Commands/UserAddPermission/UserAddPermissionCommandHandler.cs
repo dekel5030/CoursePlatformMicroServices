@@ -46,11 +46,11 @@ public class UserAddPermissionCommandHandler : ICommandHandler<UserAddPermission
         }
 
         Permission permission = permissionResult.Value;
-        Result addPermissionResultt = user.AddPermission(permission);
+        Result addPermissionResult = user.AddPermission(permission);
 
-        if (addPermissionResultt.IsFailure)
+        if (addPermissionResult.IsFailure)
         {
-            return addPermissionResultt;
+            return addPermissionResult;
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
