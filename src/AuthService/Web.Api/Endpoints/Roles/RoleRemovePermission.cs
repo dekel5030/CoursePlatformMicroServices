@@ -23,10 +23,14 @@ public class RoleRemovePermission : IEndpoint
                 onSuccess: () => Results.NoContent(),
                 onFailure: error => CustomResults.Problem(error));
         })
-        .WithMetadata<object>(
-            Tags.Roles,
-            "RemoveRolePermission",
-            "Remove permission from role",
-            "Removes a specific permission from an existing security role");
+        .RequireAuthorization()
+        .WithTags(Tags.Roles)
+        .WithName("RemoveRolePermission")
+        .WithSummary("Remove permission from role")
+        .WithDescription("Removes a specific permission from an existing security role")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status409Conflict);
     }
 }

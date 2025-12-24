@@ -22,11 +22,15 @@ public class UserRemoveRole : IEndpoint
 
             return result.Match(Results.NoContent, CustomResults.Problem);
         })
-        .WithMetadata<object>(
-            Tags.Users,
-            "RemoveUserRole",
-            "Remove a role from a user",
-            "Removes a specific security role from an existing user account");
+        .RequireAuthorization()
+        .WithTags(Tags.Users)
+        .WithName("RemoveUserRole")
+        .WithSummary("Remove a role from a user")
+        .WithDescription("Removes a specific security role from an existing user account")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status409Conflict);
     }
 }
 
