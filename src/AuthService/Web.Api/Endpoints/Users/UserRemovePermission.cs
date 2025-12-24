@@ -26,7 +26,7 @@ public class UserRemovePermission : IEndpoint
                 onSuccess: () => Results.Ok(),
                 onFailure: error => CustomResults.Problem(error));
         })
-        .WithTags(Tags.Roles)
+        .WithTags(Tags.Users)
         .WithName("UserRemovePermission")
         .WithSummary("Remove permission from user")
         .WithDescription("Removes a permission from an existing user")

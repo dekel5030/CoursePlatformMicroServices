@@ -20,6 +20,10 @@ public class GetAllRoles : IEndpoint
                 roles => Results.Ok(roles),
                 error => CustomResults.Problem(error)
             );
-        });
+        })
+        .WithTags(Tags.Roles)
+        .WithName("GetAllRoles")
+        .WithSummary("Get all roles")
+        .WithDescription("Get all roles in the database");
     }
 }

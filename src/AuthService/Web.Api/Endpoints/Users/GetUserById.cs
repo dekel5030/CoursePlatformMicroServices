@@ -19,6 +19,10 @@ public class GetUserById : IEndpoint
             Result<UserDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
-        });
+        })
+        .WithTags(Tags.Users)
+        .WithName("UserGetById")
+        .WithSummary("Get user by ID")
+        .WithDescription("Retrieves a user by their unique identifier");
     }
 }

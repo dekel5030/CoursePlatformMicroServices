@@ -22,7 +22,7 @@ public class UserRemoveRole : IEndpoint
 
             return result.Match(Results.NoContent, CustomResults.Problem);
         })
-        .WithTags(Tags.Auth)
+        .WithTags(Tags.Users)
         .WithName("RemoveUserRole")
         .WithSummary("Remove a role from an existing user")
         .WithDescription("Removes a role from an existing user account")
