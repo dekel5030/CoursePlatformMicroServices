@@ -17,8 +17,4 @@
     <ProjectReference Include="..\Domain\Auth.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="AuthUsers\Queries\" />
-  </ItemGroup>
-
 </Project>
