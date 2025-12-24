@@ -9,7 +9,6 @@ import {
 import EditProfileModal from "../../components/EditProfileModal/EditProfileModal";
 import styles from "./UserProfilePage.module.css";
 import { useAuth } from "react-oidc-context";
-import { useAuthenticatedFetch } from "../../utils/useAuthenticatedFetch";
 
 export default function UserProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -19,18 +18,18 @@ export default function UserProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const auth = useAuth();
-  const authFetch = useAuthenticatedFetch();
+  const token = auth.user?.access_token;
 
   const isOwnProfile = auth.user?.profile.sub === id;
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetchUserById(id, authFetch)
+    fetchUserById(id, token)
       .then((userData) => setUser(userData))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [id, authFetch]);
+  }, [id, token]);
 
   const handleEditProfile = () => {
     setIsEditModalOpen(true);
@@ -39,7 +38,7 @@ export default function UserProfilePage() {
   const handleSaveProfile = async (updatedData: UpdateUserRequest) => {
     if (!id) return;
     try {
-      const updatedUser = await updateUser(id, updatedData, authFetch);
+      const updatedUser = await updateUser(id, updatedData, token);
       setUser(updatedUser);
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : "Failed to update");

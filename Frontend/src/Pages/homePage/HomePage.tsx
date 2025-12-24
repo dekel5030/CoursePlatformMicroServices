@@ -3,7 +3,6 @@ import { fetchFeaturedCourses } from "../../services/CoursesAPI";
 import type { Course } from "../../types/course";
 import CourseCard from "../../features/courses/components/CourseCard";
 import { useAuth } from "react-oidc-context";
-import { useAuthenticatedFetch } from "../../utils/useAuthenticatedFetch";
 import styles from "./HomePage.module.css";
 
 export default function HomePage() {
@@ -13,15 +12,15 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const auth = useAuth();
-  const authFetch = useAuthenticatedFetch();
+  const token = auth.user?.access_token;
 
   useEffect(() => {
     setLoading(true);
-    fetchFeaturedCourses(authFetch)
+    fetchFeaturedCourses(token)
       .then(setCourses)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [authFetch]);
+  }, [token]);
 
   const categories = useMemo(() => {
     const set = new Set<string>();

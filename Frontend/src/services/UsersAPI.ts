@@ -1,9 +1,4 @@
-const API_USERS_URL = "/api";
-
-export type Fetcher = (
-  input: RequestInfo | URL,
-  init?: RequestInit
-) => Promise<Response>;
+import { apiClient } from '../lib/apiClient';
 
 export interface User {
   id: string;
@@ -21,29 +16,14 @@ export interface UpdateUserRequest {
   dateOfBirth?: string | null;
 }
 
-// קבלת fetcher כפרמטר שני
-export async function fetchUserById(
-  id: string,
-  fetcher: Fetcher
-): Promise<User> {
-  const response = await fetcher(`${API_USERS_URL}/users/${id}`);
-  if (!response.ok) throw new Error("Failed to fetch user");
-  return await response.json();
+export async function fetchUserById(id: string, token?: string): Promise<User> {
+  return apiClient.get<User>(`/users/${id}`, { token });
 }
 
 export async function updateUser(
   id: string,
   data: UpdateUserRequest,
-  fetcher: Fetcher
+  token?: string
 ): Promise<User> {
-  const response = await fetcher(`${API_USERS_URL}/users/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) throw new Error("Failed to update user");
-  return await response.json();
+  return apiClient.put<User>(`/users/${id}`, data, { token });
 }

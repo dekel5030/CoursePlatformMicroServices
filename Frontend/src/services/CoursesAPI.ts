@@ -1,36 +1,16 @@
 import type { Course } from "../types/course";
 import type { Lesson } from "../types/Lesson";
+import { apiClient } from '../lib/apiClient';
 
-const API_COURSES_URL = "/api";
-
-export type Fetcher = (
-  input: RequestInfo | URL,
-  init?: RequestInit
-) => Promise<Response>;
-
-export async function fetchFeaturedCourses(
-  fetcher: Fetcher
-): Promise<Course[]> {
-  const response = await fetcher(`${API_COURSES_URL}/courses/featured`);
-  if (!response.ok) throw new Error("Failed to fetch featured courses");
-  const data = await response.json();
-  return data.items || data;
+export async function fetchFeaturedCourses(token?: string): Promise<Course[]> {
+  const data = await apiClient.get<Course[] | { items: Course[] }>('/courses/featured', { token });
+  return Array.isArray(data) ? data : data.items || [];
 }
 
-export async function fetchCourseById(
-  id: string,
-  fetcher: Fetcher
-): Promise<Course> {
-  const response = await fetcher(`${API_COURSES_URL}/courses/${id}`);
-  if (!response.ok) throw new Error("Failed to fetch course");
-  return await response.json();
+export async function fetchCourseById(id: string, token?: string): Promise<Course> {
+  return apiClient.get<Course>(`/courses/${id}`, { token });
 }
 
-export async function fetchLessonById(
-  id: string,
-  fetcher: Fetcher
-): Promise<Lesson> {
-  const response = await fetcher(`${API_COURSES_URL}/lessons/${id}`);
-  if (!response.ok) throw new Error("Failed to fetch lesson");
-  return await response.json();
+export async function fetchLessonById(id: string, token?: string): Promise<Lesson> {
+  return apiClient.get<Lesson>(`/lessons/${id}`, { token });
 }

@@ -1,10 +1,7 @@
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-export default defineConfig(({ mode }) => {
-  // טוען משתני סביבה (אם יש)
-  const env = loadEnv(mode, process.cwd(), "");
-
+export default defineConfig(() => {
   const gatewayUrl =
     process.env.services__gateway__https__0 ||
     process.env.services__gateway__http__0;
