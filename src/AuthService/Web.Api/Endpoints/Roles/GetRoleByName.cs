@@ -19,6 +19,9 @@ public class GetRoleByName : IEndpoint
             Result<RoleDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
-        });
+        })
+        .WithTags(Tags.Roles)
+        .WithName("GetRoleByName")
+        .WithSummary("Get role by name");
     }
 }

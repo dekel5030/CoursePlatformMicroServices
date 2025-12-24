@@ -16,6 +16,7 @@ public class OpenIdConfigurationEndpoint : IEndpoint
                 id_token_signing_alg_values_supported = new[] { "RS256" }
             });
         })
-        .AllowAnonymous();
+        .AllowAnonymous()
+        .WithTags(Tags.Auth);
     }
 }

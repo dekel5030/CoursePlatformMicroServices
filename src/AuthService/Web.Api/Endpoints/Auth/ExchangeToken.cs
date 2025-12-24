@@ -16,6 +16,7 @@ public class ExchangeToken : IEndpoint
             var result = await mediator.Send(new ExchangeTokenCommand());
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .RequireAuthorization(AuthSchemes.Keycloak);
+        .RequireAuthorization(AuthSchemes.Keycloak)
+        .WithTags(Tags.Auth);
     }
 }

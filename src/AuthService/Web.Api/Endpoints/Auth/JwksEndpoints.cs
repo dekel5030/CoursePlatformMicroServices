@@ -30,6 +30,7 @@ public class JwksEndpoint : IEndpoint
 
             return Results.Json(jwk);
         })
-        .AllowAnonymous();
+        .AllowAnonymous()
+        .WithTags(Tags.Auth);
     }
 }

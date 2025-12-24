@@ -23,7 +23,7 @@ public class UserAddRole : IEndpoint
             return result.Match(() => Results.Ok(), CustomResults.Problem);
         })
         .RequireAuthorization()
-        .WithTags(Tags.Auth)
+        .WithTags(Tags.Users)
         .WithName("AddUserRole")
         .WithSummary("Add a role to an existing user")
         .WithDescription("Adds a role to an existing user account")

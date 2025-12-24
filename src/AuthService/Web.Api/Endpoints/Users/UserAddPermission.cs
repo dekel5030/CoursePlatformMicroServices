@@ -29,7 +29,7 @@ public class UserAddPermission : IEndpoint
                 onSuccess: () => Results.Ok(),
                 onFailure: error => CustomResults.Problem(error));
         })
-        .WithTags(Tags.Roles)
+        .WithTags(Tags.Users)
         .WithName("UserAddPermission")
         .WithSummary("Add permission to user")
         .WithDescription("Adds a permission to an existing user")
