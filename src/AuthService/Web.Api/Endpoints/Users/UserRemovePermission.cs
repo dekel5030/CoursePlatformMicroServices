@@ -10,21 +10,18 @@ public class UserRemovePermission : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("user/{userId:guid}/permissions/", async (
+        app.MapDelete("user/{userId:guid}/permissions/{permissionKey}", async (
             Guid userId,
-            [AsParameters] UserRemovePermissionRequestDto request,
-            ICommandHandler<UserRemovePermissionCommand> handler,
+            string permissionKey,
+            IMediator mediator,
             CancellationToken cancellationToken) =>
         {
             var command = new UserRemovePermissionCommand(
                 userId,
-                request.Effect,
-                request.Action,
-                request.Resource,
-                request.ResourceId
+                permissionKey
             );
 
-            Result result = await handler.Handle(command, cancellationToken);
+            Result result = await mediator.Send(command, cancellationToken);
             return result.Match(
                 onSuccess: () => Results.Ok(),
                 onFailure: error => CustomResults.Problem(error));

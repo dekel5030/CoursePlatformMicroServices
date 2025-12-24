@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Auth.Domain.Permissions.Errors;
 using Kernel;
 using Kernel.Auth;
@@ -7,10 +8,12 @@ namespace Auth.Domain.Permissions;
 
 public record Permission
 {
-    public EffectType Effect { get; private set; }
-    public ActionType Action { get; private set; }
-    public ResourceType Resource { get; private set; }
-    public ResourceId ResourceId { get; private set; }
+    public EffectType Effect { get; init; }
+    public ActionType Action { get; init; }
+    public ResourceType Resource { get; init; }
+    public ResourceId ResourceId { get; init; }
+
+    [JsonInclude]
     public string Key => $"{(int)Effect:D1}{(int)Action:D2}{(int)Resource:D3}{ResourceId.Value}";
 
     #pragma warning disable CS8618
