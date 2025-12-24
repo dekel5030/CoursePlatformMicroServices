@@ -10,7 +10,7 @@ public class UserRemovePermission : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("user/{userId:guid}/permissions/{permissionKey}", async (
+        app.MapDelete("users/{userId:guid}/permissions/{permissionKey}", async (
             Guid userId,
             string permissionKey,
             IMediator mediator,
