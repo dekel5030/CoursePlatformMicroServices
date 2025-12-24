@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Domain\Auth.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Roles\Queries\Dtos\" />
+  </ItemGroup>
+
 </Project>
