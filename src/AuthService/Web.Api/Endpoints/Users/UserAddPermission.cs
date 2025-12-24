@@ -10,7 +10,7 @@ public class UserAddPermission : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("user/{userId:guid}/permissions", async (
+        app.MapPost("users/{userId:guid}/permissions", async (
             Guid userId,
             UserAddPermissionRequestDto request,
             IMediator mediator,

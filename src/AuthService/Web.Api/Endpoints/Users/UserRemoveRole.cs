@@ -10,7 +10,7 @@ public class UserRemoveRole : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("user/{userId:guid}/roles/{roleName}", async (
+        app.MapDelete("users/{userId:guid}/roles/{roleName}", async (
             Guid userId,
             string roleName,
             IMediator mediator,

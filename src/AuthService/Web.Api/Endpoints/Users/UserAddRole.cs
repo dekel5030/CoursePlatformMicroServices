@@ -10,7 +10,7 @@ public class UserAddRole : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("user/{userId:guid}/roles", async (
+        app.MapPost("users/{userId:guid}/roles", async (
             Guid userId,
             UserAddRoleRequestDto request,
             IMediator mediator,
