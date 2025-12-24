@@ -31,6 +31,10 @@ public class JwksEndpoint : IEndpoint
             return Results.Json(jwk);
         })
         .AllowAnonymous()
-        .WithTags(Tags.Auth);
+        .WithTags(Tags.Auth)
+        .WithName("GetJwks")
+        .WithSummary("Get JSON Web Key Set")
+        .WithDescription("Retrieves the public keys used for token signature verification")
+        .Produces<object>(StatusCodes.Status200OK);
     }
 }

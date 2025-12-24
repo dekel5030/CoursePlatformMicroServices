@@ -22,14 +22,11 @@ public class UserAddRole : IEndpoint
 
             return result.Match(() => Results.Ok(), CustomResults.Problem);
         })
-        .RequireAuthorization()
-        .WithTags(Tags.Users)
-        .WithName("AddUserRole")
-        .WithSummary("Add a role to an existing user")
-        .WithDescription("Adds a role to an existing user account")
-        .Produces<CurrentUserDto>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status409Conflict);
+        .WithMetadata<object>(
+            Tags.Users,
+            "AddUserRole",
+            "Add a role to a user",
+            "Assigns a specific security role to the provided user identity");
     }
 }
 

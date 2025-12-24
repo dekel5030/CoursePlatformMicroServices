@@ -20,9 +20,10 @@ public class GetUserById : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Users)
-        .WithName("UserGetById")
-        .WithSummary("Get user by ID")
-        .WithDescription("Retrieves a user by their unique identifier");
+        .WithMetadata<UserDto>(
+            Tags.Users,
+            "GetUserById",
+            "Get user by ID",
+            "Retrieves a user by their unique identifier");
     }
 }

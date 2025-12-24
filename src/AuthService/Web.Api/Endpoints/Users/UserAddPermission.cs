@@ -29,12 +29,10 @@ public class UserAddPermission : IEndpoint
                 onSuccess: () => Results.Ok(),
                 onFailure: error => CustomResults.Problem(error));
         })
-        .WithTags(Tags.Users)
-        .WithName("UserAddPermission")
-        .WithSummary("Add permission to user")
-        .WithDescription("Adds a permission to an existing user")
-        .Produces(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status404NotFound);
+        .WithMetadata<object>(
+            Tags.Users,
+            "AddUserPermission",
+            "Add permission to user",
+            "Assigns a specific permission to an existing user");
     }
 }

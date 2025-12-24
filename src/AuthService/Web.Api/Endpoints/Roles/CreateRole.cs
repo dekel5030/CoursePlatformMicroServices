@@ -19,12 +19,10 @@ public class CreateRole : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Roles)
-        .WithName("CreateRole")
-        .WithSummary("Create role")
-        .WithDescription("Creates a new role in the system")
-        .Produces<CreateRoleResponseDto>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status404NotFound);
+        .WithMetadata<CreateRoleResponseDto>(
+            Tags.Roles,
+            "CreateRole",
+            "Create a new role",
+            "Creates a new security role in the system");
     }
 }

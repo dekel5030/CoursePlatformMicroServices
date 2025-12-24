@@ -26,12 +26,10 @@ public class UserRemovePermission : IEndpoint
                 onSuccess: () => Results.Ok(),
                 onFailure: error => CustomResults.Problem(error));
         })
-        .WithTags(Tags.Users)
-        .WithName("UserRemovePermission")
-        .WithSummary("Remove permission from user")
-        .WithDescription("Removes a permission from an existing user")
-        .Produces(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status404NotFound);
+        .WithMetadata<object>(
+            Tags.Users,
+            "RemoveUserPermission",
+            "Remove permission from user",
+            "Removes a specific permission from an existing user");
     }
 }

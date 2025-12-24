@@ -29,12 +29,10 @@ public class AddRolePermission : IEndpoint
                 onSuccess: () => Results.Ok(),
                 onFailure: error => CustomResults.Problem(error));
         })
-        .WithTags(Tags.Roles)
-        .WithName("AddRolePermission")
-        .WithSummary("Add permission to role")
-        .WithDescription("Adds a permission to an existing role")
-        .Produces(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status404NotFound);
+        .WithMetadata<object>(
+            Tags.Roles,
+            "AddRolePermission",
+            "Add permission to role",
+            "Assigns a specific permission to an existing security role");
     }
 }

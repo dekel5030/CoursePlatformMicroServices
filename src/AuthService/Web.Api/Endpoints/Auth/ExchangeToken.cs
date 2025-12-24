@@ -17,6 +17,13 @@ public class ExchangeToken : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .RequireAuthorization(AuthSchemes.Keycloak)
-        .WithTags(Tags.Auth);
+        .WithTags(Tags.Auth)
+        .WithName("ExchangeToken")
+        .WithSummary("Exchange external token for internal token")
+        .WithDescription("Exchanges an external authentication token for an internal system token")
+        .Produces<TokenResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status409Conflict);
     }
 }

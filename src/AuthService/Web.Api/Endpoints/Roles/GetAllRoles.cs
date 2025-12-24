@@ -21,9 +21,10 @@ public class GetAllRoles : IEndpoint
                 error => CustomResults.Problem(error)
             );
         })
-        .WithTags(Tags.Roles)
-        .WithName("GetAllRoles")
-        .WithSummary("Get all roles")
-        .WithDescription("Get all roles in the database");
+        .WithMetadata<IReadOnlyCollection<RoleDto>>(
+            Tags.Roles,
+            "GetAllRoles",
+            "Get all roles",
+            "Retrieves all security roles defined in the system");
     }
 }
