@@ -20,7 +20,7 @@ public static class MigrationExtensions
 
         if (!await dbContext.Roles.AnyAsync())
         {
-            Role userRole = Role.Create("user").Value;
+            Role userRole = Role.Create(new Domain.Roles.Primitives.RoleName("user")).Value;
             await dbContext.Roles.AddAsync(userRole);
         }
         AuthUser? user = await dbContext.Users
