@@ -10,7 +10,7 @@ namespace Auth.Domain.Roles;
 public class Role : Entity
 {
     public RoleId Id { get; private set; } = null!;
-    public string Name { get; private set; } = null!;
+    public RoleName Name { get; private set; } = null!;
 
     private readonly List<Permission> _permissions = new();
     public IReadOnlyCollection<Permission> Permissions => _permissions.AsReadOnly();
@@ -26,7 +26,7 @@ public class Role : Entity
 
         var role = new Role
         {
-            Name = roleName.Trim().ToLowerInvariant(),
+            Name = new RoleName(roleName),
             Id = new(Guid.CreateVersion7())
         };
 

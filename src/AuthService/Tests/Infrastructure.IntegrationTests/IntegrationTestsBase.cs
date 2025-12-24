@@ -1,3 +1,4 @@
+using Auth.Infrastructure.Database;
 using DotNet.Testcontainers.Builders;
 using Infrastructure.Database;
 using MassTransit;
