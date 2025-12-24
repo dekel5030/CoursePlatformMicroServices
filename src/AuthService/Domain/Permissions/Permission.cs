@@ -8,7 +8,6 @@ namespace Auth.Domain.Permissions;
 
 public record Permission
 {
-    private readonly string? _key;
     public EffectType Effect { get; init; }
     public ActionType Action { get; init; }
     public ResourceType Resource { get; init; }
@@ -31,7 +30,6 @@ public record Permission
         Action = action;
         Resource = resource;
         ResourceId = resourceId;
-        Key = $"{(int)Effect:D1}{(int)Action:D2}{(int)Resource:D3}{ResourceId.Value}";
     }
 
     public static Permission CreateRolePermission(

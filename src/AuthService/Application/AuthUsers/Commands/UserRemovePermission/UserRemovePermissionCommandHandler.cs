@@ -2,7 +2,6 @@
 using Auth.Domain.AuthUsers;
 using Auth.Domain.AuthUsers.Errors;
 using Auth.Domain.AuthUsers.Primitives;
-using Auth.Domain.Permissions;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -34,19 +33,7 @@ public class UserRemovePermissionCommandHandler : ICommandHandler<UserRemovePerm
             return Result.Failure(AuthUserErrors.NotFound);
         }
 
-        var permissionResult = Permission.Parse(
-            request.Effect,
-            request.Action,
-            request.Resource,
-            request.ResourceId);
-
-        if (permissionResult.IsFailure)
-        {
-            return Result.Failure(permissionResult.Error);
-        }
-
-        Permission permission = permissionResult.Value;
-        Result removePermissionResult = user.RemovePermission(permission);
+        Result removePermissionResult = user.RemovePermission(request.PermissionKey);
 
         if (removePermissionResult.IsFailure)
         {

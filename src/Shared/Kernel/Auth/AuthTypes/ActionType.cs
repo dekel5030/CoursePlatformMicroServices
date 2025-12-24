@@ -2,14 +2,14 @@
 
 public enum ActionType
 {
-    /// <summary>Create a resource.</summary>
-    Create,
     /// <summary>Read a resource.</summary>
-    Read,
+    Read = 0,
+    /// <summary>Create a resource.</summary>
+    Create = 1,
     /// <summary>Update a resource.</summary>
-    Update,
+    Update = 2,
     /// <summary>Delete a resource.</summary>
-    Delete,
+    Delete = 3,
     /// <summary>Wildcard for all actions.</summary>
-    Wildcard
+    Wildcard = 99
 }

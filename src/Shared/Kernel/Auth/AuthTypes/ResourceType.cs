@@ -5,10 +5,10 @@
 /// </summary>
 public enum ResourceType
 {
-    Course,
-    Lesson,
-    User,
-    Enrollment,
+    Course = 0,
+    Lesson = 1,
+    User = 2,
+    Enrollment = 3,
     /// <summary>Wildcard for all resources.</summary>
-    Wildcard
+    Wildcard = 999
 }

@@ -2,6 +2,7 @@ using Auth.Domain.AuthUsers.Errors;
 using Auth.Domain.AuthUsers.Events;
 using Auth.Domain.AuthUsers.Primitives;
 using Auth.Domain.Permissions;
+using Auth.Domain.Permissions.Errors;
 using Auth.Domain.Roles;
 using Kernel;
 
@@ -102,5 +103,17 @@ public class AuthUser : Entity
         }
 
         return Result.Success();
+    }
+
+    public Result RemovePermission(string permissionKey)
+    {
+        var permission = _permissions.FirstOrDefault(p => p.Key == permissionKey);
+
+        if (permission is null)
+        {
+            return Result.Failure(PermissionErrors.PermissionNotAssigned);
+        }
+
+        return RemovePermission(permission);
     }
 }
