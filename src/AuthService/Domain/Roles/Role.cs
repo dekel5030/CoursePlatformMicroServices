@@ -17,16 +17,16 @@ public class Role : Entity
 
     private Role() { }
 
-    public static Result<Role> Create(string roleName)
+    public static Result<Role> Create(RoleName name)
     {
-        if (string.IsNullOrWhiteSpace(roleName))
+        if (string.IsNullOrWhiteSpace(name.Value))
         {
             return Result.Failure<Role>(RoleErrors.NameCannotBeEmpty);
         }
 
         var role = new Role
         {
-            Name = new RoleName(roleName),
+            Name = name,
             Id = new(Guid.CreateVersion7())
         };
 
