@@ -1,30 +1,14 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { Course } from "@/types";
 import { Lesson } from "@/features/lessons";
-import { fetchCourseById } from "@/services";
-import { useAuthenticatedFetch } from "@/hooks";
+import { useCourse } from "@/features/courses";
 import styles from "./CoursePage.module.css";
 
 export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
-  const [course, setCourse] = useState<Course | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: course, isLoading, error } = useCourse(id);
 
-  const authFetch = useAuthenticatedFetch();
-
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    fetchCourseById(id, authFetch)
-      .then(setCourse)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [id, authFetch]);
-
-  if (loading) return <div className={styles.status}>Loading course...</div>;
-  if (error) return <div className={styles.statusError}>Error: {error}</div>;
+  if (isLoading) return <div className={styles.status}>Loading course...</div>;
+  if (error) return <div className={styles.statusError}>Error: {error.message}</div>;
   if (!course)
     return <div className={styles.statusError}>Course not found</div>;
 

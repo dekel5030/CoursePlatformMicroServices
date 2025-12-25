@@ -1,35 +1,34 @@
 import type { Course, Lesson } from "@/types";
+import { axiosClient } from "@/api/axiosClient";
 
-const API_COURSES_URL = "/api";
+/**
+ * Courses API - Stateless service layer using Axios
+ * No React hooks allowed in this file
+ */
 
-export type Fetcher = (
-  input: RequestInfo | URL,
-  init?: RequestInit
-) => Promise<Response>;
-
-export async function fetchFeaturedCourses(
-  fetcher: Fetcher
-): Promise<Course[]> {
-  const response = await fetcher(`${API_COURSES_URL}/courses/featured`);
-  if (!response.ok) throw new Error("Failed to fetch featured courses");
-  const data = await response.json();
-  return data.items || data;
+/**
+ * Fetch featured courses
+ */
+export async function fetchFeaturedCourses(): Promise<Course[]> {
+  const response = await axiosClient.get<Course[] | { items: Course[] }>('/courses/featured');
+  const data = response.data;
+  
+  // Handle both array and object with items property
+  return Array.isArray(data) ? data : data.items || [];
 }
 
-export async function fetchCourseById(
-  id: string,
-  fetcher: Fetcher
-): Promise<Course> {
-  const response = await fetcher(`${API_COURSES_URL}/courses/${id}`);
-  if (!response.ok) throw new Error("Failed to fetch course");
-  return await response.json();
+/**
+ * Fetch a single course by ID
+ */
+export async function fetchCourseById(id: string): Promise<Course> {
+  const response = await axiosClient.get<Course>(`/courses/${id}`);
+  return response.data;
 }
 
-export async function fetchLessonById(
-  id: string,
-  fetcher: Fetcher
-): Promise<Lesson> {
-  const response = await fetcher(`${API_COURSES_URL}/lessons/${id}`);
-  if (!response.ok) throw new Error("Failed to fetch lesson");
-  return await response.json();
+/**
+ * Fetch a single lesson by ID
+ */
+export async function fetchLessonById(id: string): Promise<Lesson> {
+  const response = await axiosClient.get<Lesson>(`/lessons/${id}`);
+  return response.data;
 }
