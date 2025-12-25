@@ -28,7 +28,6 @@ export function LoginButton() {
   }
 
   return (
-    // זה הכפתור שמבצע את הקסם ומעביר ל-Keycloak
     <button onClick={() => auth.signinRedirect()}>Log in with Keycloak</button>
   );
 }
