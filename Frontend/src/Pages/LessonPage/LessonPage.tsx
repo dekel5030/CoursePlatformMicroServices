@@ -1,29 +1,13 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { Lesson } from "@/types";
-import { fetchLessonById } from "@/services";
-import { useAuthenticatedFetch } from "@/hooks";
+import { useLesson } from "@/features/lessons";
 import styles from "./LessonPage.module.css";
 
 export default function LessonPage() {
   const { id } = useParams<{ id: string }>();
-  const [lesson, setLesson] = useState<Lesson | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: lesson, isLoading, error } = useLesson(id);
 
-  const authFetch = useAuthenticatedFetch();
-
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    fetchLessonById(id, authFetch)
-      .then((data) => setLesson(data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [id, authFetch]);
-
-  if (loading) return <div className={styles.status}>Loading lesson...</div>;
-  if (error) return <div className={styles.statusError}>Error: {error}</div>;
+  if (isLoading) return <div className={styles.status}>Loading lesson...</div>;
+  if (error) return <div className={styles.statusError}>Error: {error.message}</div>;
   if (!lesson)
     return <div className={styles.statusError}>Lesson not found</div>;
 

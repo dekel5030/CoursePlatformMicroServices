@@ -1,27 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
-import { fetchFeaturedCourses } from "@/services";
-import type { Course } from "@/types";
-import { CourseCard } from "@/features/courses";
+import { useMemo, useState } from "react";
+import { CourseCard, useCourses } from "@/features/courses";
 import { useAuth } from "react-oidc-context";
-import { useAuthenticatedFetch } from "@/hooks";
 import styles from "./HomePage.module.css";
 
 export default function HomePage() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const auth = useAuth();
-  const authFetch = useAuthenticatedFetch();
-
-  useEffect(() => {
-    setLoading(true);
-    fetchFeaturedCourses(authFetch)
-      .then(setCourses)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [authFetch]);
+  const { data: courses = [], isLoading, error } = useCourses();
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -77,10 +63,10 @@ export default function HomePage() {
       </section>
 
       <main>
-        {loading && <div>Loading courses...</div>}
-        {error && <div style={{ color: "red" }}>Error: {error}</div>}
+        {isLoading && <div>Loading courses...</div>}
+        {error && <div style={{ color: "red" }}>Error: {error.message}</div>}
 
-        {!loading && !error && (
+        {!isLoading && !error && (
           <div className={styles.grid}>
             {filtered.map((course) => (
               <CourseCard key={course.id.value} course={course} />

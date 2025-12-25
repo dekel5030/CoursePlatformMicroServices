@@ -1,53 +1,35 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  type User,
-  type UpdateUserRequest,
-  fetchUserById,
-  updateUser,
-} from "@/services/UsersAPI";
+import type { UpdateUserRequest } from "@/services/UsersAPI";
 import { EditProfileModal } from "@/components/common";
 import styles from "./UserProfilePage.module.css";
 import { useAuth } from "react-oidc-context";
-import { useAuthenticatedFetch } from "@/hooks";
+import { useUser, useUpdateUser } from "@/features/users";
 
 export default function UserProfilePage() {
   const { id } = useParams<{ id: string }>();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const auth = useAuth();
-  const authFetch = useAuthenticatedFetch();
+  const { data: user, isLoading, error } = useUser(id);
+  const updateUserMutation = useUpdateUser(id || '');
 
   const isOwnProfile = auth.user?.profile.sub === id;
-
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    fetchUserById(id, authFetch)
-      .then((userData) => setUser(userData))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [id, authFetch]);
 
   const handleEditProfile = () => {
     setIsEditModalOpen(true);
   };
 
   const handleSaveProfile = async (updatedData: UpdateUserRequest) => {
-    if (!id) return;
     try {
-      const updatedUser = await updateUser(id, updatedData, authFetch);
-      setUser(updatedUser);
+      await updateUserMutation.mutateAsync(updatedData);
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : "Failed to update");
     }
   };
 
-  if (loading) return <div className={styles.status}>Loading...</div>;
-  if (error) return <div className={styles.statusError}>Error: {error}</div>;
+  if (isLoading) return <div className={styles.status}>Loading...</div>;
+  if (error) return <div className={styles.statusError}>Error: {error.message}</div>;
   if (!user) return <div className={styles.statusError}>User not found</div>;
 
   const fullName =
