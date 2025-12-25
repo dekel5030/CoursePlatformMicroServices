@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import type { Lesson as LessonType } from "../../../types/Lesson";
+import type { Lesson as LessonType } from "@/types";
 import styles from "./Lesson.module.css";
 
 interface LessonProps {

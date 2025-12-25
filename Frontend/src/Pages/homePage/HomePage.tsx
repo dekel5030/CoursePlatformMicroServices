@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchFeaturedCourses } from "../../services/CoursesAPI";
-import type { Course } from "../../types/course";
-import CourseCard from "../../features/courses/components/CourseCard";
+import { fetchFeaturedCourses } from "@/services";
+import type { Course } from "@/types";
+import { CourseCard } from "@/features/courses";
 import { useAuth } from "react-oidc-context";
-import { useAuthenticatedFetch } from "../../utils/useAuthenticatedFetch";
+import { useAuthenticatedFetch } from "@/hooks";
 import styles from "./HomePage.module.css";
 
 export default function HomePage() {

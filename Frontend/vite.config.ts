@@ -1,9 +1,10 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig(({ mode }) => {
-  // טוען משתני סביבה (אם יש)
-  const env = loadEnv(mode, process.cwd(), "");
+  // Load environment variables if exists
+  loadEnv(mode, process.cwd(), "");
 
   const gatewayUrl =
     process.env.services__gateway__https__0 ||
@@ -11,6 +12,11 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+    },
     server: {
       host: true,
       port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
