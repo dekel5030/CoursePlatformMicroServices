@@ -20,16 +20,30 @@ export const axiosClient = axios.create({
  */
 axiosClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // Ensure OIDC environment variables are configured
+    const oidcAuthority = import.meta.env.VITE_OIDC_AUTHORITY;
+    const oidcClientId = import.meta.env.VITE_OIDC_CLIENT_ID;
+    
+    if (!oidcAuthority || !oidcClientId) {
+      // OIDC not configured, skip token injection
+      return config;
+    }
+    
     // Try to get token from sessionStorage (OIDC stores it there)
-    const oidcStorage = sessionStorage.getItem(`oidc.user:${import.meta.env.VITE_OIDC_AUTHORITY}:${import.meta.env.VITE_OIDC_CLIENT_ID}`);
+    const storageKey = `oidc.user:${oidcAuthority}:${oidcClientId}`;
+    const oidcStorage = sessionStorage.getItem(storageKey);
     
     if (oidcStorage) {
       try {
         const userData = JSON.parse(oidcStorage);
-        const token = userData.access_token;
         
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+        // Validate userData structure
+        if (userData && typeof userData === 'object' && 'access_token' in userData) {
+          const token = userData.access_token;
+          
+          if (typeof token === 'string' && token.length > 0) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
         }
       } catch (error) {
         console.error('Failed to parse OIDC user data:', error);
