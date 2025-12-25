@@ -10,9 +10,8 @@ export function useUpdateUser(userId: string) {
   return useMutation<User, Error, UpdateUserRequest>({
     mutationFn: (data: UpdateUserRequest) => updateUser(userId, data),
     onSuccess: (updatedUser) => {
-      // Invalidate and refetch user data
+      // Optimistically update the cache with the new user data
       queryClient.setQueryData(['users', userId], updatedUser);
-      queryClient.invalidateQueries({ queryKey: ['users', userId] });
     },
   });
 }
