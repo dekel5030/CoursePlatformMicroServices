@@ -5,12 +5,11 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import './index.css'
 import App from './App.tsx'
 
-// Configure React Query client with sensible defaults
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+      staleTime: 5 * 60 * 1000, 
+      gcTime: 10 * 60 * 1000, 
       retry: 1,
       refetchOnWindowFocus: false,
     },
