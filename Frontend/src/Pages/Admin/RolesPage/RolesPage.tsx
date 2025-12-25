@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from 'react-oidc-context';
 import { useToast } from '../../../hooks/useToast';
 import { ApiError } from '../../../lib/apiClient';
 import styles from './RolesPage.module.css';
@@ -30,8 +29,6 @@ export default function RolesPage() {
     resourceId: '*',
   });
 
-  const auth = useAuth();
-  const token = auth.user?.access_token;
   const { showToast } = useToast();
 
   const loadRoles = useCallback(async () => {
@@ -39,7 +36,7 @@ export default function RolesPage() {
     setError(null);
 
     try {
-      const data = await getAllRoles(token);
+      const data = await getAllRoles();
       setRoles(data);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -50,13 +47,13 @@ export default function RolesPage() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   const loadRoleDetail = useCallback(async (roleName: string) => {
     setDetailLoading(true);
 
     try {
-      const data = await getRoleByName(roleName, token);
+      const data = await getRoleByName(roleName);
       setSelectedRoleDetail(data);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -68,7 +65,7 @@ export default function RolesPage() {
     } finally {
       setDetailLoading(false);
     }
-  }, [token, showToast]);
+  }, [showToast]);
 
   useEffect(() => {
     loadRoles();
@@ -87,7 +84,7 @@ export default function RolesPage() {
     }
 
     try {
-      await createRole({ name: newRoleName }, token);
+      await createRole({ name: newRoleName });
       showToast('Role created successfully', 'success');
       setShowCreateModal(false);
       setNewRoleName('');
@@ -110,7 +107,7 @@ export default function RolesPage() {
     }
 
     try {
-      await addRolePermission(selectedRoleName, permissionForm, token);
+      await addRolePermission(selectedRoleName, permissionForm);
       showToast('Permission added successfully', 'success');
       setShowAddPermissionModal(false);
       setPermissionForm({
@@ -135,7 +132,7 @@ export default function RolesPage() {
     if (!selectedRoleName) return;
 
     try {
-      await removeRolePermission(selectedRoleName, permissionKey, token);
+      await removeRolePermission(selectedRoleName, permissionKey);
       showToast('Permission removed successfully', 'success');
       await loadRoleDetail(selectedRoleName);
       await loadRoles();

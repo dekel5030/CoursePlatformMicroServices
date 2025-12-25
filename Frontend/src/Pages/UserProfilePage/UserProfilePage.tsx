@@ -18,18 +18,17 @@ export default function UserProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const auth = useAuth();
-  const token = auth.user?.access_token;
 
   const isOwnProfile = auth.user?.profile.sub === id;
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetchUserById(id, token)
+    fetchUserById(id)
       .then((userData) => setUser(userData))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [id, token]);
+  }, [id]);
 
   const handleEditProfile = () => {
     setIsEditModalOpen(true);
@@ -38,7 +37,7 @@ export default function UserProfilePage() {
   const handleSaveProfile = async (updatedData: UpdateUserRequest) => {
     if (!id) return;
     try {
-      const updatedUser = await updateUser(id, updatedData, token);
+      const updatedUser = await updateUser(id, updatedData);
       setUser(updatedUser);
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : "Failed to update");

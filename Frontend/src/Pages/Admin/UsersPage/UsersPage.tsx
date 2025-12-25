@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from 'react-oidc-context';
 import { useToast } from '../../../hooks/useToast';
 import { ApiError } from '../../../lib/apiClient';
 import styles from './UsersPage.module.css';
@@ -30,19 +29,15 @@ export default function UsersPage() {
     resourceId: '*',
   });
 
-  const auth = useAuth();
-  const token = auth.user?.access_token;
   const { showToast } = useToast();
 
   useEffect(() => {
-    if (token) {
-      getAllRoles(token)
-        .then(setRoles)
-        .catch((err) => {
-          console.error('Failed to load roles:', err);
-        });
-    }
-  }, [token]);
+    getAllRoles()
+      .then(setRoles)
+      .catch((err) => {
+        console.error('Failed to load roles:', err);
+      });
+  }, []);
 
   const handleSearch = async () => {
     if (!userId.trim()) {
@@ -55,7 +50,7 @@ export default function UsersPage() {
     setUser(null);
 
     try {
-      const userData = await getUserById(userId, token);
+      const userData = await getUserById(userId);
       setUser(userData);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -74,11 +69,11 @@ export default function UsersPage() {
     if (!user || !selectedRole) return;
 
     try {
-      await addUserRole(user.id, { roleName: selectedRole }, token);
+      await addUserRole(user.id, { roleName: selectedRole });
       showToast('Role assigned successfully', 'success');
       setShowAddRoleModal(false);
       setSelectedRole('');
-      const updatedUser = await getUserById(user.id, token);
+      const updatedUser = await getUserById(user.id);
       setUser(updatedUser);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -93,9 +88,9 @@ export default function UsersPage() {
     if (!user) return;
 
     try {
-      await removeUserRole(user.id, roleName, token);
+      await removeUserRole(user.id, roleName);
       showToast('Role removed successfully', 'success');
-      const updatedUser = await getUserById(user.id, token);
+      const updatedUser = await getUserById(user.id);
       setUser(updatedUser);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -115,7 +110,7 @@ export default function UsersPage() {
     }
 
     try {
-      await addUserPermission(user.id, permissionForm, token);
+      await addUserPermission(user.id, permissionForm);
       showToast('Permission assigned successfully', 'success');
       setShowAddPermissionModal(false);
       setPermissionForm({
@@ -125,7 +120,7 @@ export default function UsersPage() {
         resource: '',
         resourceId: '*',
       });
-      const updatedUser = await getUserById(user.id, token);
+      const updatedUser = await getUserById(user.id);
       setUser(updatedUser);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -140,9 +135,9 @@ export default function UsersPage() {
     if (!user) return;
 
     try {
-      await removeUserPermission(user.id, permissionKey, token);
+      await removeUserPermission(user.id, permissionKey);
       showToast('Permission removed successfully', 'success');
-      const updatedUser = await getUserById(user.id, token);
+      const updatedUser = await getUserById(user.id);
       setUser(updatedUser);
     } catch (err) {
       if (err instanceof ApiError) {

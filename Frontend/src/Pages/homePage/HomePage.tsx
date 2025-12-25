@@ -12,15 +12,14 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const auth = useAuth();
-  const token = auth.user?.access_token;
 
   useEffect(() => {
     setLoading(true);
-    fetchFeaturedCourses(token)
+    fetchFeaturedCourses()
       .then(setCourses)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, []);
 
   const categories = useMemo(() => {
     const set = new Set<string>();

@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import type { Course } from "../../types/course";
 import Lesson from "../../features/lessons/components/Lesson";
 import { fetchCourseById } from "../../services/CoursesAPI";
-import { useAuth } from "react-oidc-context";
 import styles from "./CoursePage.module.css";
 
 export default function CoursePage() {
@@ -12,17 +11,14 @@ export default function CoursePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const auth = useAuth();
-  const token = auth.user?.access_token;
-
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetchCourseById(id, token)
+    fetchCourseById(id)
       .then(setCourse)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [id, token]);
+  }, [id]);
 
   if (loading) return <div className={styles.status}>Loading course...</div>;
   if (error) return <div className={styles.statusError}>Error: {error}</div>;

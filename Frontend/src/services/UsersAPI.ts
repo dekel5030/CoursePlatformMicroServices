@@ -16,14 +16,13 @@ export interface UpdateUserRequest {
   dateOfBirth?: string | null;
 }
 
-export async function fetchUserById(id: string, token?: string): Promise<User> {
-  return apiClient.get<User>(`/users/${id}`, { token });
+export async function fetchUserById(id: string): Promise<User> {
+  return apiClient.get<User>(`/users/${id}`);
 }
 
 export async function updateUser(
   id: string,
-  data: UpdateUserRequest,
-  token?: string
+  data: UpdateUserRequest
 ): Promise<User> {
-  return apiClient.put<User>(`/users/${id}`, data, { token });
+  return apiClient.put<User>(`/users/${id}`, data);
 }

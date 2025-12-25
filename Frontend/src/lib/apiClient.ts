@@ -25,14 +25,23 @@ export class ApiError extends Error {
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;
-  token?: string;
+}
+
+let authToken: string | undefined;
+
+export function setAuthToken(token: string | undefined) {
+  authToken = token;
+}
+
+export function getAuthToken(): string | undefined {
+  return authToken;
 }
 
 async function request<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { params, token, ...fetchOptions } = options;
+  const { params, ...fetchOptions } = options;
 
   let url = `/api${endpoint}`;
 
@@ -49,14 +58,13 @@ async function request<T>(
     headers.set('Content-Type', 'application/json');
   }
 
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
+  if (authToken) {
+    headers.set('Authorization', `Bearer ${authToken}`);
   }
 
   const response = await fetch(url, {
     ...fetchOptions,
     headers,
-    credentials: 'include',
   });
 
   if (response.status === 204) {

@@ -10,66 +10,60 @@ import type {
   RoleAddPermissionRequest,
 } from '../types/auth';
 
-export async function getUserById(userId: string, token?: string): Promise<UserDto> {
-  return apiClient.get<UserDto>(`/auth/users/${userId}`, { token });
+export async function getUserById(userId: string): Promise<UserDto> {
+  return apiClient.get<UserDto>(`/auth/users/${userId}`);
 }
 
-export async function getAllRoles(token?: string): Promise<RoleListDto[]> {
-  return apiClient.get<RoleListDto[]>('/auth/roles', { token });
+export async function getAllRoles(): Promise<RoleListDto[]> {
+  return apiClient.get<RoleListDto[]>('/auth/roles');
 }
 
-export async function getRoleByName(roleName: string, token?: string): Promise<RoleDetailDto> {
-  return apiClient.get<RoleDetailDto>(`/auth/roles/${roleName}`, { token });
+export async function getRoleByName(roleName: string): Promise<RoleDetailDto> {
+  return apiClient.get<RoleDetailDto>(`/auth/roles/${roleName}`);
 }
 
-export async function createRole(request: CreateRoleRequest, token?: string): Promise<CreateRoleResponse> {
-  return apiClient.post<CreateRoleResponse>('/auth/roles', request, { token });
+export async function createRole(request: CreateRoleRequest): Promise<CreateRoleResponse> {
+  return apiClient.post<CreateRoleResponse>('/auth/roles', request);
 }
 
 export async function addRolePermission(
   roleName: string,
-  request: RoleAddPermissionRequest,
-  token?: string
+  request: RoleAddPermissionRequest
 ): Promise<void> {
-  return apiClient.post<void>(`/auth/roles/${roleName}/permissions`, request, { token });
+  return apiClient.post<void>(`/auth/roles/${roleName}/permissions`, request);
 }
 
 export async function removeRolePermission(
   roleName: string,
-  permissionKey: string,
-  token?: string
+  permissionKey: string
 ): Promise<void> {
-  return apiClient.delete<void>(`/auth/roles/${roleName}/permissions/${permissionKey}`, { token });
+  return apiClient.delete<void>(`/auth/roles/${roleName}/permissions/${permissionKey}`);
 }
 
 export async function addUserRole(
   userId: string,
-  request: UserAddRoleRequest,
-  token?: string
+  request: UserAddRoleRequest
 ): Promise<void> {
-  return apiClient.post<void>(`/auth/users/${userId}/roles`, request, { token });
+  return apiClient.post<void>(`/auth/users/${userId}/roles`, request);
 }
 
 export async function removeUserRole(
   userId: string,
-  roleName: string,
-  token?: string
+  roleName: string
 ): Promise<void> {
-  return apiClient.delete<void>(`/auth/users/${userId}/roles/${roleName}`, { token });
+  return apiClient.delete<void>(`/auth/users/${userId}/roles/${roleName}`);
 }
 
 export async function addUserPermission(
   userId: string,
-  request: UserAddPermissionRequest,
-  token?: string
+  request: UserAddPermissionRequest
 ): Promise<void> {
-  return apiClient.post<void>(`/auth/users/${userId}/permissions`, request, { token });
+  return apiClient.post<void>(`/auth/users/${userId}/permissions`, request);
 }
 
 export async function removeUserPermission(
   userId: string,
-  permissionKey: string,
-  token?: string
+  permissionKey: string
 ): Promise<void> {
-  return apiClient.delete<void>(`/auth/users/${userId}/permissions/${permissionKey}`, { token });
+  return apiClient.delete<void>(`/auth/users/${userId}/permissions/${permissionKey}`);
 }

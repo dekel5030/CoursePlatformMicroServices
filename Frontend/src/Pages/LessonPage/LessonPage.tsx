@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Lesson } from "../../types/Lesson";
 import { fetchLessonById } from "../../services/CoursesAPI";
-import { useAuth } from "react-oidc-context";
 import styles from "./LessonPage.module.css";
 
 export default function LessonPage() {
@@ -11,17 +10,14 @@ export default function LessonPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const auth = useAuth();
-  const token = auth.user?.access_token;
-
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetchLessonById(id, token)
+    fetchLessonById(id)
       .then((data) => setLesson(data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [id, token]);
+  }, [id]);
 
   if (loading) return <div className={styles.status}>Loading lesson...</div>;
   if (error) return <div className={styles.statusError}>Error: {error}</div>;
