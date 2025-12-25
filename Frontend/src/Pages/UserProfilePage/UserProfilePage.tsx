@@ -5,11 +5,11 @@ import {
   type UpdateUserRequest,
   fetchUserById,
   updateUser,
-} from "../../services/UsersAPI";
-import EditProfileModal from "../../components/EditProfileModal/EditProfileModal";
+} from "@/services/UsersAPI";
+import { EditProfileModal } from "@/components/common";
 import styles from "./UserProfilePage.module.css";
 import { useAuth } from "react-oidc-context";
-import { useAuthenticatedFetch } from "../../utils/useAuthenticatedFetch";
+import { useAuthenticatedFetch } from "@/hooks";
 
 export default function UserProfilePage() {
   const { id } = useParams<{ id: string }>();

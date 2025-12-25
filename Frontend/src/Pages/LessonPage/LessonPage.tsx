@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { Lesson } from "../../types/Lesson";
-import { fetchLessonById } from "../../services/CoursesAPI";
-import { useAuthenticatedFetch } from "../../utils/useAuthenticatedFetch";
+import type { Lesson } from "@/types";
+import { fetchLessonById } from "@/services";
+import { useAuthenticatedFetch } from "@/hooks";
 import styles from "./LessonPage.module.css";
 
 export default function LessonPage() {

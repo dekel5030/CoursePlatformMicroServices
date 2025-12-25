@@ -1,8 +1,6 @@
 import styles from "./Navbar.module.css";
-import Dropdown from "../Dropdown/Dropdown";
-import Button from "../Button/Button";
-import SearchBox from "../SearchBox/SearchBox";
-import ProfileMenu from "../ProfileMenu/ProfileMenu";
+import { Dropdown, SearchBox, ProfileMenu } from "@/components/common";
+import { Button } from "@/components/ui";
 import { useAuth } from "react-oidc-context";
 
 export default function Navbar() {

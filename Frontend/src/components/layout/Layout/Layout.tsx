@@ -1,6 +1,4 @@
-import Navbar from "../NavBar/Navbar";
-import Footer from "../Footer/Footer";
-import Breadcrumb from "../Breadcrumb/Breadcrumb";
+import { Navbar, Footer, Breadcrumb } from "@/components/layout";
 import type { ReactNode } from "react";
 import styles from "./Layout.module.css";
 
