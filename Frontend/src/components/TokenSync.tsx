@@ -6,8 +6,12 @@ export default function TokenSync() {
   const auth = useAuth();
 
   useEffect(() => {
-    setAuthToken(auth.user?.access_token);
-  }, [auth.user?.access_token]);
+    if (auth.isAuthenticated && auth.user?.access_token) {
+      setAuthToken(auth.user.access_token);
+    } else {
+      setAuthToken(undefined);
+    }
+  }, [auth.isAuthenticated, auth.user?.access_token]);
 
   return null;
 }
