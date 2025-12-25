@@ -1,44 +1,44 @@
-export interface PermissionDto {
+export type PermissionDto = {
   key: string;
   effect: string;
   action: string;
   resource: string;
   resourceId: string;
-}
+};
 
-export interface RoleListItemDto {
+export type RoleListItemDto = {
   id: string;
   name: string;
   permissionCount: number;
-}
+};
 
-export interface RoleDetailDto {
+export type RoleDetailDto = {
   id: string;
   name: string;
   permissions: PermissionDto[];
-}
+};
 
-export interface UserDto {
+export type UserDto = {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
   roles: UserRoleDto[];
   permissions: PermissionDto[];
-}
+};
 
-export interface UserRoleDto {
+export type UserRoleDto = {
   id: string;
   name: string;
-}
+};
 
-export interface AddPermissionRequest {
+export type AddPermissionRequest = {
   effect: string;
   action: string;
   resource: string;
   resourceId: string;
-}
+};
 
-export interface AddRoleRequest {
+export type AddRoleRequest = {
   roleName: string;
-}
+};

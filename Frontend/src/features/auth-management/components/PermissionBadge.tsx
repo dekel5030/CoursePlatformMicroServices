@@ -1,5 +1,5 @@
 import styles from './PermissionBadge.module.css';
-import type { PermissionDto } from '../../types';
+import type { PermissionDto } from '../types';
 
 interface PermissionBadgeProps {
   permission: PermissionDto;

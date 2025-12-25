@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Modal from '@/components/ui/Modal/Modal';
 import styles from './AddPermissionModal.module.css';
-import type { AddPermissionRequest } from '../../types';
+import type { AddPermissionRequest } from '../types';
 
 interface AddPermissionModalProps {
   isOpen: boolean;
@@ -27,7 +27,7 @@ export default function AddPermissionModal({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev: AddPermissionRequest) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
