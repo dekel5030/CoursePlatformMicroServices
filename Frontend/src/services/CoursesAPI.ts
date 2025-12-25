@@ -1,6 +1,6 @@
-import type { Course } from "../types/course";
-import type { Lesson } from "../types/Lesson";
-import { apiClient } from '../lib/apiClient';
+import type { Course } from "@/types";
+import type { Lesson } from "@/types";
+import { apiClient } from "@/api";
 
 export async function fetchFeaturedCourses(): Promise<Course[]> {
   const data = await apiClient.get<Course[] | { items: Course[] }>('/courses/featured');

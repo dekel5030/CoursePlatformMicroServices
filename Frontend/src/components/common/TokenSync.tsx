@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useAuth } from 'react-oidc-context';
-import { setAuthToken } from '../lib/apiClient';
+import { setAuthToken } from '@/api';
 
 export default function TokenSync() {
   const auth = useAuth();

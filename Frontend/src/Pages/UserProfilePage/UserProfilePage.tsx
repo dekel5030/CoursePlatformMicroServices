@@ -5,8 +5,8 @@ import {
   type UpdateUserRequest,
   fetchUserById,
   updateUser,
-} from "../../services/UsersAPI";
-import EditProfileModal from "../../components/EditProfileModal/EditProfileModal";
+} from "@/services";
+import { EditProfileModal } from "@/components";
 import styles from "./UserProfilePage.module.css";
 import { useAuth } from "react-oidc-context";
 

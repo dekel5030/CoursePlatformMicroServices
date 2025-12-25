@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchFeaturedCourses } from "../../services/CoursesAPI";
-import type { Course } from "../../types/course";
-import CourseCard from "../../features/courses/components/CourseCard";
+import { fetchFeaturedCourses } from "@/services";
+import type { Course } from "@/types";
+import CourseCard from "@/features/courses/components/CourseCard";
 import { useAuth } from "react-oidc-context";
 import styles from "./HomePage.module.css";
 

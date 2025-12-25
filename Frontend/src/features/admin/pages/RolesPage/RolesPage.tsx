@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useToast } from '../../../hooks/useToast';
-import { ApiError } from '../../../lib/apiClient';
+import { useToast } from '@/hooks';
+import { ApiError } from '@/api';
 import styles from './RolesPage.module.css';
 import {
   getAllRoles,
@@ -8,8 +8,8 @@ import {
   createRole,
   addRolePermission,
   removeRolePermission,
-} from '../../../services/AuthAdminAPI';
-import type { RoleListDto, RoleDetailDto, RoleAddPermissionRequest } from '../../../types/auth';
+} from '@/services';
+import type { RoleListDto, RoleDetailDto, RoleAddPermissionRequest } from '@/types';
 
 export default function RolesPage() {
   const [roles, setRoles] = useState<RoleListDto[]>([]);

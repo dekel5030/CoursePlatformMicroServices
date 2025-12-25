@@ -1,7 +1,6 @@
 import { useState } from "react";
-import Modal from "../Modal/Modal";
-import Input from "../Input/Input";
-import { type User, type UpdateUserRequest } from "../../services/UsersAPI";
+import { Modal, Input } from "@/components";
+import { type User, type UpdateUserRequest } from "@/services";
 import styles from "./EditProfileModal.module.css";
 
 type EditProfileModalProps = {

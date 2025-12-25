@@ -1,9 +1,8 @@
 import { BrowserRouter } from "react-router-dom";
-import Layout from "./components/Layout/Layout";
-import AppRoutes from "./routes/AppRoutes.tsx";
-import { AuthProvider } from "./providers/AuthProvider.tsx";
-import { ToastProvider } from "./providers/ToastProvider.tsx";
-import TokenSync from "./components/TokenSync.tsx";
+import { Layout, TokenSync } from "@/components";
+import AppRoutes from "@/routes/AppRoutes";
+import { AuthProvider } from "@/providers/AuthProvider";
+import { ToastProvider } from "@/providers/ToastProvider";
 
 export default function App() {
   return (

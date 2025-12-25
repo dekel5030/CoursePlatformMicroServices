@@ -1,11 +1,10 @@
 import { Routes, Route } from "react-router-dom";
-import HomePage from "../Pages/homePage/HomePage";
-import CoursePage from "../Pages/CoursePage/CoursePage";
-import LessonPage from "../Pages/LessonPage/LessonPage";
-import UserProfilePage from "../Pages/UserProfilePage/UserProfilePage";
-import AdminLayout from "../components/AdminLayout/AdminLayout";
-import UsersPage from "../Pages/Admin/UsersPage/UsersPage";
-import RolesPage from "../Pages/Admin/RolesPage/RolesPage";
+import HomePage from "@/Pages/homePage/HomePage";
+import CoursePage from "@/Pages/CoursePage/CoursePage";
+import LessonPage from "@/Pages/LessonPage/LessonPage";
+import UserProfilePage from "@/Pages/UserProfilePage/UserProfilePage";
+import { AdminLayout } from "@/components";
+import { UsersPage, RolesPage } from "@/features/admin";
 
 export default function AppRoutes() {
   return (

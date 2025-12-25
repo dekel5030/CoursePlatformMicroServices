@@ -1,4 +1,4 @@
-import { apiClient } from "../lib/apiClient";
+import { apiClient } from "@/api";
 import type {
   UserDto,
   RoleListDto,
@@ -8,7 +8,7 @@ import type {
   UserAddRoleRequest,
   UserAddPermissionRequest,
   RoleAddPermissionRequest,
-} from "../types/auth";
+} from "@/types";
 
 export async function getUserById(userId: string): Promise<UserDto> {
   return apiClient.get<UserDto>(`/admin/users/${userId}`);

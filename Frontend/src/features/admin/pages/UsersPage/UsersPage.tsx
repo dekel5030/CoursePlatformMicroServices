@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useToast } from '../../../hooks/useToast';
-import { ApiError } from '../../../lib/apiClient';
+import { useToast } from '@/hooks';
+import { ApiError } from '@/api';
 import styles from './UsersPage.module.css';
 import {
   getUserById,
@@ -9,8 +9,8 @@ import {
   removeUserRole,
   addUserPermission,
   removeUserPermission,
-} from '../../../services/AuthAdminAPI';
-import type { UserDto, RoleListDto, UserAddPermissionRequest } from '../../../types/auth';
+} from '@/services';
+import type { UserDto, RoleListDto, UserAddPermissionRequest } from '@/types';
 
 export default function UsersPage() {
   const [userId, setUserId] = useState('');

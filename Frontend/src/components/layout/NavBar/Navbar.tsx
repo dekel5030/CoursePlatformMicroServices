@@ -1,7 +1,5 @@
 import styles from "./Navbar.module.css";
-import Dropdown from "../Dropdown/Dropdown";
-import Button from "../Button/Button";
-import SearchBox from "../SearchBox/SearchBox";
+import { Dropdown, Button, SearchBox } from "@/components/ui";
 import ProfileMenu from "../ProfileMenu/ProfileMenu";
 import { useAuth } from "react-oidc-context";
 
