@@ -1,15 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks';
 import { ApiError } from '@/api';
+import { AuthService } from '@/services';
 import styles from './UsersPage.module.css';
-import {
-  getUserById,
-  getAllRoles,
-  addUserRole,
-  removeUserRole,
-  addUserPermission,
-  removeUserPermission,
-} from '@/services';
 import type { UserDto, RoleListDto, UserAddPermissionRequest } from '@/types';
 
 export default function UsersPage() {
@@ -32,7 +25,7 @@ export default function UsersPage() {
   const { showToast } = useToast();
 
   useEffect(() => {
-    getAllRoles()
+    AuthService.getAllRoles()
       .then(setRoles)
       .catch((err) => {
         console.error('Failed to load roles:', err);
@@ -50,7 +43,7 @@ export default function UsersPage() {
     setUser(null);
 
     try {
-      const userData = await getUserById(userId);
+      const userData = await AuthService.getUserById(userId);
       setUser(userData);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -69,11 +62,11 @@ export default function UsersPage() {
     if (!user || !selectedRole) return;
 
     try {
-      await addUserRole(user.id, { roleName: selectedRole });
+      await AuthService.addUserRole(user.id, { roleName: selectedRole });
       showToast('Role assigned successfully', 'success');
       setShowAddRoleModal(false);
       setSelectedRole('');
-      const updatedUser = await getUserById(user.id);
+      const updatedUser = await AuthService.getUserById(user.id);
       setUser(updatedUser);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -88,9 +81,9 @@ export default function UsersPage() {
     if (!user) return;
 
     try {
-      await removeUserRole(user.id, roleName);
+      await AuthService.removeUserRole(user.id, roleName);
       showToast('Role removed successfully', 'success');
-      const updatedUser = await getUserById(user.id);
+      const updatedUser = await AuthService.getUserById(user.id);
       setUser(updatedUser);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -110,7 +103,7 @@ export default function UsersPage() {
     }
 
     try {
-      await addUserPermission(user.id, permissionForm);
+      await AuthService.addUserPermission(user.id, permissionForm);
       showToast('Permission assigned successfully', 'success');
       setShowAddPermissionModal(false);
       setPermissionForm({
@@ -120,7 +113,7 @@ export default function UsersPage() {
         resource: '',
         resourceId: '*',
       });
-      const updatedUser = await getUserById(user.id);
+      const updatedUser = await AuthService.getUserById(user.id);
       setUser(updatedUser);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -135,9 +128,9 @@ export default function UsersPage() {
     if (!user) return;
 
     try {
-      await removeUserPermission(user.id, permissionKey);
+      await AuthService.removeUserPermission(user.id, permissionKey);
       showToast('Permission removed successfully', 'success');
-      const updatedUser = await getUserById(user.id);
+      const updatedUser = await AuthService.getUserById(user.id);
       setUser(updatedUser);
     } catch (err) {
       if (err instanceof ApiError) {

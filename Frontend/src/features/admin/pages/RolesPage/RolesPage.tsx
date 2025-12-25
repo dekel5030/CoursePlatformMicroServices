@@ -1,14 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks';
 import { ApiError } from '@/api';
+import { AuthService } from '@/services';
 import styles from './RolesPage.module.css';
-import {
-  getAllRoles,
-  getRoleByName,
-  createRole,
-  addRolePermission,
-  removeRolePermission,
-} from '@/services';
 import type { RoleListDto, RoleDetailDto, RoleAddPermissionRequest } from '@/types';
 
 export default function RolesPage() {
@@ -36,7 +30,7 @@ export default function RolesPage() {
     setError(null);
 
     try {
-      const data = await getAllRoles();
+      const data = await AuthService.getAllRoles();
       setRoles(data);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -53,7 +47,7 @@ export default function RolesPage() {
     setDetailLoading(true);
 
     try {
-      const data = await getRoleByName(roleName);
+      const data = await AuthService.getRoleByName(roleName);
       setSelectedRoleDetail(data);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -84,7 +78,7 @@ export default function RolesPage() {
     }
 
     try {
-      await createRole({ name: newRoleName });
+      await AuthService.createRole({ name: newRoleName });
       showToast('Role created successfully', 'success');
       setShowCreateModal(false);
       setNewRoleName('');
@@ -107,7 +101,7 @@ export default function RolesPage() {
     }
 
     try {
-      await addRolePermission(selectedRoleName, permissionForm);
+      await AuthService.addRolePermission(selectedRoleName, permissionForm);
       showToast('Permission added successfully', 'success');
       setShowAddPermissionModal(false);
       setPermissionForm({
@@ -132,7 +126,7 @@ export default function RolesPage() {
     if (!selectedRoleName) return;
 
     try {
-      await removeRolePermission(selectedRoleName, permissionKey);
+      await AuthService.removeRolePermission(selectedRoleName, permissionKey);
       showToast('Permission removed successfully', 'success');
       await loadRoleDetail(selectedRoleName);
       await loadRoles();

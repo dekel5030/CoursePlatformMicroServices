@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Lesson } from "@/types";
-import { fetchLessonById } from "@/services";
+import { CourseService } from "@/services";
 import styles from "./LessonPage.module.css";
 
 export default function LessonPage() {
@@ -13,7 +13,7 @@ export default function LessonPage() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetchLessonById(id)
+    CourseService.getLessonById(id)
       .then((data) => setLesson(data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));

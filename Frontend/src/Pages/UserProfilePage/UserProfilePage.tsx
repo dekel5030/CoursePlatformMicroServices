@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  type User,
-  type UpdateUserRequest,
-  fetchUserById,
-  updateUser,
-} from "@/services";
+import { UserService } from "@/services";
+import type { User, UpdateUserRequest } from "@/services/UserService";
 import { EditProfileModal } from "@/components";
 import styles from "./UserProfilePage.module.css";
-import { useAuth } from "react-oidc-context";
+import { useAuth } from "@/hooks";
 
 export default function UserProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -19,12 +15,12 @@ export default function UserProfilePage() {
 
   const auth = useAuth();
 
-  const isOwnProfile = auth.user?.profile.sub === id;
+  const isOwnProfile = auth.user?.access_token && id ? user?.id === id : false;
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetchUserById(id)
+    UserService.getUserById(id)
       .then((userData) => setUser(userData))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -37,7 +33,7 @@ export default function UserProfilePage() {
   const handleSaveProfile = async (updatedData: UpdateUserRequest) => {
     if (!id) return;
     try {
-      const updatedUser = await updateUser(id, updatedData);
+      const updatedUser = await UserService.updateUser(id, updatedData);
       setUser(updatedUser);
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : "Failed to update");

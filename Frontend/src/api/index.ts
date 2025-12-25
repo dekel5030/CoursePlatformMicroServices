@@ -1,2 +1,2 @@
-export { apiClient, setAuthToken, getAuthToken, ApiError } from './apiClient';
-export type { ProblemDetails } from './apiClient';
+export { apiClient, setTokenProvider, ApiError } from './axiosClient';
+export type { ProblemDetails } from './axiosClient';

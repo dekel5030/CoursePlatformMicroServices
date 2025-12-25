@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Modal, Input } from "@/components";
-import { type User, type UpdateUserRequest } from "@/services";
+import { type User, type UpdateUserRequest } from "@/services/UserService";
 import styles from "./EditProfileModal.module.css";
 
 type EditProfileModalProps = {
@@ -19,10 +19,8 @@ export default function EditProfileModal({
   const [formData, setFormData] = useState({
     firstName: user.firstName || "",
     lastName: user.lastName || "",
-    phoneNumber: user.phoneNumber || "",
-    dateOfBirth: user.dateOfBirth
-      ? new Date(user.dateOfBirth).toISOString().split("T")[0]
-      : "",
+    bio: user.bio || "",
+    profilePictureUrl: user.profilePictureUrl || "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -42,26 +40,6 @@ export default function EditProfileModal({
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    // Phone number validation - must match format: countryCode number (e.g., "+1 1234567890")
-    if (formData.phoneNumber) {
-      const trimmed = formData.phoneNumber.trim();
-      // Check if it matches the expected format with country code and number separated by space
-      const phoneRegex = /^\+\d{1,4}\s\d{7,15}$/;
-      if (!phoneRegex.test(trimmed)) {
-        newErrors.phoneNumber = 
-          "Phone number must be in format: +CountryCode Number (e.g., +1 1234567890)";
-      }
-    }
-
-    // Date of birth validation (optional but if provided, should be valid)
-    if (formData.dateOfBirth) {
-      const dob = new Date(formData.dateOfBirth);
-      const today = new Date();
-      if (dob > today) {
-        newErrors.dateOfBirth = "Date of birth cannot be in the future";
-      }
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -78,32 +56,11 @@ export default function EditProfileModal({
     setIsSubmitting(true);
 
     try {
-      // Parse phone number if provided
-      // Expected format: "+CountryCode Number" (e.g., "+1 1234567890")
-      let phoneNumber = null;
-      if (formData.phoneNumber) {
-        const trimmed = formData.phoneNumber.trim();
-        const spaceIndex = trimmed.indexOf(" ");
-        
-        if (spaceIndex > 0) {
-          phoneNumber = {
-            countryCode: trimmed.substring(0, spaceIndex),
-            number: trimmed.substring(spaceIndex + 1),
-          };
-        } else {
-          // This case should be caught by validation, but handle it safely
-          phoneNumber = {
-            countryCode: "+1",
-            number: trimmed,
-          };
-        }
-      }
-
-      const updatedData = {
-        firstName: formData.firstName || null,
-        lastName: formData.lastName || null,
-        phoneNumber: phoneNumber,
-        dateOfBirth: formData.dateOfBirth || null,
+      const updatedData: UpdateUserRequest = {
+        firstName: formData.firstName || undefined,
+        lastName: formData.lastName || undefined,
+        bio: formData.bio || undefined,
+        profilePictureUrl: formData.profilePictureUrl || undefined,
       };
 
       await onSave(updatedData);
@@ -142,21 +99,21 @@ export default function EditProfileModal({
         />
 
         <Input
-          label="Phone Number"
-          name="phoneNumber"
-          value={formData.phoneNumber}
+          label="Bio"
+          name="bio"
+          value={formData.bio}
           onChange={handleChange}
-          placeholder="+1 1234567890"
-          error={errors.phoneNumber}
+          placeholder="Tell us about yourself"
+          error={errors.bio}
         />
 
         <Input
-          label="Date of Birth"
-          type="date"
-          name="dateOfBirth"
-          value={formData.dateOfBirth}
+          label="Profile Picture URL"
+          name="profilePictureUrl"
+          value={formData.profilePictureUrl}
           onChange={handleChange}
-          error={errors.dateOfBirth}
+          placeholder="https://example.com/profile.jpg"
+          error={errors.profilePictureUrl}
         />
 
         {submitError && (

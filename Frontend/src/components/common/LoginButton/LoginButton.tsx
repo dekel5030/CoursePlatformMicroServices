@@ -1,14 +1,7 @@
-import { useAuth } from "react-oidc-context";
+import { useAuth } from "@/hooks";
 
 export function LoginButton() {
   const auth = useAuth();
-
-  switch (auth.activeNavigator) {
-    case "signinSilent":
-      return <div>Signing you in...</div>;
-    case "signoutRedirect":
-      return <div>Signing you out...</div>;
-  }
 
   if (auth.isLoading) {
     return <div>Loading...</div>;
@@ -22,13 +15,10 @@ export function LoginButton() {
     return (
       <div>
         Hello {auth.user?.profile.preferred_username}
-        <button onClick={() => auth.removeUser()}>Log out</button>
+        <button onClick={() => auth.logout()}>Log out</button>
       </div>
     );
   }
 
-  return (
-    // זה הכפתור שמבצע את הקסם ומעביר ל-Keycloak
-    <button onClick={() => auth.signinRedirect()}>Log in with Keycloak</button>
-  );
+  return <button onClick={() => auth.login()}>Log in with Keycloak</button>;
 }

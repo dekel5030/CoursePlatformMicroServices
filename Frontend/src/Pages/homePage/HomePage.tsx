@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchFeaturedCourses } from "@/services";
+import { CourseService } from "@/services";
 import type { Course } from "@/types";
 import CourseCard from "@/features/courses/components/CourseCard";
-import { useAuth } from "react-oidc-context";
+import { useAuth } from "@/hooks";
 import styles from "./HomePage.module.css";
 
 export default function HomePage() {
@@ -15,7 +15,7 @@ export default function HomePage() {
 
   useEffect(() => {
     setLoading(true);
-    fetchFeaturedCourses()
+    CourseService.getFeaturedCourses()
       .then(setCourses)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -44,7 +44,7 @@ export default function HomePage() {
           {!auth.isAuthenticated && (
             <button
               className={styles.loginButton}
-              onClick={() => void auth.signinRedirect()}
+              onClick={() => void auth.login()}
             >
               Log in
             </button>
