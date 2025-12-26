@@ -24,6 +24,8 @@ internal class InternalJwtOptionsSetup : IConfigureNamedOptions<JwtBearerOptions
     {
         if (name != AuthSchemes.Internal) return;
 
+        options.MapInboundClaims = false;
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
