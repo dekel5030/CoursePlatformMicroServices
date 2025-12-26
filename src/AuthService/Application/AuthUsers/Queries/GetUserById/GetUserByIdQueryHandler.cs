@@ -1,4 +1,5 @@
 ﻿using Auth.Application.Abstractions.Data;
+using Auth.Application.AuthUsers.Queries.Dtos;
 using Auth.Domain.AuthUsers;
 using Auth.Domain.AuthUsers.Errors;
 using Auth.Domain.AuthUsers.Primitives;
@@ -6,7 +7,7 @@ using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Auth.Application.AuthUsers.Queries;
+namespace Auth.Application.AuthUsers.Queries.GetUserById;
 
 internal class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, UserDto>
 {
@@ -21,7 +22,7 @@ internal class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, UserDto
         GetUserByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        AuthUserId userId = new AuthUserId(request.UserId);
+        var userId = new AuthUserId(request.UserId);
 
         var user = await _dbContext.Users.Include(u => u.Roles)
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);

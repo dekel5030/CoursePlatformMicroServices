@@ -1,6 +1,6 @@
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
-using Auth.Application.AuthUsers.Queries;
+using Auth.Application.AuthUsers.Queries.Dtos;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
