@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { Users } from 'lucide-react';
+import { Users, Shield } from 'lucide-react';
 import { useRoles } from '../hooks';
-import Badge from '@/components/ui/Badge/Badge';
-import styles from './RoleList.module.css';
+import { Badge, Card, CardHeader, CardTitle, CardContent, CardFooter, Skeleton } from '@/components/ui';
 
 export default function RoleList() {
   const navigate = useNavigate();
@@ -10,11 +9,11 @@ export default function RoleList() {
 
   if (isLoading) {
     return (
-      <div className={styles.container}>
-        <div className={styles.skeleton}>
-          <div className={styles.skeletonItem}></div>
-          <div className={styles.skeletonItem}></div>
-          <div className={styles.skeletonItem}></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-40" />
+          ))}
         </div>
       </div>
     );
@@ -22,57 +21,62 @@ export default function RoleList() {
 
   if (error) {
     return (
-      <div className={styles.container}>
-        <div className={styles.error}>
-          <p>Failed to load roles: {error.message}</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+          Failed to load roles: {error.message}
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>Roles</h2>
-        <p className={styles.subtitle}>Manage security roles and their permissions</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="space-y-2">
+        <h2 className="text-2xl font-bold">Roles</h2>
+        <p className="text-muted-foreground">Manage security roles and their permissions</p>
       </div>
 
       {roles && roles.length === 0 ? (
-        <div className={styles.empty}>
+        <div className="text-center py-12 text-muted-foreground">
           <p>No roles found</p>
         </div>
       ) : (
-        <div className={styles.grid}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {roles?.map((role) => (
-            <div
+            <Card
               key={role.id}
-              className={styles.card}
+              className="cursor-pointer hover:shadow-lg transition-shadow"
               onClick={() => navigate(`/admin/roles/${encodeURIComponent(role.name)}`)}
             >
-              <div className={styles.cardHeader}>
-                <h3 className={styles.roleName}>{role.name}</h3>
-              </div>
-              <div className={styles.cardBody}>
-                <div className={styles.statsContainer}>
-                  <div className={styles.stat}>
-                    <span className={styles.statValue}>{role.userCount}</span>
-                    <span className={styles.statLabel}>
-                      <Users size={14} />
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-primary" />
+                  {role.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <div className="text-2xl font-bold">{role.userCount}</div>
+                    <div className="text-sm text-muted-foreground flex items-center gap-1">
+                      <Users className="h-3 w-3" />
                       {role.userCount === 1 ? 'User' : 'Users'}
-                    </span>
+                    </div>
                   </div>
-                  <div className={styles.stat}>
-                    <span className={styles.statValue}>{role.permissionCount}</span>
-                    <span className={styles.statLabel}>
+                  <div className="space-y-1">
+                    <div className="text-2xl font-bold">{role.permissionCount}</div>
+                    <div className="text-sm text-muted-foreground">
                       {role.permissionCount === 1 ? 'Permission' : 'Permissions'}
-                    </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className={styles.cardFooter}>
-                <Badge variant="default">{role.permissionCount} permissions</Badge>
-              </div>
-            </div>
+              </CardContent>
+              <CardFooter>
+                <Badge variant="secondary" className="text-xs">
+                  {role.permissionCount} permissions
+                </Badge>
+              </CardFooter>
+            </Card>
           ))}
         </div>
       )}

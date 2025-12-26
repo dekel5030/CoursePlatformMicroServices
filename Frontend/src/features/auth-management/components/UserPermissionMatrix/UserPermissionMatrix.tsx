@@ -1,13 +1,11 @@
 import { useState, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
-import Switch from '@/components/ui/Switch/Switch';
-import Badge from '@/components/ui/Badge/Badge';
+import { Switch, Badge, Button } from '@/components/ui';
 import AddPermissionModal from '../AddPermissionModal';
 import { useUserManagement } from '../../hooks';
 import { groupPermissionsByCategory } from '../../utils/permissionUtils';
 import type { PermissionDto, AddPermissionRequest } from '../../types';
 import type { ApiErrorResponse } from '@/api/axiosClient';
-import styles from './UserPermissionMatrix.module.css';
 
 interface UserPermissionMatrixProps {
   userId: string;
@@ -60,75 +58,77 @@ export default function UserPermissionMatrix({ userId, permissions }: UserPermis
   };
 
   return (
-    <>
-      <div className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <div>
-            <h2 className={styles.sectionTitle}>Fine-Grained Permissions</h2>
-            <p className={styles.sectionSubtitle}>User-specific permissions override role permissions</p>
-          </div>
-          <button onClick={() => setIsAddModalOpen(true)} className={styles.addButton}>
-            + Add Permission
-          </button>
-        </div>
-
-        {error && <div className={styles.error}>{error}</div>}
-
-        {(addPermission.isPending || removePermission.isPending) && (
-          <div className={styles.loading}>
-            <Loader2 className={styles.spinner} size={16} />
-            <span>Updating permissions...</span>
-          </div>
-        )}
-
-        {Object.keys(groupedPermissions).length === 0 ? (
-          <div className={styles.empty}>
-            <p>No fine-grained permissions assigned to this user</p>
-            <button onClick={() => setIsAddModalOpen(true)} className={styles.addButtonEmpty}>
-              Add your first permission
-            </button>
-          </div>
-        ) : (
-          <div className={styles.categories}>
-            {Object.entries(groupedPermissions).map(([category, perms]) => (
-              <div key={category} className={styles.category}>
-                <div className={styles.categoryHeader}>
-                  <h3 className={styles.categoryTitle}>{category}</h3>
-                  <Badge variant="default">{perms.length}</Badge>
-                </div>
-                <div className={styles.permissionList}>
-                  {perms.map((permission) => (
-                    <div key={permission.key} className={styles.permissionItem}>
-                      <div className={styles.permissionInfo}>
-                        <span className={styles.permissionAction}>{permission.action}</span>
-                        <span className={styles.permissionResource}>on {permission.resource}</span>
-                        {permission.resourceId && (
-                          <Badge variant="info">{permission.resourceId}</Badge>
-                        )}
-                        <Badge variant={permission.effect === 'Allow' ? 'success' : 'error'}>
-                          {permission.effect}
-                        </Badge>
-                      </div>
-                      <Switch
-                        checked={isPermissionEnabled(permission)}
-                        onCheckedChange={(checked) => handleTogglePermission(permission, checked)}
-                        disabled={addPermission.isPending || removePermission.isPending}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Permission Matrix</h3>
+        <Button onClick={() => setIsAddModalOpen(true)} size="sm">
+          + Add Permission
+        </Button>
       </div>
 
+      {error && (
+        <div className="bg-destructive/15 text-destructive px-4 py-2 rounded-md text-sm">
+          {error}
+        </div>
+      )}
+
+      {(addPermission.isPending || removePermission.isPending) && (
+        <div className="flex items-center gap-2 text-muted-foreground text-sm">
+          <Loader2 className="animate-spin h-4 w-4" />
+          <span>Updating permissions...</span>
+        </div>
+      )}
+
+      {Object.keys(groupedPermissions).length === 0 ? (
+        <div className="text-center py-8 space-y-4">
+          <p className="text-muted-foreground">No permissions assigned to this user</p>
+          <Button onClick={() => setIsAddModalOpen(true)} size="sm">
+            Add your first permission
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {Object.entries(groupedPermissions).map(([category, perms]) => (
+            <div key={category} className="border border-border rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold">{category}</h4>
+                <Badge variant="secondary">{perms.length}</Badge>
+              </div>
+              <div className="space-y-2">
+                {perms.map((permission) => (
+                  <div
+                    key={permission.key}
+                    className="flex items-center justify-between p-3 rounded-md border border-border bg-muted/30 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium text-sm">{permission.action}</span>
+                      <span className="text-sm text-muted-foreground">on {permission.resource}</span>
+                      {permission.resourceId && (
+                        <Badge variant="secondary" className="text-xs">{permission.resourceId}</Badge>
+                      )}
+                      <Badge variant={permission.effect === 'Allow' ? 'default' : 'destructive'}>
+                        {permission.effect}
+                      </Badge>
+                    </div>
+                    <Switch
+                      checked={isPermissionEnabled(permission)}
+                      onCheckedChange={(checked) => handleTogglePermission(permission, checked)}
+                      disabled={addPermission.isPending || removePermission.isPending}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <AddPermissionModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        open={isAddModalOpen}
+        onOpenChange={setIsAddModalOpen}
         onSubmit={handleAddPermission}
         isLoading={addPermission.isPending}
       />
-    </>
+    </div>
   );
 }

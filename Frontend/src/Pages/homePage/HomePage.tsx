@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { CourseCard, useCourses } from "@/features/courses";
 import { useAuth } from "react-oidc-context";
-import styles from "./HomePage.module.css";
+import { Button, Skeleton } from "@/components/ui";
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -20,54 +20,60 @@ export default function HomePage() {
     : courses;
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Learn anything, anywhere</h1>
-          <p className={styles.subtitle}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold">Learn anything, anywhere</h1>
+          <p className="text-lg text-muted-foreground">
             Browse curated courses from local devs or your API.
           </p>
         </div>
         <div>
           {!auth.isAuthenticated && (
-            <button
-              className={styles.loginButton}
-              onClick={() => void auth.signinRedirect()}
-            >
+            <Button onClick={() => void auth.signinRedirect()} size="lg">
               Log in
-            </button>
+            </Button>
           )}
         </div>
       </header>
 
-      <section className={styles.categories} aria-label="Categories">
-        <button
-          className={
-            !selectedCategory ? styles.categoryActive : styles.category
-          }
+      <section className="flex flex-wrap gap-2" aria-label="Categories">
+        <Button
+          variant={!selectedCategory ? "default" : "outline"}
+          size="sm"
           onClick={() => setSelectedCategory(null)}
         >
           All
-        </button>
+        </Button>
         {categories.map((cat) => (
-          <button
+          <Button
             key={cat}
-            className={
-              selectedCategory === cat ? styles.categoryActive : styles.category
-            }
+            variant={selectedCategory === cat ? "default" : "outline"}
+            size="sm"
             onClick={() => setSelectedCategory(cat)}
           >
             {cat}
-          </button>
+          </Button>
         ))}
       </section>
 
       <main>
-        {isLoading && <div>Loading courses...</div>}
-        {error && <div style={{ color: "red" }}>Error: {error.message}</div>}
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-80" />
+            ))}
+          </div>
+        )}
+        
+        {error && (
+          <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+            Error: {error.message}
+          </div>
+        )}
 
         {!isLoading && !error && (
-          <div className={styles.grid}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((course) => (
               <CourseCard key={course.id.value} course={course} />
             ))}

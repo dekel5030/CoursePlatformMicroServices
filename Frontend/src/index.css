@@ -1,132 +1,45 @@
-:root {
-  --primary-color: #4f46e5;
-  --primary-color-rgb: 79, 70, 229;
-  --secondary-color: #ffffff;
-  --border-color: #e2e8f0;
-  --hover-bg: #f3f4f6;
+@import "tailwindcss";
 
-  /* Card colors */
-  --card-border: #e5e7eb;
-  --card-shadow-color: rgba(0, 0, 0, 0.06);
-  --card-shadow-hover: rgba(0, 0, 0, 0.1);
-
-  /* Accent and status colors */
-  --accent-color: #4f46e5; /* סגול עיקרי למחירים או דגשים */
-  --success-bg: #e0fbea;
-  --success-text: #15803d;
-  --warning-bg: #fff7ed;
-  --warning-text: #b45309;
-  --error-color: #dc2626;
-
-  /* Backgrounds */
-  --background-primary: #f9fafb;
-  --background-secondary: #ffffff;
-
-  /* Text */
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
+@theme {
+  --color-background: oklch(100% 0 0);
+  --color-foreground: oklch(15% 0.01 258);
   
-  /* Action colors */
-  --success-color: #10b981;
-  --success-color-hover: #059669;
-  --warning-color: #f59e0b;
-  --info-color: #3b82f6;
+  --color-card: oklch(100% 0 0);
+  --color-card-foreground: oklch(15% 0.01 258);
   
-  /* Button colors */
-  --button-primary-bg: var(--primary-color);
-  --button-primary-hover: #4338ca;
-  --button-secondary-bg: #6b7280;
-  --button-secondary-hover: #4b5563;
-  --button-success-bg: var(--success-color);
-  --button-success-hover: var(--success-color-hover);
+  --color-popover: oklch(100% 0 0);
+  --color-popover-foreground: oklch(15% 0.01 258);
+  
+  --color-primary: oklch(59% 0.19 265);
+  --color-primary-foreground: oklch(98% 0.01 258);
+  
+  --color-secondary: oklch(96% 0.01 258);
+  --color-secondary-foreground: oklch(18% 0.01 258);
+  
+  --color-muted: oklch(96% 0.01 258);
+  --color-muted-foreground: oklch(52% 0.02 258);
+  
+  --color-accent: oklch(59% 0.19 265);
+  --color-accent-foreground: oklch(18% 0.01 258);
+  
+  --color-destructive: oklch(60% 0.18 25);
+  --color-destructive-foreground: oklch(98% 0.01 258);
+  
+  --color-border: oklch(92% 0.01 258);
+  --color-input: oklch(92% 0.01 258);
+  --color-ring: oklch(59% 0.19 265);
+  
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
 }
 
-html,
-body,
-#root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background-color: #f9fafb;
-  color: #242424;
-  box-sizing: border-box;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: inherit;
-}
-
-a {
-  color: #646cff;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-
-button:hover {
-  border-color: #646cff;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin: 0;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-p {
-  margin: 0;
-  line-height: 1.5;
-}
-
-img {
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-
-ul,
-ol {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-@media (prefers-color-scheme: light) {
+@layer base {
+  * {
+    @apply border-border;
+  }
   body {
-    background-color: #ffffff;
-    color: #213547;
-  }
-
-  a:hover {
-    color: #747bff;
-  }
-
-  button {
-    background-color: #f9f9f9;
+    @apply bg-background text-foreground;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
   }
 }

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import type { Lesson as LessonType } from "@/types";
-import styles from "./Lesson.module.css";
+import { Card, CardContent, Badge } from "@/components/ui";
+import { Clock, PlayCircle } from "lucide-react";
 
 interface LessonProps {
   lesson: LessonType;
@@ -9,6 +10,7 @@ interface LessonProps {
 
 export default function Lesson({ lesson, index }: LessonProps) {
   const navigate = useNavigate();
+
   const formatDuration = (duration: string | null | undefined) => {
     if (!duration) return null;
 
@@ -30,8 +32,8 @@ export default function Lesson({ lesson, index }: LessonProps) {
   };
 
   return (
-    <div 
-      className={styles.lesson}
+    <Card 
+      className="cursor-pointer hover:shadow-md transition-shadow"
       onClick={handleLessonClick}
       role="button"
       tabIndex={0}
@@ -41,27 +43,41 @@ export default function Lesson({ lesson, index }: LessonProps) {
         }
       }}
     >
-      <div className={styles.lessonHeader}>
-        <div className={styles.lessonNumber}>{index + 1}</div>
-        <div className={styles.lessonInfo}>
-          <h3 className={styles.lessonTitle}>
-            {lesson.title}
-            {lesson.isPreview && (
-              <span className={styles.previewBadge}>Preview</span>
+      <CardContent className="p-4">
+        <div className="flex items-start gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
+            {index + 1}
+          </div>
+          
+          <div className="flex-1 space-y-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-semibold text-base line-clamp-1">
+                {lesson.title}
+              </h3>
+              {lesson.isPreview && (
+                <Badge variant="secondary" className="text-xs">
+                  Preview
+                </Badge>
+              )}
+            </div>
+            {lesson.description && (
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {lesson.description}
+              </p>
             )}
-          </h3>
-          {lesson.description && (
-            <p className={styles.lessonDescription}>{lesson.description}</p>
-          )}
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
+            {lesson.duration && (
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                <span>{formatDuration(lesson.duration)}</span>
+              </div>
+            )}
+            <PlayCircle className="h-5 w-5" />
+          </div>
         </div>
-      </div>
-      <div className={styles.lessonMeta}>
-        {lesson.duration && (
-          <span className={styles.duration}>
-            {formatDuration(lesson.duration)}
-          </span>
-        )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

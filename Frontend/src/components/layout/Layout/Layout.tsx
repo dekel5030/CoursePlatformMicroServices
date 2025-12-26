@@ -1,6 +1,5 @@
 import { Navbar, Footer, Breadcrumb } from "@/components/layout";
 import type { ReactNode } from "react";
-import styles from "./Layout.module.css";
 
 type LayoutProps = {
   children: ReactNode;
@@ -8,10 +7,10 @@ type LayoutProps = {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div className={styles.layout}>
+    <div className="flex flex-col">
       <Navbar />
       <Breadcrumb />
-      <main>{children}</main>
+      <main className="min-h-screen">{children}</main>
       <Footer />
     </div>
   );

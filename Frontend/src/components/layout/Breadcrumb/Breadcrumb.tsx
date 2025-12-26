@@ -1,5 +1,4 @@
 import { Link, useLocation } from "react-router-dom";
-import styles from "./Breadcrumb.module.css";
 
 export interface BreadcrumbItem {
   label: string;
@@ -19,24 +18,24 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
   if (breadcrumbItems.length === 0) return null;
 
   return (
-    <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-      <ol className={styles.list}>
+    <nav className="bg-background border-b border-border py-3 px-8 text-sm" aria-label="Breadcrumb">
+      <ol className="flex flex-wrap items-center gap-2 list-none max-w-7xl mx-auto">
         {breadcrumbItems.map((item, index) => {
           const isLast = index === breadcrumbItems.length - 1;
           
           return (
-            <li key={index} className={styles.item}>
+            <li key={index} className="flex items-center gap-2">
               {!isLast && item.path ? (
                 <>
-                  <Link to={item.path} className={styles.link}>
+                  <Link to={item.path} className="text-primary font-medium transition-colors hover:text-primary/80 hover:underline">
                     {item.label}
                   </Link>
-                  <span className={styles.separator} aria-hidden="true">
+                  <span className="text-muted-foreground select-none" aria-hidden="true">
                     &gt;
                   </span>
                 </>
               ) : (
-                <span className={styles.current} aria-current={isLast ? "page" : undefined}>
+                <span className="text-foreground font-semibold" aria-current={isLast ? "page" : undefined}>
                   {item.label}
                 </span>
               )}

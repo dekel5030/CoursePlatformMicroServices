@@ -1,5 +1,7 @@
 import { useState } from "react";
-import styles from "./SearchBox.module.css";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui";
+import { Button } from "@/components/ui";
 
 interface SearchBoxProps {
   placeholder?: string;
@@ -18,18 +20,20 @@ export default function SearchBox({
   };
 
   return (
-    <form className={styles.searchForm} onSubmit={handleSubmit}>
-      <button type="submit" className={styles.searchBtn} disabled={!query}>
-        🔍
-      </button>
-      <input
-        type="text"
-        className={styles.searchInput}
-        placeholder={placeholder}
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        autoComplete="off"
-      />
+    <form onSubmit={handleSubmit} className="flex gap-2 w-full max-w-sm">
+      <div className="relative flex-1">
+        <Input
+          type="text"
+          placeholder={placeholder}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          autoComplete="off"
+          className="pr-10"
+        />
+      </div>
+      <Button type="submit" size="icon" disabled={!query}>
+        <Search className="h-4 w-4" />
+      </Button>
     </form>
   );
 }
