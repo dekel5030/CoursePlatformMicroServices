@@ -1,9 +1,10 @@
 using Auth.Application.Abstractions.Data;
+using Auth.Application.AuthUsers.Queries.Dtos;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Auth.Application.AuthUsers.Queries;
+namespace Auth.Application.AuthUsers.Queries.GetAllUsers;
 
 internal class GetAllUsersQueryHandler : IQueryHandler<GetAllUsersQuery, IReadOnlyList<UserDto>>
 {

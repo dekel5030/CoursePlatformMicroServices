@@ -1,4 +1,5 @@
 using Auth.Application.Abstractions.Data;
+using Auth.Application.AuthUsers.Queries.Dtos;
 using Auth.Domain.AuthUsers;
 using Auth.Domain.AuthUsers.Errors;
 using Auth.Domain.AuthUsers.Primitives;
@@ -8,7 +9,7 @@ using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Auth.Application.AuthUsers.Queries;
+namespace Auth.Application.AuthUsers.Queries.GetMe;
 
 internal class GetMeQueryHandler : IQueryHandler<GetMeQuery, UserDto>
 {
@@ -30,7 +31,7 @@ internal class GetMeQueryHandler : IQueryHandler<GetMeQuery, UserDto>
             return Result<UserDto>.Failure(AuthUserErrors.NotFound);
         }
 
-        AuthUserId userId = new AuthUserId(_userContext.Id.Value);
+        var userId = new AuthUserId(_userContext.Id.Value);
 
         var user = await _dbContext.Users.Include(u => u.Roles)
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
@@ -40,7 +41,7 @@ internal class GetMeQueryHandler : IQueryHandler<GetMeQuery, UserDto>
             return Result<UserDto>.Failure(AuthUserErrors.NotFound);
         }
 
-        List<Permission> allPermissions = user.Roles
+        var allPermissions = user.Roles
             .SelectMany(r => r.Permissions)
             .Concat(user.Permissions)
             .GroupBy(p => p.Key)
