@@ -3,6 +3,7 @@ import { useAuthUser, useUserManagement } from "../hooks";
 import styles from "./UserRoleManagement.module.css";
 import ConfirmationModal from "./ConfirmationModal";
 import AddRoleModal from "./AddRoleModal";
+import type { ApiErrorResponse } from "@/api/axiosClient";
 
 interface UserRoleManagementProps {
   userId: string;
@@ -16,15 +17,18 @@ export default function UserRoleManagement({
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
+  const [removeError, setRemoveError] = useState<ApiErrorResponse | null>(null);
 
   const handleRemoveRole = async () => {
     if (!confirmRemove) return;
 
+    setRemoveError(null);
     try {
       await removeRole.mutateAsync(confirmRemove);
       setConfirmRemove(null);
-    } catch (err) {
-      console.error("Failed to remove role", err);
+      setRemoveError(null);
+    } catch (err: unknown) {
+      setRemoveError(err as ApiErrorResponse);
     }
   };
 
@@ -88,12 +92,16 @@ export default function UserRoleManagement({
 
       <ConfirmationModal
         isOpen={!!confirmRemove}
-        onClose={() => setConfirmRemove(null)}
+        onClose={() => {
+          setConfirmRemove(null);
+          setRemoveError(null);
+        }}
         onConfirm={handleRemoveRole}
         title="Remove Role"
         message={`Are you sure you want to remove the role "${confirmRemove}"? This action cannot be undone.`}
         confirmText="Remove"
         isLoading={removeRole.isPending}
+        error={removeError?.message}
       />
     </div>
   );

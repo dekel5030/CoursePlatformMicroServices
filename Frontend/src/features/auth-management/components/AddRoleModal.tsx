@@ -28,8 +28,8 @@ export default function AddRoleModal({
 
       setRoleName("");
       onClose();
-    } catch (err: any) {
-      setApiError(err);
+    } catch (err: unknown) {
+      setApiError(err as ApiErrorResponse);
     }
   };
 

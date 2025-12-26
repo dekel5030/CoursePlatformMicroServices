@@ -6,6 +6,7 @@ import AddPermissionModal from './AddPermissionModal';
 import ConfirmationModal from './ConfirmationModal';
 import styles from './RoleDetail.module.css';
 import type { AddPermissionRequest } from '../types';
+import type { ApiErrorResponse } from '@/api/axiosClient';
 
 export default function RoleDetail() {
   const navigate = useNavigate();
@@ -15,24 +16,23 @@ export default function RoleDetail() {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
+  const [removeError, setRemoveError] = useState<ApiErrorResponse | null>(null);
 
   const handleAddPermission = async (permission: AddPermissionRequest) => {
-    try {
-      await addPermission.mutateAsync(permission);
-      setIsAddModalOpen(false);
-    } catch (err) {
-      console.error('Failed to add permission', err);
-    }
+    await addPermission.mutateAsync(permission);
+    setIsAddModalOpen(false);
   };
 
   const handleRemovePermission = async () => {
     if (!confirmRemove) return;
 
+    setRemoveError(null);
     try {
       await removePermission.mutateAsync(confirmRemove);
       setConfirmRemove(null);
-    } catch (err) {
-      console.error('Failed to remove permission', err);
+      setRemoveError(null);
+    } catch (err: unknown) {
+      setRemoveError(err as ApiErrorResponse);
     }
   };
 
@@ -120,12 +120,16 @@ export default function RoleDetail() {
 
       <ConfirmationModal
         isOpen={!!confirmRemove}
-        onClose={() => setConfirmRemove(null)}
+        onClose={() => {
+          setConfirmRemove(null);
+          setRemoveError(null);
+        }}
         onConfirm={handleRemovePermission}
         title="Remove Permission"
         message="Are you sure you want to remove this permission? This action cannot be undone."
         confirmText="Remove"
         isLoading={removePermission.isPending}
+        error={removeError?.message}
       />
     </div>
   );

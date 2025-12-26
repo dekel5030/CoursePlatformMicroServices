@@ -83,3 +83,20 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.inputError,
+.selectError {
+  border-color: var(--error-color);
+}
+
+.inputError:focus,
+.selectError:focus {
+  border-color: var(--error-color);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.fieldError {
+  font-size: 0.75rem;
+  color: var(--error-color);
+  margin-top: -0.25rem;
+}
