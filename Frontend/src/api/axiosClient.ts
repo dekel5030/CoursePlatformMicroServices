@@ -9,7 +9,6 @@ export const axiosClient = axios.create({
   },
 });
 
-// Store the logout callback to be set by the AxiosInterceptorProvider
 let logoutCallback: (() => void) | null = null;
 
 export function setLogoutCallback(callback: () => void) {
@@ -87,16 +86,6 @@ axiosClient.interceptors.response.use(
         apiError.message = data.detail;
       } else if (data.title) {
         apiError.message = data.title;
-      }
-    }
-
-    // Handle 401 Unauthorized - trigger logout and clear state
-    if (error.response?.status === 401) {
-      apiError.message = "Session expired. Please log in again.";
-      
-      // Trigger OIDC logout if callback is available
-      if (logoutCallback) {
-        logoutCallback();
       }
     }
 
