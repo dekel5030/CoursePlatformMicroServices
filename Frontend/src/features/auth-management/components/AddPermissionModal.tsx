@@ -1,19 +1,25 @@
 import { useState } from 'react';
-import { Modal } from '@/components/ui';
-import styles from './AddPermissionModal.module.css';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui';
+import { Button, FormField, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui';
 import type { AddPermissionRequest } from '../types';
 import type { ApiErrorResponse } from '@/api/axiosClient';
 
 interface AddPermissionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSubmit: (permission: AddPermissionRequest) => Promise<void>;
   isLoading?: boolean;
 }
 
 export default function AddPermissionModal({
-  isOpen,
-  onClose,
+  open,
+  onOpenChange,
   onSubmit,
   isLoading = false,
 }: AddPermissionModalProps) {
@@ -26,7 +32,7 @@ export default function AddPermissionModal({
   const [apiError, setApiError] = useState<ApiErrorResponse | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev: AddPermissionRequest) => ({ ...prev, [name]: value }));
@@ -45,7 +51,7 @@ export default function AddPermissionModal({
         resourceId: '*',
       });
       setApiError(null);
-      onClose();
+      onOpenChange(false);
     } catch (err: unknown) {
       setApiError(err as ApiErrorResponse);
     }
@@ -59,120 +65,85 @@ export default function AddPermissionModal({
       resourceId: '*',
     });
     setApiError(null);
-    onClose();
+    onOpenChange(false);
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      title="Add Permission"
-      error={apiError?.message}
-    >
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.formGroup}>
-          <label htmlFor="effect" className={styles.label}>
-            Effect
-          </label>
-          <select
-            id="effect"
-            name="effect"
-            value={formData.effect}
-            onChange={handleChange}
-            className={styles.select}
-            required
-          >
-            <option value="Allow">Allow</option>
-            <option value="Deny">Deny</option>
-          </select>
-        </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add Permission</DialogTitle>
+        </DialogHeader>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="action" className={styles.label}>
-            Action
-          </label>
-          <input
-            id="action"
-            type="text"
+        {apiError?.message && (
+          <div className="bg-destructive/15 text-destructive px-4 py-2 rounded-md text-sm">
+            {apiError.message}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="effect" className="text-sm font-medium">
+              Effect
+            </label>
+            <Select
+              value={formData.effect}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, effect: value as 'Allow' | 'Deny' }))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Allow">Allow</SelectItem>
+                <SelectItem value="Deny">Deny</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <FormField
+            label="Action"
             name="action"
             value={formData.action}
             onChange={handleChange}
-            className={
-              apiError?.errors?.Action ? styles.inputError : styles.input
-            }
             placeholder="e.g., Read, Write, Delete"
+            error={apiError?.errors?.Action?.[0]}
             required
           />
-          {apiError?.errors?.Action && (
-            <span className={styles.fieldError}>
-              {apiError.errors.Action[0]}
-            </span>
-          )}
-        </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="resource" className={styles.label}>
-            Resource
-          </label>
-          <input
-            id="resource"
-            type="text"
+          <FormField
+            label="Resource"
             name="resource"
             value={formData.resource}
             onChange={handleChange}
-            className={
-              apiError?.errors?.Resource ? styles.inputError : styles.input
-            }
             placeholder="e.g., Course, User, Order"
+            error={apiError?.errors?.Resource?.[0]}
             required
           />
-          {apiError?.errors?.Resource && (
-            <span className={styles.fieldError}>
-              {apiError.errors.Resource[0]}
-            </span>
-          )}
-        </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="resourceId" className={styles.label}>
-            Resource ID
-          </label>
-          <input
-            id="resourceId"
-            type="text"
+          <FormField
+            label="Resource ID"
             name="resourceId"
             value={formData.resourceId}
             onChange={handleChange}
-            className={
-              apiError?.errors?.ResourceId ? styles.inputError : styles.input
-            }
             placeholder="* for all, or specific ID"
+            error={apiError?.errors?.ResourceId?.[0]}
           />
-          {apiError?.errors?.ResourceId && (
-            <span className={styles.fieldError}>
-              {apiError.errors.ResourceId[0]}
-            </span>
-          )}
-        </div>
 
-        <div className={styles.actions}>
-          <button
-            type="button"
-            onClick={handleClose}
-            className={styles.cancelButton}
-            disabled={isLoading}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Adding...' : 'Add Permission'}
-          </button>
-        </div>
-      </form>
-    </Modal>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Adding...' : 'Add Permission'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

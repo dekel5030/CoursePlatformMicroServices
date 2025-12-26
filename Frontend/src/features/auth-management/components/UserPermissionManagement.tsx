@@ -85,15 +85,15 @@ export default function UserPermissionManagement({ userId }: UserPermissionManag
       )}
 
       <AddPermissionModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        open={isAddModalOpen}
+        onOpenChange={setIsAddModalOpen}
         onSubmit={handleAddPermission}
         isLoading={addPermission.isPending}
       />
 
       <ConfirmationModal
-        isOpen={!!confirmRemove}
-        onClose={() => {
+        open={!!confirmRemove}
+        onOpenChange={() => {
           setConfirmRemove(null);
           setRemoveError(null);
         }}

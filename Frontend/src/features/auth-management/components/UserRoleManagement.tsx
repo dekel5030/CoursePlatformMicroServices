@@ -84,15 +84,15 @@ export default function UserRoleManagement({
       )}
 
       <AddRoleModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        open={isAddModalOpen}
+        onOpenChange={setIsAddModalOpen}
         onSubmit={(roleName) => addRole.mutateAsync({ roleName })}
         isLoading={addRole.isPending}
       />
 
       <ConfirmationModal
-        isOpen={!!confirmRemove}
-        onClose={() => {
+        open={!!confirmRemove}
+        onOpenChange={() => {
           setConfirmRemove(null);
           setRemoveError(null);
         }}

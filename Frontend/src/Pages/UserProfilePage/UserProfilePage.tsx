@@ -54,8 +54,8 @@ export default function UserProfilePage() {
 
       {user && (
         <EditProfileModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
+          open={isEditModalOpen}
+          onOpenChange={(open) => setIsEditModalOpen(open)}
           user={user}
           onSave={handleSaveProfile}
         />

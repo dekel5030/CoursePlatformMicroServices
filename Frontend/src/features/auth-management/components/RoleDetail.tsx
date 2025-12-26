@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Settings } from 'lucide-react';
+import { Settings, ArrowLeft } from 'lucide-react';
+import { Button, Skeleton } from '@/components/ui';
 import { useRole } from '../hooks';
 import PermissionBadge from './PermissionBadge';
 import PermissionMatrix from './PermissionMatrix/PermissionMatrix';
-import styles from './RoleDetail.module.css';
 
 export default function RoleDetail() {
   const navigate = useNavigate();
@@ -14,10 +14,10 @@ export default function RoleDetail() {
 
   if (isLoading) {
     return (
-      <div className={styles.container}>
-        <div className={styles.skeleton}>
-          <div className={styles.skeletonHeader}></div>
-          <div className={styles.skeletonContent}></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-64 w-full" />
         </div>
       </div>
     );
@@ -25,12 +25,15 @@ export default function RoleDetail() {
 
   if (error) {
     return (
-      <div className={styles.container}>
-        <div className={styles.error}>
-          <p>Failed to load role: {error.message}</p>
-          <button onClick={() => navigate('/admin/roles')} className={styles.backButton}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center space-y-4">
+          <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+            Failed to load role: {error.message}
+          </div>
+          <Button onClick={() => navigate('/admin/roles')} variant="outline">
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Roles
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -38,12 +41,13 @@ export default function RoleDetail() {
 
   if (!role) {
     return (
-      <div className={styles.container}>
-        <div className={styles.error}>
-          <p>Role not found</p>
-          <button onClick={() => navigate('/admin/roles')} className={styles.backButton}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center space-y-4">
+          <p className="text-muted-foreground">Role not found</p>
+          <Button onClick={() => navigate('/admin/roles')} variant="outline">
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Roles
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -52,32 +56,37 @@ export default function RoleDetail() {
   const topPermissions = role.permissions.slice(0, 3);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <button onClick={() => navigate('/admin/roles')} className={styles.backButton}>
-          ← Back
-        </button>
-        <h1 className={styles.title}>{role.name}</h1>
-        <p className={styles.subtitle}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="space-y-2">
+        <Button
+          onClick={() => navigate('/admin/roles')}
+          variant="ghost"
+          className="mb-4"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back
+        </Button>
+        <h1 className="text-3xl font-bold">{role.name}</h1>
+        <p className="text-muted-foreground">
           {role.permissions.length} {role.permissions.length === 1 ? 'permission' : 'permissions'}
         </p>
       </div>
 
-      <div className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Top Permissions</h2>
-          <button onClick={() => setIsMatrixOpen(true)} className={styles.matrixButton}>
-            <Settings size={16} />
+      <div className="border border-border rounded-lg p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Top Permissions</h2>
+          <Button onClick={() => setIsMatrixOpen(true)}>
+            <Settings className="mr-2 h-4 w-4" />
             Manage All Permissions
-          </button>
+          </Button>
         </div>
 
         {role.permissions.length === 0 ? (
-          <div className={styles.empty}>
+          <div className="text-center py-8 text-muted-foreground">
             <p>No permissions assigned to this role</p>
           </div>
         ) : (
-          <div className={styles.permissions}>
+          <div className="space-y-3">
             {topPermissions.map((permission) => (
               <PermissionBadge
                 key={permission.key}
@@ -86,19 +95,21 @@ export default function RoleDetail() {
               />
             ))}
             {role.permissions.length > 3 && (
-              <div className={styles.morePermissions}>
-                <button onClick={() => setIsMatrixOpen(true)} className={styles.viewAllButton}>
-                  View all {role.permissions.length} permissions →
-                </button>
-              </div>
+              <Button
+                onClick={() => setIsMatrixOpen(true)}
+                variant="link"
+                className="w-full"
+              >
+                View all {role.permissions.length} permissions →
+              </Button>
             )}
           </div>
         )}
       </div>
 
       <PermissionMatrix
-        isOpen={isMatrixOpen}
-        onClose={() => setIsMatrixOpen(false)}
+        open={isMatrixOpen}
+        onOpenChange={setIsMatrixOpen}
         roleName={roleName!}
         permissions={role.permissions}
       />

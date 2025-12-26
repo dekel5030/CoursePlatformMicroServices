@@ -124,8 +124,8 @@ export default function UserPermissionMatrix({ userId, permissions }: UserPermis
       </div>
 
       <AddPermissionModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        open={isAddModalOpen}
+        onOpenChange={setIsAddModalOpen}
         onSubmit={handleAddPermission}
         isLoading={addPermission.isPending}
       />

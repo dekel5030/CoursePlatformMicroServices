@@ -1,19 +1,25 @@
 import { useState } from "react";
-import { Modal, FormField } from "@/components/ui";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui";
+import { Button, FormField } from "@/components/ui";
 import { type User, type UpdateUserRequest } from "@/services/UsersAPI";
 import type { ApiErrorResponse } from "@/api/axiosClient";
-import styles from "./EditProfileModal.module.css";
 
 type EditProfileModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   user: User;
   onSave: (updatedUser: UpdateUserRequest) => Promise<void>;
 };
 
 export default function EditProfileModal({
-  isOpen,
-  onClose,
+  open,
+  onOpenChange,
   user,
   onSave,
 }: EditProfileModalProps) {
@@ -46,20 +52,11 @@ export default function EditProfileModal({
     // Phone number validation - must match format: countryCode number (e.g., "+1 1234567890")
     if (formData.phoneNumber) {
       const trimmed = formData.phoneNumber.trim();
-      // Check if it matches the expected format with country code and number separated by space
       const phoneRegex = /^\+\d{1,4}\s\d{7,15}$/;
-      if (!phoneRegex.test(trimmed)) {
-        newErrors.phoneNumber = 
-          "Phone number must be in format: +CountryCode Number (e.g., +1 1234567890)";
-      }
-    }
 
-    // Date of birth validation (optional but if provided, should be valid)
-    if (formData.dateOfBirth) {
-      const dob = new Date(formData.dateOfBirth);
-      const today = new Date();
-      if (dob > today) {
-        newErrors.dateOfBirth = "Date of birth cannot be in the future";
+      if (!phoneRegex.test(trimmed)) {
+        newErrors.phoneNumber =
+          'Phone must be in format: +<country code> <number> (e.g., "+1 1234567890")';
       }
     }
 
@@ -69,34 +66,40 @@ export default function EditProfileModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setApiError(null);
-    setSubmitSuccess(false);
 
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
+    setApiError(null);
+    setSubmitSuccess(false);
 
     try {
-      // Parse phone number if provided
-      // Expected format: "+CountryCode Number" (e.g., "+1 1234567890")
-      let phoneNumber = null;
-      if (formData.phoneNumber) {
-        const trimmed = formData.phoneNumber.trim();
-        const spaceIndex = trimmed.indexOf(" ");
-        
-        if (spaceIndex > 0) {
-          phoneNumber = {
-            countryCode: trimmed.substring(0, spaceIndex),
-            number: trimmed.substring(spaceIndex + 1),
-          };
+      let phoneNumber: { countryCode: string; number: string } | null = null;
+      const newErrors: Record<string, string> = {};
+
+      if (formData.phoneNumber?.trim()) {
+        const cleaned = formData.phoneNumber.replace(/\s+/g, " ").trim();
+
+        if (cleaned.startsWith("+")) {
+          // Split into country code and number
+          const parts = cleaned.split(" ");
+          if (parts.length >= 2) {
+            phoneNumber = {
+              countryCode: parts[0],
+              number: parts.slice(1).join(""),
+            };
+          } else {
+            newErrors.phoneNumber = 'Phone must include country code and number separated by space (e.g., "+1 1234567890")';
+            setErrors(newErrors);
+            return;
+          }
         } else {
-          // This case should be caught by validation, but handle it safely
-          phoneNumber = {
-            countryCode: "+1",
-            number: trimmed,
-          };
+          newErrors.phoneNumber =
+            'Phone must start with + followed by country code (e.g., "+1 1234567890")';
+          setErrors(newErrors);
+          return;
         }
       }
 
@@ -110,7 +113,7 @@ export default function EditProfileModal({
       await onSave(updatedData);
       setSubmitSuccess(true);
       setTimeout(() => {
-        onClose();
+        onOpenChange(false);
       }, 1500);
     } catch (error: unknown) {
       setApiError(error as ApiErrorResponse);
@@ -120,73 +123,76 @@ export default function EditProfileModal({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Edit Profile"
-      error={apiError?.message}
-    >
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <FormField
-          label="First Name"
-          name="firstName"
-          value={formData.firstName}
-          onChange={handleChange}
-          placeholder="Enter your first name"
-          error={errors.firstName || (apiError?.errors?.FirstName?.[0])}
-        />
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Profile</DialogTitle>
+        </DialogHeader>
 
-        <FormField
-          label="Last Name"
-          name="lastName"
-          value={formData.lastName}
-          onChange={handleChange}
-          placeholder="Enter your last name"
-          error={errors.lastName || (apiError?.errors?.LastName?.[0])}
-        />
-
-        <FormField
-          label="Phone Number"
-          name="phoneNumber"
-          value={formData.phoneNumber}
-          onChange={handleChange}
-          placeholder="+1 1234567890"
-          error={errors.phoneNumber || (apiError?.errors?.PhoneNumber?.[0])}
-        />
-
-        <FormField
-          label="Date of Birth"
-          type="date"
-          name="dateOfBirth"
-          value={formData.dateOfBirth}
-          onChange={handleChange}
-          error={errors.dateOfBirth || (apiError?.errors?.DateOfBirth?.[0])}
-        />
-
-        {submitSuccess && (
-          <div className={styles.successMessage}>
-            Profile updated successfully!
+        {apiError?.message && (
+          <div className="bg-destructive/15 text-destructive px-4 py-2 rounded-md text-sm">
+            {apiError.message}
           </div>
         )}
 
-        <div className={styles.actions}>
-          <button
-            type="button"
-            onClick={onClose}
-            className={styles.cancelButton}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className={styles.saveButton}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </button>
-        </div>
-      </form>
-    </Modal>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <FormField
+            label="First Name"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            placeholder="Enter your first name"
+            error={errors.firstName || (apiError?.errors?.FirstName?.[0])}
+          />
+
+          <FormField
+            label="Last Name"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            placeholder="Enter your last name"
+            error={errors.lastName || (apiError?.errors?.LastName?.[0])}
+          />
+
+          <FormField
+            label="Phone Number"
+            name="phoneNumber"
+            value={formData.phoneNumber}
+            onChange={handleChange}
+            placeholder="+1 1234567890"
+            error={errors.phoneNumber || (apiError?.errors?.PhoneNumber?.[0])}
+          />
+
+          <FormField
+            label="Date of Birth"
+            type="date"
+            name="dateOfBirth"
+            value={formData.dateOfBirth}
+            onChange={handleChange}
+            error={errors.dateOfBirth || (apiError?.errors?.DateOfBirth?.[0])}
+          />
+
+          {submitSuccess && (
+            <div className="bg-green-50 text-green-800 px-4 py-2 rounded-md text-sm">
+              Profile updated successfully!
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
