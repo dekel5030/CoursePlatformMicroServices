@@ -76,6 +76,48 @@
   background-color: var(--button-primary-hover);
 }
 
+.matrixButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.matrixButton:hover {
+  background-color: var(--button-primary-hover);
+}
+
+.viewAllButton {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  transition: color 0.2s;
+}
+
+.viewAllButton:hover {
+  color: var(--button-primary-hover);
+}
+
+.morePermissions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1rem 0;
+}
+
 .permissions {
   display: flex;
   flex-wrap: wrap;

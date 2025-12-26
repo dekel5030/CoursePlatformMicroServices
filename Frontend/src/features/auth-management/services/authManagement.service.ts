@@ -42,6 +42,11 @@ export async function removeRolePermission(
   );
 }
 
+export async function fetchAllUsers(): Promise<UserDto[]> {
+  const response = await axiosClient.get<UserDto[]>("admin/users");
+  return response.data;
+}
+
 export async function fetchUserById(userId: string): Promise<UserDto> {
   const response = await axiosClient.get<UserDto>(`admin/users/${userId}`);
   return response.data;
