@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { UserTable, UserDrawer } from '@/features/auth-management';
-import { useUsers } from '@/features/auth-management/hooks';
-import type { UserDto } from '@/features/auth-management/types';
-import styles from './UsersListPage.module.css';
+import { useState } from "react";
+import { UserTable, UserDrawer } from "@/features/auth-management";
+import { useUsers } from "@/features/auth-management/hooks";
+import type { UserDto } from "@/features/auth-management/types";
+import styles from "./UsersListPage.module.css";
 
 export default function UsersListPage() {
   const { data: users, isLoading, error } = useUsers();
@@ -35,9 +35,7 @@ export default function UsersListPage() {
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>User Management</h1>
-          <p className={styles.subtitle}>
-            Manage user roles and permissions
-          </p>
+          <p className={styles.subtitle}>Manage user roles and permissions</p>
         </div>
       </div>
 

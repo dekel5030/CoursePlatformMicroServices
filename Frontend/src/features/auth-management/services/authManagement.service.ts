@@ -5,6 +5,7 @@ import type {
   UserDto,
   AddPermissionRequest,
   AddRoleRequest,
+  PaginatedResponse,
 } from "../types";
 
 export async function fetchAllRoles(): Promise<RoleListItemDto[]> {
@@ -43,7 +44,7 @@ export async function removeRolePermission(
 }
 
 export async function fetchAllUsers(): Promise<UserDto[]> {
-  const response = await axiosClient.get<UserDto[]>("users");
+  const response = await axiosClient.get<UserDto[]>("admin/users");
   return response.data;
 }
 

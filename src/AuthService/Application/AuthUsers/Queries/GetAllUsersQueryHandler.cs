@@ -20,7 +20,7 @@ internal class GetAllUsersQueryHandler : IQueryHandler<GetAllUsersQuery, IReadOn
     {
         var users = await _dbContext.Users
             .Include(u => u.Roles)
-            .OrderBy(u => u.Email.Address)
+            .OrderBy(u => u.Email)
             .ToListAsync(cancellationToken);
 
         var userDtos = users.Select(user => new UserDto(
