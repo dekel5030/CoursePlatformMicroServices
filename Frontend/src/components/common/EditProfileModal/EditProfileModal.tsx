@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal } from "@/components/ui";
 import { Input } from "@/components/ui";
 import { type User, type UpdateUserRequest } from "@/services/UsersAPI";
+import type { ApiErrorResponse } from "@/api/axiosClient";
 import styles from "./EditProfileModal.module.css";
 
 type EditProfileModalProps = {
@@ -28,7 +29,7 @@ export default function EditProfileModal({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<ApiErrorResponse | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,7 +70,7 @@ export default function EditProfileModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitError(null);
+    setApiError(null);
     setSubmitSuccess(false);
 
     if (!validateForm()) {
@@ -112,17 +113,20 @@ export default function EditProfileModal({
       setTimeout(() => {
         onClose();
       }, 1500);
-    } catch (error) {
-      setSubmitError(
-        error instanceof Error ? error.message : "Failed to update profile"
-      );
+    } catch (error: unknown) {
+      setApiError(error as ApiErrorResponse);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Edit Profile">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Edit Profile"
+      error={apiError?.message}
+    >
       <form onSubmit={handleSubmit} className={styles.form}>
         <Input
           label="First Name"
@@ -130,7 +134,7 @@ export default function EditProfileModal({
           value={formData.firstName}
           onChange={handleChange}
           placeholder="Enter your first name"
-          error={errors.firstName}
+          error={errors.firstName || (apiError?.errors?.FirstName?.[0])}
         />
 
         <Input
@@ -139,7 +143,7 @@ export default function EditProfileModal({
           value={formData.lastName}
           onChange={handleChange}
           placeholder="Enter your last name"
-          error={errors.lastName}
+          error={errors.lastName || (apiError?.errors?.LastName?.[0])}
         />
 
         <Input
@@ -148,7 +152,7 @@ export default function EditProfileModal({
           value={formData.phoneNumber}
           onChange={handleChange}
           placeholder="+1 1234567890"
-          error={errors.phoneNumber}
+          error={errors.phoneNumber || (apiError?.errors?.PhoneNumber?.[0])}
         />
 
         <Input
@@ -157,12 +161,8 @@ export default function EditProfileModal({
           name="dateOfBirth"
           value={formData.dateOfBirth}
           onChange={handleChange}
-          error={errors.dateOfBirth}
+          error={errors.dateOfBirth || (apiError?.errors?.DateOfBirth?.[0])}
         />
-
-        {submitError && (
-          <div className={styles.errorMessage}>{submitError}</div>
-        )}
 
         {submitSuccess && (
           <div className={styles.successMessage}>

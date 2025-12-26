@@ -10,6 +10,7 @@ interface ConfirmationModalProps {
   confirmText?: string;
   cancelText?: string;
   isLoading?: boolean;
+  error?: string | null;
 }
 
 export default function ConfirmationModal({
@@ -21,9 +22,10 @@ export default function ConfirmationModal({
   confirmText = 'Confirm',
   cancelText = 'Cancel',
   isLoading = false,
+  error = null,
 }: ConfirmationModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title}>
+    <Modal isOpen={isOpen} onClose={onClose} title={title} error={error}>
       <div className={styles.content}>
         <p className={styles.message}>{message}</p>
         <div className={styles.actions}>

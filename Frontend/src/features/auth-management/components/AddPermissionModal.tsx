@@ -2,11 +2,12 @@ import { useState } from 'react';
 import Modal from '@/components/ui/Modal/Modal';
 import styles from './AddPermissionModal.module.css';
 import type { AddPermissionRequest } from '../types';
+import type { ApiErrorResponse } from '@/api/axiosClient';
 
 interface AddPermissionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (permission: AddPermissionRequest) => void;
+  onSubmit: (permission: AddPermissionRequest) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -22,6 +23,7 @@ export default function AddPermissionModal({
     resource: '',
     resourceId: '*',
   });
+  const [apiError, setApiError] = useState<ApiErrorResponse | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -30,15 +32,23 @@ export default function AddPermissionModal({
     setFormData((prev: AddPermissionRequest) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({
-      effect: 'Allow',
-      action: '',
-      resource: '',
-      resourceId: '*',
-    });
+    setApiError(null);
+
+    try {
+      await onSubmit(formData);
+      setFormData({
+        effect: 'Allow',
+        action: '',
+        resource: '',
+        resourceId: '*',
+      });
+      setApiError(null);
+      onClose();
+    } catch (err: unknown) {
+      setApiError(err as ApiErrorResponse);
+    }
   };
 
   const handleClose = () => {
@@ -48,11 +58,17 @@ export default function AddPermissionModal({
       resource: '',
       resourceId: '*',
     });
+    setApiError(null);
     onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Add Permission">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Add Permission"
+      error={apiError?.message}
+    >
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.formGroup}>
           <label htmlFor="effect" className={styles.label}>
@@ -81,10 +97,17 @@ export default function AddPermissionModal({
             name="action"
             value={formData.action}
             onChange={handleChange}
-            className={styles.input}
+            className={
+              apiError?.errors?.Action ? styles.inputError : styles.input
+            }
             placeholder="e.g., Read, Write, Delete"
             required
           />
+          {apiError?.errors?.Action && (
+            <span className={styles.fieldError}>
+              {apiError.errors.Action[0]}
+            </span>
+          )}
         </div>
 
         <div className={styles.formGroup}>
@@ -97,10 +120,17 @@ export default function AddPermissionModal({
             name="resource"
             value={formData.resource}
             onChange={handleChange}
-            className={styles.input}
+            className={
+              apiError?.errors?.Resource ? styles.inputError : styles.input
+            }
             placeholder="e.g., Course, User, Order"
             required
           />
+          {apiError?.errors?.Resource && (
+            <span className={styles.fieldError}>
+              {apiError.errors.Resource[0]}
+            </span>
+          )}
         </div>
 
         <div className={styles.formGroup}>
@@ -113,9 +143,16 @@ export default function AddPermissionModal({
             name="resourceId"
             value={formData.resourceId}
             onChange={handleChange}
-            className={styles.input}
+            className={
+              apiError?.errors?.ResourceId ? styles.inputError : styles.input
+            }
             placeholder="* for all, or specific ID"
           />
+          {apiError?.errors?.ResourceId && (
+            <span className={styles.fieldError}>
+              {apiError.errors.ResourceId[0]}
+            </span>
+          )}
         </div>
 
         <div className={styles.actions}>
