@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -35,7 +36,6 @@ export default function EditProfileModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<ApiErrorResponse | null>(null);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -73,7 +73,6 @@ export default function EditProfileModal({
 
     setIsSubmitting(true);
     setApiError(null);
-    setSubmitSuccess(false);
 
     try {
       let phoneNumber: { countryCode: string; number: string } | null = null;
@@ -111,12 +110,12 @@ export default function EditProfileModal({
       };
 
       await onSave(updatedData);
-      setSubmitSuccess(true);
-      setTimeout(() => {
-        onOpenChange(false);
-      }, 1500);
+      toast.success("Profile updated successfully!");
+      onOpenChange(false);
     } catch (error: unknown) {
-      setApiError(error as ApiErrorResponse);
+      const apiError = error as ApiErrorResponse;
+      setApiError(apiError);
+      toast.error(apiError.message || "Failed to update profile");
     } finally {
       setIsSubmitting(false);
     }
@@ -167,16 +166,8 @@ export default function EditProfileModal({
             label="Date of Birth"
             type="date"
             name="dateOfBirth"
-            value={formData.dateOfBirth}
-            onChange={handleChange}
             error={errors.dateOfBirth || (apiError?.errors?.DateOfBirth?.[0])}
           />
-
-          {submitSuccess && (
-            <div className="bg-green-50 text-green-800 px-4 py-2 rounded-md text-sm">
-              Profile updated successfully!
-            </div>
-          )}
 
           <DialogFooter>
             <Button

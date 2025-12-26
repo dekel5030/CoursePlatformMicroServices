@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   addUserRole,
   removeUserRole,
@@ -14,6 +15,11 @@ export function useUserManagement(userId: string) {
     mutationFn: (request: AddRoleRequest) => addUserRole(userId, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['auth', 'users', userId] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'users'] });
+      toast.success('Role added successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to add role');
     },
   });
 
@@ -21,6 +27,11 @@ export function useUserManagement(userId: string) {
     mutationFn: (roleName: string) => removeUserRole(userId, roleName),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['auth', 'users', userId] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'users'] });
+      toast.success('Role removed successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to remove role');
     },
   });
 
@@ -29,6 +40,11 @@ export function useUserManagement(userId: string) {
       addUserPermission(userId, permission),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['auth', 'users', userId] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'users'] });
+      toast.success('Permission added successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to add permission');
     },
   });
 
@@ -37,6 +53,11 @@ export function useUserManagement(userId: string) {
       removeUserPermission(userId, permissionKey),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['auth', 'users', userId] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'users'] });
+      toast.success('Permission removed successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to remove permission');
     },
   });
 

@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   addRolePermission,
   removeRolePermission,
@@ -13,6 +14,10 @@ export function useRoleManagement(roleName: string) {
       addRolePermission(roleName, permission),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['auth', 'roles'] });
+      toast.success('Permission added to role successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to add permission to role');
     },
   });
 
@@ -21,6 +26,10 @@ export function useRoleManagement(roleName: string) {
       removeRolePermission(roleName, permissionKey),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['auth', 'roles'] });
+      toast.success('Permission removed from role successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to remove permission from role');
     },
   });
 

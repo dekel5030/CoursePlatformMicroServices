@@ -111,7 +111,7 @@ export default function UserTable({ users, onUserSelect }: UserTableProps) {
         />
       </div>
 
-      <div className="rounded-lg border border-border">
+      <div className="rounded-lg border border-border overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui';
 import { Combobox } from '@/components/ui';
 import { useUserManagement, useRoles } from '../../hooks';
 import type { UserDto } from '../../types';
-import type { ApiErrorResponse } from '@/api/axiosClient';
 
 interface UserDrawerProps {
   open: boolean;
@@ -20,7 +19,6 @@ interface UserDrawerProps {
 
 export default function UserDrawer({ open, onOpenChange, user }: UserDrawerProps) {
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const { data: allRoles, isLoading: rolesLoading } = useRoles();
   const { addRole, removeRole } = useUserManagement(user?.id.toString() || '');
 
@@ -38,8 +36,6 @@ export default function UserDrawer({ open, onOpenChange, user }: UserDrawerProps
   })) || [];
 
   const handleRoleChange = async (newRoles: string[]) => {
-    setError(null);
-
     const rolesToAdd = newRoles.filter((role) => !selectedRoles.includes(role));
     const rolesToRemove = selectedRoles.filter((role) => !newRoles.includes(role));
 
@@ -52,8 +48,7 @@ export default function UserDrawer({ open, onOpenChange, user }: UserDrawerProps
 
       setSelectedRoles(newRoles);
     } catch (err) {
-      const apiError = err as ApiErrorResponse;
-      setError(apiError.message || 'Failed to update roles');
+      // Error is handled by toast in the mutation hook
     }
   };
 
@@ -83,15 +78,10 @@ export default function UserDrawer({ open, onOpenChange, user }: UserDrawerProps
 
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-foreground">Assigned Roles</h3>
-            {error && (
-              <div className="bg-destructive/15 text-destructive px-3 py-2 rounded-md text-sm">
-                {error}
-              </div>
-            )}
             
             {rolesLoading ? (
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="animate-spin" size={20} />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 <span className="text-sm">Loading roles...</span>
               </div>
             ) : (
@@ -105,7 +95,7 @@ export default function UserDrawer({ open, onOpenChange, user }: UserDrawerProps
 
             {(addRole.isPending || removeRole.isPending) && (
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Loader2 className="animate-spin" size={16} />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 <span>Saving changes...</span>
               </div>
             )}
