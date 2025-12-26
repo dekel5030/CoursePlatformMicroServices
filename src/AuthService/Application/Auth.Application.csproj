@@ -21,4 +21,8 @@
     <Folder Include="Roles\Queries\Dtos\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Auth.Application.UnitTests" />
+  </ItemGroup>
+
 </Project>
