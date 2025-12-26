@@ -10,7 +10,7 @@ public class GetMe : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/users/me", async (
+        app.MapGet("/me", async (
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {

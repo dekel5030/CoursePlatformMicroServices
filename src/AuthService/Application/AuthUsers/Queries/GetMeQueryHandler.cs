@@ -2,6 +2,7 @@ using Auth.Application.Abstractions.Data;
 using Auth.Domain.AuthUsers;
 using Auth.Domain.AuthUsers.Errors;
 using Auth.Domain.AuthUsers.Primitives;
+using Auth.Domain.Permissions;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
@@ -39,6 +40,13 @@ internal class GetMeQueryHandler : IQueryHandler<GetMeQuery, UserDto>
             return Result<UserDto>.Failure(AuthUserErrors.NotFound);
         }
 
+        List<Permission> allPermissions = user.Roles
+            .SelectMany(r => r.Permissions)
+            .Concat(user.Permissions)
+            .GroupBy(p => p.Key)
+            .Select(g => g.First())
+            .ToList();
+
         var userDto = new UserDto(
             Id: user.Id.Value,
             Email: user.Email.Address,
@@ -48,7 +56,7 @@ internal class GetMeQueryHandler : IQueryHandler<GetMeQuery, UserDto>
                 Id: role.Id.Value,
                 Name: role.Name.Value
             )).ToList(),
-            Permissions: user.Permissions.Select(p => new PermissionDto(
+            Permissions: allPermissions.Select(p => new PermissionDto(
                 Key: p.Key,
                 Effect: p.Effect.ToString(),
                 Action: p.Action.ToString(),
