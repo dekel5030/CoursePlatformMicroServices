@@ -5,7 +5,6 @@ import type {
   UserDto,
   AddPermissionRequest,
   AddRoleRequest,
-  PaginatedResponse,
 } from "../types";
 
 export async function fetchAllRoles(): Promise<RoleListItemDto[]> {
