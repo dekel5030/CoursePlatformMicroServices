@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthUser } from '@/features/auth-management/hooks';
-import { UserRoleManagement, UserPermissionManagement } from '@/features/auth-management';
+import { UserRoleManagement } from '@/features/auth-management';
+import UserPermissionMatrix from '@/features/auth-management/components/UserPermissionMatrix/UserPermissionMatrix';
 import styles from './UserManagementPage.module.css';
 
 export default function UserManagementPage() {
@@ -52,7 +53,7 @@ export default function UserManagementPage() {
       </div>
 
       <UserRoleManagement userId={userId!} />
-      <UserPermissionManagement userId={userId!} />
+      <UserPermissionMatrix userId={userId!} permissions={user.permissions} />
     </div>
   );
 }

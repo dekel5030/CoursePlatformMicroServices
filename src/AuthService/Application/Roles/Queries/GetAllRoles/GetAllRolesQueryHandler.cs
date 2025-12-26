@@ -18,7 +18,6 @@ internal class GetAllRolesQueryHandler : IQueryHandler<GetAllRolesQuery, IReadOn
         GetAllRolesQuery request, 
         CancellationToken cancellationToken = default)
     {
-        // Efficient query using grouping to count users per role
         var roleUserCounts = await _readDbContext.Users
             .SelectMany(u => u.Roles.Select(r => r.Id))
             .GroupBy(roleId => roleId)
