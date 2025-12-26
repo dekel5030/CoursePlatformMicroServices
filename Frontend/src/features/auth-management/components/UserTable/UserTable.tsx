@@ -9,7 +9,7 @@ import {
   type SortingState,
 } from '@tanstack/react-table';
 import { Search, ChevronUp, ChevronDown, Edit2 } from 'lucide-react';
-import Badge from '@/components/ui/Badge/Badge';
+import { Badge } from '@/components/ui';
 import type { UserDto } from '../../types';
 import styles from './UserTable.module.css';
 

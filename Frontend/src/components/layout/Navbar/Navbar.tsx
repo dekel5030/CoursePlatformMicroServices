@@ -1,4 +1,3 @@
-import styles from "./Navbar.module.css";
 import { Dropdown, SearchBox, ProfileMenu } from "@/components/common";
 import { Button } from "@/components/ui";
 import { useAuth } from "react-oidc-context";
@@ -17,36 +16,36 @@ export default function Navbar() {
   };
 
   return (
-    <header className={styles.header}>
-      <div className={styles.logo}>CourseHub</div>
+    <header className="flex items-center justify-between px-8 py-2 bg-background border-b border-border">
+      <div className="text-2xl font-bold text-primary">CourseHub</div>
 
-      <nav className={styles.mainNav}>
-        <ul className={styles.navList}>
+      <nav className="flex-1 ml-8 hidden md:block">
+        <ul className="flex items-center gap-6 list-none">
           <Dropdown label="Explore">
-            <li className={styles.dropdownItem}>Learn AI</li>
-            <li className={styles.dropdownItem}>Launch a Career</li>
-            <li className={styles.dropdownItem}>Certification Prep</li>
+            <li className="hover:bg-accent px-2 py-1 rounded">Learn AI</li>
+            <li className="hover:bg-accent px-2 py-1 rounded">Launch a Career</li>
+            <li className="hover:bg-accent px-2 py-1 rounded">Certification Prep</li>
           </Dropdown>
           <SearchBox />
           <Dropdown label="Development">
-            <li className={styles.dropdownItem}>Web Development</li>
-            <li className={styles.dropdownItem}>Mobile Apps</li>
-            <li className={styles.dropdownItem}>Data Science</li>
+            <li className="hover:bg-accent px-2 py-1 rounded">Web Development</li>
+            <li className="hover:bg-accent px-2 py-1 rounded">Mobile Apps</li>
+            <li className="hover:bg-accent px-2 py-1 rounded">Data Science</li>
           </Dropdown>
-          <li className={styles.navItem}>Design</li>
-          <li className={styles.navItem}>Marketing</li>
+          <li className="relative">Design</li>
+          <li className="relative">Marketing</li>
         </ul>
       </nav>
 
-      <div className={styles.authButtons}>
+      <div className="flex gap-4">
         {auth.isAuthenticated ? (
           <ProfileMenu />
         ) : (
           <>
-            <Button variant="outlined" onClick={handleLoginClick}>
+            <Button variant="outline" onClick={handleLoginClick}>
               Log in
             </Button>
-            <Button variant="filled" onClick={handleSignUpClick}>
+            <Button variant="default" onClick={handleSignUpClick}>
               Sign up
             </Button>
           </>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Modal from "@/components/ui/Modal/Modal";
+import { Modal } from "@/components/ui";
 import styles from "./AddRoleModal.module.css";
 import type { ApiErrorResponse } from "@/api/axiosClient";
 

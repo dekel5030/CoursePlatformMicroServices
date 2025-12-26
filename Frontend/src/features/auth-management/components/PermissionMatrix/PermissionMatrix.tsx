@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
-import Switch from '@/components/ui/Switch/Switch';
-import Modal from '@/components/ui/Modal/Modal';
-import Badge from '@/components/ui/Badge/Badge';
+import { Switch } from '@/components/ui';
+import { Modal } from '@/components/ui';
+import { Badge } from '@/components/ui';
 import AddPermissionModal from '../AddPermissionModal';
 import { useRoleManagement } from '../../hooks';
 import { groupPermissionsByCategory } from '../../utils/permissionUtils';
@@ -108,9 +108,9 @@ export default function PermissionMatrix({
                           <span className={styles.permissionAction}>{permission.action}</span>
                           <span className={styles.permissionResource}>on {permission.resource}</span>
                           {permission.resourceId && (
-                            <Badge variant="info">{permission.resourceId}</Badge>
+                            <Badge variant="secondary">{permission.resourceId}</Badge>
                           )}
-                          <Badge variant={permission.effect === 'Allow' ? 'success' : 'error'}>
+                          <Badge variant={permission.effect === 'Allow' ? 'default' : 'destructive'}>
                             {permission.effect}
                           </Badge>
                         </div>

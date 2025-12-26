@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Modal } from "@/components/ui";
-import { Input } from "@/components/ui";
+import { Modal, FormField } from "@/components/ui";
 import { type User, type UpdateUserRequest } from "@/services/UsersAPI";
 import type { ApiErrorResponse } from "@/api/axiosClient";
 import styles from "./EditProfileModal.module.css";
@@ -128,7 +127,7 @@ export default function EditProfileModal({
       error={apiError?.message}
     >
       <form onSubmit={handleSubmit} className={styles.form}>
-        <Input
+        <FormField
           label="First Name"
           name="firstName"
           value={formData.firstName}
@@ -137,7 +136,7 @@ export default function EditProfileModal({
           error={errors.firstName || (apiError?.errors?.FirstName?.[0])}
         />
 
-        <Input
+        <FormField
           label="Last Name"
           name="lastName"
           value={formData.lastName}
@@ -146,7 +145,7 @@ export default function EditProfileModal({
           error={errors.lastName || (apiError?.errors?.LastName?.[0])}
         />
 
-        <Input
+        <FormField
           label="Phone Number"
           name="phoneNumber"
           value={formData.phoneNumber}
@@ -155,7 +154,7 @@ export default function EditProfileModal({
           error={errors.phoneNumber || (apiError?.errors?.PhoneNumber?.[0])}
         />
 
-        <Input
+        <FormField
           label="Date of Birth"
           type="date"
           name="dateOfBirth"

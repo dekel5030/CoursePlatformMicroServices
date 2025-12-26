@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Users } from 'lucide-react';
 import { useRoles } from '../hooks';
-import Badge from '@/components/ui/Badge/Badge';
+import { Badge } from '@/components/ui';
 import styles from './RoleList.module.css';
 
 export default function RoleList() {

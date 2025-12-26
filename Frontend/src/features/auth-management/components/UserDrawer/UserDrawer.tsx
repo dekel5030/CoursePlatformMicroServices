@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
-import Drawer from '@/components/ui/Drawer/Drawer';
-import Badge from '@/components/ui/Badge/Badge';
-import MultiSelect from '@/components/ui/MultiSelect/MultiSelect';
+import { Drawer } from '@/components/ui';
+import { Badge } from '@/components/ui';
+import { MultiSelect } from '@/components/ui';
 import { useUserManagement, useRoles } from '../../hooks';
 import type { UserDto } from '../../types';
 import type { ApiErrorResponse } from '@/api/axiosClient';
@@ -107,7 +107,7 @@ export default function UserDrawer({ isOpen, onClose, user }: UserDrawerProps) {
             <div className={styles.permissions}>
               {user.permissions.map((permission) => (
                 <div key={permission.key} className={styles.permission}>
-                  <Badge variant={permission.effect === 'Allow' ? 'success' : 'error'}>
+                  <Badge variant={permission.effect === 'Allow' ? 'default' : 'destructive'}>
                     {permission.effect}
                   </Badge>
                   <span className={styles.permissionText}>

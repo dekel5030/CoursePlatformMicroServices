@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Modal from '@/components/ui/Modal/Modal';
+import { Modal } from '@/components/ui';
 import styles from './AddPermissionModal.module.css';
 import type { AddPermissionRequest } from '../types';
 import type { ApiErrorResponse } from '@/api/axiosClient';

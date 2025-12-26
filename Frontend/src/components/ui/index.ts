@@ -10,3 +10,12 @@ export * from "./skeleton"
 export * from "./select"
 export * from "./table"
 export * from "./sonner"
+export * from "./popover"
+export * from "./command"
+export * from "./combobox"
+export * from "./form-field"
+
+// Compatibility exports
+export { default as Modal } from "./modal-compat"
+export { default as Drawer } from "./drawer-compat"
+export { default as MultiSelect } from "./multiselect-compat"
