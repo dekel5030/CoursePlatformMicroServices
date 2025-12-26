@@ -9,9 +9,16 @@ import {
   type SortingState,
 } from '@tanstack/react-table';
 import { Search, ChevronUp, ChevronDown, Edit2 } from 'lucide-react';
-import { Badge } from '@/components/ui';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui';
+import { Badge, Input, Button } from '@/components/ui';
 import type { UserDto } from '../../types';
-import styles from './UserTable.module.css';
 
 interface UserTableProps {
   users: UserDto[];
@@ -28,29 +35,29 @@ export default function UserTable({ users, onUserSelect }: UserTableProps) {
         accessorKey: 'firstName',
         header: 'Name',
         cell: ({ row }) => (
-          <div className={styles.nameCell}>
-            <span className={styles.name}>
-              {row.original.firstName} {row.original.lastName}
-            </span>
+          <div className="font-medium">
+            {row.original.firstName} {row.original.lastName}
           </div>
         ),
       },
       {
         accessorKey: 'email',
         header: 'Email',
-        cell: ({ row }) => <span className={styles.email}>{row.original.email}</span>,
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">{row.original.email}</span>
+        ),
       },
       {
         id: 'roles',
         header: 'Assigned Roles',
         accessorFn: (row) => row.roles.map((r) => r.name).join(', '),
         cell: ({ row }) => (
-          <div className={styles.rolesCell}>
+          <div className="flex flex-wrap gap-1">
             {row.original.roles.length === 0 ? (
-              <span className={styles.noRoles}>No roles</span>
+              <span className="text-sm text-muted-foreground">No roles</span>
             ) : (
               row.original.roles.map((role) => (
-                <Badge key={role.id} variant="default">
+                <Badge key={role.id} variant="secondary">
                   {role.name}
                 </Badge>
               ))
@@ -62,14 +69,15 @@ export default function UserTable({ users, onUserSelect }: UserTableProps) {
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => (
-          <button
-            className={styles.actionButton}
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => onUserSelect(row.original)}
-            title="Edit user"
+            className="gap-2"
           >
-            <Edit2 size={16} />
+            <Edit2 className="h-4 w-4" />
             Edit
-          </button>
+          </Button>
         ),
       },
     ],
@@ -91,76 +99,82 @@ export default function UserTable({ users, onUserSelect }: UserTableProps) {
   });
 
   return (
-    <div className={styles.container}>
-      <div className={styles.searchContainer}>
-        <Search size={20} className={styles.searchIcon} />
-        <input
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
           type="text"
           placeholder="Search users by name, email, or role..."
           value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}
-          className={styles.searchInput}
+          className="pl-10"
         />
       </div>
 
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead className={styles.thead}>
+      <div className="rounded-lg border border-border">
+        <Table>
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
+              <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th
+                  <TableHead
                     key={header.id}
-                    className={styles.th}
                     onClick={header.column.getToggleSortingHandler()}
+                    className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''}
                   >
-                    <div className={styles.headerContent}>
+                    <div className="flex items-center gap-2">
                       {flexRender(header.column.columnDef.header, header.getContext())}
                       {header.column.getCanSort() && (
-                        <span className={styles.sortIcon}>
+                        <span className="text-muted-foreground">
                           {header.column.getIsSorted() === 'asc' ? (
-                            <ChevronUp size={16} />
+                            <ChevronUp className="h-4 w-4" />
                           ) : header.column.getIsSorted() === 'desc' ? (
-                            <ChevronDown size={16} />
+                            <ChevronDown className="h-4 w-4" />
                           ) : (
-                            <span className={styles.sortPlaceholder}>⇅</span>
+                            <span className="text-xs">⇅</span>
                           )}
                         </span>
                       )}
                     </div>
-                  </th>
+                  </TableHead>
                 ))}
-              </tr>
+              </TableRow>
             ))}
-          </thead>
-          <tbody className={styles.tbody}>
+          </TableHeader>
+          <TableBody>
             {table.getRowModel().rows.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length} className={styles.emptyState}>
-                  <div className={styles.emptyContent}>
-                    <p>No users found</p>
+              <TableRow>
+                <TableCell colSpan={columns.length} className="text-center py-8">
+                  <div className="space-y-2">
+                    <p className="text-muted-foreground">No users found</p>
                     {globalFilter && (
-                      <button className={styles.clearButton} onClick={() => setGlobalFilter('')}>
+                      <Button variant="link" onClick={() => setGlobalFilter('')}>
                         Clear search
-                      </button>
+                      </Button>
                     )}
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className={styles.row}>
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className={styles.td}>
+                    <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
+                    </TableCell>
                   ))}
-                </tr>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
+
+      {table.getRowModel().rows.length > 0 && (
+        <div className="text-sm text-muted-foreground">
+          Showing {table.getRowModel().rows.length} of {users.length} users
+        </div>
+      )}
     </div>
   );
 }

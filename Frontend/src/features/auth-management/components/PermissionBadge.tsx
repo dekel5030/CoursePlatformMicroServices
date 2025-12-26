@@ -1,4 +1,6 @@
-import styles from './PermissionBadge.module.css';
+import { X } from 'lucide-react';
+import { Badge, Button } from '@/components/ui';
+import { cn } from '@/lib/utils';
 import type { PermissionDto } from '../types';
 
 interface PermissionBadgeProps {
@@ -12,35 +14,41 @@ export default function PermissionBadge({
   onRemove,
   showRemove = false,
 }: PermissionBadgeProps) {
-  const effectClass =
-    permission.effect.toLowerCase() === 'allow'
-      ? styles.allow
-      : styles.deny;
+  const isAllow = permission.effect.toLowerCase() === 'allow';
 
   return (
-    <div className={`${styles.badge} ${effectClass}`}>
-      <div className={styles.content}>
-        <span className={styles.effect}>{permission.effect}</span>
-        <span className={styles.separator}>:</span>
-        <span className={styles.action}>{permission.action}</span>
-        <span className={styles.separator}>on</span>
-        <span className={styles.resource}>{permission.resource}</span>
+    <div className={cn(
+      "flex items-center gap-2 p-3 rounded-md border",
+      isAllow ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"
+    )}>
+      <div className="flex items-center gap-2 flex-wrap flex-1">
+        <Badge variant={isAllow ? 'default' : 'destructive'} className="font-semibold">
+          {permission.effect}
+        </Badge>
+        <span className="text-sm text-muted-foreground">:</span>
+        <span className="text-sm font-medium">{permission.action}</span>
+        <span className="text-sm text-muted-foreground">on</span>
+        <span className="text-sm font-medium">{permission.resource}</span>
         {permission.resourceId !== '*' && (
           <>
-            <span className={styles.separator}>/</span>
-            <span className={styles.resourceId}>{permission.resourceId}</span>
+            <span className="text-sm text-muted-foreground">/</span>
+            <Badge variant="secondary" className="text-xs">
+              {permission.resourceId}
+            </Badge>
           </>
         )}
       </div>
       {showRemove && onRemove && (
-        <button
-          className={styles.removeButton}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6"
           onClick={onRemove}
           title="Remove permission"
           type="button"
         >
-          ×
-        </button>
+          <X className="h-4 w-4" />
+        </Button>
       )}
     </div>
   );
