@@ -10,6 +10,7 @@ export type RoleListItemDto = {
   id: string;
   name: string;
   permissionCount: number;
+  userCount: number;
 };
 
 export type RoleDetailDto = {
@@ -18,11 +19,18 @@ export type RoleDetailDto = {
   permissions: PermissionDto[];
 };
 
+export type PaginatedResponse<T> = {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+};
+
 export type UserDto = {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  firstName: string | null;
+  lastName: string | null;
   roles: UserRoleDto[];
   permissions: PermissionDto[];
 };

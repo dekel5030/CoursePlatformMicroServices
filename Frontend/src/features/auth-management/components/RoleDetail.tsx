@@ -1,40 +1,16 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useRole, useRoleManagement } from '../hooks';
+import { Settings } from 'lucide-react';
+import { useRole } from '../hooks';
 import PermissionBadge from './PermissionBadge';
-import AddPermissionModal from './AddPermissionModal';
-import ConfirmationModal from './ConfirmationModal';
+import PermissionMatrix from './PermissionMatrix/PermissionMatrix';
 import styles from './RoleDetail.module.css';
-import type { AddPermissionRequest } from '../types';
-import type { ApiErrorResponse } from '@/api/axiosClient';
 
 export default function RoleDetail() {
   const navigate = useNavigate();
   const { roleName } = useParams<{ roleName: string }>();
   const { data: role, isLoading, error } = useRole(roleName);
-  const { addPermission, removePermission } = useRoleManagement(roleName!);
-
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
-  const [removeError, setRemoveError] = useState<ApiErrorResponse | null>(null);
-
-  const handleAddPermission = async (permission: AddPermissionRequest) => {
-    await addPermission.mutateAsync(permission);
-    setIsAddModalOpen(false);
-  };
-
-  const handleRemovePermission = async () => {
-    if (!confirmRemove) return;
-
-    setRemoveError(null);
-    try {
-      await removePermission.mutateAsync(confirmRemove);
-      setConfirmRemove(null);
-      setRemoveError(null);
-    } catch (err: unknown) {
-      setRemoveError(err as ApiErrorResponse);
-    }
-  };
+  const [isMatrixOpen, setIsMatrixOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -73,6 +49,8 @@ export default function RoleDetail() {
     );
   }
 
+  const topPermissions = role.permissions.slice(0, 3);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -87,9 +65,10 @@ export default function RoleDetail() {
 
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Permissions</h2>
-          <button onClick={() => setIsAddModalOpen(true)} className={styles.addButton}>
-            + Add Permission
+          <h2 className={styles.sectionTitle}>Top Permissions</h2>
+          <button onClick={() => setIsMatrixOpen(true)} className={styles.matrixButton}>
+            <Settings size={16} />
+            Manage All Permissions
           </button>
         </div>
 
@@ -99,37 +78,29 @@ export default function RoleDetail() {
           </div>
         ) : (
           <div className={styles.permissions}>
-            {role.permissions.map((permission) => (
+            {topPermissions.map((permission) => (
               <PermissionBadge
                 key={permission.key}
                 permission={permission}
-                showRemove
-                onRemove={() => setConfirmRemove(permission.key)}
+                showRemove={false}
               />
             ))}
+            {role.permissions.length > 3 && (
+              <div className={styles.morePermissions}>
+                <button onClick={() => setIsMatrixOpen(true)} className={styles.viewAllButton}>
+                  View all {role.permissions.length} permissions →
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      <AddPermissionModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSubmit={handleAddPermission}
-        isLoading={addPermission.isPending}
-      />
-
-      <ConfirmationModal
-        isOpen={!!confirmRemove}
-        onClose={() => {
-          setConfirmRemove(null);
-          setRemoveError(null);
-        }}
-        onConfirm={handleRemovePermission}
-        title="Remove Permission"
-        message="Are you sure you want to remove this permission? This action cannot be undone."
-        confirmText="Remove"
-        isLoading={removePermission.isPending}
-        error={removeError?.message}
+      <PermissionMatrix
+        isOpen={isMatrixOpen}
+        onClose={() => setIsMatrixOpen(false)}
+        roleName={roleName!}
+        permissions={role.permissions}
       />
     </div>
   );
