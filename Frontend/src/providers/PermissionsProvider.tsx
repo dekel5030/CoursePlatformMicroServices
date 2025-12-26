@@ -1,16 +1,8 @@
-import { createContext, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "react-oidc-context";
-import { fetchCurrentUser, type CurrentUserDto, type PermissionDto } from "@/services/currentUser.service";
-
-export interface PermissionsContextValue {
-  user: CurrentUserDto | null;
-  permissions: PermissionDto[];
-  isLoading: boolean;
-  error: Error | null;
-}
-
-export const PermissionsContext = createContext<PermissionsContextValue | undefined>(undefined);
+import { fetchCurrentUser } from "@/services/currentUser.service";
+import { PermissionsContext, type PermissionsContextValue } from "@/contexts/PermissionsContext";
 
 export function PermissionsProvider({ children }: { children: ReactNode }) {
   const auth = useAuth();

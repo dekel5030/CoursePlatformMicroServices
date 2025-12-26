@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { PermissionsContext, type PermissionsContextValue } from "@/providers/PermissionsProvider";
+import { PermissionsContext, type PermissionsContextValue } from "@/contexts/PermissionsContext";
 import type { CurrentUserDto, PermissionDto } from "@/services/currentUser.service";
 
 /**
