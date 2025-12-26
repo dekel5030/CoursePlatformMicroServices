@@ -1,5 +1,7 @@
 import type { Course } from "@/types";
-import styles from "./CourseCard.module.css";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui";
+import { Badge } from "@/components/ui";
+import { BookOpen, Clock, DollarSign } from "lucide-react";
 
 interface Props {
   course: Course;
@@ -7,37 +9,47 @@ interface Props {
 
 export default function CourseCard({ course }: Props) {
   return (
-    <div className={styles.card}>
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       {course.imageUrl && (
-        <div className={styles.imageWrapper}>
-          <img src={course.imageUrl} alt={course.title} />
+        <div className="relative h-48 w-full overflow-hidden">
+          <img 
+            src={course.imageUrl} 
+            alt={course.title}
+            className="h-full w-full object-cover"
+          />
         </div>
       )}
 
-      <div className={styles.content}>
-        <h3 className={styles.title}>{course.title}</h3>
-        <p className={styles.description}>{course.description}</p>
+      <CardHeader>
+        <CardTitle className="line-clamp-2">{course.title}</CardTitle>
+      </CardHeader>
 
-        <div className={styles.meta}>
-          <span className={styles.price}>
-            💰 {course.price.amount} {course.price.currency}
-          </span>
-          <span
-            className={`${styles.status} ${
-              course.isPublished ? styles.published : styles.draft
-            }`}
-          >
+      <CardContent className="space-y-4">
+        <p className="text-sm text-muted-foreground line-clamp-3">
+          {course.description}
+        </p>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1 text-sm font-semibold">
+            <DollarSign className="h-4 w-4" />
+            {course.price.amount} {course.price.currency}
+          </div>
+          <Badge variant={course.isPublished ? "default" : "secondary"}>
             {course.isPublished ? "Published" : "Draft"}
-          </span>
+          </Badge>
         </div>
+      </CardContent>
 
-        <div className={styles.details}>
-          <span>📚 {course.lessons?.length || 0} lessons</span>
-          <span>
-            🕒 Updated: {new Date(course.updatedAtUtc).toLocaleDateString()}
-          </span>
+      <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center gap-1">
+          <BookOpen className="h-3 w-3" />
+          {course.lessons?.length || 0} lessons
         </div>
-      </div>
-    </div>
+        <div className="flex items-center gap-1">
+          <Clock className="h-3 w-3" />
+          {new Date(course.updatedAtUtc).toLocaleDateString()}
+        </div>
+      </CardFooter>
+    </Card>
   );
 }

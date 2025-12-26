@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuthUser, useUserManagement } from '../hooks';
-import styles from './UserPermissionManagement.module.css';
+import { Button, Skeleton } from '@/components/ui';
 import PermissionBadge from './PermissionBadge';
 import AddPermissionModal from './AddPermissionModal';
 import ConfirmationModal from './ConfirmationModal';
@@ -39,40 +39,40 @@ export default function UserPermissionManagement({ userId }: UserPermissionManag
 
   if (isLoading) {
     return (
-      <div className={styles.section}>
-        <div className={styles.skeleton}></div>
+      <div className="space-y-4">
+        <Skeleton className="h-24 w-full" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.section}>
-        <div className={styles.error}>
-          <p>Failed to load user data: {error.message}</p>
-        </div>
+      <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+        Failed to load user data: {error.message}
       </div>
     );
   }
 
   return (
-    <div className={styles.section}>
-      <div className={styles.sectionHeader}>
-        <div>
-          <h2 className={styles.sectionTitle}>Fine-Grained Permissions</h2>
-          <p className={styles.sectionSubtitle}>User-specific permissions override role permissions</p>
+    <div className="space-y-6">
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold">Fine-Grained Permissions</h2>
+          <p className="text-sm text-muted-foreground">
+            User-specific permissions override role permissions
+          </p>
         </div>
-        <button onClick={() => setIsAddModalOpen(true)} className={styles.addButton}>
+        <Button onClick={() => setIsAddModalOpen(true)}>
           + Add Permission
-        </button>
+        </Button>
       </div>
 
       {user && user.permissions.length === 0 ? (
-        <div className={styles.empty}>
+        <div className="text-center py-12 text-muted-foreground">
           <p>No fine-grained permissions assigned to this user</p>
         </div>
       ) : (
-        <div className={styles.permissions}>
+        <div className="space-y-2">
           {user?.permissions.map((permission) => (
             <PermissionBadge
               key={permission.key}

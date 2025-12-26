@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuthUser, useUserManagement } from "../hooks";
-import styles from "./UserRoleManagement.module.css";
+import { Button, Badge, Skeleton } from "@/components/ui";
 import ConfirmationModal from "./ConfirmationModal";
 import AddRoleModal from "./AddRoleModal";
 import type { ApiErrorResponse } from "@/api/axiosClient";
@@ -34,51 +34,55 @@ export default function UserRoleManagement({
 
   if (isLoading) {
     return (
-      <div className={styles.section}>
-        <div className={styles.skeleton}></div>
+      <div className="space-y-4">
+        <Skeleton className="h-24 w-full" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.section}>
-        <div className={styles.error}>
-          <p>Failed to load user data: {error.message}</p>
-        </div>
+      <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+        Failed to load user data: {error.message}
       </div>
     );
   }
 
   return (
-    <div className={styles.section}>
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Assigned Roles</h2>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className={styles.addButton}
-        >
-          + Add Role
-        </button>
+    <div className="space-y-6">
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold">Role Assignments</h2>
+          <p className="text-sm text-muted-foreground">
+            Roles grant collections of permissions to users
+          </p>
+        </div>
+        <Button onClick={() => setIsAddModalOpen(true)}>
+          + Assign Role
+        </Button>
       </div>
 
       {user && user.roles.length === 0 ? (
-        <div className={styles.empty}>
+        <div className="text-center py-12 text-muted-foreground">
           <p>No roles assigned to this user</p>
         </div>
       ) : (
-        <div className={styles.roles}>
+        <div className="flex flex-wrap gap-2">
           {user?.roles.map((role) => (
-            <div key={role.id} className={styles.roleCard}>
-              <span className={styles.roleName}>{role.name}</span>
+            <Badge
+              key={role.id}
+              variant="secondary"
+              className="text-sm py-2 px-3 gap-2"
+            >
+              <span>{role.name}</span>
               <button
-                className={styles.removeButton}
                 onClick={() => setConfirmRemove(role.name)}
+                className="ml-1 hover:text-destructive transition-colors"
                 title="Remove role"
               >
                 ×
               </button>
-            </div>
+            </Badge>
           ))}
         </div>
       )}
@@ -86,7 +90,10 @@ export default function UserRoleManagement({
       <AddRoleModal
         open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
-        onSubmit={(roleName) => addRole.mutateAsync({ roleName })}
+        onSubmit={async (roleName) => {
+          await addRole.mutateAsync({ roleName });
+          setIsAddModalOpen(false);
+        }}
         isLoading={addRole.isPending}
       />
 
@@ -98,7 +105,7 @@ export default function UserRoleManagement({
         }}
         onConfirm={handleRemoveRole}
         title="Remove Role"
-        message={`Are you sure you want to remove the role "${confirmRemove}"? This action cannot be undone.`}
+        message="Are you sure you want to remove this role from the user? This action cannot be undone."
         confirmText="Remove"
         isLoading={removeRole.isPending}
         error={removeError?.message}

@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import styles from "./Dropdown.module.css";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui";
 
 interface DropdownProps {
   label: string;
@@ -8,9 +12,15 @@ interface DropdownProps {
 
 export default function Dropdown({ label, children }: DropdownProps) {
   return (
-    <li className={styles.navItem}>
-      <button className={styles.dropdownButton}>{label}</button>
-      <ul className={styles.dropdownMenu}>{children}</ul>
-    </li>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors">
+          {label}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {children}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
