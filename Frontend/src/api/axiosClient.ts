@@ -9,6 +9,13 @@ export const axiosClient = axios.create({
   },
 });
 
+// Store the logout callback to be set by the AxiosInterceptorProvider
+let logoutCallback: (() => void) | null = null;
+
+export function setLogoutCallback(callback: () => void) {
+  logoutCallback = callback;
+}
+
 axiosClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const oidcAuthority = import.meta.env.VITE_OIDC_AUTHORITY;
@@ -56,6 +63,7 @@ interface ProblemDetails {
   instance?: string;
   errors?: Record<string, string[]>;
 }
+
 export interface ApiErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
@@ -82,79 +90,16 @@ axiosClient.interceptors.response.use(
       }
     }
 
+    // Handle 401 Unauthorized - trigger logout and clear state
     if (error.response?.status === 401) {
       apiError.message = "Session expired. Please log in again.";
+      
+      // Trigger OIDC logout if callback is available
+      if (logoutCallback) {
+        logoutCallback();
+      }
     }
 
     return Promise.reject(apiError);
   }
 );
-
-// axiosClient.interceptors.response.use(
-//   (response) => response,
-//   (error: AxiosError<ProblemDetails>) => {
-//     let errorMessage = "An unexpected error occurred";
-
-//     if (error.response) {
-//       const data = error.response.data;
-
-//       if (data) {
-//         if (data.errors) {
-//           errorMessage = Object.values(data.errors).flat().join(", ");
-//         } else if (data.detail) {
-//           errorMessage = data.detail;
-//         } else if (data.title) {
-//           errorMessage = data.title;
-//         }
-//       }
-
-//       switch (error.response.status) {
-//         case 401:
-//           console.error("Unauthorized - Redirecting to login...");
-//           break;
-//         case 403:
-//           errorMessage = "You don't have permission to perform this action";
-//           break;
-//       }
-//     } else if (error.request) {
-//       errorMessage =
-//         "No response from server. Please check your network connection.";
-//     } else {
-//       errorMessage = error.message;
-//     }
-
-//     return Promise.reject(errorMessage);
-//   }
-// );
-
-// axiosClient.interceptors.response.use(
-//   (response) => response,
-//   (error: AxiosError) => {
-//     if (error.response) {
-//       const status = error.response.status;
-
-//       switch (status) {
-//         case 401:
-//           console.error('Unauthorized access - please log in again');
-//           break;
-//         case 403:
-//           console.error('Access forbidden - insufficient permissions');
-//           break;
-//         case 404:
-//           console.error('Resource not found');
-//           break;
-//         case 500:
-//           console.error('Server error - please try again later');
-//           break;
-//         default:
-//           console.error(`HTTP Error ${status}:`, error.response.data);
-//       }
-//     } else if (error.request) {
-//       console.error('Network error - please check your connection');
-//     } else {
-//       console.error('Request failed:', error.message);
-//     }
-
-//     return Promise.reject(error);
-//   }
-// );
