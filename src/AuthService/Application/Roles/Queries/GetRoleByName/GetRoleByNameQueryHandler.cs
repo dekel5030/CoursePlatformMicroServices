@@ -1,5 +1,5 @@
 ﻿using Auth.Application.Abstractions.Data;
-using Auth.Application.AuthUsers.Queries;
+using Auth.Application.AuthUsers.Queries.Dtos;
 using Auth.Domain.Roles.Errors;
 using Auth.Domain.Roles.Primitives;
 using Kernel;

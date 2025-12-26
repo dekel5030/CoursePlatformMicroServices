@@ -1,4 +1,4 @@
-﻿namespace Auth.Application.AuthUsers.Queries;
+﻿namespace Auth.Application.AuthUsers.Queries.Dtos;
 
 public record PermissionDto(
     string Key,

@@ -10,12 +10,14 @@ import {
 export function PermissionsProvider({ children }: { children: ReactNode }) {
   const auth = useAuth();
 
+  const accessToken = auth.user?.access_token;
+
   const {
     data: user,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["currentUser"],
+    queryKey: ["currentUser", accessToken],
     queryFn: fetchCurrentUser,
     enabled: auth.isAuthenticated,
     staleTime: Infinity,

@@ -1,6 +1,7 @@
 using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Auth.Application.AuthUsers.Queries.Dtos;
+using Auth.Application.AuthUsers.Queries.GetMe;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -10,7 +11,7 @@ public class GetMe : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/me", async (
+        app.MapGet("auth/me", async (
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
