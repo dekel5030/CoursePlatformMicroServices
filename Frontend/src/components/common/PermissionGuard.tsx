@@ -9,9 +9,6 @@ interface PermissionGuardProps {
   fallback?: ReactNode;
 }
 
-/**
- * Component that conditionally renders children based on user permissions
- */
 export function PermissionGuard({
   action,
   resource,
@@ -30,9 +27,6 @@ interface AnyPermissionGuardProps {
   fallback?: ReactNode;
 }
 
-/**
- * Component that conditionally renders children if user has any of the specified permissions
- */
 export function AnyPermissionGuard({
   checks,
   children,

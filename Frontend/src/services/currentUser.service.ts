@@ -23,6 +23,6 @@ export interface CurrentUserDto {
 }
 
 export async function fetchCurrentUser(): Promise<CurrentUserDto> {
-  const response = await axiosClient.get<CurrentUserDto>("/me");
+  const response = await axiosClient.get<CurrentUserDto>("auth/me");
   return response.data;
 }

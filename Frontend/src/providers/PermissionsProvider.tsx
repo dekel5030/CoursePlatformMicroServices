@@ -2,16 +2,23 @@ import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "react-oidc-context";
 import { fetchCurrentUser } from "@/services/currentUser.service";
-import { PermissionsContext, type PermissionsContextValue } from "@/contexts/PermissionsContext";
+import {
+  PermissionsContext,
+  type PermissionsContextValue,
+} from "@/contexts/PermissionsContext";
 
 export function PermissionsProvider({ children }: { children: ReactNode }) {
   const auth = useAuth();
 
-  const { data: user, isLoading, error } = useQuery({
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["currentUser"],
     queryFn: fetchCurrentUser,
     enabled: auth.isAuthenticated,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: Infinity,
     retry: 1,
   });
 

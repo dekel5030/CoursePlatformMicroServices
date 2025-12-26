@@ -1,29 +1,28 @@
 import { useContext } from "react";
-import { PermissionsContext, type PermissionsContextValue } from "@/contexts/PermissionsContext";
-import type { CurrentUserDto, PermissionDto } from "@/services/currentUser.service";
+import {
+  PermissionsContext,
+  type PermissionsContextValue,
+} from "@/contexts/PermissionsContext";
+import type {
+  CurrentUserDto,
+  PermissionDto,
+} from "@/services/currentUser.service";
 
-/**
- * Hook to access the permissions context
- */
 export function usePermissionsContext(): PermissionsContextValue {
   const context = useContext(PermissionsContext);
   if (context === undefined) {
-    throw new Error("usePermissionsContext must be used within a PermissionsProvider");
+    throw new Error(
+      "usePermissionsContext must be used within a PermissionsProvider"
+    );
   }
   return context;
 }
 
-/**
- * Hook to access the current authenticated user's data
- */
 export function useCurrentUser(): CurrentUserDto | null {
   const { user } = usePermissionsContext();
   return user;
 }
 
-/**
- * Hook to access the current user's permissions
- */
 export function usePermissions(): PermissionDto[] {
   const { permissions } = usePermissionsContext();
   return permissions;
@@ -101,7 +100,7 @@ export function useHasAllPermissions(
  */
 export function useHasRole(roleName: string): boolean {
   const { user } = usePermissionsContext();
-  
+
   if (!user) {
     return false;
   }
@@ -118,7 +117,7 @@ export function useHasRole(roleName: string): boolean {
  */
 export function useHasAnyRole(roleNames: string[]): boolean {
   const { user } = usePermissionsContext();
-  
+
   if (!user) {
     return false;
   }
