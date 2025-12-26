@@ -7,6 +7,7 @@ import RoleManagementPage from "../Pages/Admin/RoleManagementPage/RoleManagement
 import RoleDetailPage from "../Pages/Admin/RoleDetailPage/RoleDetailPage";
 import UserManagementPage from "../Pages/Admin/UserManagementPage/UserManagementPage";
 import UsersListPage from "../Pages/Admin/UsersListPage/UsersListPage";
+import { PermissionsExample } from "../components/examples/PermissionsExample";
 
 export default function AppRoutes() {
   return (
@@ -19,6 +20,8 @@ export default function AppRoutes() {
       <Route path="/admin/roles/:roleName" element={<RoleDetailPage />} />
       <Route path="/admin/users" element={<UsersListPage />} />
       <Route path="/admin/users/:userId" element={<UserManagementPage />} />
+      {/* Example/Demo route for testing permissions system */}
+      <Route path="/examples/permissions" element={<PermissionsExample />} />
     </Routes>
   );
 }
