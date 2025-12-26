@@ -1,15 +1,39 @@
 import { useParams } from "react-router-dom";
 import { useLesson } from "@/features/lessons";
-import styles from "./LessonPage.module.css";
+import { Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui";
+import { Clock } from "lucide-react";
 
 export default function LessonPage() {
   const { id } = useParams<{ id: string }>();
   const { data: lesson, isLoading, error } = useLesson(id);
 
-  if (isLoading) return <div className={styles.status}>Loading lesson...</div>;
-  if (error) return <div className={styles.statusError}>Error: {error.message}</div>;
-  if (!lesson)
-    return <div className={styles.statusError}>Lesson not found</div>;
+  if (isLoading) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+          Error: {error.message}
+        </div>
+      </div>
+    );
+  }
+
+  if (!lesson) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+          Lesson not found
+        </div>
+      </div>
+    );
+  }
 
   const formatDuration = (duration: string | null | undefined) => {
     if (!duration) return null;
@@ -18,32 +42,45 @@ export default function LessonPage() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {lesson.videoUrl && (
-        <div className={styles.videoSection}>
-          <video
-            className={styles.videoPlayer}
-            controls
-            poster={lesson.thumbnailImage || undefined}
-          >
-            <source src={lesson.videoUrl} type="video/mp4" />
-          </video>
-        </div>
+        <Card>
+          <CardContent className="p-0">
+            <video
+              className="w-full aspect-video"
+              controls
+              poster={lesson.thumbnailImage || undefined}
+            >
+              <source src={lesson.videoUrl} type="video/mp4" />
+            </video>
+          </CardContent>
+        </Card>
       )}
-      <div className={styles.contentSection}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>{lesson.title}</h1>
-          <div className={styles.metadata}>
-            {formatDuration(lesson.duration)}
+
+      <Card>
+        <CardHeader className="space-y-3">
+          <div className="flex items-start justify-between">
+            <CardTitle className="text-3xl">{lesson.title}</CardTitle>
+            {lesson.duration && (
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <Clock className="h-4 w-4" />
+                {formatDuration(lesson.duration)}
+              </div>
+            )}
           </div>
-        </div>
+        </CardHeader>
+
         {lesson.description && (
-          <div className={styles.descriptionSection}>
-            <h2 className={styles.sectionTitle}>Description</h2>
-            <p className={styles.description}>{lesson.description}</p>
-          </div>
+          <CardContent>
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold">Description</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                {lesson.description}
+              </p>
+            </div>
+          </CardContent>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

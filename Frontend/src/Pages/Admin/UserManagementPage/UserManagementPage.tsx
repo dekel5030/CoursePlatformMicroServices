@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { useAuthUser } from '@/features/auth-management/hooks';
 import { UserRoleManagement } from '@/features/auth-management';
 import UserPermissionMatrix from '@/features/auth-management/components/UserPermissionMatrix/UserPermissionMatrix';
-import styles from './UserManagementPage.module.css';
+import { Button, Skeleton } from '@/components/ui';
 
 export default function UserManagementPage() {
   const navigate = useNavigate();
@@ -11,20 +12,18 @@ export default function UserManagementPage() {
 
   if (isLoading) {
     return (
-      <div className={styles.container}>
-        <div className={styles.skeleton}>
-          <div className={styles.skeletonHeader}></div>
-          <div className={styles.skeletonContent}></div>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <Skeleton className="h-20 w-full" />
+        <Skeleton className="h-64 w-full" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.container}>
-        <div className={styles.error}>
-          <p>Failed to load user: {error.message}</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+          Failed to load user: {error.message}
         </div>
       </div>
     );
@@ -32,24 +31,27 @@ export default function UserManagementPage() {
 
   if (!user) {
     return (
-      <div className={styles.container}>
-        <div className={styles.error}>
-          <p>User not found</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+          User not found
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <button onClick={() => navigate(-1)} className={styles.backButton}>
-          ← Back
-        </button>
-        <h1 className={styles.title}>
-          {user.firstName} {user.lastName}
-        </h1>
-        <p className={styles.subtitle}>{user.email}</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="space-y-4">
+        <Button onClick={() => navigate(-1)} variant="ghost" className="gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold">
+            {user.firstName} {user.lastName}
+          </h1>
+          <p className="text-lg text-muted-foreground">{user.email}</p>
+        </div>
       </div>
 
       <UserRoleManagement userId={userId!} />

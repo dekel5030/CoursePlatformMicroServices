@@ -1,65 +1,94 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import type { UpdateUserRequest } from "@/services/UsersAPI";
-import { EditProfileModal } from "@/components/common";
-import styles from "./UserProfilePage.module.css";
-import { useAuth } from "react-oidc-context";
 import { useUser, useUpdateUser } from "@/features/users";
+import { EditProfileModal } from "@/components/common";
+import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui";
+import { User, Mail, Phone, Calendar } from "lucide-react";
 
 export default function UserProfilePage() {
-  const { id } = useParams<{ id: string }>();
+  const { userId } = useParams<{ userId: string }>();
+  const { data: user, isLoading, error } = useUser(userId!);
+  const updateUser = useUpdateUser(userId!);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const auth = useAuth();
-  const { data: user, isLoading, error } = useUser(id);
-  const updateUserMutation = useUpdateUser(id || '');
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <Skeleton className="h-48 w-full" />
+      </div>
+    );
+  }
 
-  const isOwnProfile = auth.user?.profile.sub === id;
-
-  const handleEditProfile = () => {
-    setIsEditModalOpen(true);
-  };
-
-  const handleSaveProfile = async (updatedData: UpdateUserRequest) => {
-    try {
-      await updateUserMutation.mutateAsync(updatedData);
-    } catch (err) {
-      throw new Error(err instanceof Error ? err.message : "Failed to update");
-    }
-  };
-
-  if (isLoading) return <div className={styles.status}>Loading...</div>;
-  if (error) return <div className={styles.statusError}>Error: {error.message}</div>;
-  if (!user) return <div className={styles.statusError}>User not found</div>;
-
-  const fullName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || "N/A";
+  if (error || !user) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+          {error?.message || "User not found"}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.profileCard}>
-        <div className={styles.header}>
-          <h1 className={styles.name}>{fullName}</h1>
-          <p className={styles.email}>{user.email}</p>
-        </div>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Profile Information</CardTitle>
+          <Button onClick={() => setIsEditModalOpen(true)}>Edit Profile</Button>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                <span>Name</span>
+              </div>
+              <p className="text-lg font-medium">
+                {user.firstName || user.lastName
+                  ? `${user.firstName || ""} ${user.lastName || ""}`.trim()
+                  : "Not provided"}
+              </p>
+            </div>
 
-        {isOwnProfile && (
-          <div className={styles.actions}>
-            <button onClick={handleEditProfile} className={styles.editButton}>
-              Edit Profile
-            </button>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Mail className="h-4 w-4" />
+                <span>Email</span>
+              </div>
+              <p className="text-lg font-medium">{user.email || "Not provided"}</p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Phone className="h-4 w-4" />
+                <span>Phone</span>
+              </div>
+              <p className="text-lg font-medium">{user.phoneNumber || "Not provided"}</p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                <span>Date of Birth</span>
+              </div>
+              <p className="text-lg font-medium">
+                {user.dateOfBirth
+                  ? new Date(user.dateOfBirth).toLocaleDateString()
+                  : "Not provided"}
+              </p>
+            </div>
           </div>
-        )}
-      </div>
+        </CardContent>
+      </Card>
 
-      {user && (
-        <EditProfileModal
-          open={isEditModalOpen}
-          onOpenChange={(open) => setIsEditModalOpen(open)}
-          user={user}
-          onSave={handleSaveProfile}
-        />
-      )}
+      <EditProfileModal
+        open={isEditModalOpen}
+        onOpenChange={(open) => setIsEditModalOpen(open)}
+        user={user}
+        onSave={async (data) => {
+          await updateUser.mutateAsync(data);
+        }}
+      />
     </div>
   );
 }
