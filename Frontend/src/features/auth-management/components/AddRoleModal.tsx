@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import Modal from '@/components/ui/Modal/Modal';
-import styles from './AddRoleModal.module.css';
+import { useState } from "react";
+import Modal from "@/components/ui/Modal/Modal";
+import styles from "./AddRoleModal.module.css";
+import type { ApiErrorResponse } from "@/api/axiosClient";
 
 interface AddRoleModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (roleName: string) => void;
+  onSubmit: (roleName: string) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -15,21 +16,36 @@ export default function AddRoleModal({
   onSubmit,
   isLoading = false,
 }: AddRoleModalProps) {
-  const [roleName, setRoleName] = useState('');
+  const [roleName, setRoleName] = useState("");
+  const [apiError, setApiError] = useState<ApiErrorResponse | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(roleName);
-    setRoleName('');
+    setApiError(null);
+
+    try {
+      await onSubmit(roleName);
+
+      setRoleName("");
+      onClose();
+    } catch (err: any) {
+      setApiError(err);
+    }
   };
 
   const handleClose = () => {
-    setRoleName('');
+    setRoleName("");
+    setApiError(null);
     onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Add Role">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Add Role"
+      error={apiError?.message}
+    >
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.formGroup}>
           <label htmlFor="roleName" className={styles.label}>
@@ -40,10 +56,18 @@ export default function AddRoleModal({
             type="text"
             value={roleName}
             onChange={(e) => setRoleName(e.target.value)}
-            className={styles.input}
+            className={
+              apiError?.errors?.RoleName ? styles.inputError : styles.input
+            }
             placeholder="e.g., Admin, Instructor, Student"
             required
           />
+
+          {apiError?.errors?.RoleName && (
+            <span className={styles.fieldError}>
+              {apiError.errors.RoleName[0]}
+            </span>
+          )}
         </div>
 
         <div className={styles.actions}>
@@ -60,7 +84,7 @@ export default function AddRoleModal({
             className={styles.submitButton}
             disabled={isLoading}
           >
-            {isLoading ? 'Adding...' : 'Add Role'}
+            {isLoading ? "Adding..." : "Add Role"}
           </button>
         </div>
       </form>

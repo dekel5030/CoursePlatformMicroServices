@@ -1,28 +1,21 @@
-import { useState } from 'react';
-import { useAuthUser, useUserManagement } from '../hooks';
-import styles from './UserRoleManagement.module.css';
-import ConfirmationModal from './ConfirmationModal';
-import AddRoleModal from './AddRoleModal';
+import { useState } from "react";
+import { useAuthUser, useUserManagement } from "../hooks";
+import styles from "./UserRoleManagement.module.css";
+import ConfirmationModal from "./ConfirmationModal";
+import AddRoleModal from "./AddRoleModal";
 
 interface UserRoleManagementProps {
   userId: string;
 }
 
-export default function UserRoleManagement({ userId }: UserRoleManagementProps) {
+export default function UserRoleManagement({
+  userId,
+}: UserRoleManagementProps) {
   const { data: user, isLoading, error } = useAuthUser(userId);
   const { addRole, removeRole } = useUserManagement(userId);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
-
-  const handleAddRole = async (roleName: string) => {
-    try {
-      await addRole.mutateAsync({ roleName });
-      setIsAddModalOpen(false);
-    } catch (err) {
-      console.error('Failed to add role', err);
-    }
-  };
 
   const handleRemoveRole = async () => {
     if (!confirmRemove) return;
@@ -31,7 +24,7 @@ export default function UserRoleManagement({ userId }: UserRoleManagementProps) 
       await removeRole.mutateAsync(confirmRemove);
       setConfirmRemove(null);
     } catch (err) {
-      console.error('Failed to remove role', err);
+      console.error("Failed to remove role", err);
     }
   };
 
@@ -57,7 +50,10 @@ export default function UserRoleManagement({ userId }: UserRoleManagementProps) 
     <div className={styles.section}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Assigned Roles</h2>
-        <button onClick={() => setIsAddModalOpen(true)} className={styles.addButton}>
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className={styles.addButton}
+        >
           + Add Role
         </button>
       </div>
@@ -86,7 +82,7 @@ export default function UserRoleManagement({ userId }: UserRoleManagementProps) 
       <AddRoleModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onSubmit={handleAddRole}
+        onSubmit={(roleName) => addRole.mutateAsync({ roleName })}
         isLoading={addRole.isPending}
       />
 
