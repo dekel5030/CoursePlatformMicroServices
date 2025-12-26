@@ -1,6 +1,7 @@
 ﻿using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Auth.Application.AuthUsers.Queries.Dtos;
+using Auth.Application.AuthUsers.Queries.GetUserById;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

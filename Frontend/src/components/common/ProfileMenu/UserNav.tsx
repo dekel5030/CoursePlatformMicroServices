@@ -10,22 +10,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui";
 import ProfileAvatar from "./ProfileAvatar";
+import { useCurrentUser } from "@/hooks";
 
 export default function UserNav() {
   const navigate = useNavigate();
   const auth = useAuth();
+  const currentUser = useCurrentUser();
 
   const userProfile = auth.user?.profile;
 
   const getInitial = () => {
+    if (currentUser?.firstName)
+      return currentUser.firstName.charAt(0).toUpperCase();
     if (userProfile?.given_name)
       return userProfile.given_name.charAt(0).toUpperCase();
+    if (currentUser?.email) return currentUser.email.charAt(0).toUpperCase();
     if (userProfile?.email) return userProfile.email.charAt(0).toUpperCase();
     return "U";
   };
 
   const handleProfileClick = () => {
-    if (userProfile?.sub) {
+    if (currentUser?.id) {
+      navigate(`/users/${currentUser.id}`);
+    } else if (userProfile?.sub) {
       navigate(`/users/${userProfile.sub}`);
     }
   };
@@ -38,7 +45,11 @@ export default function UserNav() {
     }
   };
 
-  const displayName = userProfile?.given_name || userProfile?.email || "User";
+  const displayName = currentUser?.firstName 
+    || userProfile?.given_name 
+    || currentUser?.email 
+    || userProfile?.email 
+    || "User";
 
   return (
     <DropdownMenu>
@@ -51,9 +62,9 @@ export default function UserNav() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{displayName}</p>
-            {userProfile?.email && (
+            {(currentUser?.email || userProfile?.email) && (
               <p className="text-xs leading-none text-muted-foreground">
-                {userProfile.email}
+                {currentUser?.email || userProfile?.email}
               </p>
             )}
           </div>
