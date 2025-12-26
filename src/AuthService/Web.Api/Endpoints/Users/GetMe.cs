@@ -19,7 +19,6 @@ public class GetMe : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .RequireAuthorization()
         .WithMetadata<UserDto>(
             Tags.Users,
             "GetMe",
