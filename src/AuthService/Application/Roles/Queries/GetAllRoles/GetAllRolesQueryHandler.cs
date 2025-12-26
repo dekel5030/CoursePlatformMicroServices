@@ -18,10 +18,16 @@ internal class GetAllRolesQueryHandler : IQueryHandler<GetAllRolesQuery, IReadOn
         GetAllRolesQuery request, 
         CancellationToken cancellationToken = default)
     {
-        List<RoleDto> roles = await _readDbContext.Roles
-            .Select(r => new RoleDto(r.Id.Value, r.Name.Value, r.Permissions.Count))
-            .ToListAsync(cancellationToken);
+        var roles = await _readDbContext.Roles.ToListAsync(cancellationToken);
+        var users = await _readDbContext.Users.Include(u => u.Roles).ToListAsync(cancellationToken);
 
-        return Result<IReadOnlyCollection<RoleDto>>.Success(roles);
+        List<RoleDto> roleDtos = roles.Select(role => new RoleDto(
+            role.Id.Value,
+            role.Name.Value,
+            role.Permissions.Count,
+            users.Count(u => u.Roles.Any(r => r.Id == role.Id))
+        )).ToList();
+
+        return Result<IReadOnlyCollection<RoleDto>>.Success(roleDtos);
     }
 }

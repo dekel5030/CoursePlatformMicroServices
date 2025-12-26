@@ -55,6 +55,13 @@
 .cardBody {
   display: flex;
   align-items: center;
+  margin-bottom: 1rem;
+}
+
+.statsContainer {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
 }
 
 .stat {
@@ -64,17 +71,25 @@
 }
 
 .statValue {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--primary-color);
   line-height: 1;
 }
 
 .statLabel {
-  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.cardFooter {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--card-border);
 }
 
 .skeleton {

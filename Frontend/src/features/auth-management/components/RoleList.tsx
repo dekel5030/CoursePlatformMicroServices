@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+import { Users } from 'lucide-react';
 import { useRoles } from '../hooks';
+import Badge from '@/components/ui/Badge/Badge';
 import styles from './RoleList.module.css';
 
 export default function RoleList() {
@@ -51,12 +53,24 @@ export default function RoleList() {
                 <h3 className={styles.roleName}>{role.name}</h3>
               </div>
               <div className={styles.cardBody}>
-                <div className={styles.stat}>
-                  <span className={styles.statValue}>{role.permissionCount}</span>
-                  <span className={styles.statLabel}>
-                    {role.permissionCount === 1 ? 'Permission' : 'Permissions'}
-                  </span>
+                <div className={styles.statsContainer}>
+                  <div className={styles.stat}>
+                    <span className={styles.statValue}>{role.userCount}</span>
+                    <span className={styles.statLabel}>
+                      <Users size={14} />
+                      {role.userCount === 1 ? 'User' : 'Users'}
+                    </span>
+                  </div>
+                  <div className={styles.stat}>
+                    <span className={styles.statValue}>{role.permissionCount}</span>
+                    <span className={styles.statLabel}>
+                      {role.permissionCount === 1 ? 'Permission' : 'Permissions'}
+                    </span>
+                  </div>
                 </div>
+              </div>
+              <div className={styles.cardFooter}>
+                <Badge variant="default">{role.permissionCount} permissions</Badge>
               </div>
             </div>
           ))}
