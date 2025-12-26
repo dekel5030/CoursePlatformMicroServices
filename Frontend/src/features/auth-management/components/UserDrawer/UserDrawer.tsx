@@ -40,15 +40,11 @@ export default function UserDrawer({ isOpen, onClose, user }: UserDrawerProps) {
     const rolesToRemove = selectedRoles.filter((role) => !newRoles.includes(role));
 
     try {
-      // Add roles
-      for (const roleName of rolesToAdd) {
-        await addRole.mutateAsync({ roleName });
-      }
-
-      // Remove roles
-      for (const roleName of rolesToRemove) {
-        await removeRole.mutateAsync(roleName);
-      }
+      // Execute all role changes in parallel for better performance
+      await Promise.all([
+        ...rolesToAdd.map(roleName => addRole.mutateAsync({ roleName })),
+        ...rolesToRemove.map(roleName => removeRole.mutateAsync(roleName))
+      ]);
 
       setSelectedRoles(newRoles);
     } catch (err) {
