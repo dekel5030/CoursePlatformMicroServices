@@ -1,7 +1,6 @@
 namespace Kernel.Messaging.Abstractions;
 
-public interface IDomainEventHandler<TEvent>
-    where TEvent : IDomainEvent
+public interface IDomainEventHandler<TEvent> : IEventHandler<TEvent>
+    where TEvent : class, IDomainEvent
 {
-    Task Handle(TEvent @event, CancellationToken cancellationToken = default);
 }

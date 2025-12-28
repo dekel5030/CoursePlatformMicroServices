@@ -1,6 +1,9 @@
-﻿namespace Kernel.EventBus;
+﻿using Kernel.Messaging.Abstractions;
 
-public interface IEventConsumer<TEvent>
+namespace Kernel.EventBus;
+
+public interface IEventConsumer<TEvent> : IEventHandler<TEvent>
+    where TEvent : class
 {
-    Task HandleAsync(TEvent @event, CancellationToken cancellationToken = default);
+
 }
