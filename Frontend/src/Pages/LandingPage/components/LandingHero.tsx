@@ -10,7 +10,7 @@ export function LandingHero() {
   const { t } = useTranslation();
   
   return (
-    <PageSection className="relative lg:py-32 overflow-hidden bg-background">
+    <PageSection className="relative pt-12 pb-24 lg:pt-16 lg:pb-32 overflow-hidden bg-background">
       <div className="relative z-10">
         <motion.div 
           className="flex flex-col items-center space-y-6 text-center max-w-4xl mx-auto"

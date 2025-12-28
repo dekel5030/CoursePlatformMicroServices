@@ -95,10 +95,13 @@
       "addToCart": "Add to Cart",
       "about": "About This Course",
       "lessons": "Lessons",
-      "noLessons": "No lessons available."
+      "noLessons": "No lessons available.",
+      "deleteCourse": "Delete Course",
+      "addLesson": "Add Lesson"
     },
     "lesson": {
-      "description": "Description"
+      "description": "Description",
+      "deleteLesson": "Delete Lesson"
     }
   },
   "modals": {

@@ -4,12 +4,18 @@ import { Button, Skeleton } from "@/components/ui";
 import Breadcrumb from "@/components/layout/Breadcrumb/Breadcrumb";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, Plus } from "lucide-react";
+import { usePermissions } from "@/hooks/usePermissions";
+import { hasPermission } from "@/utils/permissionEvaluation";
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { t } = useTranslation();
   const { data: courses = [], isLoading, error } = useCourses();
+  
+  const permissions = usePermissions();
+  // Pass the raw permissions array (PermissionDto[]) directly to the new implementation
+  const canAddCourse = hasPermission(permissions, "Create", "Course", "*");
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -60,6 +66,12 @@ export default function HomePage() {
              <SlidersHorizontal className="h-4 w-4" />
              Filters
            </Button>
+           {canAddCourse && (
+             <Button size="sm" className="gap-2">
+               <Plus className="h-4 w-4" />
+               Add Course
+             </Button>
+           )}
         </div>
       </header>
 

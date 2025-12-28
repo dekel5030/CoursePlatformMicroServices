@@ -1,16 +1,32 @@
 import { useParams } from "react-router-dom";
 import { Lesson } from "@/features/lessons";
 import { useCourse } from "@/features/courses";
-import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+} from "@/components/ui";
 import Breadcrumb from "@/components/layout/Breadcrumb/Breadcrumb";
 import { ShoppingCart, CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { usePermissions } from "@/hooks/usePermissions";
+import { hasPermission } from "@/utils/permissionEvaluation";
+import { Plus, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
   const { data: course, isLoading, error } = useCourse(id);
   const { t, i18n } = useTranslation();
+  const permissions = usePermissions();
+
+  const canDeleteCourse = course
+    ? hasPermission(permissions, "Delete", "Course", course.id.value)
+    : false;
+  const canAddLesson = hasPermission(permissions, "Create", "Lesson", "*");
 
   if (isLoading) {
     return (
@@ -55,7 +71,7 @@ export default function CoursePage() {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
-          {t('common.error', { message: error.message })}
+          {t("common.error", { message: error.message })}
         </div>
       </div>
     );
@@ -73,11 +89,11 @@ export default function CoursePage() {
 
   // Determine content direction based on the current language or explicit field if available
   // For now, we will use auto detection for text content
-  const contentDir = i18n.dir(); 
+  const contentDir = i18n.dir();
 
   const breadcrumbItems = [
-    { label: t('breadcrumbs.home'), path: '/' },
-    { label: t('breadcrumbs.courses'), path: '/catalog' },
+    { label: t("breadcrumbs.home"), path: "/" },
+    { label: t("breadcrumbs.courses"), path: "/catalog" },
     { label: course.title },
   ];
 
@@ -86,20 +102,20 @@ export default function CoursePage() {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
+    show: { opacity: 1, y: 0 },
   };
 
   return (
     <div className="space-y-6">
       <Breadcrumb items={breadcrumbItems} />
-      <motion.div 
+      <motion.div
         className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"
         variants={container}
         initial="hidden"
@@ -122,22 +138,43 @@ export default function CoursePage() {
               )}
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <h1 className="text-3xl font-bold" dir="auto">{course.title}</h1>
+                  <div className="flex justify-between items-start">
+                    <h1 className="text-3xl font-bold" dir="auto">
+                      {course.title}
+                    </h1>
+                    {canDeleteCourse && (
+                      <Button variant="destructive" size="sm" className="gap-2">
+                        <Trash2 className="h-4 w-4" />
+                        {t("pages.course.deleteCourse")}
+                      </Button>
+                    )}
+                  </div>
                   <p className="text-muted-foreground">
-                    {t('pages.course.instructor')}: <span dir="auto">{course.instructorUserId ?? "Unknown"}</span>
+                    {t("pages.course.instructor")}:{" "}
+                    <span dir="auto">
+                      {course.instructorUserId ?? "Unknown"}
+                    </span>
                   </p>
                 </div>
                 <div className="flex gap-3">
-                  <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <motion.div
+                    className="flex-1"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
                     <Button className="w-full gap-2">
                       <CreditCard className="h-4 w-4" />
-                      {t('pages.course.buyNow')}
+                      {t("pages.course.buyNow")}
                     </Button>
                   </motion.div>
-                  <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <motion.div
+                    className="flex-1"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
                     <Button variant="outline" className="w-full gap-2">
                       <ShoppingCart className="h-4 w-4" />
-                      {t('pages.course.addToCart')}
+                      {t("pages.course.addToCart")}
                     </Button>
                   </motion.div>
                 </div>
@@ -150,10 +187,12 @@ export default function CoursePage() {
           <motion.div variants={item}>
             <Card>
               <CardHeader>
-                <CardTitle>{t('pages.course.about')}</CardTitle>
+                <CardTitle>{t("pages.course.about")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground" dir="auto">{course.description}</p>
+                <p className="text-muted-foreground" dir="auto">
+                  {course.description}
+                </p>
               </CardContent>
             </Card>
           </motion.div>
@@ -161,17 +200,26 @@ export default function CoursePage() {
 
         <motion.div variants={item}>
           <Card>
-            <CardHeader>
-              <CardTitle>{t('pages.course.lessons')}</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>{t("pages.course.lessons")}</CardTitle>
+              {canAddLesson && (
+                <Button size="sm" className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  {t("pages.course.addLesson")}
+                </Button>
+              )}
             </CardHeader>
             <CardContent className="space-y-2">
               {course.lessons && course.lessons.length > 0 ? (
                 course.lessons
                   .sort((a, b) => a.order - b.order)
                   .map((lesson, index) => (
-                    <motion.div 
+                    <motion.div
                       key={lesson.id.value}
-                      initial={{ opacity: 0, x: contentDir === 'rtl' ? 10 : -10 }}
+                      initial={{
+                        opacity: 0,
+                        x: contentDir === "rtl" ? 10 : -10,
+                      }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
@@ -180,7 +228,7 @@ export default function CoursePage() {
                   ))
               ) : (
                 <p className="text-muted-foreground text-center py-8">
-                  {t('pages.course.noLessons')}
+                  {t("pages.course.noLessons")}
                 </p>
               )}
             </CardContent>
