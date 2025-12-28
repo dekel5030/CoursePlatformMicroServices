@@ -5,11 +5,12 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/co
 import Breadcrumb from "@/components/layout/Breadcrumb/Breadcrumb";
 import { ShoppingCart, CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 
 export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
   const { data: course, isLoading, error } = useCourse(id);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   if (isLoading) {
     return (
@@ -23,7 +24,7 @@ export default function CoursePage() {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
-          Error: {error.message}
+          {t('common.error', { message: error.message })}
         </div>
       </div>
     );
@@ -39,78 +40,122 @@ export default function CoursePage() {
     );
   }
 
+  // Determine content direction based on the current language or explicit field if available
+  // For now, we will use auto detection for text content
+  const contentDir = i18n.dir(); 
+
   const breadcrumbItems = [
     { label: t('breadcrumbs.home'), path: '/' },
     { label: t('breadcrumbs.courses'), path: '/catalog' },
     { label: course.title },
   ];
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
   return (
     <div className="space-y-6">
       <Breadcrumb items={breadcrumbItems} />
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <Card className="overflow-hidden">
-        <div className="grid md:grid-cols-2 gap-6 p-6">
-          {course.imageUrl && (
-            <div className="relative h-64 md:h-full overflow-hidden rounded-lg">
-              <img
-                src={course.imageUrl}
-                alt={course.title}
-                className="h-full w-full object-cover"
-              />
+      <motion.div 
+        className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"
+        variants={container}
+        initial="hidden"
+        animate="show"
+      >
+        <motion.div variants={item}>
+          <Card className="overflow-hidden">
+            <div className="grid md:grid-cols-2 gap-6 p-6">
+              {course.imageUrl && (
+                <div className="relative h-64 md:h-full overflow-hidden rounded-lg">
+                  <motion.img
+                    initial={{ scale: 1.1 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    src={course.imageUrl}
+                    alt={course.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold" dir="auto">{course.title}</h1>
+                  <p className="text-muted-foreground">
+                    {t('pages.course.instructor')}: <span dir="auto">{course.instructorUserId ?? "Unknown"}</span>
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button className="w-full gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      {t('pages.course.buyNow')}
+                    </Button>
+                  </motion.div>
+                  <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button variant="outline" className="w-full gap-2">
+                      <ShoppingCart className="h-4 w-4" />
+                      {t('pages.course.addToCart')}
+                    </Button>
+                  </motion.div>
+                </div>
+              </div>
             </div>
-          )}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold">{course.title}</h1>
-              <p className="text-muted-foreground">
-                Instructor: {course.instructorUserId ?? "Unknown"}
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Button className="flex-1 gap-2">
-                <CreditCard className="h-4 w-4" />
-                Buy Now
-              </Button>
-              <Button variant="outline" className="flex-1 gap-2">
-                <ShoppingCart className="h-4 w-4" />
-                Add to Cart
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Card>
+          </Card>
+        </motion.div>
 
-      {course.description && (
-        <Card>
-          <CardHeader>
-            <CardTitle>About This Course</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">{course.description}</p>
-          </CardContent>
-        </Card>
-      )}
+        {course.description && (
+          <motion.div variants={item}>
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('pages.course.about')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground" dir="auto">{course.description}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Lessons</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {course.lessons && course.lessons.length > 0 ? (
-            course.lessons
-              .sort((a, b) => a.order - b.order)
-              .map((lesson, index) => (
-                <Lesson key={lesson.id.value} lesson={lesson} index={index} />
-              ))
-          ) : (
-            <p className="text-muted-foreground text-center py-8">
-              No lessons available.
-            </p>
-          )}
-        </CardContent>
-      </Card>
-      </div>
+        <motion.div variants={item}>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('pages.course.lessons')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {course.lessons && course.lessons.length > 0 ? (
+                course.lessons
+                  .sort((a, b) => a.order - b.order)
+                  .map((lesson, index) => (
+                    <motion.div 
+                      key={lesson.id.value}
+                      initial={{ opacity: 0, x: contentDir === 'rtl' ? 10 : -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <Lesson lesson={lesson} index={index} />
+                    </motion.div>
+                  ))
+              ) : (
+                <p className="text-muted-foreground text-center py-8">
+                  {t('pages.course.noLessons')}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

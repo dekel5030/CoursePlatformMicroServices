@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui';
 import { Combobox } from '@/components/ui';
 import { useUserManagement, useRoles } from '../../hooks';
 import type { UserDto } from '../../types';
+import { useTranslation } from 'react-i18next';
 
 interface UserDrawerProps {
   open: boolean;
@@ -18,6 +19,7 @@ interface UserDrawerProps {
 }
 
 export default function UserDrawer({ open, onOpenChange, user }: UserDrawerProps) {
+  const { t } = useTranslation();
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const { data: allRoles, isLoading: rolesLoading } = useRoles();
   const { addRole, removeRole } = useUserManagement(user?.id.toString() || '');
@@ -56,55 +58,55 @@ export default function UserDrawer({ open, onOpenChange, user }: UserDrawerProps
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Edit User</SheetTitle>
+          <SheetTitle>{t('authManagement.users.drawer.editUser')}</SheetTitle>
         </SheetHeader>
 
         <div className="space-y-6 mt-6">
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">User Information</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t('authManagement.users.drawer.userInfo')}</h3>
             <div className="space-y-2">
               <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground">Name</span>
+                <span className="text-xs text-muted-foreground">{t('authManagement.users.drawer.name')}</span>
                 <span className="text-sm font-medium">
                   {user.firstName} {user.lastName}
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground">Email</span>
+                <span className="text-xs text-muted-foreground">{t('authManagement.users.drawer.email')}</span>
                 <span className="text-sm font-medium">{user.email}</span>
               </div>
             </div>
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">Assigned Roles</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t('authManagement.users.drawer.assignedRoles')}</h3>
             
             {rolesLoading ? (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm">Loading roles...</span>
+                <span className="text-sm">{t('authManagement.users.drawer.loadingRoles')}</span>
               </div>
             ) : (
               <Combobox
                 options={roleOptions}
                 value={selectedRoles}
                 onChange={handleRoleChange}
-                placeholder="Select roles..."
+                placeholder={t('authManagement.users.drawer.selectRoles')}
               />
             )}
 
             {(addRole.isPending || removeRole.isPending) && (
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Saving changes...</span>
+                <span>{t('authManagement.users.drawer.saving')}</span>
               </div>
             )}
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">Permissions</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t('authManagement.users.drawer.permissions')}</h3>
             {user.permissions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No direct permissions assigned</p>
+              <p className="text-sm text-muted-foreground">{t('authManagement.users.drawer.noPermissions')}</p>
             ) : (
               <div className="space-y-2">
                 {user.permissions.map((permission) => (

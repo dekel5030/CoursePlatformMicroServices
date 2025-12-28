@@ -1,11 +1,149 @@
 {
+  "profileMenu": {
+    "profile": "דף פרופיל",
+    "logout": "התנתק"
+  },
+  "common": {
+    "error": "שגיאה: {{message}}"
+  },
   "breadcrumbs": {
     "home": "בית",
     "courses": "קורסים",
     "lessons": "שיעורים",
     "course": "קורס",
     "lesson": "שיעור",
-    "profile": "פרופיל"
+    "profile": "פרופיל",
+    "roles": "תפקידים",
+    "roleDetails": "פרטי תפקיד",
+    "users": "משתמשים",
+    "admin": "לוח בקרה למנהל"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "לוח בקרה למנהל",
+      "subtitle": "סקירה וניהול של הפלטפורמה",
+      "usersCard": {
+        "title": "ניהול משתמשים",
+        "description": "ניהול תפקידי משתמשים והרשאות"
+      },
+      "rolesCard": {
+        "title": "ניהול תפקידים",
+        "description": "הגדרה והגדרת תפקידי אבטחה"
+      }
+    }
+  },
+  "authManagement": {
+    "roles": {
+      "title": "תפקידים",
+      "subtitle": "ניהול תפקידי אבטחה והרשאות",
+      "noRoles": "לא נמצאו תפקידים",
+      "userCount": "משתמש",
+      "userCount_plural": "משתמשים",
+      "permissionCount": "הרשאה",
+      "permissionCount_plural": "הרשאות",
+      "permissions": "הרשאות",
+      "backToRoles": "חזרה לתפקידים",
+      "managePermissions": "ניהול הרשאות",
+      "noPermissions": "אין הרשאות מוקצות",
+      "viewAllPermissions": "צפה ב-{{count}} הרשאות",
+      "roleDetails": "פרטי תפקיד",
+      "roleNotFound": "תפקיד לא נמצא"
+    },
+    "users": {
+      "title": "ניהול משתמשים",
+      "subtitle": "ניהול תפקידי משתמשים והרשאות",
+      "noUsers": "לא נמצאו משתמשים במערכת",
+      "searchPlaceholder": "חפש משתמשים לפי שם, אימייל או תפקיד...",
+      "clearSearch": "נקה חיפוש",
+      "showingUsers": "מציג {{count}} מתוך {{total}} משתמשים",
+      "table": {
+        "name": "שם",
+        "email": "אימייל",
+        "assignedRoles": "תפקידים מוקצים",
+        "actions": "פעולות",
+        "noRoles": "אין תפקידים",
+        "edit": "ערוך"
+      },
+      "drawer": {
+        "editUser": "ערוך משתמש",
+        "userInfo": "פרטי משתמש",
+        "name": "שם",
+        "email": "אימייל",
+        "assignedRoles": "תפקידים מוקצים",
+        "loadingRoles": "טוען תפקידים...",
+        "selectRoles": "בחר תפקידים...",
+        "saving": "שומר שינויים...",
+        "permissions": "הרשאות",
+        "noPermissions": "אין הרשאות ישירות מוקצות"
+      },
+      "permissions": {
+        "title": "הרשאות פרטניות",
+        "subtitle": "הרשאות ספציפיות למשתמש גוברות על הרשאות תפקיד",
+        "addPermission": "+ הוסף הרשאה",
+        "noPermissions": "אין הרשאות פרטניות מוקצות למשתמש זה",
+        "failedToLoad": "נכשל בטעינת נתוני משתמש: {{message}}",
+        "removeTitle": "הסר הרשאה",
+        "removeMessage": "האם אתה בטוח שברצונך להסיר הרשאה זו? פעולה זו אינה הפיכה.",
+        "remove": "הסר"
+      }
+    }
+  },
+  "pages": {
+    "course": {
+      "instructor": "מדריך",
+      "buyNow": "קנה עכשיו",
+      "addToCart": "הוסף לסל",
+      "about": "על הקורס",
+      "lessons": "שיעורים",
+      "noLessons": "אין שיעורים זמינים."
+    },
+    "lesson": {
+      "description": "תיאור"
+    }
+  },
+  "modals": {
+    "addPermission": {
+      "title": "הוסף הרשאה",
+      "effect": "אפקט",
+      "action": "פעולה",
+      "actionPlaceholder": "לדוגמה: Read, Write, Delete",
+      "resource": "משאב",
+      "resourcePlaceholder": "לדוגמה: Course, User, Order",
+      "resourceId": "מזהה משאב",
+      "resourceIdPlaceholder": "* עבור הכל, או מזהה ספציפי",
+      "cancel": "ביטול",
+      "submit": "הוסף הרשאה",
+      "submitLoading": "מוסיף..."
+    },
+    "addRole": {
+      "title": "הוסף תפקיד",
+      "roleName": "שם התפקיד",
+      "roleNamePlaceholder": "לדוגמה: Admin, Instructor, Student",
+      "cancel": "ביטול",
+      "submit": "הוסף תפקיד",
+      "submitLoading": "מוסיף..."
+    },
+    "confirmation": {
+      "cancel": "ביטול",
+      "loading": "מעבד..."
+    },
+    "editProfile": {
+      "title": "ערוך פרופיל",
+      "firstName": "שם פרטי",
+      "firstNamePlaceholder": "הכנס את שמך הפרטי",
+      "lastName": "שם משפחה",
+      "lastNamePlaceholder": "הכנס את שם המשפחה שלך",
+      "phone": "מספר טלפון",
+      "phonePlaceholder": "+972 501234567",
+      "dob": "תאריך לידה",
+      "cancel": "ביטול",
+      "submit": "שמור שינויים",
+      "submitLoading": "שומר...",
+      "success": "הפרופיל עודכן בהצלחה!",
+      "validation": {
+        "phoneFormat": "מספר הטלפון חייב להיות בפורמט: +<קידומת מדינה> <מספר> (לדוגמה: \"+972 501234567\")"
+      }
+    }
   },
   "navbar": {
     "login": "התחבר",

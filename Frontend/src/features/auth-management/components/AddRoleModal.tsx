@@ -5,9 +5,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  Alert,
+  AlertDescription,
 } from "@/components/ui";
 import { Button, FormField } from "@/components/ui";
+import { AlertCircle } from "lucide-react";
 import type { ApiErrorResponse } from "@/api/axiosClient";
+import { useTranslation } from "react-i18next";
 
 interface AddRoleModalProps {
   open: boolean;
@@ -22,6 +26,7 @@ export default function AddRoleModal({
   onSubmit,
   isLoading = false,
 }: AddRoleModalProps) {
+  const { t } = useTranslation();
   const [roleName, setRoleName] = useState("");
   const [apiError, setApiError] = useState<ApiErrorResponse | null>(null);
 
@@ -48,22 +53,25 @@ export default function AddRoleModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Role</DialogTitle>
+          <DialogTitle>{t('modals.addRole.title')}</DialogTitle>
         </DialogHeader>
 
         {apiError?.message && (
-          <div className="bg-destructive/15 text-destructive px-4 py-2 rounded-md text-sm">
-            {apiError.message}
-          </div>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {t('common.error', { message: apiError.message })}
+            </AlertDescription>
+          </Alert>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <FormField
-            label="Role Name"
+            label={t('modals.addRole.roleName')}
             name="roleName"
             value={roleName}
             onChange={(e) => setRoleName(e.target.value)}
-            placeholder="e.g., Admin, Instructor, Student"
+            placeholder={t('modals.addRole.roleNamePlaceholder')}
             error={apiError?.errors?.RoleName?.[0]}
             required
           />
@@ -75,10 +83,10 @@ export default function AddRoleModal({
               onClick={handleClose}
               disabled={isLoading}
             >
-              Cancel
+              {t('modals.addRole.cancel')}
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Adding..." : "Add Role"}
+              {isLoading ? t('modals.addRole.submitLoading') : t('modals.addRole.submit')}
             </Button>
           </DialogFooter>
         </form>

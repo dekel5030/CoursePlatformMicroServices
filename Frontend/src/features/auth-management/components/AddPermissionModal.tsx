@@ -5,10 +5,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  Alert,
+  AlertDescription,
 } from '@/components/ui';
 import { Button, FormField, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui';
+import { AlertCircle } from 'lucide-react';
 import type { AddPermissionRequest } from '../types';
 import type { ApiErrorResponse } from '@/api/axiosClient';
+import { useTranslation } from 'react-i18next';
 
 interface AddPermissionModalProps {
   open: boolean;
@@ -23,6 +27,7 @@ export default function AddPermissionModal({
   onSubmit,
   isLoading = false,
 }: AddPermissionModalProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<AddPermissionRequest>({
     effect: 'Allow',
     action: '',
@@ -72,19 +77,22 @@ export default function AddPermissionModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Permission</DialogTitle>
+          <DialogTitle>{t('modals.addPermission.title')}</DialogTitle>
         </DialogHeader>
 
         {apiError?.message && (
-          <div className="bg-destructive/15 text-destructive px-4 py-2 rounded-md text-sm">
-            {apiError.message}
-          </div>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {t('common.error', { message: apiError.message })}
+            </AlertDescription>
+          </Alert>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="effect" className="text-sm font-medium">
-              Effect
+              {t('modals.addPermission.effect')}
             </label>
             <Select
               value={formData.effect}
@@ -101,31 +109,31 @@ export default function AddPermissionModal({
           </div>
 
           <FormField
-            label="Action"
+            label={t('modals.addPermission.action')}
             name="action"
             value={formData.action}
             onChange={handleChange}
-            placeholder="e.g., Read, Write, Delete"
+            placeholder={t('modals.addPermission.actionPlaceholder')}
             error={apiError?.errors?.Action?.[0]}
             required
           />
 
           <FormField
-            label="Resource"
+            label={t('modals.addPermission.resource')}
             name="resource"
             value={formData.resource}
             onChange={handleChange}
-            placeholder="e.g., Course, User, Order"
+            placeholder={t('modals.addPermission.resourcePlaceholder')}
             error={apiError?.errors?.Resource?.[0]}
             required
           />
 
           <FormField
-            label="Resource ID"
+            label={t('modals.addPermission.resourceId')}
             name="resourceId"
             value={formData.resourceId}
             onChange={handleChange}
-            placeholder="* for all, or specific ID"
+            placeholder={t('modals.addPermission.resourceIdPlaceholder')}
             error={apiError?.errors?.ResourceId?.[0]}
           />
 
@@ -136,10 +144,10 @@ export default function AddPermissionModal({
               onClick={handleClose}
               disabled={isLoading}
             >
-              Cancel
+              {t('modals.addPermission.cancel')}
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Adding...' : 'Add Permission'}
+              {isLoading ? t('modals.addPermission.submitLoading') : t('modals.addPermission.submit')}
             </Button>
           </DialogFooter>
         </form>

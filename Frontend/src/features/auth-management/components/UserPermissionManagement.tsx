@@ -6,12 +6,14 @@ import AddPermissionModal from './AddPermissionModal';
 import ConfirmationModal from './ConfirmationModal';
 import type { AddPermissionRequest } from '../types';
 import type { ApiErrorResponse } from '@/api/axiosClient';
+import { useTranslation } from 'react-i18next';
 
 interface UserPermissionManagementProps {
   userId: string;
 }
 
 export default function UserPermissionManagement({ userId }: UserPermissionManagementProps) {
+  const { t } = useTranslation();
   const { data: user, isLoading, error } = useAuthUser(userId);
   const { addPermission, removePermission } = useUserManagement(userId);
 
@@ -48,7 +50,7 @@ export default function UserPermissionManagement({ userId }: UserPermissionManag
   if (error) {
     return (
       <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
-        Failed to load user data: {error.message}
+        {t('authManagement.users.permissions.failedToLoad', { message: error.message })}
       </div>
     );
   }
@@ -57,19 +59,19 @@ export default function UserPermissionManagement({ userId }: UserPermissionManag
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold">Fine-Grained Permissions</h2>
+          <h2 className="text-2xl font-bold">{t('authManagement.users.permissions.title')}</h2>
           <p className="text-sm text-muted-foreground">
-            User-specific permissions override role permissions
+            {t('authManagement.users.permissions.subtitle')}
           </p>
         </div>
         <Button onClick={() => setIsAddModalOpen(true)}>
-          + Add Permission
+          {t('authManagement.users.permissions.addPermission')}
         </Button>
       </div>
 
       {user && user.permissions.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
-          <p>No fine-grained permissions assigned to this user</p>
+          <p>{t('authManagement.users.permissions.noPermissions')}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -98,9 +100,9 @@ export default function UserPermissionManagement({ userId }: UserPermissionManag
           setRemoveError(null);
         }}
         onConfirm={handleRemovePermission}
-        title="Remove Permission"
-        message="Are you sure you want to remove this permission? This action cannot be undone."
-        confirmText="Remove"
+        title={t('authManagement.users.permissions.removeTitle')}
+        message={t('authManagement.users.permissions.removeMessage')}
+        confirmText={t('authManagement.users.permissions.remove')}
         isLoading={removePermission.isPending}
         error={removeError?.message}
       />

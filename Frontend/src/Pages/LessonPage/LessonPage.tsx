@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components
 import Breadcrumb from "@/components/layout/Breadcrumb/Breadcrumb";
 import { Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 
 export default function LessonPage() {
   const { id } = useParams<{ id: string }>();
@@ -24,7 +25,7 @@ export default function LessonPage() {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
-          Error: {error.message}
+          {t('common.error', { message: error.message })}
         </div>
       </div>
     );
@@ -53,49 +54,73 @@ export default function LessonPage() {
     { label: lesson.title },
   ];
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
   return (
     <div className="space-y-6">
       <Breadcrumb items={breadcrumbItems} />
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <motion.div 
+        className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6"
+        variants={container}
+        initial="hidden"
+        animate="show"
+      >
         {lesson.videoUrl && (
-          <Card>
-          <CardContent className="p-0">
-            <video
-              className="w-full aspect-video"
-              controls
-              poster={lesson.thumbnailImage || undefined}
-            >
-              <source src={lesson.videoUrl} type="video/mp4" />
-            </video>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardHeader className="space-y-3">
-          <div className="flex items-start justify-between">
-            <CardTitle className="text-3xl">{lesson.title}</CardTitle>
-            {lesson.duration && (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                {formatDuration(lesson.duration)}
-              </div>
-            )}
-          </div>
-        </CardHeader>
-
-        {lesson.description && (
-          <CardContent>
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold">Description</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                {lesson.description}
-              </p>
-            </div>
-          </CardContent>
+          <motion.div variants={item}>
+            <Card className="overflow-hidden border-0 shadow-lg bg-black">
+              <CardContent className="p-0">
+                <video
+                  className="w-full aspect-video"
+                  controls
+                  poster={lesson.thumbnailImage || undefined}
+                >
+                  <source src={lesson.videoUrl} type="video/mp4" />
+                </video>
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
-      </Card>
-      </div>
+
+        <motion.div variants={item}>
+          <Card>
+            <CardHeader className="space-y-3">
+              <div className="flex items-start justify-between">
+                <CardTitle className="text-3xl" dir="auto">{lesson.title}</CardTitle>
+                {lesson.duration && (
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
+                    <Clock className="h-4 w-4" />
+                    {formatDuration(lesson.duration)}
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+
+            {lesson.description && (
+              <CardContent>
+                <div className="space-y-2">
+                  <h2 className="text-lg font-semibold">{t('pages.lesson.description')}</h2>
+                  <p className="text-muted-foreground leading-relaxed" dir="auto">
+                    {lesson.description}
+                  </p>
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
