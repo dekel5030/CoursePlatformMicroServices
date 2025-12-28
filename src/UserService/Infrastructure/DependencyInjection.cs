@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Users.Application.Abstractions.Context;
 using Users.Application.Abstractions.Data;
 using Users.Infrastructure.Auth;
 using Users.Infrastructure.Database;
 using Users.Infrastructure.DomainEvents;
+using Users.Infrastructure.MassTransit;
 
 namespace Users.Infrastructure;
 
@@ -22,7 +22,7 @@ public static class DependencyInjection
     {
         services.AddDatabase(configuration);
         services.AddMassTransitInternal(configuration);
-        services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
+        //services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
         //services.ConfigureJwtAuthentication(configuration);
         services.AddHttpContextAccessor();
@@ -71,53 +71,6 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IWriteDbContext>(serviceProvider => serviceProvider.GetRequiredService<WriteDbContext>());
-
-        return services;
-    }
-
-    private static IServiceCollection AddMassTransitInternal(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddMassTransit(config =>
-        {
-            config.AddConsumers(typeof(DependencyInjection).Assembly);
-
-            config.AddEntityFrameworkOutbox<WriteDbContext>(o =>
-            {
-                o.UsePostgres();
-                o.UseBusOutbox();
-                o.QueryDelay = TimeSpan.FromSeconds(30);
-            });
-
-
-            config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
-            {
-                endpointCfg.UseEntityFrameworkOutbox<WriteDbContext>(ctx);
-                endpointCfg.UseMessageRetry(r =>
-                {
-                    r.Handle<InvalidOperationException>();
-                    r.Intervals(
-                        TimeSpan.FromSeconds(10),
-                        TimeSpan.FromSeconds(20),
-                        TimeSpan.FromSeconds(40));
-                });
-            });
-
-            config.UsingRabbitMq((context, busConfig) =>
-            {
-                var connectionString = configuration.GetConnectionString(RabbitMqConnectionStringName)!;
-
-                busConfig.Host(new Uri(connectionString!), h => { });
-                busConfig.ConfigureEndpoints(context);
-            });
-
-            config.ConfigureHealthCheckOptions(options =>
-            {
-                options.Name = "masstransit";
-                options.MinimalFailureStatus = HealthStatus.Unhealthy;
-                options.Tags.Add("ready");
-            });
-        });
-
 
         return services;
     }

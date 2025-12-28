@@ -1,16 +1,16 @@
 ﻿using Domain.Users;
 using Kernel;
+using Kernel.Messaging.Abstractions;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Users.Application.Abstractions.Data;
-using Users.Infrastructure.DomainEvents;
 
 namespace Users.Infrastructure.Database;
 
 public sealed class WriteDbContext(
     DbContextOptions<WriteDbContext> options,
-    IDomainEventsDispatcher eventsDispatcher)
-    : DbContext(options), IWriteDbContext
+    IMediator mediator)
+        : DbContext(options), IWriteDbContext
 {
     public DbSet<User> Users { get; set; }
 
@@ -45,6 +45,6 @@ public sealed class WriteDbContext(
             entity.ClearDomainEvents();
         }
 
-        return eventsDispatcher.DispatchAsync(domainEvents, cancellationToken);
+        return mediator.Publish(domainEvents, cancellationToken);
     }
 }

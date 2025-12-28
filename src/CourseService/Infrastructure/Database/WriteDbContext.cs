@@ -9,9 +9,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Courses.Infrastructure.Database;
 
 public sealed class WriteDbContext(
-    DbContextOptions<WriteDbContext> options,
-    IDomainEventsDispatcher dispatcher)
-    : DbContext(options), IWriteDbContext
+    DbContextOptions<WriteDbContext> options)
+        : DbContext(options), IWriteDbContext
 {
     public DbSet<Course> Courses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
@@ -49,7 +48,8 @@ public sealed class WriteDbContext(
             entity.ClearDomainEvents();
         }
 
-        return dispatcher.DispatchAsync(domainEvents, cancellationToken);
+        //return dispatcher.DispatchAsync(domainEvents, cancellationToken);
+        return Task.CompletedTask;
     }
 
     private void AssignConcurrencyToken(ModelBuilder modelBuilder)

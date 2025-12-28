@@ -40,7 +40,6 @@ public class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfWork
             entity.ClearDomainEvents();
         }
 
-        //return _domainEventsDispatcher.DispatchAsync(domainEvents, cancellationToken);
         foreach (var domainEvent in domainEvents)
         {
             await _mediator.Publish(domainEvent, cancellationToken);

@@ -30,7 +30,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
+        //services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
         return services;
     }
 
