@@ -95,10 +95,13 @@
       "addToCart": "הוסף לסל",
       "about": "על הקורס",
       "lessons": "שיעורים",
-      "noLessons": "אין שיעורים זמינים."
+      "noLessons": "אין שיעורים זמינים.",
+      "deleteCourse": "מחק קורס",
+      "addLesson": "הוסף שיעור"
     },
     "lesson": {
-      "description": "תיאור"
+      "description": "תיאור",
+      "deleteLesson": "מחק שיעור"
     }
   },
   "modals": {
