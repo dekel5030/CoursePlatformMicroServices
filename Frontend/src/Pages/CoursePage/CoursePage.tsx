@@ -14,8 +14,39 @@ export default function CoursePage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Skeleton className="h-96 w-full" />
+      <div className="space-y-6">
+        <div className="bg-background border-b border-border py-3 px-8">
+          <div className="max-w-7xl mx-auto">
+            <Skeleton className="h-4 w-48" />
+          </div>
+        </div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+          <Card className="overflow-hidden">
+            <div className="grid md:grid-cols-2 gap-6 p-6">
+              <Skeleton className="relative h-64 md:h-full rounded-lg" />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-10 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+                <div className="flex gap-3">
+                  <Skeleton className="h-10 flex-1" />
+                  <Skeleton className="h-10 flex-1" />
+                </div>
+              </div>
+            </div>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-32" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-2/3" />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }

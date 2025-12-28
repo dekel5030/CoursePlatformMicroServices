@@ -56,7 +56,7 @@ export default function UserNav() {
   return (
     <DropdownMenu dir={i18n.dir()}>
       <DropdownMenuTrigger asChild>
-        <button className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full">
+        <button className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full cursor-pointer">
           <ProfileAvatar initial={getInitial()} />
         </button>
       </DropdownMenuTrigger>

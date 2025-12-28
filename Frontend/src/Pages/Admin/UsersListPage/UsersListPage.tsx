@@ -20,11 +20,40 @@ export default function UsersListPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Breadcrumb items={breadcrumbItems} />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-background border-b border-border py-3 px-8">
+          <div className="max-w-7xl mx-auto">
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+          <div className="space-y-2">
+            <Skeleton className="h-10 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
           <div className="space-y-4">
-            <Skeleton className="h-12 w-64" />
-            <Skeleton className="h-96 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <div className="rounded-lg border border-border overflow-hidden">
+              <div className="border-b bg-muted/50 p-4">
+                <div className="grid grid-cols-4 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Skeleton key={i} className="h-4 w-full" />
+                  ))}
+                </div>
+              </div>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="p-4 border-b">
+                  <div className="grid grid-cols-4 gap-4">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                    <div className="flex gap-1">
+                      <Skeleton className="h-5 w-16" />
+                      <Skeleton className="h-5 w-16" />
+                    </div>
+                    <Skeleton className="h-8 w-20 ml-auto" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

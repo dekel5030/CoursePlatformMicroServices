@@ -15,8 +15,31 @@ export default function LessonPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Skeleton className="h-96 w-full" />
+      <div className="space-y-6">
+        <div className="bg-background border-b border-border py-3 px-8">
+          <div className="max-w-7xl mx-auto">
+            <Skeleton className="h-4 w-64" />
+          </div>
+        </div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+          <Skeleton className="w-full aspect-video rounded-xl shadow-lg" />
+          <Card>
+            <CardHeader className="space-y-3">
+              <div className="flex items-start justify-between">
+                <Skeleton className="h-10 w-1/2" />
+                <Skeleton className="h-6 w-20 rounded-full" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
