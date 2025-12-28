@@ -2,6 +2,8 @@
 
 namespace Gateway.Api.Services.AuthClient;
 
+public record TokenResponse(string InternalToken);
+
 public class AuthHttpClient : IAuthClient
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -30,9 +32,9 @@ public class AuthHttpClient : IAuthClient
             if (!response.IsSuccessStatusCode) return null;
 
             var internalToken = await response.Content
-               .ReadFromJsonAsync<string>(cancellationToken: cancellationToken);
+               .ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
 
-            return internalToken;
+            return internalToken?.InternalToken;
         }
         catch (Exception ex)
         {

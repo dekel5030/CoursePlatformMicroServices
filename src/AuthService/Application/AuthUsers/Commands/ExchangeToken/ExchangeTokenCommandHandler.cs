@@ -76,9 +76,24 @@ internal class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenComman
         Result<AuthUser> userCreationResult = AuthUser.Create(externalId, fullName, email, defaultRole!);
         AuthUser newUser = userCreationResult.Value!;
 
-        await _dbContext.Users.AddAsync(newUser);
-        await _unitOfWork.SaveChangesAsync();
+        try
+        {
+            await _dbContext.Users.AddAsync(newUser, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return newUser;
+        }
+        catch (DbUpdateException ex)
+        {
+            var existingUser = await _dbContext.Users
+                        .Include(u => u.Roles)
+                        .FirstOrDefaultAsync(u => u.IdentityId == externalId, cancellationToken);
 
-        return newUser;
+            if (existingUser is not null)
+            {
+                return existingUser;
+            }
+
+            throw;
+        }
     }
 }

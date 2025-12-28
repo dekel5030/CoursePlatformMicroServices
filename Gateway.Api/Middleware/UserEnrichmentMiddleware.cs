@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Concurrent;
+using System.Security.Claims;
 using Gateway.Api.Services.AuthClient;
 using Gateway.Api.Services.CacheService;
 using Kernel.Auth;
@@ -9,12 +10,15 @@ public class UserEnrichmentMiddleware : IMiddleware
 {
     private readonly ICacheService _cacheService;
     private readonly IAuthClient _authClient;
+    private readonly ILogger<UserEnrichmentMiddleware> _logger;
+    private static readonly ConcurrentDictionary<string, Task<string?>> _exchangeTasks = new();
 
     public UserEnrichmentMiddleware(
-        ICacheService cacheService, IAuthClient authClient)
+        ICacheService cacheService, IAuthClient authClient, ILogger<UserEnrichmentMiddleware> logger)
     {
         _cacheService = cacheService;
         _authClient = authClient;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -32,14 +36,30 @@ public class UserEnrichmentMiddleware : IMiddleware
             return;
         }
 
-        var internalToken = await GetOrExchangeInternalTokenAsync(context, identityUserId);
+        var internalToken = await _exchangeTasks.GetOrAdd(identityUserId, _ =>
+            GetOrExchangeInternalTokenWithCleanupAsync(context, identityUserId));
 
-        if (!string.IsNullOrEmpty(internalToken))
+        if (string.IsNullOrEmpty(internalToken))
         {
-            context.Request.Headers.Authorization = $"Bearer {internalToken}";
+            _logger.LogWarning("Blocking request for user {UserId} - Internal token exchange failed", identityUserId);
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return;
         }
 
+        context.Request.Headers.Authorization = $"Bearer {internalToken}";
         await next(context);
+    }
+
+    private async Task<string?> GetOrExchangeInternalTokenWithCleanupAsync(HttpContext context, string identityUserId)
+    {
+        try
+        {
+            return await GetOrExchangeInternalTokenAsync(context, identityUserId);
+        }
+        finally
+        {
+            _exchangeTasks.TryRemove(identityUserId, out _);
+        }
     }
 
     private async Task<string?> GetOrExchangeInternalTokenAsync(HttpContext context, string identityUserId)
@@ -47,6 +67,7 @@ public class UserEnrichmentMiddleware : IMiddleware
         var cachedToken = await _cacheService.GetAsync<string>(AuthCacheKeys.UserInternalJwt(identityUserId));
         if (!string.IsNullOrEmpty(cachedToken))
         {
+            _logger.LogInformation("Cache hit for user {UserId}", identityUserId);
             return cachedToken;
         }
 
@@ -56,7 +77,8 @@ public class UserEnrichmentMiddleware : IMiddleware
             return null;
         }
 
-        var internalToken = await _authClient.GetInternalToken(keycloakToken, context.RequestAborted);
+        _logger.LogInformation("Cache miss - Fetching internal token for user {UserId}", identityUserId);
+        var internalToken = await _authClient.GetInternalToken(keycloakToken);
 
         return internalToken;
     }
