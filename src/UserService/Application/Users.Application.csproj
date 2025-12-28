@@ -11,6 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Contracts\CoursePlatform.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\CoursePlatform.ServiceDefaults\CoursePlatform.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Domain\Users.Domain.csproj" />
   </ItemGroup>
 

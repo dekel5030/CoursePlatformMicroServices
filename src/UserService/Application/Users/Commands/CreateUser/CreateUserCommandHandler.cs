@@ -8,7 +8,8 @@ using Users.Application.Abstractions.Data;
 
 namespace Users.Application.Users.Commands.CreateUser;
 
-public class CreateUserCommandHandler(IWriteDbContext dbContext) : ICommandHandler<CreateUserCommand, CreatedUserRespondDto>
+public class CreateUserCommandHandler(IWriteDbContext dbContext)
+    : ICommandHandler<CreateUserCommand, CreatedUserRespondDto>
 {
     public async Task<Result<CreatedUserRespondDto>> Handle(
         CreateUserCommand request,
@@ -27,7 +28,6 @@ public class CreateUserCommandHandler(IWriteDbContext dbContext) : ICommandHandl
 
         // Note: Manual user creation is deprecated. Users should be created via AuthService events.
         // This creates a temporary AuthUserId for backward compatibility.
-        var tempAuthUserId = new AuthUserId($"temp-{Guid.NewGuid()}");
 
         // Parse userId if provided, otherwise it will be generated
         UserId? userId = null;
@@ -40,9 +40,8 @@ public class CreateUserCommandHandler(IWriteDbContext dbContext) : ICommandHandl
         }
 
         Result<User> creationResult = User.CreateUser(
-            authUserId: tempAuthUserId,
+            Id: userId ?? new UserId(Guid.CreateVersion7()),
             email: request.Email,
-            userId: userId,
             fullName: userFullName,
             phoneNumber: request.PhoneNumber,
             dateOfBirth: request.DateOfBirth);
