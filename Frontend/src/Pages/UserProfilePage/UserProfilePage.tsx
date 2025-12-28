@@ -3,13 +3,16 @@ import { useParams } from "react-router-dom";
 import { useUser, useUpdateUser } from "@/features/users";
 import { EditProfileModal } from "@/components/common";
 import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui";
+import Breadcrumb from "@/components/layout/Breadcrumb/Breadcrumb";
 import { User, Mail, Phone, Calendar } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function UserProfilePage() {
   const { userId } = useParams<{ userId: string }>();
   const { data: user, isLoading, error } = useUser(userId!);
   const updateUser = useUpdateUser(userId!);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
@@ -29,8 +32,15 @@ export default function UserProfilePage() {
     );
   }
 
+  const breadcrumbItems = [
+    { label: t('breadcrumbs.home'), path: '/' },
+    { label: t('breadcrumbs.profile') },
+  ];
+
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="space-y-6">
+      <Breadcrumb items={breadcrumbItems} />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Profile Information</CardTitle>
@@ -89,6 +99,7 @@ export default function UserProfilePage() {
           await updateUser.mutateAsync(data);
         }}
       />
+      </div>
     </div>
   );
 }

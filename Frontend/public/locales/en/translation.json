@@ -1,0 +1,105 @@
+{
+  "breadcrumbs": {
+    "home": "Home",
+    "courses": "Courses",
+    "lessons": "Lessons",
+    "course": "Course",
+    "lesson": "Lesson",
+    "profile": "Profile"
+  },
+  "navbar": {
+    "login": "Log in",
+    "signup": "Sign up",
+    "catalog": "Catalog",
+    "explore": "Software",
+    "development": "Disciplines",
+    "design": "Interiors",
+    "marketing": "Visualization"
+  },
+  "landing": {
+    "hero": {
+      "badge": "New Revit & Lumion courses",
+      "title": "Master Architecture & Design with",
+      "subtitle": "Bridge the gap between design theory and technical mastery. Learn Revit, AutoCAD, Lumion, and more from industry professionals.",
+      "getStarted": "Start Learning",
+      "viewCatalog": "View Catalog"
+    },
+    "stats": {
+      "courses": "Courses",
+      "students": "Architects & Designers",
+      "instructors": "BIM Managers",
+      "rating": "Average Rating"
+    },
+    "features": {
+      "title": "Built for the AEC Industry",
+      "subtitle": "Specialized training for Architects, Engineers, and Construction professionals.",
+      "globalCommunity": {
+        "title": "Design Community",
+        "description": "Connect with architects and designers worldwide. Share families, details, and rendering techniques."
+      },
+      "expertContent": {
+        "title": "Industry Standards",
+        "description": "Courses covering ISO 19650, local building codes, and advanced BIM workflows."
+      },
+      "fastLearning": {
+        "title": "Project-Based",
+        "description": "Learn by creating real-world projects like high-rise towers, residential villas, and parametric structures."
+      },
+      "certificates": {
+        "title": "Certification",
+        "description": "Earn certificates to validate your software proficiency to firms and clients."
+      },
+      "securePlatform": {
+        "title": "Secure Platform",
+        "description": "Access your project files and training history securely from anywhere."
+      }
+    },
+    "about": {
+      "title": "From Blueprint to Reality",
+      "description": "Architecture is changing. The tools are getting more complex, but the deadlines are getting tighter. CourseHub provides the technical edge you need—whether you're moving from 2D to BIM, mastering photorealistic rendering, or automating tasks with visual scripting.",
+      "points": {
+        "curriculum": "Workflows for Revit, Rhino, and AutoCAD",
+        "projects": "Create portfolio-ready renderings and sheets",
+        "mentorship": "Learn from licensed architects and BIM leads",
+        "community": "Resource sharing for families and textures"
+      },
+      "readStory": "Our Vision"
+    },
+    "showcase": {
+      "title": "Visualize Your Future",
+      "subtitle": "Master the tools that shape the built environment.",
+      "categories": {
+        "interactive": "BIM Modeling",
+        "guidance": "Photorealism",
+        "community": "Parametric Design",
+        "achievement": "Construction Docs"
+      }
+    }
+  },
+  "footer": {
+    "product": "Platform",
+    "resources": "Resources",
+    "company": "Company",
+    "legal": "Legal",
+    "links": {
+      "courses": "Courses",
+      "pricing": "Pricing",
+      "enterprise": "For Firms",
+      "successStories": "Success Stories",
+      "blog": "Design Blog",
+      "documentation": "Tutorials",
+      "community": "Forum",
+      "helpCenter": "Support",
+      "aboutUs": "About Us",
+      "careers": "Careers",
+      "contact": "Contact",
+      "partners": "Partners",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "cookiePolicy": "Cookie Policy",
+      "accessibility": "Accessibility",
+      "sitemap": "Sitemap"
+    },
+    "rightsReserved": "CourseHub Inc. All rights reserved."
+  }
+}

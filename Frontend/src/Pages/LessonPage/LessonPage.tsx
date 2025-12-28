@@ -1,11 +1,16 @@
 import { useParams } from "react-router-dom";
 import { useLesson } from "@/features/lessons";
+import { useCourse } from "@/features/courses";
 import { Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui";
+import Breadcrumb from "@/components/layout/Breadcrumb/Breadcrumb";
 import { Clock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function LessonPage() {
   const { id } = useParams<{ id: string }>();
   const { data: lesson, isLoading, error } = useLesson(id);
+  const { data: course } = useCourse(lesson?.courseId);
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
@@ -41,10 +46,19 @@ export default function LessonPage() {
     return `${parseInt(parts[0])}h ${parseInt(parts[1])}m`;
   };
 
+  const breadcrumbItems = [
+    { label: t('breadcrumbs.home'), path: '/' },
+    { label: t('breadcrumbs.courses'), path: '/catalog' },
+    { label: course?.title || t('breadcrumbs.course'), path: course ? `/courses/${course.id.value}` : undefined },
+    { label: lesson.title },
+  ];
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {lesson.videoUrl && (
-        <Card>
+    <div className="space-y-6">
+      <Breadcrumb items={breadcrumbItems} />
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        {lesson.videoUrl && (
+          <Card>
           <CardContent className="p-0">
             <video
               className="w-full aspect-video"
@@ -81,6 +95,7 @@ export default function LessonPage() {
           </CardContent>
         )}
       </Card>
+      </div>
     </div>
   );
 }

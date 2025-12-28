@@ -2,11 +2,14 @@ import { useParams } from "react-router-dom";
 import { Lesson } from "@/features/lessons";
 import { useCourse } from "@/features/courses";
 import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui";
+import Breadcrumb from "@/components/layout/Breadcrumb/Breadcrumb";
 import { ShoppingCart, CreditCard } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
   const { data: course, isLoading, error } = useCourse(id);
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
@@ -36,9 +39,17 @@ export default function CoursePage() {
     );
   }
 
+  const breadcrumbItems = [
+    { label: t('breadcrumbs.home'), path: '/' },
+    { label: t('breadcrumbs.courses'), path: '/catalog' },
+    { label: course.title },
+  ];
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      <Card className="overflow-hidden">
+    <div className="space-y-6">
+      <Breadcrumb items={breadcrumbItems} />
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <Card className="overflow-hidden">
         <div className="grid md:grid-cols-2 gap-6 p-6">
           {course.imageUrl && (
             <div className="relative h-64 md:h-full overflow-hidden rounded-lg">
@@ -99,6 +110,7 @@ export default function CoursePage() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

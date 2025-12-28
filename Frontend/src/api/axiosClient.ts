@@ -11,6 +11,10 @@ export const axiosClient = axios.create({
 
 let logoutCallback: (() => void) | null = null;
 
+export function getLogoutCallback() {
+  return logoutCallback;
+}
+
 export function setLogoutCallback(callback: () => void) {
   logoutCallback = callback;
 }
