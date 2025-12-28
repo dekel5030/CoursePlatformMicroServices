@@ -5,8 +5,12 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
+  Alert,
+  AlertDescription,
 } from '@/components/ui';
 import { Button } from '@/components/ui';
+import { AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmationModalProps {
   open: boolean;
@@ -26,11 +30,13 @@ export default function ConfirmationModal({
   onConfirm,
   title,
   message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
   isLoading = false,
   error = null,
 }: ConfirmationModalProps) {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -40,9 +46,10 @@ export default function ConfirmationModal({
         </DialogHeader>
 
         {error && (
-          <div className="bg-destructive/15 text-destructive px-4 py-2 rounded-md text-sm">
-            {error}
-          </div>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
         <DialogFooter>
@@ -52,7 +59,7 @@ export default function ConfirmationModal({
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
           >
-            {cancelText}
+            {cancelText || t('modals.confirmation.cancel')}
           </Button>
           <Button
             type="button"
@@ -60,7 +67,7 @@ export default function ConfirmationModal({
             onClick={onConfirm}
             disabled={isLoading}
           >
-            {isLoading ? 'Processing...' : confirmText}
+            {isLoading ? t('modals.confirmation.loading') : (confirmText || 'Confirm')}
           </Button>
         </DialogFooter>
       </DialogContent>

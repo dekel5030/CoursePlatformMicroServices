@@ -1,16 +1,13 @@
-import { Navbar, Footer, Breadcrumb } from "@/components/layout";
-import type { ReactNode } from "react";
+import { Navbar, Footer } from "@/components/layout";
+import { Outlet } from "react-router-dom";
 
-type LayoutProps = {
-  children: ReactNode;
-};
-
-export default function Layout({ children }: LayoutProps) {
+export default function Layout() {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <Breadcrumb />
-      <main className="min-h-screen">{children}</main>
+      <main className="flex-1">
+        <Outlet />
+      </main>
       <Footer />
     </div>
   );

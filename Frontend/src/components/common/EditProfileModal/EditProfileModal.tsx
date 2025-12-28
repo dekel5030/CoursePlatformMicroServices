@@ -6,10 +6,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  Alert,
+  AlertDescription,
 } from "@/components/ui";
 import { Button, FormField } from "@/components/ui";
+import { AlertCircle } from "lucide-react";
 import { type User, type UpdateUserRequest } from "@/services/UsersAPI";
 import type { ApiErrorResponse } from "@/api/axiosClient";
+import { useTranslation } from "react-i18next";
 
 type EditProfileModalProps = {
   open: boolean;
@@ -24,6 +28,7 @@ export default function EditProfileModal({
   user,
   onSave,
 }: EditProfileModalProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     firstName: user.firstName || "",
     lastName: user.lastName || "",
@@ -55,8 +60,7 @@ export default function EditProfileModal({
       const phoneRegex = /^\+\d{1,4}\s\d{7,15}$/;
 
       if (!phoneRegex.test(trimmed)) {
-        newErrors.phoneNumber =
-          'Phone must be in format: +<country code> <number> (e.g., "+1 1234567890")';
+        newErrors.phoneNumber = t('modals.editProfile.validation.phoneFormat');
       }
     }
 
@@ -90,13 +94,12 @@ export default function EditProfileModal({
               number: parts.slice(1).join(""),
             };
           } else {
-            newErrors.phoneNumber = 'Phone must include country code and number separated by space (e.g., "+1 1234567890")';
+            newErrors.phoneNumber = t('modals.editProfile.validation.phoneFormat');
             setErrors(newErrors);
             return;
           }
         } else {
-          newErrors.phoneNumber =
-            'Phone must start with + followed by country code (e.g., "+1 1234567890")';
+          newErrors.phoneNumber = t('modals.editProfile.validation.phoneFormat');
           setErrors(newErrors);
           return;
         }
@@ -110,12 +113,12 @@ export default function EditProfileModal({
       };
 
       await onSave(updatedData);
-      toast.success("Profile updated successfully!");
+      toast.success(t('modals.editProfile.success'));
       onOpenChange(false);
     } catch (error: unknown) {
       const apiError = error as ApiErrorResponse;
       setApiError(apiError);
-      toast.error(apiError.message || "Failed to update profile");
+      toast.error(apiError.message || t('common.error', { message: 'Failed to update profile' }));
     } finally {
       setIsSubmitting(false);
     }
@@ -125,47 +128,52 @@ export default function EditProfileModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle>{t('modals.editProfile.title')}</DialogTitle>
         </DialogHeader>
 
         {apiError?.message && (
-          <div className="bg-destructive/15 text-destructive px-4 py-2 rounded-md text-sm">
-            {apiError.message}
-          </div>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {t('common.error', { message: apiError.message })}
+            </AlertDescription>
+          </Alert>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <FormField
-            label="First Name"
+            label={t('modals.editProfile.firstName')}
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
-            placeholder="Enter your first name"
+            placeholder={t('modals.editProfile.firstNamePlaceholder')}
             error={errors.firstName || (apiError?.errors?.FirstName?.[0])}
           />
 
           <FormField
-            label="Last Name"
+            label={t('modals.editProfile.lastName')}
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
-            placeholder="Enter your last name"
+            placeholder={t('modals.editProfile.lastNamePlaceholder')}
             error={errors.lastName || (apiError?.errors?.LastName?.[0])}
           />
 
           <FormField
-            label="Phone Number"
+            label={t('modals.editProfile.phone')}
             name="phoneNumber"
             value={formData.phoneNumber}
             onChange={handleChange}
-            placeholder="+1 1234567890"
+            placeholder={t('modals.editProfile.phonePlaceholder')}
             error={errors.phoneNumber || (apiError?.errors?.PhoneNumber?.[0])}
           />
 
           <FormField
-            label="Date of Birth"
+            label={t('modals.editProfile.dob')}
             type="date"
             name="dateOfBirth"
+            value={formData.dateOfBirth}
+            onChange={handleChange}
             error={errors.dateOfBirth || (apiError?.errors?.DateOfBirth?.[0])}
           />
 
@@ -176,10 +184,10 @@ export default function EditProfileModal({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('modals.editProfile.cancel')}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Changes"}
+              {isSubmitting ? t('modals.editProfile.submitLoading') : t('modals.editProfile.submit')}
             </Button>
           </DialogFooter>
         </form>

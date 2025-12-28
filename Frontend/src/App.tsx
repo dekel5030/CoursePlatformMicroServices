@@ -1,5 +1,4 @@
 import { BrowserRouter } from "react-router-dom";
-import { Layout } from "@/components/layout";
 import AppRoutes from "@/routes/AppRoutes";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { AxiosInterceptorProvider } from "@/providers/AxiosInterceptorProvider";
@@ -12,9 +11,7 @@ export default function App() {
       <AuthProvider>
         <AxiosInterceptorProvider>
           <PermissionsProvider>
-            <Layout>
-              <AppRoutes />
-            </Layout>
+            <AppRoutes />
             <Toaster />
           </PermissionsProvider>
         </AxiosInterceptorProvider>
