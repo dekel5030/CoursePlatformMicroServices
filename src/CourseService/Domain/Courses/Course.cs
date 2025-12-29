@@ -1,4 +1,5 @@
 ﻿using Courses.Domain.Courses.Errors;
+using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
@@ -23,7 +24,6 @@ public class Course : Entity
     public IReadOnlyCollection<Lesson> Lessons => _lessons.AsReadOnly();
     public IReadOnlyCollection<ImageUrl> Images => _images.AsReadOnly();
     public IReadOnlyCollection<Enrollment> Enrollments => _enrollments.AsReadOnly();
-
 
     #pragma warning disable CS8618
     private Course() { }
@@ -63,6 +63,9 @@ public class Course : Entity
 
         Status = CourseStatus.Published;
         UpdatedAtUtc = timeProvider.GetUtcNow();
+
+        Raise(new CoursePublished(this));
+
         return Result.Success();
     }
 
@@ -157,6 +160,8 @@ public class Course : Entity
         Enrollment enrollment = Enrollment.CreateEnrollment(Id, studentId, timeProvider);
         _enrollments.Add(enrollment);
         UpdatedAtUtc = timeProvider.GetUtcNow();
+
+        Raise(new StudentEnrolled(this, studentId));
 
         return Result.Success();
     }
