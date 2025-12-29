@@ -3,7 +3,7 @@ using Courses.Domain.Lessons.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Courses.Infrastructure.Lessons;
+namespace Courses.Infrastructure.EfConfiguration;
 
 public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
 {
