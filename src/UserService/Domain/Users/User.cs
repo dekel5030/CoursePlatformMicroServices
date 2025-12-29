@@ -16,7 +16,7 @@ public class User : Entity
     private User() { }
 
     public static Result<User> CreateUser(
-        UserId Id,
+        UserId id,
         string? email,
         FullName? fullName = null,
         PhoneNumber? phoneNumber = null,
@@ -24,7 +24,7 @@ public class User : Entity
     {
         var user = new User
         {
-            Id = Id,
+            Id = id,
             Email = email ?? string.Empty,
             FullName = fullName,
             PhoneNumber = phoneNumber,

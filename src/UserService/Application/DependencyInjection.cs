@@ -21,6 +21,23 @@ public static class DependencyInjection
 
 
         services.AddScoped<IMediator, Mediator>();
+        services.AddEventHandler();
         return services;
+    }
+
+    private static IServiceCollection AddEventHandler(this IServiceCollection services)
+    {
+        services.Scan(selector => selector
+                .FromAssemblies(typeof(DependencyInjection).Assembly)
+                .AddClasses(classes => classes
+                    .Where(t => t.GetInterfaces().Any(i =>
+                        i.IsGenericType &&
+                        i.GetGenericTypeDefinition() == typeof(IEventHandler<>))),
+                    publicOnly: false)
+                .AsImplementedInterfaces()
+                .WithScopedLifetime());
+
+        return services;
+
     }
 }

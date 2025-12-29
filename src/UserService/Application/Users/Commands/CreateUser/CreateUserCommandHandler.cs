@@ -40,7 +40,7 @@ public class CreateUserCommandHandler(IWriteDbContext dbContext)
         }
 
         Result<User> creationResult = User.CreateUser(
-            Id: userId ?? new UserId(Guid.CreateVersion7()),
+            id: userId ?? new UserId(Guid.CreateVersion7()),
             email: request.Email,
             fullName: userFullName,
             phoneNumber: request.PhoneNumber,

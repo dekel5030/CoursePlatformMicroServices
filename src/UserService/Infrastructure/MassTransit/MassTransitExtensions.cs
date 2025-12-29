@@ -83,8 +83,6 @@ internal static class MassTransitExtensions
             var closedBridgeType = typeof(GenericConsumerBridge<>).MakeGenericType(eventType);
 
             registrationConfigurator.AddConsumer(closedBridgeType);
-
-            services.TryAddScoped(entry.interfaceType, entry.concreteType);
         }
     }
 }
