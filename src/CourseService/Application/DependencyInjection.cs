@@ -27,9 +27,9 @@ public static class DependencyInjection
 
     private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
     {
-        services.AddScoped<IQueryHandler<GetCourseByIdQuery, CourseReadDto>, GetCourseByIdQueryHandler>();
-        services.AddScoped<IQueryHandler<GetCoursesQuery, PagedResponseDto<CourseReadDto>>, GetCoursesQueryHandler>();
-        services.AddScoped<IQueryHandler<GetFeaturedQuery, PagedResponseDto<CourseReadDto>>, GetFeaturedQueryHandler>();
+        //services.AddScoped<IQueryHandler<GetCourseByIdQuery, CourseReadDto>, GetCourseByIdQueryHandler>();
+        //services.AddScoped<IQueryHandler<GetCoursesQuery, PagedResponseDto<CourseReadDto>>, GetCoursesQueryHandler>();
+        //services.AddScoped<IQueryHandler<GetFeaturedQuery, PagedResponseDto<CourseReadDto>>, GetFeaturedQueryHandler>();
 
         services.AddScoped<IQueryHandler<GetLessonByIdQuery, LessonReadDto>, GetLessonByIdQueryHandler>();
 
@@ -38,7 +38,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
     {
-        services.AddScoped<ICommandHandler<CreateCourseCommand, CourseId>, CreateCourseCommandHandler>();
+        //services.AddScoped<ICommandHandler<CreateCourseCommand, CourseId>, CreateCourseCommandHandler>();
         services.AddScoped<ICommandHandler<CreateLessonCommand, LessonId>, CreateLessonCommandHandler>();
 
         return services;
