@@ -1,4 +1,5 @@
-﻿using Kernel.Messaging.Abstractions;
+﻿using CoursePlatform.ServiceDefaults.Messaging;
+using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Users.Application.Users.Commands.CreateUser;
 using Users.Application.Users.Commands.UpdateUser;
@@ -18,6 +19,25 @@ public static class DependencyInjection
         services.AddScoped<ICommandHandler<CreateUserCommand, CreatedUserRespondDto>, CreateUserCommandHandler>();
         services.AddScoped<ICommandHandler<UpdateUserCommand, UpdatedUserResponseDto>, UpdateUserCommandHandler>();
 
+
+        services.AddScoped<IMediator, Mediator>();
+        services.AddEventHandler();
         return services;
+    }
+
+    private static IServiceCollection AddEventHandler(this IServiceCollection services)
+    {
+        services.Scan(selector => selector
+                .FromAssemblies(typeof(DependencyInjection).Assembly)
+                .AddClasses(classes => classes
+                    .Where(t => t.GetInterfaces().Any(i =>
+                        i.IsGenericType &&
+                        i.GetGenericTypeDefinition() == typeof(IEventHandler<>))),
+                    publicOnly: false)
+                .AsImplementedInterfaces()
+                .WithScopedLifetime());
+
+        return services;
+
     }
 }

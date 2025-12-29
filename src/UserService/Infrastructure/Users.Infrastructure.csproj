@@ -7,8 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="MassTransit\Consumers\**" />
     <Compile Remove="Users\**" />
+    <EmbeddedResource Remove="MassTransit\Consumers\**" />
     <EmbeddedResource Remove="Users\**" />
+    <None Remove="MassTransit\Consumers\**" />
     <None Remove="Users\**" />
   </ItemGroup>
 
@@ -36,7 +39,6 @@
 
   <ItemGroup>
     <Folder Include="Database\Migrations\" />
-    <Folder Include="MassTransit\Consumers\" />
   </ItemGroup>
 
 </Project>

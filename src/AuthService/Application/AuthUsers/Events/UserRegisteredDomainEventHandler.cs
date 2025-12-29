@@ -15,7 +15,7 @@ internal class UserRegisteredDomainEventHandler : IDomainEventHandler<UserRegist
         _eventPublisher = eventPublisher;
     }
 
-    public Task Handle(
+    public Task HandleAsync(
         UserRegisteredDomainEvent @event, 
         CancellationToken cancellationToken = default)
     {

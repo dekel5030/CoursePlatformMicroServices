@@ -50,14 +50,20 @@ public sealed class Mediator : IMediator
         }
     }
 
-    public async Task Publish(IDomainEvent domainEvent, CancellationToken cancellationToken = default)
+    public async Task Publish<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
+        where TEvent : class
     {
+        if (@event is null)
+        {
+            return;
+        }
         //using IServiceScope scope = serviceProvider.CreateScope();
 
-        Type domainEventType = domainEvent.GetType();
+        Type eventType = @event.GetType();
+
         Type handlerType = _handlerTypeDictionary.GetOrAdd(
-            domainEventType,
-            et => typeof(IDomainEventHandler<>).MakeGenericType(et));
+                eventType,
+                et => typeof(IEventHandler<>).MakeGenericType(et));
 
         //IEnumerable<object?> handlers = scope.ServiceProvider.GetServices(handlerType);
         IEnumerable<object?> handlers = _serviceProvider.GetServices(handlerType);
@@ -69,15 +75,15 @@ public sealed class Mediator : IMediator
                 continue;
             }
 
-            var handlerWrapper = HandlerWrapper.Create(handler, domainEventType);
+            var handlerWrapper = HandlerWrapper.Create(handler, eventType);
 
-            await handlerWrapper.Handle(domainEvent, cancellationToken);
+            await handlerWrapper.HandleAsync(@event, cancellationToken);
         }
     }
 
     private abstract class HandlerWrapper
     {
-        public abstract Task Handle(IDomainEvent domainEvent, CancellationToken cancellationToken);
+        public abstract Task HandleAsync(object @event, CancellationToken cancellationToken);
 
         public static HandlerWrapper Create(object handler, Type domainEventType)
         {
@@ -93,13 +99,14 @@ public sealed class Mediator : IMediator
         }
     }
 
-    private sealed class HandlerWrapper<T>(object handler) : HandlerWrapper where T : IDomainEvent
+    private sealed class HandlerWrapper<T>(object handler) : HandlerWrapper 
+        where T : class
     {
-        private readonly IDomainEventHandler<T> _handler = (IDomainEventHandler<T>)handler;
+        private readonly IEventHandler<T> _handler = (IEventHandler<T>)handler;
 
-        public override async Task Handle(IDomainEvent domainEvent, CancellationToken cancellationToken)
+        public override async Task HandleAsync(object @event, CancellationToken cancellationToken)
         {
-            await _handler.Handle((T)domainEvent, cancellationToken);
+            await _handler.HandleAsync((T)@event, cancellationToken);
         }
     }
 }
