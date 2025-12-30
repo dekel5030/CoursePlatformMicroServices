@@ -104,8 +104,9 @@ public class Course : Entity
     {
         if (_images.Contains(imageUrl))
         {
-            return Result.Failure<Course>(CourseErrors.ImageAlreadyExists);
+            return Result.Success();
         }
+
         _images.Add(imageUrl);
         UpdatedAtUtc = timeProvider.GetUtcNow();
         return Result.Success();
@@ -144,21 +145,18 @@ public class Course : Entity
         return Result.Success();
     }
 
-    public Result<Enrollment> CreateEnrollment()
+    public Result<Enrollment> CreateEnrollment(
+        StudentId studentId, 
+        TimeProvider timeProvider, 
+        TimeSpan validFor)
     {
         if (Status != CourseStatus.Published)
         {
             return Result.Failure<Enrollment>(CourseErrors.CourseNotPublished);
         }
 
-        var enrollment = Enrollment.Create
+        var enrollment = Enrollment.Create(Id, studentId, timeProvider, validFor);
 
-        return Result.Success();
-    }
-
-    public Result RegisterEnrollment()
-    {
-        EnrollmentCount++;
-        return Result.Success();
+        return Result.Success(enrollment);
     }
 }
