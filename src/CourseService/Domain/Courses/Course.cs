@@ -29,11 +29,11 @@ public class Course : Entity
     #pragma warning restore CS8618
 
     public static Result<Course> CreateCourse(
-        Title? title,
-        Description? description,
-        InstructorId? instructorId,
-        Money? price,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        Title? title = null,
+        Description? description = null,
+        InstructorId? instructorId = null,
+        Money? price = null)
     {
         Course newCourse = new Course
         {
