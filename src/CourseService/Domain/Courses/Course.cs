@@ -1,6 +1,7 @@
 ﻿using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
@@ -143,19 +144,19 @@ public class Course : Entity
         return Result.Success();
     }
 
-    public Result CanEnroll()
+    public Result<Enrollment> CreateEnrollment(
+        StudentId studentId, 
+        TimeProvider timeProvider,
+        TimeSpan validFor)
     {
         if (Status != CourseStatus.Published)
         {
-            return Result.Failure<Course>(CourseErrors.CourseNotPublished);
+            return Result.Failure<Enrollment>(CourseErrors.CourseNotPublished);
         }
 
-        return Result.Success();
-    }
-
-    public Result RegisterEnrollment()
-    {
+        var enrollment = Enrollment.Create(Id, studentId, timeProvider, validFor);
         EnrollmentCount++;
-        return Result.Success();
+
+        return Result.Success(enrollment);
     }
 }

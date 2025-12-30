@@ -1,7 +1,6 @@
 ﻿using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments.Primitives;
-using Kernel;
 
 namespace Courses.Domain.Enrollments;
 
@@ -11,31 +10,27 @@ public class Enrollment
     public CourseId CourseId { get; private set; }
     public StudentId StudentId { get; private set; }
     public DateTimeOffset EnrolledAtUtc { get; private set; }
-    public TimeSpan ValidFor { get; private set; }
+    public DateTimeOffset ExpiresAtUtc { get; private set; }
 
     #pragma warning disable CS8618
     private Enrollment() { }
     #pragma warning restore CS8618
 
-    internal static Enrollment CreateEnrollment(
+    internal static Enrollment Create(
         CourseId courseId,
         StudentId studentId,
         TimeProvider timeProvider,
         TimeSpan? validFor = null)
     {
+        var now = timeProvider.GetUtcNow();
+        var duration = validFor ?? TimeSpan.FromDays(365);
+
         return new Enrollment()
         {
-            CourseId = courseId.Id,
+            CourseId = courseId,
             StudentId = studentId,
-            EnrolledAtUtc = timeProvider.GetUtcNow(),
-            ValidFor = validFor ?? TimeSpan.FromDays(365)
+            EnrolledAtUtc = now,
+            ExpiresAtUtc = now.Add(duration)
         };
     }
-}
-
-public static class EnrollmentErrors
-{
-    public static readonly Error UnPublishedCourse = Error.Validation(
-        "Enrollment.CourseUnpublished",
-        "Cannot enroll in unpublished course");
 }
