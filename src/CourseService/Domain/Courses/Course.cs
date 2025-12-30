@@ -1,7 +1,6 @@
 ﻿using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
@@ -17,7 +16,7 @@ public class Course : Entity
     public Description Description { get; private set; } = Description.Empty;
     public InstructorId? InstructorId { get; private set; } = null;
     public CourseStatus Status { get; private set; }
-    public int EnrollmentCount { get; private set; }
+    public int EnrollmentCount { get; private set; } = 0;
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
     public Money Price { get; private set; } = Money.Zero();
@@ -141,6 +140,22 @@ public class Course : Entity
         InstructorId = instructorId;
         UpdatedAtUtc = timeProvider.GetUtcNow();
 
+        return Result.Success();
+    }
+
+    public Result CanEnroll()
+    {
+        if (Status != CourseStatus.Published)
+        {
+            return Result.Failure<Course>(CourseErrors.CourseNotPublished);
+        }
+
+        return Result.Success();
+    }
+
+    public Result RegisterEnrollment()
+    {
+        EnrollmentCount++;
         return Result.Success();
     }
 }
