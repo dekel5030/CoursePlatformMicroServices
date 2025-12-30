@@ -17,7 +17,7 @@ public class Course : Entity
     public Description Description { get; private set; } = Description.Empty;
     public InstructorId? InstructorId { get; private set; } = null;
     public CourseStatus Status { get; private set; }
-    public int EnrollmentCount { get; private set; }
+    public int EnrollmentCount { get; private set; } = 0;
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
     public Money Price { get; private set; } = Money.Zero();
@@ -141,6 +141,24 @@ public class Course : Entity
         InstructorId = instructorId;
         UpdatedAtUtc = timeProvider.GetUtcNow();
 
+        return Result.Success();
+    }
+
+    public Result<Enrollment> CreateEnrollment()
+    {
+        if (Status != CourseStatus.Published)
+        {
+            return Result.Failure<Enrollment>(CourseErrors.CourseNotPublished);
+        }
+
+        var enrollment = Enrollment.Create
+
+        return Result.Success();
+    }
+
+    public Result RegisterEnrollment()
+    {
+        EnrollmentCount++;
         return Result.Success();
     }
 }

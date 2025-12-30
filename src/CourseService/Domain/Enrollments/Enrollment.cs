@@ -10,22 +10,27 @@ public class Enrollment
     public CourseId CourseId { get; private set; }
     public StudentId StudentId { get; private set; }
     public DateTimeOffset EnrolledAtUtc { get; private set; }
-
+    public DateTimeOffset ExpiresAtUtc { get; private set; }
 
     #pragma warning disable CS8618
     private Enrollment() { }
     #pragma warning restore CS8618
 
-    internal static Enrollment CreateEnrollment(
+    internal static Enrollment Create(
         CourseId courseId,
         StudentId studentId,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        TimeSpan? validFor = null)
     {
-        return new Enrollment
+        var now = timeProvider.GetUtcNow();
+        var duration = validFor ?? TimeSpan.FromDays(365);
+
+        return new Enrollment()
         {
             CourseId = courseId,
             StudentId = studentId,
-            EnrolledAtUtc = timeProvider.GetUtcNow()
+            EnrolledAtUtc = now,
+            ExpiresAtUtc = now.Add(duration)
         };
     }
 }
