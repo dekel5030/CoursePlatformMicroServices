@@ -1,5 +1,7 @@
-﻿using Courses.Domain.Lessons;
+﻿using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Shared.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,6 +13,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
     {
         builder.ToTable("Lessons");
         builder.HasKey(lesson => lesson.Id);
+        builder.HasIndex(l => new { l.CourseId, l.Index }).IsUnique();
 
         builder.Property(lesson => lesson.Id)
             .HasConversion(
@@ -18,12 +21,39 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
                 value => new LessonId(value));
 
         builder.Property(lesson => lesson.Title)
-            .IsRequired()
-            .HasMaxLength(200);
+            .HasConversion(
+                title => title.Value,
+                value => new Title(value));
+
+        builder.Property(lesson => lesson.Description)
+            .HasConversion(
+                description => description.Value,
+                value => new Description(value));
+
+        builder.Property(lesson => lesson.Access)
+            .HasConversion<string>();
+
+        builder.Property(lesson => lesson.Status)
+            .HasConversion<string>();
+
+        builder.Property(lesson => lesson.CourseId)
+            .HasConversion(
+                id => id.Value,
+                value => new CourseId(value));
 
         builder.HasOne(lesson => lesson.Course)
             .WithMany(course => course.Lessons)
             .HasForeignKey(lesson => lesson.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(l => l.ThumbnailImageUrl)
+            .HasConversion(
+                url => url != null ? url.Path : null,
+                value => value != null ? ImageUrl.Create(value) : null);
+
+        builder.Property(lesson => lesson.VideoUrl)
+            .HasConversion(
+                url => url != null ? url.Path : null,
+                value => value != null ? VideoUrl.Create(value) : null);
     }
 }
