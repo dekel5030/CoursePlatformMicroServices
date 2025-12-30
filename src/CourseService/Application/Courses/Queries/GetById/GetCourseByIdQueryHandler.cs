@@ -1,3 +1,4 @@
+using Courses.Application.Abstractions;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Domain.Courses.Errors;
@@ -7,11 +8,6 @@ using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Queries.GetById;
-
-public interface IUrlResolver
-{
-    string Resolve(string relativePath);
-}
 
 internal class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CourseReadDto>
 {
