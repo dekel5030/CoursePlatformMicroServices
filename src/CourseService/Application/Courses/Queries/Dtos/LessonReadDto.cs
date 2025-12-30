@@ -3,11 +3,12 @@ using Courses.Domain.Lessons.Primitives;
 namespace Courses.Application.Courses.Queries.Dtos;
 
 public record LessonReadDto(
-    LessonId Id,
+    Guid Id,
     string Title,
-    string? Description,
+    string Description,
+    LessonAccess Access,
+    LessonStatus Status,
+    int Index,
+    string? ThumbnailImageUrl,
     string? VideoUrl,
-    string? ThumbnailImage,
-    bool IsPreview,
-    int Order,
     TimeSpan? Duration);
