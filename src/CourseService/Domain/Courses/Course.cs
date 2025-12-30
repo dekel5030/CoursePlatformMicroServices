@@ -13,7 +13,6 @@ public class Course : Entity
     private readonly List<Lesson> _lessons = new();
     private readonly List<ImageUrl> _images = new();
     private readonly List<Enrollment> _enrollments = new();
-
     public CourseId Id { get; private set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
