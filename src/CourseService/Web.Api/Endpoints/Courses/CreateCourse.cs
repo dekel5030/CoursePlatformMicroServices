@@ -1,7 +1,6 @@
 ﻿using Courses.Api.Extensions;
 using Courses.Api.Infrastructure;
 using Courses.Application.Courses.Commands.CreateCourse;
-using Courses.Domain.Courses.Primitives;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Courses;
@@ -11,16 +10,29 @@ public class CreateCourse : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("courses", async (
-            [AsParameters] CreateCourseDto dto,
-            ICommandHandler<CreateCourseCommand, CourseId> handler) =>
+            CreateCourseCommand command,
+            IMediator mediator) =>
         {
-            var result = await handler.Handle(new CreateCourseCommand(dto));
+            Guid? instructorId = null;
+            if (Guid.TryParse(dto.InstructorId, out var id))
+            {
+                instructorId = id;
+            }
+
+            var command = new CreateCourseCommand(
+                dto.Title, 
+                dto.Description, 
+                instructorId, 
+                dto.PriceAmount, 
+                dto.PriceCurrency);
+
+            var result = await mediator.Send(command);
 
             return result.Match(
-                courseId => Results.CreatedAtRoute(
+                response => Results.CreatedAtRoute(
                 "GetCourseById",
-                new { id = courseId.Value },
-                new { Id = courseId.Value }
+                new { id = response.CourseId },
+                new { Id = response.CourseId }
             ),
             CustomResults.Problem);
         });

@@ -19,7 +19,12 @@ public static class CourseErrors
     internal static readonly Error LessonAlreadyExists = Error.Validation(
         "Course.LessonAlreadyExists",
         "Course Lesson Already Exists.");
-    internal static readonly Error InvalidPrice;
-    internal static readonly Error ImageAlreadyExists;
-    internal static readonly Error CourseNotPublished;
+
+    internal static readonly Error InvalidPrice = Error.Validation(
+        "Course.InvalidPrice",
+        "Course price is invalid.");
+
+    internal static readonly Error CourseNotPublished = Error.Validation(
+        "Course.NotPublished",
+        "Course isnt published.");
 }
