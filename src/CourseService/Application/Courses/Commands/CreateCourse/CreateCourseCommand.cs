@@ -5,6 +5,5 @@ namespace Courses.Application.Courses.Commands.CreateCourse;
 public record CreateCourseCommand(
     string? Title,
     string? Description,
-    Guid? InstructorId,
-    decimal? PriceAmount,
-    string? PriceCurrency) : ICommand<CreateCourseResponse>;
+    Guid? InstructorId) 
+        : ICommand<CreateCourseResponse>;
