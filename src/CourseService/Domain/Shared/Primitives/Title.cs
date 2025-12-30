@@ -1,4 +1,4 @@
-﻿namespace Courses.Domain.Courses.Primitives;
+﻿namespace Courses.Domain.Shared.Primitives;
 
 public record Title(string Value)
 {

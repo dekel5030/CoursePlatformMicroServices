@@ -3,6 +3,7 @@ using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
+using Courses.Domain.Shared.Primitives;
 using Kernel;
 
 namespace Courses.Domain.Courses;
