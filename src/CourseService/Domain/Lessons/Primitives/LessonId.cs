@@ -1,3 +1,6 @@
 ﻿namespace Courses.Domain.Lessons.Primitives;
 
-public record struct LessonId(Guid Value);
+public record LessonId(Guid Value)
+{
+    public static LessonId CreateNew() => new(Guid.CreateVersion7());
+};

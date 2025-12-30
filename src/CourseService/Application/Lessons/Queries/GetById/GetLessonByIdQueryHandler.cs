@@ -27,7 +27,7 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
                 lesson.Title,
                 lesson.Description,
                 lesson.VideoUrl,
-                lesson.ThumbnailImage,
+                lesson.ThumbnailImageUrl,
                 lesson.IsPreview,
                 lesson.Order,
                 lesson.Duration))
