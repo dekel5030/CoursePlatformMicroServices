@@ -23,6 +23,8 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
         builder.Property(e => e.StudentId)
             .HasConversion(id => id.Value, v => new StudentId(v));
 
+        builder.HasIndex(e => new { e.CourseId, e.StudentId });
+
         builder.HasOne<Course>()
             .WithMany()
             .HasForeignKey(e => e.CourseId)

@@ -144,19 +144,21 @@ public class Course : Entity
         return Result.Success();
     }
 
-    public Result<Enrollment> CreateEnrollment(
-        StudentId studentId, 
-        TimeProvider timeProvider,
-        TimeSpan validFor)
+    public Result<Enrollment> CreateEnrollment()
     {
         if (Status != CourseStatus.Published)
         {
             return Result.Failure<Enrollment>(CourseErrors.CourseNotPublished);
         }
 
-        var enrollment = Enrollment.Create(Id, studentId, timeProvider, validFor);
-        EnrollmentCount++;
+        var enrollment = Enrollment.Create
 
-        return Result.Success(enrollment);
+        return Result.Success();
+    }
+
+    public Result RegisterEnrollment()
+    {
+        EnrollmentCount++;
+        return Result.Success();
     }
 }
