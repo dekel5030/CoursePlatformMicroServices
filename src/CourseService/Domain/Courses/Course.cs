@@ -68,17 +68,6 @@ public class Course : Entity
         return Result.Success();
     }
 
-    public Result AddLesson(Lesson lesson, TimeProvider timeProvider)
-    {
-        if (_lessons.Any(l => l.Id == lesson.Id))
-        {
-            return Result.Failure<Course>(CourseErrors.LessonAlreadyExists);
-        }
-        _lessons.Add(lesson);
-        UpdatedAtUtc = timeProvider.GetUtcNow();
-        return Result.Success();
-    }
-
     public Result RemoveLesson(Lesson lesson, TimeProvider timeProvider)
     {
         if (_lessons.Remove(lesson))
@@ -156,7 +145,30 @@ public class Course : Entity
         }
 
         var enrollment = Enrollment.Create(Id, studentId, timeProvider, validFor);
+        EnrollmentCount++;
 
         return Result.Success(enrollment);
+    }
+
+    public Result<Lesson> AddLesson(
+        Title? title,
+        Description? description,
+        TimeProvider timeProvider)
+    {
+        int index = _lessons.Count; 
+        
+        var lessonResult = Lesson.Create(Id, title, description, index);
+
+        if (lessonResult.IsFailure)
+        {
+            return Result.Failure<Lesson>(lessonResult.Error);
+        }
+
+        var lesson = lessonResult.Value;
+        
+        _lessons.Add(lesson);
+        UpdatedAtUtc = timeProvider.GetUtcNow();
+
+        return Result.Success(lesson);
     }
 }

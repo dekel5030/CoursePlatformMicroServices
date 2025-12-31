@@ -1,7 +1,6 @@
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure;
 using Courses.Application.Lessons.Commands.CreateLesson;
-using Courses.Domain.Lessons.Primitives;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Lessons;
@@ -12,19 +11,19 @@ public class CreateLesson : IEndpoint
     {
         app.MapPost("lessons", async (
             CreateLessonDto dto,
-            ICommandHandler<CreateLessonCommand, LessonId> handler) =>
+            IMediator mediator) =>
         {
-            var result = await handler.Handle(new CreateLessonCommand(dto));
+            var result = await mediator.Send(new CreateLessonCommand(dto));
 
             return result.Match(
-                lessonId => Results.CreatedAtRoute(
+                lessonDto => Results.CreatedAtRoute(
                     "GetLessonById",
-                    new { id = lessonId.Value },
-                    new { Id = lessonId.Value }
+                    new { id = lessonDto.Id },
+                    lessonDto
                 ),
                 CustomResults.Problem);
         })
         .WithName("CreateLesson")
-        .WithTags("Lessons");
+        .WithTags(Tags.Lessons);
     }
 }
