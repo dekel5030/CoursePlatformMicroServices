@@ -12,11 +12,11 @@ public class GetCourses : IEndpoint
     {
         app.MapGet("courses", async (
             [AsParameters] PagedQueryDto pagedQuery,
-            IQueryHandler<GetCoursesQuery, PagedResponseDto<CourseReadDto>> handler,
+            IMediator mediator,
             CancellationToken cancellationToken) =>
         {
             var query = new GetCoursesQuery(pagedQuery);
-            var result = await handler.Handle(query, cancellationToken);
+            var result = await mediator.Send(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         });

@@ -3,13 +3,14 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Queries.GetById;
 
-internal class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CourseReadDto>
+internal class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CourseDetailsDto>
 {
     private readonly IReadDbContext _dbContext;
     private readonly IUrlResolver _urlResolver;
@@ -20,7 +21,7 @@ internal class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, Cou
         _urlResolver = urlResolver;
     }
 
-    public async Task<Result<CourseReadDto>> Handle(
+    public async Task<Result<CourseDetailsDto>> Handle(
         GetCourseByIdQuery request,
         CancellationToken cancellationToken = default)
     {
@@ -32,35 +33,33 @@ internal class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, Cou
 
         if (course is null)
         {
-            return Result.Failure<CourseReadDto>(CourseErrors.NotFound);
+            return Result.Failure<CourseDetailsDto>(CourseErrors.NotFound);
         }
 
-        var response = new CourseReadDto
+        var response = new CourseDetailsDto
         (
             Id: course.Id.Value,
             Title: course.Title.Value,
             Description: course.Description.Value,
-            InstructorId: course.InstructorId?.Value,
-            UpdatedAtUtc: course.UpdatedAtUtc,
+            InstructorName: course.InstructorId?.Value.ToString(),
             Price: course.Price.Amount,
             Currency: course.Price.Currency,
             EnrollmentCount: course.EnrollmentCount,
-            ImagesUrls: course.Images
+            UpdatedAtUtc: course.UpdatedAtUtc,
+            ImageUrls: course.Images
                 .Select(img => _urlResolver.Resolve(img.Path))
                 .ToList(),
             Lessons: course.Lessons
                 .OrderBy(l => l.Index)
-                .Select(lesson => new LessonReadDto
+                .Select(lesson => new LessonSummaryDto
                 (
                     Id: lesson.Id.Value,
                     Title: lesson.Title.Value,
                     Description: lesson.Description.Value,
-                    Access: lesson.Access,
-                    Status: lesson.Status,
                     Index: lesson.Index,
-                    ThumbnailImageUrl: _urlResolver.Resolve(lesson.ThumbnailImageUrl?.Path ?? string.Empty),
-                    VideoUrl: null,
-                    Duration: lesson.Duration
+                    Duration: lesson.Duration,
+                    IsPreview: lesson.Access == LessonAccess.Public,
+                    ThumbnailUrl: _urlResolver.Resolve(lesson.ThumbnailImageUrl?.Path ?? string.Empty)
                 )).ToList()
         );
 

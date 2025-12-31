@@ -6,7 +6,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Queries.GetFeatured;
 
-public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResponseDto<CourseReadDto>>
+public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResponseDto<CourseSummaryDto>>
 {
     private readonly IFeaturedCoursesRepository _featuredCoursesProvider;
     private readonly IUrlResolver _urlResolver;
@@ -19,40 +19,24 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResp
         _urlResolver = urlResolver;
     }
 
-    public async Task<Result<PagedResponseDto<CourseReadDto>>> Handle(
+    public async Task<Result<PagedResponseDto<CourseSummaryDto>>> Handle(
         GetFeaturedQuery request,
         CancellationToken cancellationToken = default)
     {
         var courses = await _featuredCoursesProvider.GetFeaturedCourse();
 
-        var courseDtos = courses.Select(course => new CourseReadDto(
+        var courseDtos = courses.Select(course => new CourseSummaryDto(
             course.Id.Value,
             course.Title.Value,
-            course.Description.Value,
-            course.InstructorId?.Value,
+            course.InstructorId?.Value.ToString(), 
             course.Price.Amount,
             course.Price.Currency,
-            course.EnrollmentCount,
-            course.UpdatedAtUtc,
-            course.Images
-                .Select(img => _urlResolver.Resolve(img.Path))
-                .ToList(),
-            course.Lessons
-                .OrderBy(l => l.Index)
-                .Select(lesson => new LessonReadDto(
-                    lesson.Id.Value,
-                    lesson.Title.Value,
-                    lesson.Description.Value,
-                    lesson.Access,
-                    lesson.Status,
-                    lesson.Index,
-                    _urlResolver.Resolve(lesson.ThumbnailImageUrl?.Path ?? string.Empty),
-                    null,
-                    lesson.Duration))
-                .ToList()
+            _urlResolver.Resolve(course.Images.FirstOrDefault()?.Path ?? string.Empty),
+            course.Lessons.Count,
+            course.EnrollmentCount
         )).ToList();
 
-        var response = new PagedResponseDto<CourseReadDto>
+        var response = new PagedResponseDto<CourseSummaryDto>
         {
             Items = courseDtos,
             PageNumber = 1,

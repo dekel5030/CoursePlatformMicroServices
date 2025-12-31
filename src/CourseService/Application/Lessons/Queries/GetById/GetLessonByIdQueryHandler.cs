@@ -1,43 +1,48 @@
-//using Courses.Application.Abstractions.Data;
-//using Courses.Application.Courses.Queries.Dtos;
-//using Courses.Domain.Lessons.Errors;
-//using Kernel;
-//using Kernel.Messaging.Abstractions;
-//using Microsoft.EntityFrameworkCore;
+using Courses.Application.Abstractions;
+using Courses.Application.Abstractions.Data;
+using Courses.Application.Courses.Queries.Dtos;
+using Courses.Domain.Lessons.Errors;
+using Courses.Domain.Lessons.Primitives;
+using Kernel;
+using Kernel.Messaging.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
-//namespace Courses.Application.Lessons.Queries.GetById;
+namespace Courses.Application.Lessons.Queries.GetById;
 
-//public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, LessonReadDto>
-//{
-//    private readonly IReadDbContext _dbContext;
+public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, LessonDetailsDto>
+{
+    private readonly IReadDbContext _dbContext;
+    private readonly IUrlResolver _urlResolver;
 
-//    public GetLessonByIdQueryHandler(IReadDbContext dbContext)
-//    {
-//        _dbContext = dbContext;
-//    }
+    public GetLessonByIdQueryHandler(IReadDbContext dbContext, IUrlResolver urlResolver)
+    {
+        _dbContext = dbContext;
+        _urlResolver = urlResolver;
+    }
 
-//    public async Task<Result<LessonReadDto>> Handle(
-//        GetLessonByIdQuery request,
-//        CancellationToken cancellationToken = default)
-//    {
-//        LessonReadDto? result = await _dbContext.Lessons
-//            .Where(lesson => lesson.Id == request.Id)
-//            .Select(lesson => new LessonReadDto(
-//                lesson.Id,
-//                lesson.Title,
-//                lesson.Description,
-//                lesson.VideoUrl,
-//                lesson.ThumbnailImageUrl,
-//                lesson.IsPreview,
-//                lesson.Order,
-//                lesson.Duration))
-//            .FirstOrDefaultAsync(cancellationToken);
+    public async Task<Result<LessonDetailsDto>> Handle(
+        GetLessonByIdQuery request,
+        CancellationToken cancellationToken = default)
+    {
+        var lesson = await _dbContext.Lessons
+            .FirstOrDefaultAsync(l => l.Id == request.Id, cancellationToken);
 
-//        if (result is null)
-//        {
-//            return Result.Failure<LessonReadDto>(LessonErrors.NotFound);
-//        }
+        if (lesson is null)
+        {
+            return Result.Failure<LessonDetailsDto>(LessonErrors.NotFound);
+        }
 
-//        return Result.Success(result);
-//    }
-//}
+        var response = new LessonDetailsDto(
+            lesson.Id.Value,
+            lesson.Title.Value,
+            lesson.Description.Value,
+            lesson.Index,
+            lesson.Duration,
+            lesson.Access == LessonAccess.Public,
+            _urlResolver.Resolve(lesson.ThumbnailImageUrl?.Path ?? string.Empty),
+            _urlResolver.Resolve(lesson.VideoUrl?.Path ?? string.Empty)
+        );
+
+        return Result.Success(response);
+    }
+}

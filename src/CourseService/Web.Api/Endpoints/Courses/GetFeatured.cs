@@ -12,10 +12,10 @@ public class GetFeatured : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("courses/featured", async (
-            IQueryHandler<GetFeaturedQuery, PagedResponseDto<CourseReadDto>> handler,
+            IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var result = await handler.Handle(new GetFeaturedQuery(), cancellationToken);
+            var result = await mediator.Send(new GetFeaturedQuery(), cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         });
