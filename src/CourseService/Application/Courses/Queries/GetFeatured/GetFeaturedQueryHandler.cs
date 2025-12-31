@@ -1,62 +1,65 @@
-﻿using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions;
 using Courses.Application.Abstractions.Data.Repositories;
 using Courses.Application.Courses.Queries.Dtos;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Queries.GetFeatured;
 
 public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResponseDto<CourseReadDto>>
 {
-    private readonly IReadDbContext _dbContext;
     private readonly IFeaturedCoursesRepository _featuredCoursesProvider;
+    private readonly IUrlResolver _urlResolver;
 
-    public GetFeaturedQueryHandler(IReadDbContext dbContext)
+    public GetFeaturedQueryHandler(
+        IFeaturedCoursesRepository featuredCoursesProvider,
+        IUrlResolver urlResolver)
     {
-        _dbContext = dbContext;
+        _featuredCoursesProvider = featuredCoursesProvider;
+        _urlResolver = urlResolver;
     }
 
     public async Task<Result<PagedResponseDto<CourseReadDto>>> Handle(
         GetFeaturedQuery request,
         CancellationToken cancellationToken = default)
     {
-        if (_featuredCourseIds.Count == 0)
+        var courses = await _featuredCoursesProvider.GetFeaturedCourse();
+
+        var courseDtos = courses.Select(course => new CourseReadDto(
+            course.Id.Value,
+            course.Title.Value,
+            course.Description.Value,
+            course.InstructorId?.Value,
+            course.Price.Amount,
+            course.Price.Currency,
+            course.EnrollmentCount,
+            course.UpdatedAtUtc,
+            course.Images
+                .Select(img => _urlResolver.Resolve(img.Path))
+                .ToList(),
+            course.Lessons
+                .OrderBy(l => l.Index)
+                .Select(lesson => new LessonReadDto(
+                    lesson.Id.Value,
+                    lesson.Title.Value,
+                    lesson.Description.Value,
+                    lesson.Access,
+                    lesson.Status,
+                    lesson.Index,
+                    _urlResolver.Resolve(lesson.ThumbnailImageUrl?.Path ?? string.Empty),
+                    null,
+                    lesson.Duration))
+                .ToList()
+        )).ToList();
+
+        var response = new PagedResponseDto<CourseReadDto>
         {
-            return Result.Success(new PagedResponseDto<CourseReadDto>
-            {
-                Items = new(),
-                PageNumber = 1,
-                PageSize = 1,
-                TotalItems = 0
-            });
-        }
-
-        var featuredIds = _featuredCourseIds.ToArray();
-
-        var items = await _dbContext.Courses
-            .Where(c => featuredIds.Contains(c.Id))
-            .OrderByDescending(c => c.UpdatedAtUtc)
-            .Select(c => new CourseReadDto(
-                c.Id,
-                c.Title,
-                c.Description,
-                c.IsPublished,
-                c.ImageUrl,
-                c.InstructorUserId,
-                c.Price,
-                c.UpdatedAtUtc,
-                null))
-            .ToListAsync(cancellationToken);
-
-        var dto = new PagedResponseDto<CourseReadDto>
-        {
-            Items = items,
+            Items = courseDtos,
             PageNumber = 1,
-            PageSize = Math.Max(1, items.Count),
-            TotalItems = items.Count
+            PageSize = Math.Max(1, courseDtos.Count),
+            TotalItems = courseDtos.Count
         };
 
-        return Result.Success(dto);
+        return Result.Success(response);
     }
 }
