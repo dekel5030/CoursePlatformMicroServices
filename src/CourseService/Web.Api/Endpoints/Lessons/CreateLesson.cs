@@ -7,13 +7,21 @@ namespace Courses.Api.Endpoints.Lessons;
 
 public class CreateLesson : IEndpoint
 {
+    public record CreateLessonRequest(string? Title, string? Description);
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("lessons", async (
-            CreateLessonDto dto,
+        app.MapPost("courses/{courseid:guid}/lessons", async (
+            Guid courseid,
+            CreateLessonRequest request,
             IMediator mediator) =>
         {
-            var result = await mediator.Send(new CreateLessonCommand(dto));
+            var command = new CreateLessonCommand(
+                courseid,
+                request.Title,
+                request.Description);
+
+            var result = await mediator.Send(command);
 
             return result.Match(
                 lessonDto => Results.CreatedAtRoute(

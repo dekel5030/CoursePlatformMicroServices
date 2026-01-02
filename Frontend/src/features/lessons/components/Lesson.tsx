@@ -28,17 +28,17 @@ export default function Lesson({ lesson, index }: LessonProps) {
   };
 
   const handleLessonClick = () => {
-    navigate(`/lessons/${lesson.id.value}`);
+    navigate(`/lessons/${lesson.id}`);
   };
 
   return (
-    <Card 
+    <Card
       className="cursor-pointer hover:shadow-md transition-shadow"
       onClick={handleLessonClick}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === "Enter" || e.key === " ") {
           handleLessonClick();
         }
       }}
@@ -48,7 +48,7 @@ export default function Lesson({ lesson, index }: LessonProps) {
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
             {index + 1}
           </div>
-          
+
           <div className="flex-1 space-y-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="font-semibold text-base line-clamp-1">

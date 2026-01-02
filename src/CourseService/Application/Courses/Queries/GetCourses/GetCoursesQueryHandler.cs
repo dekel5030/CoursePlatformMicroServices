@@ -40,21 +40,21 @@ public class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, PagedRespon
                 c.Price,
                 c.EnrollmentCount,
                 c.InstructorId,
-                ThumbnailPath = c.Images.Select(i => i.Value.Path).FirstOrDefault(),
+                Images = c.Images,
                 LessonsCount = c.Lessons.Count
             })
             .ToListAsync(cancellationToken);
 
-        var items = itemsData.Select(c => new CourseSummaryDto(
-            c.Id.Value,
-            c.Title.Value,
-            c.InstructorId?.Value.ToString(), 
-            c.Price.Amount,
-            c.Price.Currency,
-            _urlResolver.Resolve(c.ThumbnailPath ?? string.Empty),
-            c.LessonsCount,
-            c.EnrollmentCount
-        )).ToList();
+                var items = itemsData.Select(c => new CourseSummaryDto(
+                    c.Id.Value,
+                    c.Title.Value,
+                    c.InstructorId?.Value.ToString(),
+                    c.Price.Amount,
+                    c.Price.Currency,
+                    _urlResolver.Resolve(c.Images?.FirstOrDefault()?.Value.Path ?? string.Empty),
+                    c.LessonsCount,
+                    c.EnrollmentCount
+                )).ToList();
 
         var dto = new PagedResponseDto<CourseSummaryDto>
         {

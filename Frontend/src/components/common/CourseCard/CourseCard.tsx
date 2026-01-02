@@ -1,5 +1,11 @@
 import type { Course } from "@/types";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui";
 import { Badge } from "@/components/ui";
 import { BookOpen, Clock } from "lucide-react";
 import { motion } from "framer-motion";
@@ -11,7 +17,7 @@ interface Props {
 
 export default function CourseCard({ course }: Props) {
   return (
-    <Link to={`/courses/${course.id.value}`}>
+    <Link to={`/courses/${course.id}`}>
       <motion.div
         whileHover={{ y: -5 }}
         transition={{ type: "spring", stiffness: 300 }}
@@ -19,8 +25,8 @@ export default function CourseCard({ course }: Props) {
         <Card className="h-full overflow-hidden border border-border/60 hover:border-primary/50 transition-colors bg-card rounded-md group">
           <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
             {course.imageUrl ? (
-              <img 
-                src={course.imageUrl} 
+              <img
+                src={course.imageUrl}
                 alt={course.title}
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
@@ -30,8 +36,13 @@ export default function CourseCard({ course }: Props) {
               </div>
             )}
             <div className="absolute top-2 right-2">
-              <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm shadow-sm border border-border/50 text-foreground font-medium">
-                {course.price.amount === 0 ? "Free" : `${course.price.amount} ${course.price.currency}`}
+              <Badge
+                variant="secondary"
+                className="bg-background/80 backdrop-blur-sm shadow-sm border border-border/50 text-foreground font-medium"
+              >
+                {course.price.amount === 0
+                  ? "Free"
+                  : `${course.price.amount} ${course.price.currency}`}
               </Badge>
             </div>
           </div>
@@ -46,13 +57,16 @@ export default function CourseCard({ course }: Props) {
             <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
               {course.description}
             </p>
-            
+
             <div className="flex flex-wrap gap-2">
-               {!course.isPublished && (
-                 <Badge variant="outline" className="text-xs text-yellow-600 border-yellow-200 bg-yellow-50">
-                   Draft
-                 </Badge>
-               )}
+              {!course.isPublished && (
+                <Badge
+                  variant="outline"
+                  className="text-xs text-yellow-600 border-yellow-200 bg-yellow-50"
+                >
+                  Draft
+                </Badge>
+              )}
             </div>
           </CardContent>
 

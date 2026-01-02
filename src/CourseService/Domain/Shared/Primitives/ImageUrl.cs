@@ -8,6 +8,10 @@ public sealed record ImageUrl
 
     public string Path => Value.Path;
 
+    #pragma warning disable CS8618 
+    private ImageUrl() { }
+    #pragma warning restore CS8618 
+
     private ImageUrl(Url value)
     {
         Value = value;

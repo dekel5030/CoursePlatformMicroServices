@@ -1,6 +1,9 @@
-﻿using Courses.Application.Abstractions.Data;
+﻿using Courses.Application.Abstractions;
+using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Data.Repositories;
 using Courses.Infrastructure.Database;
 using Courses.Infrastructure.DomainEvents;
+using Courses.Infrastructure.Repositories;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -30,7 +33,8 @@ public static class DependencyInjection
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
-        //services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
+        services.AddScoped<IFeaturedCoursesRepository, FeaturedCoursesRepo>();
+        services.AddScoped<IUrlResolver, UrlResolver.UrlResolver>();
         return services;
     }
 

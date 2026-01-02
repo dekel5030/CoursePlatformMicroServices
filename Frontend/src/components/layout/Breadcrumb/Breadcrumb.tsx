@@ -25,7 +25,8 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
   const { t } = useTranslation();
 
   // If no items are provided, auto-generate from URL path
-  const breadcrumbItems = items || generateBreadcrumbsFromPath(location.pathname, t);
+  const breadcrumbItems =
+    items || generateBreadcrumbsFromPath(location.pathname, t);
 
   if (breadcrumbItems.length === 0) return null;
 
@@ -36,9 +37,10 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
           <BreadcrumbList>
             {breadcrumbItems.map((item, index) => {
               const isLast = index === breadcrumbItems.length - 1;
+              const key = item.path ?? item.label;
 
               return (
-                <React.Fragment key={index}>
+                <React.Fragment key={key}>
                   <BreadcrumbItemUI>
                     {!isLast && item.path ? (
                       <BreadcrumbLink asChild>
@@ -48,7 +50,8 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
                       <BreadcrumbPage>{item.label}</BreadcrumbPage>
                     )}
                   </BreadcrumbItemUI>
-                  {!isLast && <BreadcrumbSeparator />}
+
+                  {!isLast && <BreadcrumbSeparator key={`${key}-separator`} />}
                 </React.Fragment>
               );
             })}
@@ -59,7 +62,10 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
   );
 }
 
-function generateBreadcrumbsFromPath(pathname: string, t: TFunction): BreadcrumbItem[] {
+function generateBreadcrumbsFromPath(
+  pathname: string,
+  t: TFunction
+): BreadcrumbItem[] {
   const items: BreadcrumbItem[] = [{ label: t("breadcrumbs.home"), path: "/" }];
 
   const pathSegments = pathname.split("/").filter(Boolean);
@@ -69,13 +75,18 @@ function generateBreadcrumbsFromPath(pathname: string, t: TFunction): Breadcrumb
     currentPath += `/${segment}`;
 
     // Skip if it's a GUID (lesson or course ID)
-    const isGuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment);
+    const isGuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        segment
+      );
 
     if (!isGuid) {
       // Try to find translation for the segment, otherwise capitalize it
       const translationKey = `breadcrumbs.${segment.toLowerCase()}`;
-      const label = t(translationKey, { defaultValue: capitalizeFirst(segment) });
-      
+      const label = t(translationKey, {
+        defaultValue: capitalizeFirst(segment),
+      });
+
       items.push({
         label,
         path: index < pathSegments.length - 1 ? currentPath : undefined,

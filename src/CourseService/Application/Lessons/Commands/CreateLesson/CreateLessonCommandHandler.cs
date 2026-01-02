@@ -31,9 +31,7 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
         CreateLessonCommand request,
         CancellationToken cancellationToken = default)
     {
-        CreateLessonDto dto = request.Dto;
-
-        var courseId = new CourseId(dto.CourseId);
+        var courseId = new CourseId(request.CourseId);
 
         var course = await _dbContext.Courses
             .Include(c => c.Lessons)
@@ -44,8 +42,8 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
             return Result.Failure<LessonDetailsDto>(CourseErrors.NotFound);
         }
 
-        Title? lessonTitle = dto.Title is null ? null : new Title(dto.Title);
-        Description? lessonDescription = dto.Description is null ? null : new Description(dto.Description);
+        Title? lessonTitle = request.Title is null ? null : new Title(request.Title);
+        Description? lessonDescription = request.Description is null ? null : new Description(request.Description);
 
         var result = course.AddLesson(lessonTitle, lessonDescription, _timeProvider);
 

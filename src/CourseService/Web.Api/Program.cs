@@ -30,6 +30,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseCors("LocalDev");
+    app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
