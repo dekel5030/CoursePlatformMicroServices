@@ -8,7 +8,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Courses;
 
-internal sealed class GetById : IEndpoint
+internal sealed class GetCourseById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -23,6 +23,9 @@ internal sealed class GetById : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithMetadata<CourseDetailsDto>(nameof(GetById) ,Tags.Courses, "Gets a course by its ID.");
+        .WithMetadata<CourseDetailsDto>(
+            nameof(GetCourseById),
+            tag: Tags.Courses,
+            summary: "Gets a course by its ID.");
     }
 }

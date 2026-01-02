@@ -1,5 +1,5 @@
-﻿
-using CoursePlatform.ServiceDefaults.CustomResults;
+﻿using CoursePlatform.ServiceDefaults.CustomResults;
+using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Courses.Queries.GetFeatured;
@@ -18,6 +18,10 @@ public class GetFeatured : IEndpoint
             var result = await mediator.Send(new GetFeaturedQuery(), cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
-        });
+        })
+        .WithMetadata<PagedResponseDto<CourseSummaryDto>>(
+            nameof(GetFeatured),
+            tag: Tags.Courses,
+            summary: "Gets featured courses.");
     }
 }

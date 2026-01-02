@@ -1,4 +1,5 @@
 ﻿using CoursePlatform.ServiceDefaults.CustomResults;
+using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Courses.Queries.GetCourses;
@@ -19,6 +20,10 @@ public class GetCourses : IEndpoint
             var result = await mediator.Send(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
-        });
+        })
+        .WithMetadata<PagedResponseDto<CourseSummaryDto>>(
+            nameof(GetCourses),
+            tag: Tags.Courses,
+            summary: "Gets a paginated list of courses.");
     }
 }
