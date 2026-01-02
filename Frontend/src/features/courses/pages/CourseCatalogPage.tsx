@@ -3,14 +3,13 @@ import { CourseCard, useCourses } from "@/features/courses";
 import { Button, Skeleton, BreadcrumbNav } from "@/components";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { Authorized } from "@/features/auth";
 import { SlidersHorizontal, Plus } from "lucide-react";
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { t } = useTranslation();
   const { data: courses = [], isLoading, error } = useCourses();
-
-  const canAddCourse = true; //hasPermission(permissions, "Create", "Course", "*");
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -46,7 +45,6 @@ export default function HomePage() {
     <div className="flex flex-col">
       <BreadcrumbNav items={breadcrumbItems} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 w-full">
-        {/* Header */}
         <header className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 border-b border-border pb-8">
           <div className="space-y-2 max-w-2xl">
             <h1 className="text-4xl font-bold tracking-tight text-foreground">
@@ -57,6 +55,7 @@ export default function HomePage() {
               courses. From BIM mastery to computational design.
             </p>
           </div>
+
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -66,12 +65,13 @@ export default function HomePage() {
               <SlidersHorizontal className="h-4 w-4" />
               Filters
             </Button>
-            {canAddCourse && (
+
+            <Authorized action="Create" resource="Course">
               <Button size="sm" className="gap-2">
                 <Plus className="h-4 w-4" />
                 Add Course
               </Button>
-            )}
+            </Authorized>
           </div>
         </header>
 
