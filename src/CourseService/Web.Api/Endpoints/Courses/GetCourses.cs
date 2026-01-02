@@ -1,5 +1,5 @@
-﻿using Courses.Api.Extensions;
-using Courses.Api.Infrastructure;
+﻿using CoursePlatform.ServiceDefaults.CustomResults;
+using Courses.Api.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Courses.Queries.GetCourses;
 using Kernel.Messaging.Abstractions;

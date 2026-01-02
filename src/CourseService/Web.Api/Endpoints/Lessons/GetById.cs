@@ -1,5 +1,5 @@
+using CoursePlatform.ServiceDefaults.CustomResults;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Lessons.Queries.GetById;
 using Courses.Domain.Lessons.Primitives;

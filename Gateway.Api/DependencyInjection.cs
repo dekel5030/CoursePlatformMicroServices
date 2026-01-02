@@ -1,4 +1,5 @@
 ﻿using CoursePlatform.ServiceDefaults;
+using CoursePlatform.ServiceDefaults.Swagger;
 using Gateway.Api.Jwt;
 using Gateway.Api.Middleware;
 using Gateway.Api.Services.AuthClient;
@@ -19,8 +20,7 @@ public static class DependencyInjection
         builder.Services.AddGatewayInternalServices();
         builder.Services.AddAuth(builder.Configuration);
         builder.Services.AddYarp(builder.Configuration);
-
-        builder.AddDefaultOpenApi(JwtBearerDefaults.AuthenticationScheme);
+        SwaggerExtensions.AddDefaultOpenApi<IHostApplicationBuilder>(builder, JwtBearerDefaults.AuthenticationScheme);
         return builder;
     }
 

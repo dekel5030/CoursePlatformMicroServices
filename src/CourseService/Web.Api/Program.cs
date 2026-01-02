@@ -1,4 +1,4 @@
-using CoursePlatform.ServiceDefaults;
+using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Endpoints;
 using Courses.Api.Extensions;
 using Courses.Application;
@@ -20,10 +20,7 @@ if (app.Environment.IsDevelopment())
 {
     app.ApplyMigrations();
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        app.MapSwagger();
-    });
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
