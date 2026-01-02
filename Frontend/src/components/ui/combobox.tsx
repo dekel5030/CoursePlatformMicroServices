@@ -1,7 +1,7 @@
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "./button"
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/utils/utils";
+import { Button } from "./button";
 import {
   Command,
   CommandEmpty,
@@ -9,24 +9,20 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "./command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "./popover"
+} from "./command";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 export interface ComboboxOption {
-  value: string
-  label: string
+  value: string;
+  label: string;
 }
 
 interface ComboboxProps {
-  options: ComboboxOption[]
-  value?: string[]
-  onChange: (value: string[]) => void
-  placeholder?: string
-  emptyText?: string
+  options: ComboboxOption[];
+  value?: string[];
+  onChange: (value: string[]) => void;
+  placeholder?: string;
+  emptyText?: string;
 }
 
 export function Combobox({
@@ -36,14 +32,14 @@ export function Combobox({
   placeholder = "Select options...",
   emptyText = "No option found.",
 }: ComboboxProps) {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
 
   const handleSelect = (optionValue: string) => {
     const newValue = value.includes(optionValue)
       ? value.filter((v) => v !== optionValue)
-      : [...value, optionValue]
-    onChange(newValue)
-  }
+      : [...value, optionValue];
+    onChange(newValue);
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -54,9 +50,7 @@ export function Combobox({
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {value.length > 0
-            ? `${value.length} selected`
-            : placeholder}
+          {value.length > 0 ? `${value.length} selected` : placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -86,5 +80,5 @@ export function Combobox({
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { Course } from "@/types";
+import type { Course } from "../types";
 import {
   Card,
   CardContent,
@@ -7,7 +7,7 @@ import {
   CardTitle,
   CardFooter,
   Badge,
-} from "@/components/ui";
+} from "@/components";
 import { BookOpen, Clock, DollarSign } from "lucide-react";
 
 interface Props {

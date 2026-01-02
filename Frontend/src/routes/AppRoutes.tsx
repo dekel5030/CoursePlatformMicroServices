@@ -1,21 +1,22 @@
 import { Routes, Route } from "react-router-dom";
-import { Layout } from "@/components/layout";
-import HomePage from "../Pages/HomePage/HomePage";
-import LandingPage from "../Pages/LandingPage/LandingPage";
-import CoursePage from "../Pages/CoursePage/CoursePage";
-import LessonPage from "../Pages/LessonPage/LessonPage";
-import UserProfilePage from "../Pages/UserProfilePage/UserProfilePage";
-import RoleManagementPage from "../Pages/Admin/RoleManagementPage/RoleManagementPage";
-import RoleDetailPage from "../Pages/Admin/RoleDetailPage/RoleDetailPage";
-import UserManagementPage from "../Pages/Admin/UserManagementPage/UserManagementPage";
-import UsersListPage from "../Pages/Admin/UsersListPage/UsersListPage";
-import AdminDashboardPage from "../Pages/Admin/AdminDashboardPage/AdminDashboardPage";
+import { Layout } from "@/components";
+import { HomePage, CoursePage } from "@/features/courses";
+import { LessonPage } from "@/features/lessons";
+import { UserProfilePage } from "@/features/users";
+import { LandingPage } from "@/features/landing";
+import {
+  AdminDashboardPage,
+  RoleManagementPage,
+  RoleDetailPage,
+  UsersListPage,
+  UserManagementPage,
+} from "@/features/iam-dashboard";
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      
+
       <Route element={<Layout />}>
         <Route path="/catalog" element={<HomePage />} />
         <Route path="/courses/:id" element={<CoursePage />} />

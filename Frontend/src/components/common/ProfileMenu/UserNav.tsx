@@ -1,6 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "react-oidc-context";
 import { User, LogOut } from "lucide-react";
+import { useTranslation } from "react-i18next";
+// ייבוא של useAuth מהמיקום החדש (feature/auth)
+import { useAuth } from "@/features/auth";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,48 +13,39 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui";
 import ProfileAvatar from "./ProfileAvatar";
-import { useCurrentUser } from "@/hooks";
-import { useTranslation } from "react-i18next";
 
 export default function UserNav() {
   const navigate = useNavigate();
-  const auth = useAuth();
   const { t, i18n } = useTranslation();
-  const currentUser = useCurrentUser();
+  const { user, signoutRedirect } = useAuth();
 
-  const userProfile = auth.user?.profile;
+  if (!user) return null;
 
   const getInitial = () => {
-    if (currentUser?.firstName)
-      return currentUser.firstName.charAt(0).toUpperCase();
-    if (userProfile?.given_name)
-      return userProfile.given_name.charAt(0).toUpperCase();
-    if (currentUser?.email) return currentUser.email.charAt(0).toUpperCase();
-    if (userProfile?.email) return userProfile.email.charAt(0).toUpperCase();
-    return "U";
+    const namePart = user.firstName || user.email || "U";
+    return namePart.charAt(0).toUpperCase();
   };
 
   const handleProfileClick = () => {
-    if (currentUser?.id) {
-      navigate(`/users/${currentUser.id}`);
-    } else if (userProfile?.sub) {
-      navigate(`/users/${userProfile.sub}`);
+    if (user.id) {
+      navigate(`/users/${user.id}`);
+    } else {
+      navigate(`/profile`);
     }
   };
 
   const handleLogout = async () => {
     try {
-      await auth.signoutRedirect();
+      await signoutRedirect();
     } catch (error) {
       console.error("Logout failed:", error);
     }
   };
 
-  const displayName = currentUser?.firstName 
-    || userProfile?.given_name 
-    || currentUser?.email 
-    || userProfile?.email 
-    || "User";
+  // בניית שם התצוגה בצורה נקייה
+  const displayName = user.firstName
+    ? `${user.firstName} ${user.lastName || ""}`.trim()
+    : user.email || "User";
 
   return (
     <DropdownMenu dir={i18n.dir()}>
@@ -60,26 +54,31 @@ export default function UserNav() {
           <ProfileAvatar initial={getInitial()} />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-56" forceMount>
+
+      <DropdownMenuContent align="end" className="w-56" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none" dir="auto">{displayName}</p>
-            {(currentUser?.email || userProfile?.email) && (
-              <p className="text-xs leading-none text-muted-foreground" dir="ltr">
-                {currentUser?.email || userProfile?.email}
-              </p>
-            )}
+            <p className="text-sm font-medium leading-none" dir="auto">
+              {displayName}
+            </p>
+            <p className="text-xs leading-none text-muted-foreground" dir="ltr">
+              {user.email}
+            </p>
           </div>
         </DropdownMenuLabel>
+
         <DropdownMenuSeparator />
+
         <DropdownMenuItem onClick={handleProfileClick}>
           <User className="mr-2 h-4 w-4" />
-          <span>{t('profileMenu.profile')}</span>
+          <span>{t("profileMenu.profile")}</span>
         </DropdownMenuItem>
+
         <DropdownMenuSeparator />
+
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>{t('profileMenu.logout')}</span>
+          <span>{t("profileMenu.logout")}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
