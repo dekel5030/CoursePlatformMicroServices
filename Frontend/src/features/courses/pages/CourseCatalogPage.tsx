@@ -1,13 +1,15 @@
 import { useMemo, useState } from "react";
 import { CourseCard, useCourses } from "@/features/courses";
+import { AddCourseDialog } from "@/features/courses/components/AddCourseDialog";
 import { Button, Skeleton, BreadcrumbNav } from "@/components";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Authorized } from "@/features/auth";
+import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
 import { SlidersHorizontal, Plus } from "lucide-react";
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
   const { t } = useTranslation();
   const { data: courses = [], isLoading, error } = useCourses();
 
@@ -66,8 +68,16 @@ export default function HomePage() {
               Filters
             </Button>
 
-            <Authorized action="Create" resource="Course">
-              <Button size="sm" className="gap-2">
+            <Authorized 
+              action={ActionType.Create} 
+              resource={ResourceType.Course}
+              resourceId={ResourceId.Wildcard}
+            >
+              <Button 
+                size="sm" 
+                className="gap-2"
+                onClick={() => setIsAddCourseOpen(true)}
+              >
                 <Plus className="h-4 w-4" />
                 Add Course
               </Button>
@@ -141,6 +151,11 @@ export default function HomePage() {
           </main>
         </div>
       </div>
+
+      <AddCourseDialog 
+        open={isAddCourseOpen} 
+        onOpenChange={setIsAddCourseOpen} 
+      />
     </div>
   );
 }

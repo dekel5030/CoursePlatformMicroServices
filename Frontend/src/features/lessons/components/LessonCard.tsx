@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import type { Lesson as LessonType } from "@/types";
-import { Card, CardContent, Badge } from "@/components";
-import { Clock, PlayCircle } from "lucide-react";
+import type { Lesson as LessonType } from "../types/Lesson";
+import { Card, CardContent, Badge, Button } from "@/components";
+import { Clock, PlayCircle, Edit, Trash2 } from "lucide-react";
+import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
+import { toast } from "sonner";
 
 interface LessonProps {
   lesson: LessonType;
@@ -29,6 +31,16 @@ export default function Lesson({ lesson, index }: LessonProps) {
 
   const handleLessonClick = () => {
     navigate(`/lessons/${lesson.id}`);
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast.info("Edit lesson functionality not implemented yet");
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast.info("Delete lesson functionality not implemented yet");
   };
 
   return (
@@ -74,7 +86,39 @@ export default function Lesson({ lesson, index }: LessonProps) {
                 <span>{formatDuration(lesson.duration)}</span>
               </div>
             )}
-            <PlayCircle className="h-5 w-5" />
+            <div className="flex gap-1">
+              <Authorized 
+                action={ActionType.Update} 
+                resource={ResourceType.Lesson}
+                resourceId={ResourceId.create(lesson.id)}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={handleEdit}
+                  title="Edit lesson"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </Authorized>
+              <Authorized 
+                action={ActionType.Delete} 
+                resource={ResourceType.Lesson}
+                resourceId={ResourceId.create(lesson.id)}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 hover:text-destructive"
+                  onClick={handleDelete}
+                  title="Delete lesson"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </Authorized>
+              <PlayCircle className="h-5 w-5 ml-1" />
+            </div>
           </div>
         </div>
       </CardContent>

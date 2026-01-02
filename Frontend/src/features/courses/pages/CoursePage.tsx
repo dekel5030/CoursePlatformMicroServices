@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { Lesson } from "@/features/lessons";
+import { AddLessonDialog } from "@/features/lessons/components/AddLessonDialog";
 import { useCourse } from "@/features/courses";
 import {
   Button,
@@ -12,18 +13,26 @@ import {
 } from "@/components";
 import { ShoppingCart, CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Edit } from "lucide-react";
 import { motion } from "framer-motion";
+import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
   const { data: course, isLoading, error } = useCourse(id);
   const { t, i18n } = useTranslation();
+  const [isAddLessonOpen, setIsAddLessonOpen] = useState(false);
 
-  const canDeleteCourse = course
-    ? true //hasPermission(permissions, "Delete", "Course", course.id)
-    : false;
-  const canAddLesson = true; //hasPermission(permissions, "Create", "Lesson", "*");
+  const handleEditCourse = () => {
+    toast.info("Edit course functionality not implemented yet");
+  };
+
+  const handleDeleteCourse = () => {
+    toast.info("Delete course functionality not implemented yet");
+  };
+
 
   if (isLoading) {
     return (
@@ -135,16 +144,42 @@ export default function CoursePage() {
               )}
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start gap-2">
                     <h1 className="text-3xl font-bold" dir="auto">
                       {course.title}
                     </h1>
-                    {canDeleteCourse && (
-                      <Button variant="destructive" size="sm" className="gap-2">
-                        <Trash2 className="h-4 w-4" />
-                        {t("pages.course.deleteCourse")}
-                      </Button>
-                    )}
+                    <div className="flex gap-2">
+                      <Authorized 
+                        action={ActionType.Update} 
+                        resource={ResourceType.Course}
+                        resourceId={ResourceId.create(course.id)}
+                      >
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="gap-2"
+                          onClick={handleEditCourse}
+                        >
+                          <Edit className="h-4 w-4" />
+                          {t("common.edit")}
+                        </Button>
+                      </Authorized>
+                      <Authorized 
+                        action={ActionType.Delete} 
+                        resource={ResourceType.Course}
+                        resourceId={ResourceId.create(course.id)}
+                      >
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          className="gap-2"
+                          onClick={handleDeleteCourse}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          {t("pages.course.deleteCourse")}
+                        </Button>
+                      </Authorized>
+                    </div>
                   </div>
                   <p className="text-muted-foreground">
                     {t("pages.course.instructor")}:{" "}
@@ -199,12 +234,20 @@ export default function CoursePage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>{t("pages.course.lessons")}</CardTitle>
-              {canAddLesson && (
-                <Button size="sm" className="gap-2">
+              <Authorized 
+                action={ActionType.Create} 
+                resource={ResourceType.Lesson}
+                resourceId={ResourceId.Wildcard}
+              >
+                <Button 
+                  size="sm" 
+                  className="gap-2"
+                  onClick={() => setIsAddLessonOpen(true)}
+                >
                   <Plus className="h-4 w-4" />
                   {t("pages.course.addLesson")}
                 </Button>
-              )}
+              </Authorized>
             </CardHeader>
             <CardContent className="space-y-2">
               {course.lessons && course.lessons.length > 0 ? (
@@ -232,6 +275,14 @@ export default function CoursePage() {
           </Card>
         </motion.div>
       </motion.div>
+
+      {course && (
+        <AddLessonDialog 
+          courseId={course.id}
+          open={isAddLessonOpen} 
+          onOpenChange={setIsAddLessonOpen} 
+        />
+      )}
     </div>
   );
 }
