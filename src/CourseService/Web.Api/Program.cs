@@ -1,24 +1,14 @@
+using CoursePlatform.ServiceDefaults;
 using Courses.Api.Endpoints;
 using Courses.Api.Extensions;
-using Courses.Infrastructure;
 using Courses.Application;
+using Courses.Infrastructure;
 using Courses.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddInfrastructureDefaults();
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("LocalDev",
-        policy => policy
-            .WithOrigins("http://localhost:5173")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-    );
-});
-
-builder.Services.AddOpenApi();
+builder.AddDefaultOpenApi();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
@@ -28,13 +18,15 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.UseCors("LocalDev");
     app.ApplyMigrations();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        app.MapSwagger();
+    });
 }
 
 app.UseHttpsRedirection();
-app.MapGet("/", () => "OK");
 app.MapEndpoints();
 
 app.UseInfrastructureDefaultEndpoints();
