@@ -1,6 +1,7 @@
 ﻿using Kernel;
+using Microsoft.AspNetCore.Http;
 
-namespace Courses.Api.Infrastructure;
+namespace CoursePlatform.ServiceDefaults.CustomResults;
 
 public static class CustomResults
 {

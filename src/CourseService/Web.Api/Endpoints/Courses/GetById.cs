@@ -1,5 +1,6 @@
-﻿using Courses.Api.Extensions;
-using Courses.Api.Infrastructure;
+﻿using CoursePlatform.ServiceDefaults.CustomResults;
+using CoursePlatform.ServiceDefaults.Swagger;
+using Courses.Api.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Courses.Queries.GetById;
 using Kernel;
@@ -22,7 +23,6 @@ internal sealed class GetById : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithName("GetCourseById")
-        .WithTags(Tags.Courses);
+        .WithMetadata<CourseDetailsDto>(nameof(GetById) ,Tags.Courses, "Gets a course by its ID.");
     }
 }

@@ -1,9 +1,9 @@
-﻿using Courses.Api.Extensions;
-using Courses.Api.Infrastructure;
+﻿using CoursePlatform.ServiceDefaults.CustomResults;
+using Courses.Api.Extensions;
 using Courses.Application.Courses.Commands.CreateCourse;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-
+using CoursePlatform.ServiceDefaults.Swagger;
 namespace Courses.Api.Endpoints.Courses;
 
 public class CreateCourse : IEndpoint
@@ -23,6 +23,11 @@ public class CreateCourse : IEndpoint
                     new { Id = response.CourseId }
                 ),
                 CustomResults.Problem);
-        });
+        })
+        .WithMetadata<CreateCourseResponse>(
+            nameof(CreateCourse),
+            tag: Tags.Courses,
+            summary: "Creates a new course.",
+            successStatusCode: StatusCodes.Status201Created);
     }
 }
