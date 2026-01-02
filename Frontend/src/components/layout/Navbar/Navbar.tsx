@@ -1,5 +1,5 @@
-import { Dropdown, ProfileMenu, LanguageSwitcher } from "@/components/common";
-import { Button } from "@/components/ui";
+import { Dropdown, ProfileMenu, LanguageSwitcher } from "../../common";
+import { Button } from "../../ui";
 import { useAuth } from "react-oidc-context";
 import { Link } from "react-router-dom";
 import { Twitter, Linkedin, Github, Facebook } from "lucide-react";
@@ -29,11 +29,21 @@ export default function Navbar() {
             <ProfileMenu />
           ) : (
             <>
-              <Button variant="ghost" size="sm" onClick={handleLoginClick} className="text-xs font-medium h-8 px-3">
-                {t('navbar.login')}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLoginClick}
+                className="text-xs font-medium h-8 px-3"
+              >
+                {t("navbar.login")}
               </Button>
-              <Button variant="default" size="sm" onClick={handleSignUpClick} className="text-xs font-medium h-8 px-3">
-                {t('navbar.signup')}
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleSignUpClick}
+                className="text-xs font-medium h-8 px-3"
+              >
+                {t("navbar.signup")}
               </Button>
             </>
           )}
@@ -42,23 +52,38 @@ export default function Navbar() {
 
         {/* Center: Logo */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
-          <Link to="/" className="text-xl font-bold text-foreground tracking-tighter hover:opacity-80 transition-opacity">
+          <Link
+            to="/"
+            className="text-xl font-bold text-foreground tracking-tighter hover:opacity-80 transition-opacity"
+          >
             CourseHub
           </Link>
         </div>
 
         {/* Right: Social Icons */}
         <div className="flex items-center gap-4">
-          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="#"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             <Twitter className="h-4 w-4" />
           </a>
-          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="#"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             <Linkedin className="h-4 w-4" />
           </a>
-          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="#"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             <Github className="h-4 w-4" />
           </a>
-          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="#"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             <Facebook className="h-4 w-4" />
           </a>
         </div>
@@ -67,25 +92,44 @@ export default function Navbar() {
       {/* Bottom Row: Navigation Tabs */}
       <div className="px-6 md:px-12 py-3 flex justify-center items-center">
         <nav className="flex items-center gap-8">
-           <ul className="flex items-center gap-8 list-none text-sm font-medium text-muted-foreground">
-            <li className="hover:text-foreground transition-colors cursor-pointer">{t('navbar.marketing')}</li>
-            <li className="hover:text-foreground transition-colors cursor-pointer">{t('navbar.design')}</li>
-            
-            <Dropdown label={t('navbar.development')}>
-              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">Architecture</li>
-              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">Interior Design</li>
-              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">Landscape</li>
+          <ul className="flex items-center gap-8 list-none text-sm font-medium text-muted-foreground">
+            <li className="hover:text-foreground transition-colors cursor-pointer">
+              {t("navbar.marketing")}
+            </li>
+            <li className="hover:text-foreground transition-colors cursor-pointer">
+              {t("navbar.design")}
+            </li>
+
+            <Dropdown label={t("navbar.development")}>
+              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
+                Architecture
+              </li>
+              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
+                Interior Design
+              </li>
+              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
+                Landscape
+              </li>
             </Dropdown>
 
-            <Dropdown label={t('navbar.explore')}>
-              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">Revit</li>
-              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">AutoCAD</li>
-              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">Lumion & V-Ray</li>
+            <Dropdown label={t("navbar.explore")}>
+              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
+                Revit
+              </li>
+              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
+                AutoCAD
+              </li>
+              <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
+                Lumion & V-Ray
+              </li>
             </Dropdown>
 
             <li>
-              <Link to="/catalog" className="hover:text-foreground transition-colors">
-                {t('navbar.catalog')}
+              <Link
+                to="/catalog"
+                className="hover:text-foreground transition-colors"
+              >
+                {t("navbar.catalog")}
               </Link>
             </li>
           </ul>

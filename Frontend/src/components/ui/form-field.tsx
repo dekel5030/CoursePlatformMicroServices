@@ -1,18 +1,21 @@
-import * as React from "react"
-import { Input } from "./input"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { Input } from "./input";
+import { cn } from "@/utils/utils";
 
 interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string
-  error?: string
-  name: string
+  label: string;
+  error?: string;
+  name: string;
 }
 
 const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
   ({ label, error, name, className, required, ...props }, ref) => {
     return (
       <div className="space-y-2">
-        <label htmlFor={name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+        <label
+          htmlFor={name}
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
           {label}
           {required && <span className="text-destructive ml-1">*</span>}
         </label>
@@ -24,13 +27,11 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
           required={required}
           {...props}
         />
-        {error && (
-          <p className="text-sm text-destructive">{error}</p>
-        )}
+        {error && <p className="text-sm text-destructive">{error}</p>}
       </div>
-    )
+    );
   }
-)
-FormField.displayName = "FormField"
+);
+FormField.displayName = "FormField";
 
-export { FormField }
+export { FormField };
