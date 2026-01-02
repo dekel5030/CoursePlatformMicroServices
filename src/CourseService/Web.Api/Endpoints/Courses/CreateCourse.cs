@@ -4,6 +4,7 @@ using Courses.Application.Courses.Commands.CreateCourse;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using CoursePlatform.ServiceDefaults.Swagger;
+
 namespace Courses.Api.Endpoints.Courses;
 
 public class CreateCourse : IEndpoint

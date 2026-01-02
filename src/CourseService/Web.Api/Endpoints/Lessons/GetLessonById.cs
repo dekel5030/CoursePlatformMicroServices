@@ -1,4 +1,5 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
+using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Lessons.Queries.GetById;
@@ -8,7 +9,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Lessons;
 
-internal sealed class GetById : IEndpoint
+internal sealed class GetLessonById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -23,7 +24,9 @@ internal sealed class GetById : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithName("GetLessonById")
-        .WithTags(Tags.Lessons);
+        .WithMetadata<LessonDetailsDto>(
+            nameof(GetLessonById),
+            tag: Tags.Lessons,
+            summary: "Gets a lesson by its ID.");
     }
 }
