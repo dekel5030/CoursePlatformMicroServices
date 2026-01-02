@@ -24,7 +24,7 @@ export default function CoursePage() {
   const permissions = usePermissions();
 
   const canDeleteCourse = course
-    ? hasPermission(permissions, "Delete", "Course", course.id.value)
+    ? hasPermission(permissions, "Delete", "Course", course.id)
     : false;
   const canAddLesson = hasPermission(permissions, "Create", "Lesson", "*");
 
@@ -215,7 +215,7 @@ export default function CoursePage() {
                   .sort((a, b) => a.order - b.order)
                   .map((lesson, index) => (
                     <motion.div
-                      key={lesson.id.value}
+                      key={lesson.id}
                       initial={{
                         opacity: 0,
                         x: contentDir === "rtl" ? 10 : -10,

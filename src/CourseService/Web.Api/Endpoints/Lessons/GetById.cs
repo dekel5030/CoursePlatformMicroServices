@@ -14,12 +14,12 @@ internal sealed class GetById : IEndpoint
     {
         app.MapGet("lessons/{id:Guid}", async (
             Guid id,
-            IQueryHandler<GetLessonByIdQuery, LessonReadDto> handler,
+            IMediator mediator,
             CancellationToken cancellationToken) =>
         {
             var query = new GetLessonByIdQuery(new LessonId(id));
 
-            Result<LessonReadDto> result = await handler.Handle(query, cancellationToken);
+            Result<LessonDetailsDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })

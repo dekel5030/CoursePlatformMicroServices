@@ -4,4 +4,4 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Lessons.Queries.GetById;
 
-public record GetLessonByIdQuery(LessonId Id) : IQuery<LessonReadDto>;
+public record GetLessonByIdQuery(LessonId Id) : IQuery<LessonDetailsDto>;

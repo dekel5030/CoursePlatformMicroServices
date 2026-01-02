@@ -1,30 +1,37 @@
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure;
 using Courses.Application.Lessons.Commands.CreateLesson;
-using Courses.Domain.Lessons.Primitives;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Lessons;
 
 public class CreateLesson : IEndpoint
 {
+    public record CreateLessonRequest(string? Title, string? Description);
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("lessons", async (
-            CreateLessonDto dto,
-            ICommandHandler<CreateLessonCommand, LessonId> handler) =>
+        app.MapPost("courses/{courseid:guid}/lessons", async (
+            Guid courseid,
+            CreateLessonRequest request,
+            IMediator mediator) =>
         {
-            var result = await handler.Handle(new CreateLessonCommand(dto));
+            var command = new CreateLessonCommand(
+                courseid,
+                request.Title,
+                request.Description);
+
+            var result = await mediator.Send(command);
 
             return result.Match(
-                lessonId => Results.CreatedAtRoute(
+                lessonDto => Results.CreatedAtRoute(
                     "GetLessonById",
-                    new { id = lessonId.Value },
-                    new { Id = lessonId.Value }
+                    new { id = lessonDto.Id },
+                    lessonDto
                 ),
                 CustomResults.Problem);
         })
         .WithName("CreateLesson")
-        .WithTags("Lessons");
+        .WithTags(Tags.Lessons);
     }
 }

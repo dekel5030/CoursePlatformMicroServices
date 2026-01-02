@@ -4,6 +4,10 @@ public sealed record Url
 {
     public string Path { get; }
 
+    #pragma warning disable CS8618 
+    private Url() { }
+    #pragma warning restore CS8618
+
     private Url(string path)
     {
         Path = path;

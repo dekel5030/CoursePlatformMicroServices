@@ -1,55 +1,68 @@
-﻿//using Courses.Application.Abstractions.Data;
-//using Courses.Application.Courses.Queries.Dtos;
-//using Courses.Domain.Courses.Errors;
-//using Kernel;
-//using Kernel.Messaging.Abstractions;
-//using Microsoft.EntityFrameworkCore;
+using Courses.Application.Abstractions;
+using Courses.Application.Abstractions.Data;
+using Courses.Application.Courses.Queries.Dtos;
+using Courses.Domain.Courses.Errors;
+using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons.Primitives;
+using Kernel;
+using Kernel.Messaging.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
-//namespace Courses.Application.Courses.Queries.GetById;
+namespace Courses.Application.Courses.Queries.GetById;
 
-//public class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CourseReadDto>
-//{
-//    private readonly IReadDbContext _dbContext;
+internal class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CourseDetailsDto>
+{
+    private readonly IReadDbContext _dbContext;
+    private readonly IUrlResolver _urlResolver;
 
-//    public GetCourseByIdQueryHandler(IReadDbContext dbContext)
-//    {
-//        _dbContext = dbContext;
-//    }
+    public GetCourseByIdQueryHandler(IReadDbContext dbContext, IUrlResolver urlResolver)
+    {
+        _dbContext = dbContext;
+        _urlResolver = urlResolver;
+    }
 
-//    public async Task<Result<CourseReadDto>> Handle(
-//        GetCourseByIdQuery request,
-//        CancellationToken cancellationToken = default)
-//    {
-//        CourseReadDto? result = await _dbContext.Courses
-//            .Where(course => course.Id == request.Id)
-//            .Select(course => new CourseReadDto(
-//                course.Id,
-//                course.Title.Value,
-//                course.Description.Value,
-//                true,
-//                course.Images.,
-//                course.InstructorUserId,
-//                course.Price,
-//                course.UpdatedAtUtc,
-//                course.Lessons.OrderBy(l => l.Order)
-//                .Select(lesson => new LessonReadDto(
-//                    lesson.Id,
-//                    lesson.Title,
-//                    lesson.Description,
-//                    lesson.VideoUrl,
-//                    lesson.ThumbnailImage,
-//                    lesson.IsPreview,
-//                    lesson.Order,
-//                    lesson.Duration))
-//                .ToList()
-//                ))
-//            .FirstOrDefaultAsync(cancellationToken);
+    public async Task<Result<CourseDetailsDto>> Handle(
+        GetCourseByIdQuery request,
+        CancellationToken cancellationToken = default)
+    {
+        CourseId courseId = new(request.Id);
 
-//        if (result is null)
-//        {
-//            return Result.Failure<CourseReadDto>(CourseErrors.NotFound);
-//        }
+        var course = await _dbContext.Courses
+            .Include(c => c.Lessons)
+            .FirstOrDefaultAsync(c => c.Id == courseId, cancellationToken);
 
-//        return Result.Success(result);
-//    }
-//}
+        if (course is null)
+        {
+            return Result.Failure<CourseDetailsDto>(CourseErrors.NotFound);
+        }
+
+        var response = new CourseDetailsDto
+        (
+            Id: course.Id.Value,
+            Title: course.Title.Value,
+            Description: course.Description.Value,
+            InstructorName: course.InstructorId?.Value.ToString(),
+            Price: course.Price.Amount,
+            Currency: course.Price.Currency,
+            EnrollmentCount: course.EnrollmentCount,
+            UpdatedAtUtc: course.UpdatedAtUtc,
+            ImageUrls: course.Images
+                .Select(img => _urlResolver.Resolve(img.Path))
+                .ToList(),
+            Lessons: course.Lessons
+                .OrderBy(l => l.Index)
+                .Select(lesson => new LessonSummaryDto
+                (
+                    Id: lesson.Id.Value,
+                    Title: lesson.Title.Value,
+                    Description: lesson.Description.Value,
+                    Index: lesson.Index,
+                    Duration: lesson.Duration,
+                    IsPreview: lesson.Access == LessonAccess.Public,
+                    ThumbnailUrl: _urlResolver.Resolve(lesson.ThumbnailImageUrl?.Path ?? string.Empty)
+                )).ToList()
+        );
+
+        return Result.Success(response);
+    }
+}

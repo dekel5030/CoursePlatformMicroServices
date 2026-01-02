@@ -1,6 +1,13 @@
 import { Link } from "react-router-dom";
 import type { Course } from "@/types";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter, Badge } from "@/components/ui";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+  Badge,
+} from "@/components/ui";
 import { BookOpen, Clock, DollarSign } from "lucide-react";
 
 interface Props {
@@ -9,18 +16,21 @@ interface Props {
 
 export default function CourseCard({ course }: Props) {
   return (
-    <Link to={`/courses/${course.id.value}`} className="block hover:opacity-80 transition-opacity">
+    <Link
+      to={`/courses/${course.id}`}
+      className="block hover:opacity-80 transition-opacity"
+    >
       <Card className="overflow-hidden hover:shadow-lg transition-shadow">
         {course.imageUrl && (
           <div className="relative h-48 w-full overflow-hidden">
-            <img 
-              src={course.imageUrl} 
+            <img
+              src={course.imageUrl}
               alt={course.title}
               className="h-full w-full object-cover"
             />
           </div>
         )}
-        
+
         <CardHeader>
           <CardTitle className="line-clamp-2">{course.title}</CardTitle>
         </CardHeader>

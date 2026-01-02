@@ -2,7 +2,6 @@
 using Courses.Api.Infrastructure;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Courses.Queries.GetById;
-using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -14,12 +13,12 @@ internal sealed class GetById : IEndpoint
     {
         app.MapGet("courses/{id:Guid}", async (
             Guid id,
-            IQueryHandler<GetCourseByIdQuery, CourseReadDto> handler,
+            IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetCourseByIdQuery(new CourseId(id));
+            var query = new GetCourseByIdQuery(id);
 
-            Result<CourseReadDto> result = await handler.Handle(query, cancellationToken);
+            Result<CourseDetailsDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })

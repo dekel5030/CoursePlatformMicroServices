@@ -1,7 +1,5 @@
-import type { IdValueObject } from "./idValueObject";
-
 export interface Lesson {
-  id: IdValueObject;
+  id: string;
   title: string;
   description?: string | null;
   videoUrl?: string | null;
