@@ -63,15 +63,15 @@ internal class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
         }
 
         // Validate price update: both amount and currency must be provided together
-        if (request.PriceAmount.HasValue || request.PriceCurrency is not null)
+        if ((request.PriceAmount.HasValue) != (request.PriceCurrency is not null))
         {
-            if (!request.PriceAmount.HasValue || request.PriceCurrency is null)
-            {
-                return Result.Failure(Error.Validation(
-                    "Course.IncompletePriceUpdate", 
-                    "Both price amount and currency must be provided together."));
-            }
-            
+            return Result.Failure(Error.Validation(
+                "Course.IncompletePriceUpdate", 
+                "Both price amount and currency must be provided together."));
+        }
+        
+        if (request.PriceAmount.HasValue && request.PriceCurrency is not null)
+        {
             var priceResult = course.SetPrice(new Money(request.PriceAmount.Value, request.PriceCurrency), _timeProvider);
             if (priceResult.IsFailure)
             {
