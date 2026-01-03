@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { Lesson as LessonType } from "../types/Lesson";
 import { Card, CardContent, Badge, Button } from "@/components";
 import { Clock, PlayCircle, Edit, Trash2 } from "lucide-react";
@@ -12,6 +13,7 @@ interface LessonProps {
 
 export default function Lesson({ lesson, index }: LessonProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['lessons', 'translation']);
 
   const formatDuration = (duration: string | null | undefined) => {
     if (!duration) return null;
@@ -35,12 +37,12 @@ export default function Lesson({ lesson, index }: LessonProps) {
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-    toast.info("Edit lesson functionality not implemented yet");
+    toast.info(t('lessons:actions.editNotImplemented'));
   };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    toast.info("Delete lesson functionality not implemented yet");
+    toast.info(t('lessons:actions.deleteNotImplemented'));
   };
 
   return (

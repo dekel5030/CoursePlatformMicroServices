@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createLesson, type CreateLessonRequest } from "../api/LessonsAPI";
+import { useCreateLesson } from "../hooks/useLessons";
 
 interface AddLessonDialogProps {
   courseId: string;
@@ -26,20 +26,9 @@ export function AddLessonDialog({
 }: AddLessonDialogProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const queryClient = useQueryClient();
+  const { t } = useTranslation(['lessons', 'translation']);
 
-  const createLessonMutation = useMutation({
-    mutationFn: (request: CreateLessonRequest) =>
-      createLesson(courseId, request),
-    onSuccess: () => {
-      toast.success("Lesson created successfully!");
-      queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
-      handleClose();
-    },
-    onError: (error: Error) => {
-      toast.error(`Failed to create lesson: ${error.message}`);
-    },
-  });
+  const createLessonMutation = useCreateLesson(courseId);
 
   const handleClose = () => {
     setTitle("");
@@ -51,23 +40,34 @@ export function AddLessonDialog({
     e.preventDefault();
 
     if (!title.trim()) {
-      toast.error("Please enter a lesson title");
+      toast.error(t('lessons:addDialog.validationError'));
       return;
     }
 
-    createLessonMutation.mutate({
-      title: title.trim(),
-      description: description.trim() || undefined,
-    });
+    createLessonMutation.mutate(
+      {
+        title: title.trim(),
+        description: description.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          toast.success(t('lessons:addDialog.successMessage'));
+          handleClose();
+        },
+        onError: (error: Error) => {
+          toast.error(t('lessons:addDialog.errorMessage', { message: error.message }));
+        },
+      }
+    );
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
-          <DialogTitle>Add New Lesson</DialogTitle>
+          <DialogTitle>{t('lessons:addDialog.title')}</DialogTitle>
           <DialogDescription>
-            Create a new lesson for this course. Fill in the details below.
+            {t('lessons:addDialog.description')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -77,7 +77,7 @@ export function AddLessonDialog({
                 htmlFor="title"
                 className="text-sm font-medium leading-none"
               >
-                Title
+                {t('lessons:addDialog.titleLabel')}
                 <span className="text-destructive ml-1">*</span>
               </label>
               <Input
@@ -85,7 +85,7 @@ export function AddLessonDialog({
                 name="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter lesson title"
+                placeholder={t('lessons:addDialog.titlePlaceholder')}
                 required
               />
             </div>
@@ -94,14 +94,14 @@ export function AddLessonDialog({
                 htmlFor="description"
                 className="text-sm font-medium leading-none"
               >
-                Description
+                {t('lessons:addDialog.descriptionLabel')}
               </label>
               <textarea
                 id="description"
                 name="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter lesson description"
+                placeholder={t('lessons:addDialog.descriptionPlaceholder')}
                 className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
@@ -113,10 +113,12 @@ export function AddLessonDialog({
               onClick={handleClose}
               disabled={createLessonMutation.isPending}
             >
-              Cancel
+              {t('lessons:addDialog.cancel')}
             </Button>
             <Button type="submit" disabled={createLessonMutation.isPending}>
-              {createLessonMutation.isPending ? "Creating..." : "Create Lesson"}
+              {createLessonMutation.isPending 
+                ? t('lessons:addDialog.submitting')
+                : t('lessons:addDialog.submit')}
             </Button>
           </DialogFooter>
         </form>
