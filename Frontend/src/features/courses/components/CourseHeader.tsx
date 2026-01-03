@@ -38,7 +38,7 @@ export function CourseHeader({ course }: CourseHeaderProps) {
             <p className="text-muted-foreground">
               {t('courses:detail.instructor')}:{" "}
               <span dir="auto">
-                {course.instructorUserId ?? "Unknown"}
+                {course.instructorUserId ?? t('common.unknown')}
               </span>
             </p>
           </div>

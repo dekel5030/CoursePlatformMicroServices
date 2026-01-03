@@ -15,7 +15,8 @@
     "description": "תיאור",
     "required": "חובה",
     "loading": "טוען...",
-    "noData": "אין נתונים זמינים"
+    "noData": "אין נתונים זמינים",
+    "unknown": "לא ידוע"
   },
   "breadcrumbs": {
     "home": "בית",

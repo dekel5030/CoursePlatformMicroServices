@@ -15,7 +15,8 @@
     "description": "Description",
     "required": "Required",
     "loading": "Loading...",
-    "noData": "No data available"
+    "noData": "No data available",
+    "unknown": "Unknown"
   },
   "breadcrumbs": {
     "home": "Home",
