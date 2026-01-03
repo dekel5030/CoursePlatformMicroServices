@@ -102,25 +102,25 @@ export default function Navbar() {
 
             <Dropdown label={t("navbar.development")}>
               <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
-                Architecture
+                {t("navbar.dropdowns.disciplines.architecture")}
               </li>
               <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
-                Interior Design
+                {t("navbar.dropdowns.disciplines.interiorDesign")}
               </li>
               <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
-                Landscape
+                {t("navbar.dropdowns.disciplines.landscape")}
               </li>
             </Dropdown>
 
             <Dropdown label={t("navbar.explore")}>
               <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
-                Revit
+                {t("navbar.dropdowns.software.revit")}
               </li>
               <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
-                AutoCAD
+                {t("navbar.dropdowns.software.autocad")}
               </li>
               <li className="hover:bg-accent px-3 py-2 rounded-sm cursor-pointer text-sm">
-                Lumion & V-Ray
+                {t("navbar.dropdowns.software.lumionVray")}
               </li>
             </Dropdown>
 

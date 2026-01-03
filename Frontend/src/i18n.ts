@@ -1,13 +1,36 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import Backend from 'i18next-http-backend';
+import HttpApi from 'i18next-http-backend';
+
+// Import locale files directly for better reliability
+import translationEN from './locales/en/translation.json';
+import translationHE from './locales/he/translation.json';
+import coursesEN from './features/courses/locales/en/courses.json';
+import coursesHE from './features/courses/locales/he/courses.json';
+import lessonsEN from './features/lessons/locales/en/lessons.json';
+import lessonsHE from './features/lessons/locales/he/lessons.json';
+
+// Define resources with feature-based structure
+const resources = {
+  en: {
+    translation: translationEN,
+    courses: coursesEN,
+    lessons: lessonsEN,
+  },
+  he: {
+    translation: translationHE,
+    courses: coursesHE,
+    lessons: lessonsHE,
+  },
+};
 
 i18n
-  .use(Backend)
+  .use(HttpApi)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
+    resources,
     fallbackLng: 'en',
     debug: false, // Set to true for debugging during dev
     interpolation: {
@@ -15,9 +38,10 @@ i18n
     },
     ns: ['translation', 'courses', 'lessons'], // Add namespaces
     defaultNS: 'translation',
-    backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
-    },
+    fallbackNS: 'translation',
+    // Return key if translation is missing instead of showing translation key
+    returnEmptyString: false,
+    returnNull: false,
   });
 
 // Handle RTL/LTR updates

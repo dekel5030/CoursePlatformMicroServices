@@ -1,0 +1,47 @@
+{
+  "catalog": {
+    "title": "קטלוג קורסים",
+    "subtitle": "חקור את אוסף הקורסים המאורגנים שלנו באדריכלות והנדסה.",
+    "filters": "פילטרים",
+    "addCourse": "הוסף קורס",
+    "all": "הכל",
+    "noCourses": "לא נמצאו קורסים בקטגוריה זו.",
+    "errorLoading": "שגיאה בטעינת קורסים: {{message}}"
+  },
+  "card": {
+    "published": "פורסם",
+    "draft": "טיוטה",
+    "lessonsCount": "שיעור {{count}}",
+    "lessonsCount_plural": "{{count}} שיעורים"
+  },
+  "detail": {
+    "instructor": "מדריך",
+    "buyNow": "קנה עכשיו",
+    "addToCart": "הוסף לסל",
+    "about": "על הקורס",
+    "lessons": "שיעורים",
+    "noLessons": "אין שיעורים זמינים.",
+    "addLesson": "הוסף שיעור",
+    "edit": "ערוך",
+    "delete": "מחק קורס",
+    "notFound": "קורס לא נמצא"
+  },
+  "addDialog": {
+    "title": "הוסף קורס חדש",
+    "description": "צור קורס חדש. מלא את הפרטים למטה.",
+    "titleLabel": "כותרת",
+    "titlePlaceholder": "הכנס כותרת קורס",
+    "descriptionLabel": "תיאור",
+    "descriptionPlaceholder": "הכנס תיאור קורס",
+    "cancel": "ביטול",
+    "submit": "צור קורס",
+    "submitting": "יוצר...",
+    "successMessage": "קורס נוצר בהצלחה!",
+    "errorMessage": "נכשל ביצירת קורס: {{message}}",
+    "validationError": "נא להזין כותרת קורס"
+  },
+  "actions": {
+    "editNotImplemented": "פונקציית עריכת קורס טרם מומשה",
+    "deleteNotImplemented": "פונקציית מחיקת קורס טרם מומשה"
+  }
+}

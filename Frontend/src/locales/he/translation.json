@@ -1,0 +1,271 @@
+{
+  "profileMenu": {
+    "profile": "דף פרופיל",
+    "logout": "התנתק"
+  },
+  "common": {
+    "error": "שגיאה: {{message}}",
+    "edit": "ערוך",
+    "delete": "מחק",
+    "cancel": "ביטול",
+    "save": "שמור",
+    "create": "צור",
+    "update": "עדכן",
+    "title": "כותרת",
+    "description": "תיאור",
+    "required": "חובה",
+    "loading": "טוען...",
+    "noData": "אין נתונים זמינים",
+    "unknown": "לא ידוע"
+  },
+  "breadcrumbs": {
+    "home": "בית",
+    "courses": "קורסים",
+    "lessons": "שיעורים",
+    "course": "קורס",
+    "lesson": "שיעור",
+    "profile": "פרופיל",
+    "roles": "תפקידים",
+    "roleDetails": "פרטי תפקיד",
+    "users": "משתמשים",
+    "admin": "לוח בקרה למנהל",
+    "catalog": "קטלוג"
+  },
+  "navbar": {
+    "login": "התחבר",
+    "signup": "הרשמה",
+    "catalog": "קטלוג",
+    "explore": "תוכנות",
+    "development": "תחומים",
+    "design": "עיצוב פנים",
+    "marketing": "הדמיות",
+    "dropdowns": {
+      "disciplines": {
+        "architecture": "אדריכלות",
+        "interiorDesign": "עיצוב פנים",
+        "landscape": "אדריכלות נוף"
+      },
+      "software": {
+        "revit": "Revit",
+        "autocad": "AutoCAD",
+        "lumionVray": "Lumion ו-V-Ray"
+      }
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "לוח בקרה למנהל",
+      "subtitle": "סקירה וניהול של הפלטפורמה",
+      "usersCard": {
+        "title": "ניהול משתמשים",
+        "description": "ניהול תפקידי משתמשים והרשאות"
+      },
+      "rolesCard": {
+        "title": "ניהול תפקידים",
+        "description": "הגדרה והגדרת תפקידי אבטחה"
+      }
+    }
+  },
+  "authManagement": {
+    "roles": {
+      "title": "תפקידים",
+      "subtitle": "ניהול תפקידי אבטחה והרשאות",
+      "noRoles": "לא נמצאו תפקידים",
+      "userCount": "משתמש",
+      "userCount_plural": "משתמשים",
+      "permissionCount": "הרשאה",
+      "permissionCount_plural": "הרשאות",
+      "permissions": "הרשאות",
+      "backToRoles": "חזרה לתפקידים",
+      "managePermissions": "ניהול הרשאות",
+      "noPermissions": "אין הרשאות מוקצות",
+      "viewAllPermissions": "צפה ב-{{count}} הרשאות",
+      "roleDetails": "פרטי תפקיד",
+      "roleNotFound": "תפקיד לא נמצא"
+    },
+    "users": {
+      "title": "ניהול משתמשים",
+      "subtitle": "ניהול תפקידי משתמשים והרשאות",
+      "noUsers": "לא נמצאו משתמשים במערכת",
+      "searchPlaceholder": "חפש משתמשים לפי שם, אימייל או תפקיד...",
+      "clearSearch": "נקה חיפוש",
+      "showingUsers": "מציג {{count}} מתוך {{total}} משתמשים",
+      "table": {
+        "name": "שם",
+        "email": "אימייל",
+        "assignedRoles": "תפקידים מוקצים",
+        "actions": "פעולות",
+        "noRoles": "אין תפקידים",
+        "edit": "ערוך"
+      },
+      "drawer": {
+        "editUser": "ערוך משתמש",
+        "userInfo": "פרטי משתמש",
+        "name": "שם",
+        "email": "אימייל",
+        "assignedRoles": "תפקידים מוקצים",
+        "loadingRoles": "טוען תפקידים...",
+        "selectRoles": "בחר תפקידים...",
+        "saving": "שומר שינויים...",
+        "permissions": "הרשאות",
+        "noPermissions": "אין הרשאות ישירות מוקצות"
+      },
+      "permissions": {
+        "title": "הרשאות פרטניות",
+        "subtitle": "הרשאות ספציפיות למשתמש גוברות על הרשאות תפקיד",
+        "addPermission": "+ הוסף הרשאה",
+        "noPermissions": "אין הרשאות פרטניות מוקצות למשתמש זה",
+        "failedToLoad": "נכשל בטעינת נתוני משתמש: {{message}}",
+        "removeTitle": "הסר הרשאה",
+        "removeMessage": "האם אתה בטוח שברצונך להסיר הרשאה זו? פעולה זו אינה הפיכה.",
+        "remove": "הסר"
+      }
+    }
+  },
+  "pages": {
+    "course": {
+      "instructor": "מדריך",
+      "buyNow": "קנה עכשיו",
+      "addToCart": "הוסף לסל",
+      "about": "על הקורס",
+      "lessons": "שיעורים",
+      "noLessons": "אין שיעורים זמינים.",
+      "deleteCourse": "מחק קורס",
+      "addLesson": "הוסף שיעור"
+    },
+    "lesson": {
+      "description": "תיאור",
+      "deleteLesson": "מחק שיעור"
+    }
+  },
+  "modals": {
+    "addPermission": {
+      "title": "הוסף הרשאה",
+      "effect": "אפקט",
+      "action": "פעולה",
+      "actionPlaceholder": "לדוגמה: Read, Write, Delete",
+      "resource": "משאב",
+      "resourcePlaceholder": "לדוגמה: Course, User, Order",
+      "resourceId": "מזהה משאב",
+      "resourceIdPlaceholder": "* עבור הכל, או מזהה ספציפי",
+      "cancel": "ביטול",
+      "submit": "הוסף הרשאה",
+      "submitLoading": "מוסיף..."
+    },
+    "addRole": {
+      "title": "הוסף תפקיד",
+      "roleName": "שם התפקיד",
+      "roleNamePlaceholder": "לדוגמה: Admin, Instructor, Student",
+      "cancel": "ביטול",
+      "submit": "הוסף תפקיד",
+      "submitLoading": "מוסיף..."
+    },
+    "confirmation": {
+      "cancel": "ביטול",
+      "loading": "מעבד..."
+    },
+    "editProfile": {
+      "title": "ערוך פרופיל",
+      "firstName": "שם פרטי",
+      "firstNamePlaceholder": "הכנס את שמך הפרטי",
+      "lastName": "שם משפחה",
+      "lastNamePlaceholder": "הכנס את שם המשפחה שלך",
+      "phone": "מספר טלפון",
+      "phonePlaceholder": "+972 501234567",
+      "dob": "תאריך לידה",
+      "cancel": "ביטול",
+      "submit": "שמור שינויים",
+      "submitLoading": "שומר...",
+      "success": "הפרופיל עודכן בהצלחה!",
+      "validation": {
+        "phoneFormat": "מספר הטלפון חייב להיות בפורמט: +<קידומת מדינה> <מספר> (לדוגמה: \"+972 501234567\")"
+      }
+    }
+  },
+  "landing": {
+    "hero": {
+      "badge": "קורסי Revit ו-Lumion חדשים",
+      "title": "שלטו באדריכלות ועיצוב עם",
+      "subtitle": "גשרו על הפער בין תאוריה עיצובית לשליטה טכנית. למדו Revit, AutoCAD, Lumion ועוד ממומחים בתעשייה.",
+      "getStarted": "התחל ללמוד",
+      "viewCatalog": "צפה בקטלוג"
+    },
+    "stats": {
+      "courses": "קורסים",
+      "students": "אדריכלים ומעצבים",
+      "instructors": "מנהלי BIM",
+      "rating": "דירוג ממוצע"
+    },
+    "features": {
+      "title": "נבנה עבור תעשיית ה-AEC",
+      "subtitle": "הכשרה מיוחדת לאדריכלים, מהנדסים ואנשי בנייה.",
+      "globalCommunity": {
+        "title": "קהילת עיצוב",
+        "description": "התחברו לאדריכלים ומעצבים מכל העולם. שתפו Families, פרטים וטכניקות רינדור."
+      },
+      "expertContent": {
+        "title": "סטנדרטים בתעשייה",
+        "description": "קורסים המכסים תקני ISO 19650, חוקי בנייה מקומיים ותהליכי עבודה מתקדמים ב-BIM."
+      },
+      "fastLearning": {
+        "title": "למידה מבוססת פרויקטים",
+        "description": "למדו דרך יצירת פרויקטים אמיתיים כמו מגדלים, וילות מגורים ומבנים פרמטריים."
+      },
+      "certificates": {
+        "title": "תעודות",
+        "description": "הרוויחו תעודות לאימות המיומנויות שלכם בפני משרדים ולקוחות."
+      },
+      "securePlatform": {
+        "title": "פלטפורמה מאובטחת",
+        "description": "גשו לקבצי הפרויקט ולהיסטוריית ההכשרה שלכם בצורה מאובטחת מכל מקום."
+      }
+    },
+    "about": {
+      "title": "מהשרטוט למציאות",
+      "description": "עולם האדריכלות משתנה. הכלים הופכים למורכבים יותר, אך לוחות הזמנים מתקצרים. CourseHub מספקת את היתרון הטכני שאתם צריכים—בין אם זה מעבר מדו-ממד ל-BIM, יצירת הדמיות ריאליסטיות, או אוטומציה עם סקריפטים ויזואליים.",
+      "points": {
+        "curriculum": "תהליכי עבודה ל-Revit, Rhino ו-AutoCAD",
+        "projects": "צרו הדמיות וגיליונות לתיק העבודות",
+        "mentorship": "למדו מאדריכלים ומנהלי BIM מנוסים",
+        "community": "שיתוף משאבים עבור טקסטורות ואובייקטים"
+      },
+      "readStory": "החזון שלנו"
+    },
+    "showcase": {
+      "title": "המחישו את העתיד",
+      "subtitle": "שלטו בכלים המעצבים את הסביבה הבנויה.",
+      "categories": {
+        "interactive": "מידול BIM",
+        "guidance": "פוטו-ריאליזם",
+        "community": "תכנון פרמטרי",
+        "achievement": "מסמכי ביצוע"
+      }
+    }
+  },
+  "footer": {
+    "product": "פלטפורמה",
+    "resources": "משאבים",
+    "company": "חברה",
+    "legal": "משפטי",
+    "links": {
+      "courses": "קורסים",
+      "pricing": "מחירים",
+      "enterprise": "למשרדים",
+      "successStories": "סיפורי הצלחה",
+      "blog": "בלוג עיצוב",
+      "documentation": "מדריכים",
+      "community": "פורום",
+      "helpCenter": "תמיכה",
+      "aboutUs": "עלינו",
+      "careers": "קריירה",
+      "contact": "צור קשר",
+      "partners": "שותפים",
+      "privacyPolicy": "מדיניות פרטיות",
+      "termsOfService": "תנאי שימוש",
+      "cookiePolicy": "מדיניות עוגיות",
+      "accessibility": "נגישות",
+      "sitemap": "מפת אתר"
+    },
+    "rightsReserved": "CourseHub Inc. כל הזכויות שמורות."
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "catalog": {
+    "title": "Course Catalog",
+    "subtitle": "Explore our curated collection of architectural and engineering courses.",
+    "filters": "Filters",
+    "addCourse": "Add Course",
+    "all": "All",
+    "noCourses": "No courses found in this category.",
+    "errorLoading": "Error loading courses: {{message}}"
+  },
+  "card": {
+    "published": "Published",
+    "draft": "Draft",
+    "lessonsCount": "{{count}} lesson",
+    "lessonsCount_plural": "{{count}} lessons"
+  },
+  "detail": {
+    "instructor": "Instructor",
+    "buyNow": "Buy Now",
+    "addToCart": "Add to Cart",
+    "about": "About This Course",
+    "lessons": "Lessons",
+    "noLessons": "No lessons available.",
+    "addLesson": "Add Lesson",
+    "edit": "Edit",
+    "delete": "Delete Course",
+    "notFound": "Course not found"
+  },
+  "addDialog": {
+    "title": "Add New Course",
+    "description": "Create a new course. Fill in the details below.",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Enter course title",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Enter course description",
+    "cancel": "Cancel",
+    "submit": "Create Course",
+    "submitting": "Creating...",
+    "successMessage": "Course created successfully!",
+    "errorMessage": "Failed to create course: {{message}}",
+    "validationError": "Please enter a course title"
+  },
+  "actions": {
+    "editNotImplemented": "Edit course functionality not implemented yet",
+    "deleteNotImplemented": "Delete course functionality not implemented yet"
+  }
+}
