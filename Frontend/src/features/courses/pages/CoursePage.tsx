@@ -1,15 +1,28 @@
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useCourse } from "@/features/courses";
-import { Card, CardHeader, CardTitle, CardContent, Skeleton, BreadcrumbNav } from "@/components";
+import { useCourse, usePatchCourse } from "@/features/courses";
+import { Card, CardHeader, CardTitle, CardContent, Skeleton, BreadcrumbNav, InlineEditableTextarea } from "@/components";
 import { motion } from "framer-motion";
 import { CourseHeader } from "../components/CourseHeader";
 import { CourseLessonsSection } from "../components/CourseLessonsSection";
+import { toast } from "sonner";
+import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
 
 export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
   const { data: course, isLoading, error } = useCourse(id);
+  const patchCourse = usePatchCourse(id!);
   const { t, i18n } = useTranslation(['courses', 'translation']);
+
+  const handleDescriptionUpdate = async (newDescription: string) => {
+    try {
+      await patchCourse.mutateAsync({ description: newDescription });
+      toast.success(t('courses:detail.descriptionUpdated'));
+    } catch (error) {
+      toast.error(t('courses:detail.descriptionUpdateFailed'));
+      throw error;
+    }
+  };
 
   if (isLoading) {
     return (
@@ -106,16 +119,32 @@ export default function CoursePage() {
           <CourseHeader course={course} />
         </motion.div>
 
-        {course.description && (
+        {(course.description || id) && (
           <motion.div variants={item}>
             <Card>
               <CardHeader>
                 <CardTitle>{t('courses:detail.about')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground" dir="auto">
-                  {course.description}
-                </p>
+                <Authorized
+                  action={ActionType.Update}
+                  resource={ResourceType.Course}
+                  resourceId={ResourceId.create(course.id)}
+                  fallback={
+                    <p className="text-muted-foreground" dir="auto">
+                      {course.description || t('courses:detail.noDescription')}
+                    </p>
+                  }
+                >
+                  <InlineEditableTextarea
+                    value={course.description || ""}
+                    onSave={handleDescriptionUpdate}
+                    displayClassName="text-muted-foreground"
+                    placeholder={t('courses:detail.enterDescription')}
+                    rows={5}
+                    maxLength={2000}
+                  />
+                </Authorized>
               </CardContent>
             </Card>
           </motion.div>

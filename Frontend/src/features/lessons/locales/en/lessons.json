@@ -23,6 +23,13 @@
   },
   "actions": {
     "editNotImplemented": "Edit lesson functionality not implemented yet",
-    "deleteNotImplemented": "Delete lesson functionality not implemented yet"
+    "deleteNotImplemented": "Delete lesson functionality not implemented yet",
+    "enterTitle": "Enter lesson title...",
+    "enterDescription": "Enter lesson description...",
+    "noDescription": "No description available",
+    "titleUpdated": "Lesson title updated successfully",
+    "titleUpdateFailed": "Failed to update lesson title",
+    "descriptionUpdated": "Lesson description updated successfully",
+    "descriptionUpdateFailed": "Failed to update lesson description"
   }
 }

@@ -1,0 +1,136 @@
+import { useState, useRef, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Edit2, Check, X } from "lucide-react";
+import { cn } from "@/utils/utils";
+
+interface InlineEditableTextProps {
+  value: string;
+  onSave: (newValue: string) => Promise<void>;
+  className?: string;
+  inputClassName?: string;
+  displayClassName?: string;
+  placeholder?: string;
+  canEdit?: boolean;
+  maxLength?: number;
+}
+
+export function InlineEditableText({
+  value,
+  onSave,
+  className,
+  inputClassName,
+  displayClassName,
+  placeholder = "Enter text...",
+  canEdit = true,
+  maxLength,
+}: InlineEditableTextProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(value);
+  const [isSaving, setIsSaving] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setEditValue(value);
+  }, [value]);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleSave = async () => {
+    if (editValue.trim() === "" || editValue === value) {
+      setIsEditing(false);
+      setEditValue(value);
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await onSave(editValue.trim());
+      setIsEditing(false);
+    } catch (error) {
+      // Error is handled by the caller (toast notification)
+      setEditValue(value); // Revert on error
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditValue(value);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      handleCancel();
+    }
+  };
+
+  if (!canEdit) {
+    return <span className={cn(displayClassName)}>{value || placeholder}</span>;
+  }
+
+  if (!isEditing) {
+    return (
+      <div className={cn("group flex items-center gap-2", className)}>
+        <span className={cn("flex-1", displayClassName)} dir="auto">
+          {value || placeholder}
+        </span>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={() => setIsEditing(true)}
+          title="Edit"
+        >
+          <Edit2 className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("flex items-center gap-2", className)}>
+      <Input
+        ref={inputRef}
+        value={editValue}
+        onChange={(e) => setEditValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onBlur={handleSave}
+        className={cn(inputClassName)}
+        placeholder={placeholder}
+        disabled={isSaving}
+        maxLength={maxLength}
+      />
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-8 w-8 p-0 text-green-600 hover:text-green-700"
+        onClick={handleSave}
+        disabled={isSaving}
+        title="Save"
+      >
+        <Check className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+        onClick={handleCancel}
+        disabled={isSaving}
+        title="Cancel"
+      >
+        <X className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+}

@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { Lesson as LessonType } from "../types/Lesson";
-import { Card, CardContent, Badge, Button } from "@/components";
-import { Clock, PlayCircle, Edit, Trash2 } from "lucide-react";
+import { Card, CardContent, Badge, Button, InlineEditableText } from "@/components";
+import { Clock, PlayCircle, Trash2 } from "lucide-react";
 import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
+import { usePatchLesson } from "../hooks/use-lessons";
 import { toast } from "sonner";
 
 interface LessonProps {
@@ -14,6 +15,7 @@ interface LessonProps {
 export default function Lesson({ lesson, index }: LessonProps) {
   const navigate = useNavigate();
   const { t } = useTranslation(['lessons', 'translation']);
+  const patchLesson = usePatchLesson(lesson.id, lesson.courseId);
 
   const formatDuration = (duration: string | null | undefined) => {
     if (!duration) return null;
@@ -35,14 +37,29 @@ export default function Lesson({ lesson, index }: LessonProps) {
     navigate(`/lessons/${lesson.id}`);
   };
 
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toast.info(t('lessons:actions.editNotImplemented'));
-  };
-
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     toast.info(t('lessons:actions.deleteNotImplemented'));
+  };
+
+  const handleTitleUpdate = async (newTitle: string) => {
+    try {
+      await patchLesson.mutateAsync({ title: newTitle });
+      toast.success(t('lessons:actions.titleUpdated'));
+    } catch (error) {
+      toast.error(t('lessons:actions.titleUpdateFailed'));
+      throw error;
+    }
+  };
+
+  const handleDescriptionUpdate = async (newDescription: string) => {
+    try {
+      await patchLesson.mutateAsync({ description: newDescription });
+      toast.success(t('lessons:actions.descriptionUpdated'));
+    } catch (error) {
+      toast.error(t('lessons:actions.descriptionUpdateFailed'));
+      throw error;
+    }
   };
 
   return (
@@ -65,19 +82,57 @@ export default function Lesson({ lesson, index }: LessonProps) {
 
           <div className="flex-1 space-y-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-semibold text-base line-clamp-1">
-                {lesson.title}
-              </h3>
+              <Authorized
+                action={ActionType.Update}
+                resource={ResourceType.Lesson}
+                resourceId={ResourceId.create(lesson.id)}
+                fallback={
+                  <h3 className="font-semibold text-base line-clamp-1">
+                    {lesson.title}
+                  </h3>
+                }
+              >
+                <div onClick={(e) => e.stopPropagation()} className="flex-1">
+                  <InlineEditableText
+                    value={lesson.title}
+                    onSave={handleTitleUpdate}
+                    displayClassName="font-semibold text-base"
+                    inputClassName="font-semibold text-base"
+                    placeholder={t('lessons:actions.enterTitle')}
+                    maxLength={200}
+                  />
+                </div>
+              </Authorized>
               {lesson.isPreview && (
                 <Badge variant="secondary" className="text-xs">
                   {t('lessons:card.preview')}
                 </Badge>
               )}
             </div>
-            {lesson.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {lesson.description}
-              </p>
+            {(lesson.description || lesson.description === "") && (
+              <Authorized
+                action={ActionType.Update}
+                resource={ResourceType.Lesson}
+                resourceId={ResourceId.create(lesson.id)}
+                fallback={
+                  lesson.description ? (
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {lesson.description}
+                    </p>
+                  ) : null
+                }
+              >
+                <div onClick={(e) => e.stopPropagation()}>
+                  <InlineEditableText
+                    value={lesson.description || ""}
+                    onSave={handleDescriptionUpdate}
+                    displayClassName="text-sm text-muted-foreground line-clamp-2"
+                    inputClassName="text-sm"
+                    placeholder={t('lessons:actions.enterDescription')}
+                    maxLength={500}
+                  />
+                </div>
+              </Authorized>
             )}
           </div>
 
@@ -89,21 +144,6 @@ export default function Lesson({ lesson, index }: LessonProps) {
               </div>
             )}
             <div className="flex gap-1">
-              <Authorized 
-                action={ActionType.Update} 
-                resource={ResourceType.Lesson}
-                resourceId={ResourceId.create(lesson.id)}
-              >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0"
-                  onClick={handleEdit}
-                  title={t('common.edit')}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-              </Authorized>
               <Authorized 
                 action={ActionType.Delete} 
                 resource={ResourceType.Lesson}

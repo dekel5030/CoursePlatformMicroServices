@@ -1,8 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { Button, Card } from "@/components";
+import { Button, Card, InlineEditableText } from "@/components";
 import { ShoppingCart, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
 import { CourseActions } from "./CourseActions";
+import { usePatchCourse } from "../hooks/use-courses";
+import { toast } from "sonner";
+import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
 import type { Course } from "../types";
 
 interface CourseHeaderProps {
@@ -11,6 +14,17 @@ interface CourseHeaderProps {
 
 export function CourseHeader({ course }: CourseHeaderProps) {
   const { t } = useTranslation(['courses', 'translation']);
+  const patchCourse = usePatchCourse(course.id);
+
+  const handleTitleUpdate = async (newTitle: string) => {
+    try {
+      await patchCourse.mutateAsync({ title: newTitle });
+      toast.success(t('courses:detail.titleUpdated'));
+    } catch (error) {
+      toast.error(t('courses:detail.titleUpdateFailed'));
+      throw error;
+    }
+  };
 
   return (
     <Card className="overflow-hidden">
@@ -30,9 +44,25 @@ export function CourseHeader({ course }: CourseHeaderProps) {
         <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between items-start gap-2">
-              <h1 className="text-3xl font-bold" dir="auto">
-                {course.title}
-              </h1>
+              <Authorized
+                action={ActionType.Update}
+                resource={ResourceType.Course}
+                resourceId={ResourceId.create(course.id)}
+                fallback={
+                  <h1 className="text-3xl font-bold" dir="auto">
+                    {course.title}
+                  </h1>
+                }
+              >
+                <InlineEditableText
+                  value={course.title}
+                  onSave={handleTitleUpdate}
+                  displayClassName="text-3xl font-bold"
+                  inputClassName="text-3xl font-bold"
+                  placeholder={t('courses:detail.enterTitle')}
+                  maxLength={200}
+                />
+              </Authorized>
               <CourseActions courseId={course.id} />
             </div>
             <p className="text-muted-foreground">
