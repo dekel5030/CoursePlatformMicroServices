@@ -1,5 +1,4 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
@@ -34,7 +33,6 @@ internal class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
             return Result.Failure(CourseErrors.NotFound);
         }
 
-        // Apply updates only for non-null fields
         if (request.Title is not null)
         {
             var titleResult = course.UpdateTitle(new Title(request.Title), _timeProvider);
@@ -62,7 +60,6 @@ internal class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
             }
         }
 
-        // Validate price update: both amount and currency must be provided together
         if ((request.PriceAmount.HasValue) != (request.PriceCurrency is not null))
         {
             return Result.Failure(Error.Validation(

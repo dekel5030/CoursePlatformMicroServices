@@ -8,5 +8,4 @@ public record PatchCourseCommand(
     string? Description,
     Guid? InstructorId,
     decimal? PriceAmount,
-    string? PriceCurrency)
-        : ICommand;
+    string? PriceCurrency) : ICommand;

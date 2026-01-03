@@ -4,6 +4,7 @@ using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.PatchLesson;
 using Kernel;
 using Kernel.Messaging.Abstractions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Courses.Api.Endpoints.Lessons;
 
@@ -12,10 +13,7 @@ public class PatchLesson : IEndpoint
     public record PatchLessonRequest(
         string? Title,
         string? Description,
-        string? Access,
-        string? ThumbnailImageUrl,
-        string? VideoUrl,
-        TimeSpan? Duration);
+        string? Access);
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -28,10 +26,7 @@ public class PatchLesson : IEndpoint
                 id,
                 request.Title,
                 request.Description,
-                request.Access,
-                request.ThumbnailImageUrl,
-                request.VideoUrl,
-                request.Duration);
+                request.Access);
 
             Result result = await mediator.Send(command);
 
@@ -39,11 +34,9 @@ public class PatchLesson : IEndpoint
                 () => Results.NoContent(),
                 CustomResults.Problem);
         })
-        .WithName(nameof(PatchLesson))
-        .WithTags(Tags.Lessons)
-        .WithSummary("Partially updates a lesson with only the fields provided.")
-        .Produces(StatusCodes.Status204NoContent)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status404NotFound);
+        .WithMetadata<EmptyResult>(
+            nameof(PatchLesson), 
+            Tags.Lessons, 
+            "Partially updates a lesson with only the fields provided.");
     }
 }

@@ -32,7 +32,6 @@ internal class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
             return Result.Failure(LessonErrors.NotFound);
         }
 
-        // Apply updates only for non-null fields
         if (request.Title is not null)
         {
             var titleResult = lesson.SetTitle(new Title(request.Title));
@@ -64,46 +63,6 @@ internal class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
             else
             {
                 return Result.Failure(Error.Validation("Lesson.InvalidAccess", "Invalid lesson access value."));
-            }
-        }
-
-        if (request.ThumbnailImageUrl is not null)
-        {
-            try
-            {
-                var thumbnailResult = lesson.SetThumbnailImage(ImageUrl.Create(request.ThumbnailImageUrl));
-                if (thumbnailResult.IsFailure)
-                {
-                    return thumbnailResult;
-                }
-            }
-            catch (ArgumentException ex)
-            {
-                return Result.Failure(Error.Validation("Lesson.InvalidThumbnailUrl", ex.Message));
-            }
-        }
-
-        // Validate video update: both URL and duration must be provided together
-        if ((request.VideoUrl is not null) != (request.Duration.HasValue))
-        {
-            return Result.Failure(Error.Validation(
-                "Lesson.IncompleteVideoUpdate", 
-                "Both video URL and duration must be provided together."));
-        }
-
-        if (request.VideoUrl is not null && request.Duration.HasValue)
-        {
-            try
-            {
-                var videoResult = lesson.UpdateVideoData(VideoUrl.Create(request.VideoUrl), request.Duration.Value);
-                if (videoResult.IsFailure)
-                {
-                    return videoResult;
-                }
-            }
-            catch (ArgumentException ex)
-            {
-                return Result.Failure(Error.Validation("Lesson.InvalidVideoUrl", ex.Message));
             }
         }
 
