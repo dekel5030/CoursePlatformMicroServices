@@ -83,8 +83,16 @@ internal class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
             }
         }
 
-        if (request.VideoUrl is not null && request.Duration.HasValue)
+        // Validate video update: both URL and duration must be provided together
+        if (request.VideoUrl is not null || request.Duration.HasValue)
         {
+            if (request.VideoUrl is null || !request.Duration.HasValue)
+            {
+                return Result.Failure(Error.Validation(
+                    "Lesson.IncompleteVideoUpdate", 
+                    "Both video URL and duration must be provided together."));
+            }
+
             try
             {
                 var videoResult = lesson.UpdateVideoData(VideoUrl.Create(request.VideoUrl), request.Duration.Value);
