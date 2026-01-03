@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useCourses } from "@/features/courses";
+import { useFeaturedCourses } from "@/features/courses";
 import { BreadcrumbNav } from "@/components";
 import { CatalogHeader } from "../components/CatalogHeader";
 import { CategoryFilter } from "../components/CategoryFilter";
@@ -9,7 +9,7 @@ import { CourseGrid } from "../components/CourseGrid";
 export default function CourseCatalogPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { t } = useTranslation(["courses", "translation"]);
-  const { data: courses = [], isLoading, error } = useCourses();
+  const { data: courses = [], isLoading, error } = useFeaturedCourses();
 
   const categories = useMemo(() => {
     const set = new Set<string>();

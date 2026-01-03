@@ -11,7 +11,7 @@ export const coursesQueryKeys = {
 } as const;
 
 // Course Queries
-export function useCourses() {
+export function useFeaturedCourses() {
   return useQuery<Course[], Error>({
     queryKey: coursesQueryKeys.featured(),
     queryFn: fetchFeaturedCourses,
