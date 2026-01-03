@@ -69,19 +69,33 @@ internal class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
 
         if (request.ThumbnailImageUrl is not null)
         {
-            var thumbnailResult = lesson.SetThumbnailImage(ImageUrl.Create(request.ThumbnailImageUrl));
-            if (thumbnailResult.IsFailure)
+            try
             {
-                return thumbnailResult;
+                var thumbnailResult = lesson.SetThumbnailImage(ImageUrl.Create(request.ThumbnailImageUrl));
+                if (thumbnailResult.IsFailure)
+                {
+                    return thumbnailResult;
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return Result.Failure(Error.Validation("Lesson.InvalidThumbnailUrl", ex.Message));
             }
         }
 
         if (request.VideoUrl is not null && request.Duration.HasValue)
         {
-            var videoResult = lesson.UpdateVideoData(VideoUrl.Create(request.VideoUrl), request.Duration.Value);
-            if (videoResult.IsFailure)
+            try
             {
-                return videoResult;
+                var videoResult = lesson.UpdateVideoData(VideoUrl.Create(request.VideoUrl), request.Duration.Value);
+                if (videoResult.IsFailure)
+                {
+                    return videoResult;
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return Result.Failure(Error.Validation("Lesson.InvalidVideoUrl", ex.Message));
             }
         }
 
