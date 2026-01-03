@@ -6,9 +6,9 @@ import { CatalogHeader } from "../components/CatalogHeader";
 import { CategoryFilter } from "../components/CategoryFilter";
 import { CourseGrid } from "../components/CourseGrid";
 
-export default function HomePage() {
+export default function CourseCatalogPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { t } = useTranslation(['courses', 'translation']);
+  const { t } = useTranslation(["courses", "translation"]);
   const { data: courses = [], isLoading, error } = useCourses();
 
   const categories = useMemo(() => {
@@ -33,14 +33,18 @@ export default function HomePage() {
         <CatalogHeader />
 
         <div className="space-y-8">
-          <CategoryFilter 
+          <CategoryFilter
             categories={categories}
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
           />
 
           <main>
-            <CourseGrid courses={filtered} isLoading={isLoading} error={error} />
+            <CourseGrid
+              courses={filtered}
+              isLoading={isLoading}
+              error={error}
+            />
           </main>
         </div>
       </div>
