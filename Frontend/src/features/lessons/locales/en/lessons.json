@@ -1,4 +1,7 @@
 {
+  "card": {
+    "preview": "Preview"
+  },
   "detail": {
     "description": "Description",
     "notFound": "Lesson not found",

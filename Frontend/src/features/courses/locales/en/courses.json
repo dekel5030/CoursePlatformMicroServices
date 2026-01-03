@@ -8,6 +8,12 @@
     "noCourses": "No courses found in this category.",
     "errorLoading": "Error loading courses: {{message}}"
   },
+  "card": {
+    "published": "Published",
+    "draft": "Draft",
+    "lessonsCount": "{{count}} lesson",
+    "lessonsCount_plural": "{{count}} lessons"
+  },
   "detail": {
     "instructor": "Instructor",
     "buyNow": "Buy Now",

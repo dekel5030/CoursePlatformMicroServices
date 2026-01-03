@@ -70,7 +70,7 @@ export default function Lesson({ lesson, index }: LessonProps) {
               </h3>
               {lesson.isPreview && (
                 <Badge variant="secondary" className="text-xs">
-                  Preview
+                  {t('lessons:card.preview')}
                 </Badge>
               )}
             </div>
@@ -99,7 +99,7 @@ export default function Lesson({ lesson, index }: LessonProps) {
                   size="sm"
                   className="h-8 w-8 p-0"
                   onClick={handleEdit}
-                  title="Edit lesson"
+                  title={t('common.edit')}
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
@@ -114,7 +114,7 @@ export default function Lesson({ lesson, index }: LessonProps) {
                   size="sm"
                   className="h-8 w-8 p-0 hover:text-destructive"
                   onClick={handleDelete}
-                  title="Delete lesson"
+                  title={t('common.delete')}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

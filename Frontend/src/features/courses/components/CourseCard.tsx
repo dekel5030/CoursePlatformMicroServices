@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { Course } from "../types";
 import {
   Card,
@@ -15,6 +16,8 @@ interface Props {
 }
 
 export default function CourseCard({ course }: Props) {
+  const { t } = useTranslation(['courses', 'translation']);
+
   return (
     <Link
       to={`/courses/${course.id}`}
@@ -48,7 +51,7 @@ export default function CourseCard({ course }: Props) {
               {course.price.amount} {course.price.currency}
             </div>
             <Badge variant={course.isPublished ? "default" : "secondary"}>
-              {course.isPublished ? "Published" : "Draft"}
+              {course.isPublished ? t('courses:card.published') : t('courses:card.draft')}
             </Badge>
           </div>
         </CardContent>
@@ -56,7 +59,7 @@ export default function CourseCard({ course }: Props) {
         <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <BookOpen className="h-3 w-3" />
-            {course.lessons?.length || 0} lessons
+            {t('courses:card.lessonsCount', { count: course.lessons?.length || 0 })}
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />

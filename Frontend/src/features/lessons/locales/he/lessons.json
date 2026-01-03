@@ -1,4 +1,7 @@
 {
+  "card": {
+    "preview": "תצוגה מקדימה"
+  },
   "detail": {
     "description": "תיאור",
     "notFound": "שיעור לא נמצא",

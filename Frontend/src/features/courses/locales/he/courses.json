@@ -8,6 +8,12 @@
     "noCourses": "לא נמצאו קורסים בקטגוריה זו.",
     "errorLoading": "שגיאה בטעינת קורסים: {{message}}"
   },
+  "card": {
+    "published": "פורסם",
+    "draft": "טיוטה",
+    "lessonsCount": "שיעור {{count}}",
+    "lessonsCount_plural": "{{count}} שיעורים"
+  },
   "detail": {
     "instructor": "מדריך",
     "buyNow": "קנה עכשיו",
