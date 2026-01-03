@@ -1,15 +1,15 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useCourses } from "@/features/courses";
+import { useFeaturedCourses } from "@/features/courses";
 import { BreadcrumbNav } from "@/components";
 import { CatalogHeader } from "../components/CatalogHeader";
 import { CategoryFilter } from "../components/CategoryFilter";
 import { CourseGrid } from "../components/CourseGrid";
 
-export default function HomePage() {
+export default function CourseCatalogPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { t } = useTranslation(['courses', 'translation']);
-  const { data: courses = [], isLoading, error } = useCourses();
+  const { t } = useTranslation(["courses", "translation"]);
+  const { data: courses = [], isLoading, error } = useFeaturedCourses();
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -33,14 +33,18 @@ export default function HomePage() {
         <CatalogHeader />
 
         <div className="space-y-8">
-          <CategoryFilter 
+          <CategoryFilter
             categories={categories}
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
           />
 
           <main>
-            <CourseGrid courses={filtered} isLoading={isLoading} error={error} />
+            <CourseGrid
+              courses={filtered}
+              isLoading={isLoading}
+              error={error}
+            />
           </main>
         </div>
       </div>

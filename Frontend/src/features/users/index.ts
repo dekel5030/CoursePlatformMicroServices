@@ -4,9 +4,8 @@ export { default as UserProfilePage } from "./pages/UserProfilePage";
 // Components
 export * from "./components";
 
-// Hooks
-export { useUser } from "./hooks/useUser";
-export { useUpdateUser } from "./hooks/useUpdateUser";
+// Hooks - Consolidated data access with centralized query keys
+export { useUser, useUpdateUser, usersQueryKeys } from "./hooks/use-users";
 
 // API
 export * from "./api";

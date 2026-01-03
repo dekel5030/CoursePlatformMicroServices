@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { Layout } from "@/components";
-import { HomePage, CoursePage } from "@/features/courses";
+import { CourseCatalogPage, CoursePage } from "@/features/courses";
 import { LessonPage } from "@/features/lessons";
 import { UserProfilePage } from "@/features/users";
 import { LandingPage } from "@/features/landing";
@@ -18,7 +18,7 @@ export default function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
 
       <Route element={<Layout />}>
-        <Route path="/catalog" element={<HomePage />} />
+        <Route path="/catalog" element={<CourseCatalogPage />} />
         <Route path="/courses/:id" element={<CoursePage />} />
         <Route path="/lessons/:id" element={<LessonPage />} />
         <Route path="/users/:id" element={<UserProfilePage />} />

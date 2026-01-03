@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCreateLesson } from "../hooks/useLessons";
+import { useCreateLesson } from "@/features/lessons";
 
 interface AddLessonDialogProps {
   courseId: string;

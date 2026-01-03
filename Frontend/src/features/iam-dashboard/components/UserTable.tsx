@@ -18,7 +18,7 @@ import {
   TableCell,
 } from "@/components";
 import { Badge, Input, Button } from "@/components";
-import type { UserDto } from "../../types/UserDto";
+import type { UserDto } from "../types/UserDto";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 
