@@ -1,0 +1,25 @@
+{
+  "detail": {
+    "description": "תיאור",
+    "notFound": "שיעור לא נמצא",
+    "delete": "מחק שיעור"
+  },
+  "addDialog": {
+    "title": "הוסף שיעור חדש",
+    "description": "צור שיעור חדש לקורס זה. מלא את הפרטים למטה.",
+    "titleLabel": "כותרת",
+    "titlePlaceholder": "הכנס כותרת שיעור",
+    "descriptionLabel": "תיאור",
+    "descriptionPlaceholder": "הכנס תיאור שיעור",
+    "cancel": "ביטול",
+    "submit": "צור שיעור",
+    "submitting": "יוצר...",
+    "successMessage": "שיעור נוצר בהצלחה!",
+    "errorMessage": "נכשל ביצירת שיעור: {{message}}",
+    "validationError": "נא להזין כותרת שיעור"
+  },
+  "actions": {
+    "editNotImplemented": "פונקציית עריכת שיעור טרם מומשה",
+    "deleteNotImplemented": "פונקציית מחיקת שיעור טרם מומשה"
+  }
+}
