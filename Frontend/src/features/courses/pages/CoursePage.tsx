@@ -119,7 +119,8 @@ export default function CoursePage() {
           <CourseHeader course={course} />
         </motion.div>
 
-        {(course.description || id) && (
+        {/* Always show description section to allow adding description if empty */}
+        {id && (
           <motion.div variants={item}>
             <Card>
               <CardHeader>
@@ -131,9 +132,15 @@ export default function CoursePage() {
                   resource={ResourceType.Course}
                   resourceId={ResourceId.create(course.id)}
                   fallback={
-                    <p className="text-muted-foreground" dir="auto">
-                      {course.description || t('courses:detail.noDescription')}
-                    </p>
+                    course.description ? (
+                      <p className="text-muted-foreground" dir="auto">
+                        {course.description}
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground italic">
+                        {t('courses:detail.noDescription')}
+                      </p>
+                    )
                   }
                 >
                   <InlineEditableTextarea

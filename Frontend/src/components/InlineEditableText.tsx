@@ -42,15 +42,23 @@ export function InlineEditableText({
   }, [isEditing]);
 
   const handleSave = async () => {
-    if (editValue.trim() === "" || editValue === value) {
+    // Don't save if value hasn't changed
+    if (editValue === value) {
       setIsEditing(false);
-      setEditValue(value);
+      return;
+    }
+
+    // Validate non-empty after trimming
+    const trimmedValue = editValue.trim();
+    if (trimmedValue === "") {
+      setIsEditing(false);
+      setEditValue(value); // Revert to original
       return;
     }
 
     setIsSaving(true);
     try {
-      await onSave(editValue.trim());
+      await onSave(trimmedValue);
       setIsEditing(false);
     } catch {
       // Error is handled by the caller (toast notification)

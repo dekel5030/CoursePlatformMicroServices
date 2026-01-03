@@ -44,14 +44,15 @@ export function InlineEditableTextarea({
   }, [isEditing]);
 
   const handleSave = async () => {
-    if (editValue.trim() === value.trim()) {
+    // Don't save if value hasn't changed (exact comparison to preserve whitespace)
+    if (editValue === value) {
       setIsEditing(false);
-      setEditValue(value);
       return;
     }
 
     setIsSaving(true);
     try {
+      // Save with trimmed value (backend requirement)
       await onSave(editValue.trim());
       setIsEditing(false);
     } catch {

@@ -109,7 +109,8 @@ export default function Lesson({ lesson, index }: LessonProps) {
                 </Badge>
               )}
             </div>
-            {(lesson.description || lesson.description === "") && (
+            {/* Show description inline edit for authorized users, or static text if description exists */}
+            {(lesson.description !== null && lesson.description !== undefined) && (
               <Authorized
                 action={ActionType.Update}
                 resource={ResourceType.Lesson}

@@ -183,7 +183,8 @@ export default function LessonPage() {
               </div>
             </CardHeader>
 
-            {(lesson.description || id) && (
+            {/* Always show description section to allow adding description if empty */}
+            {id && (
               <CardContent>
                 <div className="space-y-2">
                   <h2 className="text-lg font-semibold">
@@ -194,12 +195,18 @@ export default function LessonPage() {
                     resource={ResourceType.Lesson}
                     resourceId={ResourceId.create(lesson.id)}
                     fallback={
-                      <p
-                        className="text-muted-foreground leading-relaxed"
-                        dir="auto"
-                      >
-                        {lesson.description || t('lessons:actions.noDescription')}
-                      </p>
+                      lesson.description ? (
+                        <p
+                          className="text-muted-foreground leading-relaxed"
+                          dir="auto"
+                        >
+                          {lesson.description}
+                        </p>
+                      ) : (
+                        <p className="text-muted-foreground italic">
+                          {t('lessons:actions.noDescription')}
+                        </p>
+                      )
                     }
                   >
                     <InlineEditableTextarea
