@@ -54,7 +54,7 @@ export function InlineEditableTextarea({
     try {
       await onSave(editValue.trim());
       setIsEditing(false);
-    } catch (error) {
+    } catch {
       // Error is handled by the caller (toast notification)
       setEditValue(value); // Revert on error
     } finally {
