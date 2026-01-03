@@ -4,7 +4,16 @@
     "logout": "Logout"
   },
   "common": {
-    "error": "Error: {{message}}"
+    "error": "Error: {{message}}",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create",
+    "update": "Update",
+    "title": "Title",
+    "description": "Description",
+    "required": "Required"
   },
   "breadcrumbs": {
     "home": "Home",

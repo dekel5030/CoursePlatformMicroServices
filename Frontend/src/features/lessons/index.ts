@@ -6,6 +6,7 @@ export { default as LessonPage } from "./pages/LessonPage";
 
 // Hooks
 export { useLesson } from "./hooks/useLesson";
+export { useCreateLesson } from "./hooks/useLessons";
 
 // API
 export * from "./api";

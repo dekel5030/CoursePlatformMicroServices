@@ -1,29 +1,15 @@
 import { useParams } from "react-router-dom";
-import { Lesson } from "@/features/lessons";
-import { useCourse } from "@/features/courses";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Skeleton,
-  BreadcrumbNav,
-} from "@/components";
-import { ShoppingCart, CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2 } from "lucide-react";
+import { useCourse } from "@/features/courses";
+import { Card, CardHeader, CardTitle, CardContent, Skeleton, BreadcrumbNav } from "@/components";
 import { motion } from "framer-motion";
+import { CourseHeader } from "../components/CourseHeader";
+import { CourseLessonsSection } from "../components/CourseLessonsSection";
 
 export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
   const { data: course, isLoading, error } = useCourse(id);
-  const { t, i18n } = useTranslation();
-
-  const canDeleteCourse = course
-    ? true //hasPermission(permissions, "Delete", "Course", course.id)
-    : false;
-  const canAddLesson = true; //hasPermission(permissions, "Create", "Lesson", "*");
+  const { t, i18n } = useTranslation(['courses', 'translation']);
 
   if (isLoading) {
     return (
@@ -78,14 +64,12 @@ export default function CoursePage() {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
-          Course not found
+          {t('courses:detail.notFound')}
         </div>
       </div>
     );
   }
 
-  // Determine content direction based on the current language or explicit field if available
-  // For now, we will use auto detection for text content
   const contentDir = i18n.dir();
 
   const breadcrumbItems = [
@@ -119,72 +103,14 @@ export default function CoursePage() {
         animate="show"
       >
         <motion.div variants={item}>
-          <Card className="overflow-hidden">
-            <div className="grid md:grid-cols-2 gap-6 p-6">
-              {course.imageUrl && (
-                <div className="relative h-64 md:h-full overflow-hidden rounded-lg">
-                  <motion.img
-                    initial={{ scale: 1.1 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                    src={course.imageUrl}
-                    alt={course.title}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              )}
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-start">
-                    <h1 className="text-3xl font-bold" dir="auto">
-                      {course.title}
-                    </h1>
-                    {canDeleteCourse && (
-                      <Button variant="destructive" size="sm" className="gap-2">
-                        <Trash2 className="h-4 w-4" />
-                        {t("pages.course.deleteCourse")}
-                      </Button>
-                    )}
-                  </div>
-                  <p className="text-muted-foreground">
-                    {t("pages.course.instructor")}:{" "}
-                    <span dir="auto">
-                      {course.instructorUserId ?? "Unknown"}
-                    </span>
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <motion.div
-                    className="flex-1"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button className="w-full gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      {t("pages.course.buyNow")}
-                    </Button>
-                  </motion.div>
-                  <motion.div
-                    className="flex-1"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button variant="outline" className="w-full gap-2">
-                      <ShoppingCart className="h-4 w-4" />
-                      {t("pages.course.addToCart")}
-                    </Button>
-                  </motion.div>
-                </div>
-              </div>
-            </div>
-          </Card>
+          <CourseHeader course={course} />
         </motion.div>
 
         {course.description && (
           <motion.div variants={item}>
             <Card>
               <CardHeader>
-                <CardTitle>{t("pages.course.about")}</CardTitle>
+                <CardTitle>{t('courses:detail.about')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground" dir="auto">
@@ -196,40 +122,7 @@ export default function CoursePage() {
         )}
 
         <motion.div variants={item}>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>{t("pages.course.lessons")}</CardTitle>
-              {canAddLesson && (
-                <Button size="sm" className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  {t("pages.course.addLesson")}
-                </Button>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {course.lessons && course.lessons.length > 0 ? (
-                course.lessons
-                  .sort((a, b) => a.order - b.order)
-                  .map((lesson, index) => (
-                    <motion.div
-                      key={lesson.id}
-                      initial={{
-                        opacity: 0,
-                        x: contentDir === "rtl" ? 10 : -10,
-                      }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <Lesson lesson={lesson} index={index} />
-                    </motion.div>
-                  ))
-              ) : (
-                <p className="text-muted-foreground text-center py-8">
-                  {t("pages.course.noLessons")}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          <CourseLessonsSection course={course} contentDir={contentDir} />
         </motion.div>
       </motion.div>
     </div>
