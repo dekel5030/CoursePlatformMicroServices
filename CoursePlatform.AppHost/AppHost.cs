@@ -21,6 +21,9 @@ var keycloak = builder.AddContainer("keycloak", "quay.io/keycloak/keycloak", "26
     .WithEnvironment("KC_SPI_EVENTS_LISTENER_HTTP_WEBHOOK_EVENTS", "REGISTER")
     .WithHttpEndpoint(port: 8080, targetPort: 8080, name: "http")
     .WithBindMount(@"C:\AspireVolumes\keycloak-data", "/opt/keycloak/data")
+    .WithBindMount(Path.Combine(builder.AppHostDirectory, "..", "infrastructure", "keycloak", "themes"), "/opt/keycloak/themes")
+    .WithEnvironment("KC_THEME_CACHE_THEMES", "false")
+    .WithEnvironment("KC_THEME_CACHE_TEMPLATES", "false")
     .WithArgs("start-dev", "--health-enabled=true", "--metrics-enabled=true")
     .WithHttpHealthCheck("/health/ready");
 
