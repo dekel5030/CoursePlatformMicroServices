@@ -26,7 +26,8 @@ export function useCreateLesson(courseId: string) {
   return useMutation({
     mutationFn: (request: CreateLessonRequest) => createLesson(courseId, request),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
+      // Invalidate the course detail to update the lessons list
+      queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(courseId) });
     },
   });
 }
@@ -39,7 +40,7 @@ export function usePatchLesson(id: string, courseId?: string) {
     onSuccess: () => {
       // Invalidate the specific lesson
       queryClient.invalidateQueries({ queryKey: lessonsQueryKeys.detail(id) });
-      // Also invalidate the course detail if courseId is provided (to update lessons list)
+      // Invalidate the course detail if courseId is provided (to update lessons list)
       if (courseId) {
         queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(courseId) });
       }
@@ -55,7 +56,7 @@ export function useDeleteLesson(courseId?: string) {
     onSuccess: () => {
       // Invalidate all lessons
       queryClient.invalidateQueries({ queryKey: lessonsQueryKeys.all });
-      // Also invalidate the course detail if courseId is provided (to update lessons list)
+      // Invalidate the course detail if courseId is provided (to update lessons list)
       if (courseId) {
         queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(courseId) });
       }

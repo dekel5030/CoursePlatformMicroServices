@@ -27,10 +27,14 @@ interface LessonProps {
 
 export default function Lesson({ lesson, index }: LessonProps) {
   const navigate = useNavigate();
-  const { t } = useTranslation(["lessons", "translation"]);
+  const { t, i18n } = useTranslation(["lessons", "translation"]);
   const patchLesson = usePatchLesson(lesson.id, lesson.courseId);
   const deleteLesson = useDeleteLesson(lesson.courseId);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  
+  // Determine text alignment based on interface locale
+  const isRTL = i18n.dir() === 'rtl';
+  const textAlignClass = isRTL ? 'text-right' : 'text-left';
 
   const formatDuration = (duration: string | null | undefined) => {
     if (!duration) return null;
@@ -113,14 +117,14 @@ export default function Lesson({ lesson, index }: LessonProps) {
               {index + 1}
             </div>
 
-            <div className="flex-1 space-y-1 min-w-0">
+            <div className={`flex-1 space-y-1 min-w-0 ${textAlignClass}`}>
               <div className="flex items-center gap-2 flex-wrap">
                 <Authorized
                   action={ActionType.Update}
                   resource={ResourceType.Lesson}
                   resourceId={ResourceId.create(lesson.id)}
                   fallback={
-                    <h3 className="font-semibold text-base line-clamp-1">
+                    <h3 className={`font-semibold text-base line-clamp-1 ${textAlignClass}`} dir="auto">
                       {lesson.title}
                     </h3>
                   }
@@ -129,8 +133,8 @@ export default function Lesson({ lesson, index }: LessonProps) {
                     <InlineEditableText
                       value={lesson.title}
                       onSave={handleTitleUpdate}
-                      displayClassName="font-semibold text-base"
-                      inputClassName="font-semibold text-base"
+                      displayClassName={`font-semibold text-base ${textAlignClass}`}
+                      inputClassName={`font-semibold text-base ${textAlignClass}`}
                       placeholder={t("lessons:actions.enterTitle")}
                       maxLength={200}
                     />
@@ -151,7 +155,7 @@ export default function Lesson({ lesson, index }: LessonProps) {
                     resourceId={ResourceId.create(lesson.id)}
                     fallback={
                       lesson.description ? (
-                        <p className="text-sm text-muted-foreground line-clamp-2">
+                        <p className={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`} dir="auto">
                           {lesson.description}
                         </p>
                       ) : null
@@ -161,8 +165,8 @@ export default function Lesson({ lesson, index }: LessonProps) {
                       <InlineEditableText
                         value={lesson.description || ""}
                         onSave={handleDescriptionUpdate}
-                        displayClassName="text-sm text-muted-foreground line-clamp-2"
-                        inputClassName="text-sm"
+                        displayClassName={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`}
+                        inputClassName={`text-sm ${textAlignClass}`}
                         placeholder={t("lessons:actions.enterDescription")}
                         maxLength={500}
                       />

@@ -13,6 +13,10 @@ export default function CoursePage() {
   const { data: course, isLoading, error } = useCourse(id);
   const patchCourse = usePatchCourse(id!);
   const { t, i18n } = useTranslation(['courses', 'translation']);
+  
+  // Determine text alignment based on interface locale
+  const isRTL = i18n.dir() === 'rtl';
+  const textAlignClass = isRTL ? 'text-right' : 'text-left';
 
   const handleDescriptionUpdate = async (newDescription: string) => {
     try {
@@ -124,20 +128,20 @@ export default function CoursePage() {
           <motion.div variants={item}>
             <Card>
               <CardHeader>
-                <CardTitle>{t('courses:detail.about')}</CardTitle>
+                <CardTitle className={textAlignClass}>{t('courses:detail.about')}</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className={textAlignClass}>
                 <Authorized
                   action={ActionType.Update}
                   resource={ResourceType.Course}
                   resourceId={ResourceId.create(course.id)}
                   fallback={
                     course.description ? (
-                      <p className="text-muted-foreground" dir="auto">
+                      <p className={`text-muted-foreground ${textAlignClass}`} dir="auto">
                         {course.description}
                       </p>
                     ) : (
-                      <p className="text-muted-foreground italic">
+                      <p className={`text-muted-foreground italic ${textAlignClass}`}>
                         {t('courses:detail.noDescription')}
                       </p>
                     )
@@ -146,7 +150,7 @@ export default function CoursePage() {
                   <InlineEditableTextarea
                     value={course.description || ""}
                     onSave={handleDescriptionUpdate}
-                    displayClassName="text-muted-foreground"
+                    displayClassName={`text-muted-foreground ${textAlignClass}`}
                     placeholder={t('courses:detail.enterDescription')}
                     rows={5}
                     maxLength={2000}
