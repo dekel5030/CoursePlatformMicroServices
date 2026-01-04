@@ -5,7 +5,12 @@ import { motion } from "framer-motion";
 import { CourseActions } from "./CourseActions";
 import { usePatchCourse } from "../hooks/use-courses";
 import { toast } from "sonner";
-import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
+import {
+  Authorized,
+  ActionType,
+  ResourceType,
+  ResourceId,
+} from "@/features/auth";
 import type { Course } from "../types";
 
 interface CourseHeaderProps {
@@ -13,15 +18,15 @@ interface CourseHeaderProps {
 }
 
 export function CourseHeader({ course }: CourseHeaderProps) {
-  const { t } = useTranslation(['courses', 'translation']);
+  const { t } = useTranslation(["courses", "translation"]);
   const patchCourse = usePatchCourse(course.id);
 
   const handleTitleUpdate = async (newTitle: string) => {
     try {
       await patchCourse.mutateAsync({ title: newTitle });
-      toast.success(t('courses:detail.titleUpdated'));
+      toast.success(t("courses:detail.titleUpdated"));
     } catch (error) {
-      toast.error(t('courses:detail.titleUpdateFailed'));
+      toast.error(t("courses:detail.titleUpdateFailed"));
       throw error;
     }
   };
@@ -42,14 +47,17 @@ export function CourseHeader({ course }: CourseHeaderProps) {
           </div>
         )}
         <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex justify-between items-start gap-2">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
               <Authorized
                 action={ActionType.Update}
                 resource={ResourceType.Course}
                 resourceId={ResourceId.create(course.id)}
                 fallback={
-                  <h1 className="text-3xl font-bold" dir="auto">
+                  <h1
+                    dir="auto"
+                    className="text-3xl font-bold text-start break-words"
+                  >
                     {course.title}
                   </h1>
                 }
@@ -57,21 +65,20 @@ export function CourseHeader({ course }: CourseHeaderProps) {
                 <InlineEditableText
                   value={course.title}
                   onSave={handleTitleUpdate}
-                  displayClassName="text-3xl font-bold"
-                  inputClassName="text-3xl font-bold"
-                  placeholder={t('courses:detail.enterTitle')}
+                  displayClassName="text-3xl font-bold text-start break-words"
+                  inputClassName="text-3xl font-bold text-start"
+                  placeholder={t("courses:detail.enterTitle")}
                   maxLength={200}
+                  dir="auto"
                 />
               </Authorized>
+            </div>
+
+            <div className="flex-shrink-0 self-start">
               <CourseActions courseId={course.id} />
             </div>
-            <p className="text-muted-foreground">
-              {t('courses:detail.instructor')}:{" "}
-              <span dir="auto">
-                {course.instructorUserId ?? t('common.unknown')}
-              </span>
-            </p>
           </div>
+
           <div className="flex gap-3">
             <motion.div
               className="flex-1"
@@ -80,7 +87,7 @@ export function CourseHeader({ course }: CourseHeaderProps) {
             >
               <Button className="w-full gap-2">
                 <CreditCard className="h-4 w-4" />
-                {t('courses:detail.buyNow')}
+                {t("courses:detail.buyNow")}
               </Button>
             </motion.div>
             <motion.div
@@ -90,7 +97,7 @@ export function CourseHeader({ course }: CourseHeaderProps) {
             >
               <Button variant="outline" className="w-full gap-2">
                 <ShoppingCart className="h-4 w-4" />
-                {t('courses:detail.addToCart')}
+                {t("courses:detail.addToCart")}
               </Button>
             </motion.div>
           </div>
