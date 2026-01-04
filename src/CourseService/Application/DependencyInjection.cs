@@ -1,4 +1,5 @@
 ﻿using CoursePlatform.ServiceDefaults.Messaging;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Courses.Application;
@@ -8,6 +9,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
 
+        services.AddValidatorsFromAssembly(typeof(AssemblyMarker).Assembly);
         services.AddMediator<AssemblyMarker>();
 
         return services;
