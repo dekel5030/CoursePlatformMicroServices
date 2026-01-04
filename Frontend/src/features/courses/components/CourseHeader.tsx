@@ -69,7 +69,6 @@ export function CourseHeader({ course }: CourseHeaderProps) {
                   inputClassName="text-3xl font-bold text-start"
                   placeholder={t("courses:detail.enterTitle")}
                   maxLength={200}
-                  dir="auto"
                 />
               </Authorized>
             </div>

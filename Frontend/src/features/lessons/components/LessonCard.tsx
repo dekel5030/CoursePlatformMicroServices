@@ -9,7 +9,7 @@ import {
   Button,
   InlineEditableText,
 } from "@/components";
-import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { Clock, Trash2 } from "lucide-react";
 import {
   Authorized,

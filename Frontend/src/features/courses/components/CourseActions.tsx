@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { Edit, Trash2 } from "lucide-react";
 import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
 import { useDeleteCourse } from "../hooks/use-courses";
