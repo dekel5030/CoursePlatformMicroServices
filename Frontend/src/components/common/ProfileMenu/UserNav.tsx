@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
 // ייבוא של useAuth מהמיקום החדש (feature/auth)
 import { useAuth } from "@/features/auth";
+import { useHasRole } from "@/hooks";
 
 import {
   DropdownMenu,
@@ -18,6 +19,7 @@ export default function UserNav() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { user, signoutRedirect } = useAuth();
+  const isStaff = useHasRole(["Admin", "Instructor"]);
 
   if (!user) return null;
 
@@ -32,6 +34,10 @@ export default function UserNav() {
     } else {
       navigate(`/profile`);
     }
+  };
+
+  const handleManagementClick = () => {
+    navigate("/admin");
   };
 
   const handleLogout = async () => {
@@ -73,6 +79,13 @@ export default function UserNav() {
           <User className="mr-2 h-4 w-4" />
           <span>{t("profileMenu.profile")}</span>
         </DropdownMenuItem>
+
+        {isStaff && (
+          <DropdownMenuItem onClick={handleManagementClick}>
+            <Settings className="mr-2 h-4 w-4" />
+            <span>{t("profileMenu.management")}</span>
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuSeparator />
 

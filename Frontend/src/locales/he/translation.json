@@ -1,6 +1,7 @@
 {
   "profileMenu": {
     "profile": "דף פרופיל",
+    "management": "ניהול",
     "logout": "התנתק"
   },
   "common": {
@@ -268,5 +269,25 @@
       "sitemap": "מפת אתר"
     },
     "rightsReserved": "CourseHub Inc. כל הזכויות שמורות."
+  },
+  "management": {
+    "title": "לוח ניהול",
+    "backToLearning": "חזרה ללמידה",
+    "nav": {
+      "dashboard": "לוח בקרה",
+      "users": "ניהול משתמשים",
+      "roles": "ניהול תפקידים",
+      "courses": "ניהול קורסים",
+      "analytics": "ניתוח נתונים",
+      "enrollments": "רישומים"
+    }
+  },
+  "errors": {
+    "forbidden": {
+      "title": "403 - הגישה נדחתה",
+      "description": "אין לך הרשאה לגשת לעמוד זה. אזור זה מוגבל לחברי צוות מורשים בלבד.",
+      "goHome": "חזור לדף הבית",
+      "browseCatalog": "עיין בקטלוג"
+    }
   }
 }
