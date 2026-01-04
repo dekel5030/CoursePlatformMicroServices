@@ -23,6 +23,13 @@
   },
   "actions": {
     "editNotImplemented": "פונקציית עריכת שיעור טרם מומשה",
-    "deleteNotImplemented": "פונקציית מחיקת שיעור טרם מומשה"
+    "deleteNotImplemented": "פונקציית מחיקת שיעור טרם מומשה",
+    "enterTitle": "הכנס כותרת שיעור...",
+    "enterDescription": "הכנס תיאור שיעור...",
+    "noDescription": "אין תיאור זמין",
+    "titleUpdated": "כותרת השיעור עודכנה בהצלחה",
+    "titleUpdateFailed": "נכשל בעדכון כותרת השיעור",
+    "descriptionUpdated": "תיאור השיעור עודכן בהצלחה",
+    "descriptionUpdateFailed": "נכשל בעדכון תיאור השיעור"
   }
 }

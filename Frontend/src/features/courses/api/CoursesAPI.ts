@@ -34,3 +34,18 @@ export async function createCourse(
   );
   return { courseId: response.data.id };
 }
+
+export interface PatchCourseRequest {
+  title?: string;
+  description?: string;
+  instructorId?: string;
+  priceAmount?: number;
+  priceCurrency?: string;
+}
+
+export async function patchCourse(
+  id: string,
+  request: PatchCourseRequest
+): Promise<void> {
+  await axiosClient.patch(`/courses/${id}`, request);
+}

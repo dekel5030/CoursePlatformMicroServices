@@ -21,3 +21,16 @@ export async function createLesson(
   );
   return response.data;
 }
+
+export interface PatchLessonRequest {
+  title?: string;
+  description?: string;
+  access?: string;
+}
+
+export async function patchLesson(
+  id: string,
+  request: PatchLessonRequest
+): Promise<void> {
+  await axiosClient.patch(`/lessons/${id}`, request);
+}

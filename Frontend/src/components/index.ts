@@ -1,6 +1,10 @@
 // UI Components (Shadcn/UI)
 export * from "./ui";
 
+// Inline Editing Components
+export { InlineEditableText } from "./InlineEditableText";
+export { InlineEditableTextarea } from "./InlineEditableTextarea";
+
 // Layout Components (re-export specific ones)
 export { default as Layout } from "./layout/Layout/Layout";
 export { default as Navbar } from "./layout/Navbar/Navbar";

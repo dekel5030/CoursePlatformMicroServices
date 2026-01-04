@@ -11,6 +11,7 @@ export {
   useFeaturedCourses,
   useCourse,
   useCreateCourse,
+  usePatchCourse,
   coursesQueryKeys,
 } from "./hooks/use-courses";
 

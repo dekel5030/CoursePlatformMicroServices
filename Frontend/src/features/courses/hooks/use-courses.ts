@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchFeaturedCourses, fetchCourseById, createCourse } from "../api";
+import { fetchFeaturedCourses, fetchCourseById, createCourse, patchCourse } from "../api";
 import type { Course } from "../types";
-import type { CreateCourseRequest } from "../api";
+import type { CreateCourseRequest, PatchCourseRequest } from "../api";
 
 // Centralized Query Keys
 export const coursesQueryKeys = {
@@ -34,6 +34,19 @@ export function useCreateCourse() {
     mutationFn: (request: CreateCourseRequest) => createCourse(request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.all });
+    },
+  });
+}
+
+export function usePatchCourse(id: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (request: PatchCourseRequest) => patchCourse(id, request),
+    onSuccess: () => {
+      // Invalidate the specific course and featured courses
+      queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: coursesQueryKeys.featured() });
     },
   });
 }

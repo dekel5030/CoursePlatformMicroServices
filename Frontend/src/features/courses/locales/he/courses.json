@@ -24,7 +24,14 @@
     "addLesson": "הוסף שיעור",
     "edit": "ערוך",
     "delete": "מחק קורס",
-    "notFound": "קורס לא נמצא"
+    "notFound": "קורס לא נמצא",
+    "enterTitle": "הכנס כותרת קורס...",
+    "enterDescription": "הכנס תיאור קורס...",
+    "noDescription": "אין תיאור זמין",
+    "titleUpdated": "כותרת הקורס עודכנה בהצלחה",
+    "titleUpdateFailed": "נכשל בעדכון כותרת הקורס",
+    "descriptionUpdated": "תיאור הקורס עודכן בהצלחה",
+    "descriptionUpdateFailed": "נכשל בעדכון תיאור הקורס"
   },
   "addDialog": {
     "title": "הוסף קורס חדש",

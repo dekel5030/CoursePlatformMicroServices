@@ -24,7 +24,14 @@
     "addLesson": "Add Lesson",
     "edit": "Edit",
     "delete": "Delete Course",
-    "notFound": "Course not found"
+    "notFound": "Course not found",
+    "enterTitle": "Enter course title...",
+    "enterDescription": "Enter course description...",
+    "noDescription": "No description available",
+    "titleUpdated": "Course title updated successfully",
+    "titleUpdateFailed": "Failed to update course title",
+    "descriptionUpdated": "Course description updated successfully",
+    "descriptionUpdateFailed": "Failed to update course description"
   },
   "addDialog": {
     "title": "Add New Course",
