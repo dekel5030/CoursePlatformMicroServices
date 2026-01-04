@@ -1,22 +1,21 @@
 import { Dropdown, ProfileMenu, LanguageSwitcher } from "../../common";
 import { Button } from "../../ui";
 import { useAuth } from "react-oidc-context";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Twitter, Linkedin, Github, Facebook } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function Navbar() {
   const auth = useAuth();
+  const location = useLocation();
   const { t } = useTranslation();
 
-  const handleLoginClick = () => {
-    void auth.signinRedirect();
-  };
-
-  const handleSignUpClick = () => {
-    void auth.signinRedirect({
-      extraQueryParams: { kc_action: "register" },
-    });
+  // Build redirect URL for login/register if not on landing page
+  const getAuthRedirectUrl = () => {
+    if (location.pathname === "/" || location.pathname === "/login" || location.pathname === "/register") {
+      return "";
+    }
+    return `?redirect=${encodeURIComponent(location.pathname + location.search)}`;
   };
 
   return (
@@ -29,22 +28,24 @@ export default function Navbar() {
             <ProfileMenu />
           ) : (
             <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLoginClick}
-                className="text-xs font-medium h-8 px-3"
-              >
-                {t("navbar.login")}
-              </Button>
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleSignUpClick}
-                className="text-xs font-medium h-8 px-3"
-              >
-                {t("navbar.signup")}
-              </Button>
+              <Link to={`/login${getAuthRedirectUrl()}`}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs font-medium h-8 px-3"
+                >
+                  {t("navbar.login")}
+                </Button>
+              </Link>
+              <Link to={`/register${getAuthRedirectUrl()}`}>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="text-xs font-medium h-8 px-3"
+                >
+                  {t("navbar.signup")}
+                </Button>
+              </Link>
             </>
           )}
           <LanguageSwitcher />

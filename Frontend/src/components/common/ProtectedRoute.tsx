@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks";
 import { useHasRole } from "@/features/auth/hooks";
 
@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 
 /**
  * Component that protects routes based on user roles.
- * Redirects unauthorized users to the specified path or home page.
+ * Redirects unauthorized users to the specified path or login page.
  */
 export default function ProtectedRoute({
   children,
@@ -20,6 +20,7 @@ export default function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const hasRequiredRole = useHasRole(requiredRoles);
+  const location = useLocation();
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -33,9 +34,10 @@ export default function ProtectedRoute({
     );
   }
 
-  // Redirect to home if not authenticated
+  // Redirect to login if not authenticated, preserving the intended destination
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    const redirectUrl = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/login?redirect=${redirectUrl}`} replace />;
   }
 
   // Redirect if user doesn't have required role
