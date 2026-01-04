@@ -71,11 +71,13 @@ export function InlineEditableTextarea({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Escape") {
       e.preventDefault();
+      e.stopPropagation();
       handleCancel();
     }
     // Allow Ctrl+Enter or Cmd+Enter to save
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       e.preventDefault();
+      e.stopPropagation();
       handleSave();
     }
   };
@@ -95,7 +97,10 @@ export function InlineEditableTextarea({
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-            onClick={() => setIsEditing(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsEditing(true);
+            }}
             title="Edit"
           >
             <Edit2 className="h-4 w-4" />
@@ -122,7 +127,10 @@ export function InlineEditableTextarea({
         <Button
           variant="default"
           size="sm"
-          onClick={handleSave}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSave();
+          }}
           disabled={isSaving}
           className="gap-2"
         >
@@ -132,7 +140,10 @@ export function InlineEditableTextarea({
         <Button
           variant="outline"
           size="sm"
-          onClick={handleCancel}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCancel();
+          }}
           disabled={isSaving}
           className="gap-2"
         >

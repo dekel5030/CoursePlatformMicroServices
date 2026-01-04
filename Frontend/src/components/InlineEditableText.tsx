@@ -76,9 +76,11 @@ export function InlineEditableText({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
+      e.stopPropagation();
       handleSave();
     } else if (e.key === "Escape") {
       e.preventDefault();
+      e.stopPropagation();
       handleCancel();
     }
   };
@@ -89,7 +91,7 @@ export function InlineEditableText({
 
   if (!isEditing) {
     return (
-      <div className={cn("group flex items-center gap-2", className)}>
+      <div className={cn("group flex items-center gap-2", className)} onClick={(e) => e.stopPropagation()}>
         <span className={cn("flex-1", displayClassName)} dir="auto">
           {value || placeholder}
         </span>
@@ -129,7 +131,10 @@ export function InlineEditableText({
         variant="ghost"
         size="sm"
         className="h-8 w-8 p-0 text-green-600 hover:text-green-700"
-        onClick={handleSave}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleSave();
+        }}
         disabled={isSaving}
         title="Save"
       >
@@ -139,7 +144,10 @@ export function InlineEditableText({
         variant="ghost"
         size="sm"
         className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-        onClick={handleCancel}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleCancel();
+        }}
         disabled={isSaving}
         title="Cancel"
       >

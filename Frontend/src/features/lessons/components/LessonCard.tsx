@@ -8,7 +8,7 @@ import {
   Button,
   InlineEditableText,
 } from "@/components";
-import { Clock, PlayCircle, Trash2 } from "lucide-react";
+import { Clock, Trash2 } from "lucide-react";
 import {
   Authorized,
   ActionType,
@@ -80,6 +80,11 @@ export default function Lesson({ lesson, index }: LessonProps) {
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
+        // Prevent navigation if user is editing (inside an input field)
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+          return;
+        }
         if (e.key === "Enter" || e.key === " ") {
           handleLessonClick();
         }
@@ -103,7 +108,7 @@ export default function Lesson({ lesson, index }: LessonProps) {
                   </h3>
                 }
               >
-                <div className="flex-1">
+                <div className="flex-1" onClick={(e) => e.stopPropagation()}>
                   <InlineEditableText
                     value={lesson.title}
                     onSave={handleTitleUpdate}
@@ -135,7 +140,7 @@ export default function Lesson({ lesson, index }: LessonProps) {
                     ) : null
                   }
                 >
-                  <div>
+                  <div onClick={(e) => e.stopPropagation()}>
                     <InlineEditableText
                       value={lesson.description || ""}
                       onSave={handleDescriptionUpdate}

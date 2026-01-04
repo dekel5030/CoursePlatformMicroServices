@@ -67,7 +67,7 @@ export function AddLessonDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[525px]" dir={i18n.dir()}>
         <DialogHeader dir={i18n.dir()}>
-          <DialogTitle>{t("lessons:addDialog.title")}</DialogTitle>
+          <DialogTitle dir={i18n.dir()}>{t("lessons:addDialog.title")}</DialogTitle>
           <DialogDescription>
             {t("lessons:addDialog.description")}
           </DialogDescription>
