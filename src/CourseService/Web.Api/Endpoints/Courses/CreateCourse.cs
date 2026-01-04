@@ -13,9 +13,10 @@ public class CreateCourse : IEndpoint
     {
         app.MapPost("courses", async (
             CreateCourseCommand command,
-            IMediator mediator) =>
+            IMediator mediator,
+            CancellationToken cancellationToken) =>
         {
-            Result<CreateCourseResponse> result = await mediator.Send(command);
+            Result<CreateCourseResponse> result = await mediator.Send(command, cancellationToken);
 
             return result.Match(
                 response => Results.CreatedAtRoute(
