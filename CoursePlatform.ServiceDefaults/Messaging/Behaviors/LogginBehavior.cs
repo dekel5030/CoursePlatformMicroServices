@@ -25,7 +25,8 @@ internal class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest
         CancellationToken cancellationToken)
     {
         var requestName = typeof(TRequest).Name;
-        var userId = _userContext.Id.ToString() ?? "Anonymous";
+        string? userIdRaw = _userContext.Id.ToString();
+        string userId = string.IsNullOrEmpty(userIdRaw) ? "Anonymous" : userIdRaw;
 
         using (_logger.BeginScope(new Dictionary<string, object>
         {
