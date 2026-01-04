@@ -20,10 +20,10 @@ interface CourseHeaderProps {
 export function CourseHeader({ course }: CourseHeaderProps) {
   const { t, i18n } = useTranslation(["courses", "translation"]);
   const patchCourse = usePatchCourse(course.id);
-  
+
   // Determine text alignment based on interface locale
-  const isRTL = i18n.dir() === 'rtl';
-  const textAlignClass = isRTL ? 'text-right' : 'text-left';
+  const isRTL = i18n.dir() === "rtl";
+  const textAlignClass = isRTL ? "text-right" : "text-left";
 
   const handleTitleUpdate = async (newTitle: string) => {
     try {
@@ -60,7 +60,7 @@ export function CourseHeader({ course }: CourseHeaderProps) {
               fallback={
                 <h1
                   dir="auto"
-                  className={`text-4xl md:text-5xl font-bold break-words ${textAlignClass}`}
+                  className={`text-4xl md:text-2xl font-bold break-words ${textAlignClass}`}
                 >
                   {course.title}
                 </h1>
@@ -69,8 +69,8 @@ export function CourseHeader({ course }: CourseHeaderProps) {
               <InlineEditableText
                 value={course.title}
                 onSave={handleTitleUpdate}
-                displayClassName={`text-4xl md:text-5xl font-bold break-words ${textAlignClass}`}
-                inputClassName={`text-4xl md:text-5xl font-bold ${textAlignClass}`}
+                displayClassName={`text-4xl md:text-2xl font-bold break-words ${textAlignClass}`}
+                inputClassName={`text-4xl md:text-2xl font-bold ${textAlignClass}`}
                 placeholder={t("courses:detail.enterTitle")}
                 maxLength={200}
               />
@@ -78,7 +78,11 @@ export function CourseHeader({ course }: CourseHeaderProps) {
           </div>
 
           {/* Action Buttons */}
-          <div className={`flex items-center gap-2 ${isRTL ? 'justify-start' : 'justify-end'}`}>
+          <div
+            className={`flex items-center gap-2 ${
+              isRTL ? "justify-start" : "justify-end"
+            }`}
+          >
             <CourseActions courseId={course.id} />
           </div>
 
