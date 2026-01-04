@@ -1,4 +1,5 @@
-﻿using Kernel.Messaging.Abstractions;
+﻿using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
+using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CoursePlatform.ServiceDefaults.Messaging;
@@ -9,6 +10,7 @@ public static class MediatorExtentions
         this IServiceCollection services)
     {
         services.AddScoped<IMediator, Mediator>();
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
         services.Scan(selector => 
             selector
@@ -20,6 +22,7 @@ public static class MediatorExtentions
                     publicOnly: false)
                 .AsImplementedInterfaces()
                 .WithScopedLifetime());
+
 
         return services;
     }

@@ -14,7 +14,6 @@ public static class DependencyInjection
     }
 }
 
-
 public class AssemblyMarker
 {
 }

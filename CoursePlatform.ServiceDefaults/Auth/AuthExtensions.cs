@@ -16,6 +16,7 @@ public static class AuthExtensions
         this IServiceCollection services, 
         string authServiceUrl)
     {
+        Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>

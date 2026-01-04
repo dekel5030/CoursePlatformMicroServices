@@ -75,6 +75,7 @@ var coursesDb = builder
 var coursesService = builder.AddProject<Projects.Courses_Api>("courseservice")
     .WithReference(coursesDb)
     .WithReference(rabbitMq)
+    .WithReference(authService)
     .WaitFor(coursesDb)
     .WaitFor(rabbitMq)
     .WithEnvironment("ConnectionStrings:ReadDatabase", coursesDb.Resource.ConnectionStringExpression)
