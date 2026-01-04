@@ -49,6 +49,10 @@
   },
   "actions": {
     "editNotImplemented": "Edit course functionality not implemented yet",
-    "deleteNotImplemented": "Delete course functionality not implemented yet"
+    "deleteNotImplemented": "Delete course functionality not implemented yet",
+    "deleteSuccess": "Course deleted successfully",
+    "deleteFailed": "Failed to delete course",
+    "deleteConfirmTitle": "Delete Course",
+    "deleteConfirmMessage": "Are you sure you want to delete this course? This action cannot be undone and will also delete all lessons associated with this course."
   }
 }

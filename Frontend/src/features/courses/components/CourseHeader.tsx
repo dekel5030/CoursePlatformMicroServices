@@ -18,8 +18,12 @@ interface CourseHeaderProps {
 }
 
 export function CourseHeader({ course }: CourseHeaderProps) {
-  const { t } = useTranslation(["courses", "translation"]);
+  const { t, i18n } = useTranslation(["courses", "translation"]);
   const patchCourse = usePatchCourse(course.id);
+
+  // Determine text alignment based on interface locale
+  const isRTL = i18n.dir() === "rtl";
+  const textAlignClass = isRTL ? "text-right" : "text-left";
 
   const handleTitleUpdate = async (newTitle: string) => {
     try {
@@ -46,39 +50,43 @@ export function CourseHeader({ course }: CourseHeaderProps) {
             />
           </div>
         )}
-        <div className="space-y-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <Authorized
-                action={ActionType.Update}
-                resource={ResourceType.Course}
-                resourceId={ResourceId.create(course.id)}
-                fallback={
-                  <h1
-                    dir="auto"
-                    className="text-3xl font-bold text-start break-words"
-                  >
-                    {course.title}
-                  </h1>
-                }
-              >
-                <InlineEditableText
-                  value={course.title}
-                  onSave={handleTitleUpdate}
-                  displayClassName="text-3xl font-bold text-start break-words"
-                  inputClassName="text-3xl font-bold text-start"
-                  placeholder={t("courses:detail.enterTitle")}
-                  maxLength={200}
+        <div className="space-y-6">
+          {/* Course Title - Made more prominent */}
+          <div className={textAlignClass}>
+            <Authorized
+              action={ActionType.Update}
+              resource={ResourceType.Course}
+              resourceId={ResourceId.create(course.id)}
+              fallback={
+                <h1
                   dir="auto"
-                />
-              </Authorized>
-            </div>
-
-            <div className="flex-shrink-0 self-start">
-              <CourseActions courseId={course.id} />
-            </div>
+                  className={`text-4xl md:text-2xl font-bold break-words ${textAlignClass}`}
+                >
+                  {course.title}
+                </h1>
+              }
+            >
+              <InlineEditableText
+                value={course.title}
+                onSave={handleTitleUpdate}
+                displayClassName={`text-4xl md:text-2xl font-bold break-words ${textAlignClass}`}
+                inputClassName={`text-4xl md:text-2xl font-bold ${textAlignClass}`}
+                placeholder={t("courses:detail.enterTitle")}
+                maxLength={200}
+              />
+            </Authorized>
           </div>
 
+          {/* Action Buttons */}
+          <div
+            className={`flex items-center gap-2 ${
+              isRTL ? "justify-start" : "justify-end"
+            }`}
+          >
+            <CourseActions courseId={course.id} />
+          </div>
+
+          {/* Buy/Cart Buttons */}
           <div className="flex gap-3">
             <motion.div
               className="flex-1"

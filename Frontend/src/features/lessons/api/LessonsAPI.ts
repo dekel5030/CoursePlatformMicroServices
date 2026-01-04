@@ -34,3 +34,7 @@ export async function patchLesson(
 ): Promise<void> {
   await axiosClient.patch(`/lessons/${id}`, request);
 }
+
+export async function deleteLesson(id: string): Promise<void> {
+  await axiosClient.delete(`/lessons/${id}`);
+}

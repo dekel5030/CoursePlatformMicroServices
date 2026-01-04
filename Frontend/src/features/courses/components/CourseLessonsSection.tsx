@@ -14,14 +14,18 @@ interface CourseLessonsSectionProps {
 }
 
 export function CourseLessonsSection({ course, contentDir }: CourseLessonsSectionProps) {
-  const { t } = useTranslation(['courses', 'translation']);
+  const { t, i18n } = useTranslation(['courses', 'translation']);
   const [isAddLessonOpen, setIsAddLessonOpen] = useState(false);
+  
+  // Determine text alignment based on interface locale
+  const isRTL = i18n.dir() === 'rtl';
+  const textAlignClass = isRTL ? 'text-right' : 'text-left';
 
   return (
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>{t('courses:detail.lessons')}</CardTitle>
+          <CardTitle className={textAlignClass}>{t('courses:detail.lessons')}</CardTitle>
           <Authorized 
             action={ActionType.Create} 
             resource={ResourceType.Lesson}
@@ -55,7 +59,7 @@ export function CourseLessonsSection({ course, contentDir }: CourseLessonsSectio
                 </motion.div>
               ))
           ) : (
-            <p className="text-muted-foreground text-center py-8">
+            <p className={`text-muted-foreground text-center py-8 ${textAlignClass}`}>
               {t('courses:detail.noLessons')}
             </p>
           )}

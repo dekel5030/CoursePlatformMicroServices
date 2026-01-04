@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchFeaturedCourses, fetchCourseById, createCourse, patchCourse } from "../api";
+import { fetchFeaturedCourses, fetchCourseById, createCourse, patchCourse, deleteCourse, fetchAllCourses } from "../api";
 import type { Course } from "../types";
 import type { CreateCourseRequest, PatchCourseRequest } from "../api";
 
@@ -7,6 +7,7 @@ import type { CreateCourseRequest, PatchCourseRequest } from "../api";
 export const coursesQueryKeys = {
   all: ["courses"] as const,
   featured: () => [...coursesQueryKeys.all, "featured"] as const,
+  allCourses: () => [...coursesQueryKeys.all, "list"] as const,
   detail: (id: string) => [...coursesQueryKeys.all, id] as const,
 } as const;
 
@@ -15,6 +16,13 @@ export function useFeaturedCourses() {
   return useQuery<Course[], Error>({
     queryKey: coursesQueryKeys.featured(),
     queryFn: fetchFeaturedCourses,
+  });
+}
+
+export function useAllCourses() {
+  return useQuery<Course[], Error>({
+    queryKey: coursesQueryKeys.allCourses(),
+    queryFn: fetchAllCourses,
   });
 }
 
@@ -47,6 +55,19 @@ export function usePatchCourse(id: string) {
       // Invalidate the specific course and featured courses
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.featured() });
+      queryClient.invalidateQueries({ queryKey: coursesQueryKeys.allCourses() });
+    },
+  });
+}
+
+export function useDeleteCourse() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteCourse(id),
+    onSuccess: () => {
+      // Invalidate all course lists to ensure UI updates
+      queryClient.invalidateQueries({ queryKey: coursesQueryKeys.all });
     },
   });
 }
