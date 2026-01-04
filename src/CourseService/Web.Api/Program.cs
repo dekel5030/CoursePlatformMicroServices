@@ -27,6 +27,7 @@ app.UseHttpsRedirection();
 app.MapEndpoints();
 
 app.UseInfrastructureDefaultEndpoints();
+app.UseInfrastructure();
 
 app.Run();
 

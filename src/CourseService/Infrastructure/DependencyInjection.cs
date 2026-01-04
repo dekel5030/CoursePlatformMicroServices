@@ -1,10 +1,13 @@
-﻿using Courses.Application.Abstractions;
+﻿using CoursePlatform.ServiceDefaults.Auth;
+using Courses.Application.Abstractions;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Data.Repositories;
 using Courses.Infrastructure.Database;
 using Courses.Infrastructure.DomainEvents;
 using Courses.Infrastructure.Repositories;
+using Kernel.Auth.Abstractions;
 using MassTransit;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -21,20 +24,33 @@ public static class DependencyInjection
 
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration) =>
-        services
+        IConfiguration configuration)
+    {
+
+        string authUrl = configuration["services:authservice:https:0"]
+              ?? configuration["services:authservice:http:0"] ?? string.Empty;
+
+        return services
             .AddServices()
             .AddDatabases(configuration)
             .AddMassTransitInternal(configuration)
             .AddHealthChecksInternal(configuration)
             .AddAuthenticationInternal(configuration)
-            .AddAuthorizationInternal();
+            .AddInternalAuth(authUrl);
+    }
 
+    public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder app)
+    {
+        app.UseAuthentication();
+        app.UseAuthorization();
+        return app;
+    }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IFeaturedCoursesRepository, FeaturedCoursesRepo>();
         services.AddScoped<IUrlResolver, UrlResolver.UrlResolver>();
+
         return services;
     }
 
@@ -97,11 +113,6 @@ public static class DependencyInjection
     private static IServiceCollection AddAuthenticationInternal(
         this IServiceCollection services,
         IConfiguration configuration)
-    {
-        return services;
-    }
-
-    private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
     {
         return services;
     }
