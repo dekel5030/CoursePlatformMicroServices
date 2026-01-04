@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { fetchCurrentUser } from "../api/currentUser";
 import { AuthContext } from "../contexts/AuthContext";
+import { getAndClearRedirectUrl } from "../utils/keycloakAuth";
 
 const oidcConfig = {
   authority: import.meta.env.VITE_OIDC_AUTHORITY,
@@ -15,7 +16,9 @@ const oidcConfig = {
   automaticSilentRenew: true,
   loadUserInfo: true,
   onSigninCallback: () => {
-    window.history.replaceState({}, document.title, window.location.pathname);
+    // After successful sign-in, redirect to the stored URL or default
+    const redirectUrl = getAndClearRedirectUrl();
+    window.history.replaceState({}, document.title, redirectUrl);
   },
 };
 
