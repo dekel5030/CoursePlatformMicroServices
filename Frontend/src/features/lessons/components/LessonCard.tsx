@@ -1,9 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { Lesson as LessonType } from "../types/Lesson";
-import { Card, CardContent, Badge, Button, InlineEditableText } from "@/components";
+import {
+  Card,
+  CardContent,
+  Badge,
+  Button,
+  InlineEditableText,
+} from "@/components";
 import { Clock, PlayCircle, Trash2 } from "lucide-react";
-import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
+import {
+  Authorized,
+  ActionType,
+  ResourceType,
+  ResourceId,
+} from "@/features/auth";
 import { usePatchLesson } from "../hooks/use-lessons";
 import { toast } from "sonner";
 
@@ -14,7 +25,7 @@ interface LessonProps {
 
 export default function Lesson({ lesson, index }: LessonProps) {
   const navigate = useNavigate();
-  const { t } = useTranslation(['lessons', 'translation']);
+  const { t } = useTranslation(["lessons", "translation"]);
   const patchLesson = usePatchLesson(lesson.id, lesson.courseId);
 
   const formatDuration = (duration: string | null | undefined) => {
@@ -39,15 +50,15 @@ export default function Lesson({ lesson, index }: LessonProps) {
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    toast.info(t('lessons:actions.deleteNotImplemented'));
+    toast.info(t("lessons:actions.deleteNotImplemented"));
   };
 
   const handleTitleUpdate = async (newTitle: string) => {
     try {
       await patchLesson.mutateAsync({ title: newTitle });
-      toast.success(t('lessons:actions.titleUpdated'));
+      toast.success(t("lessons:actions.titleUpdated"));
     } catch (error) {
-      toast.error(t('lessons:actions.titleUpdateFailed'));
+      toast.error(t("lessons:actions.titleUpdateFailed"));
       throw error;
     }
   };
@@ -55,9 +66,9 @@ export default function Lesson({ lesson, index }: LessonProps) {
   const handleDescriptionUpdate = async (newDescription: string) => {
     try {
       await patchLesson.mutateAsync({ description: newDescription });
-      toast.success(t('lessons:actions.descriptionUpdated'));
+      toast.success(t("lessons:actions.descriptionUpdated"));
     } catch (error) {
-      toast.error(t('lessons:actions.descriptionUpdateFailed'));
+      toast.error(t("lessons:actions.descriptionUpdateFailed"));
       throw error;
     }
   };
@@ -92,49 +103,50 @@ export default function Lesson({ lesson, index }: LessonProps) {
                   </h3>
                 }
               >
-                <div onClick={(e) => e.stopPropagation()} className="flex-1">
+                <div className="flex-1">
                   <InlineEditableText
                     value={lesson.title}
                     onSave={handleTitleUpdate}
                     displayClassName="font-semibold text-base"
                     inputClassName="font-semibold text-base"
-                    placeholder={t('lessons:actions.enterTitle')}
+                    placeholder={t("lessons:actions.enterTitle")}
                     maxLength={200}
                   />
                 </div>
               </Authorized>
               {lesson.isPreview && (
                 <Badge variant="secondary" className="text-xs">
-                  {t('lessons:card.preview')}
+                  {t("lessons:card.preview")}
                 </Badge>
               )}
             </div>
             {/* Show description inline edit for authorized users, or static text if description exists */}
-            {(lesson.description !== null && lesson.description !== undefined) && (
-              <Authorized
-                action={ActionType.Update}
-                resource={ResourceType.Lesson}
-                resourceId={ResourceId.create(lesson.id)}
-                fallback={
-                  lesson.description ? (
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {lesson.description}
-                    </p>
-                  ) : null
-                }
-              >
-                <div onClick={(e) => e.stopPropagation()}>
-                  <InlineEditableText
-                    value={lesson.description || ""}
-                    onSave={handleDescriptionUpdate}
-                    displayClassName="text-sm text-muted-foreground line-clamp-2"
-                    inputClassName="text-sm"
-                    placeholder={t('lessons:actions.enterDescription')}
-                    maxLength={500}
-                  />
-                </div>
-              </Authorized>
-            )}
+            {lesson.description !== null &&
+              lesson.description !== undefined && (
+                <Authorized
+                  action={ActionType.Update}
+                  resource={ResourceType.Lesson}
+                  resourceId={ResourceId.create(lesson.id)}
+                  fallback={
+                    lesson.description ? (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {lesson.description}
+                      </p>
+                    ) : null
+                  }
+                >
+                  <div>
+                    <InlineEditableText
+                      value={lesson.description || ""}
+                      onSave={handleDescriptionUpdate}
+                      displayClassName="text-sm text-muted-foreground line-clamp-2"
+                      inputClassName="text-sm"
+                      placeholder={t("lessons:actions.enterDescription")}
+                      maxLength={500}
+                    />
+                  </div>
+                </Authorized>
+              )}
           </div>
 
           <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
@@ -145,8 +157,8 @@ export default function Lesson({ lesson, index }: LessonProps) {
               </div>
             )}
             <div className="flex gap-1">
-              <Authorized 
-                action={ActionType.Delete} 
+              <Authorized
+                action={ActionType.Delete}
                 resource={ResourceType.Lesson}
                 resourceId={ResourceId.create(lesson.id)}
               >
@@ -155,12 +167,11 @@ export default function Lesson({ lesson, index }: LessonProps) {
                   size="sm"
                   className="h-8 w-8 p-0 hover:text-destructive"
                   onClick={handleDelete}
-                  title={t('common.delete')}
+                  title={t("common.delete")}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </Authorized>
-              <PlayCircle className="h-5 w-5 ml-1" />
             </div>
           </div>
         </div>

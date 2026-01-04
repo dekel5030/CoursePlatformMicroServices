@@ -97,7 +97,10 @@ export function InlineEditableText({
           variant="ghost"
           size="sm"
           className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={() => setIsEditing(true)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsEditing(true);
+          }}
           title="Edit"
         >
           <Edit2 className="h-4 w-4" />
@@ -107,7 +110,10 @@ export function InlineEditableText({
   }
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div
+      className={cn("flex items-center gap-2", className)}
+      onClick={(e) => e.stopPropagation()}
+    >
       <Input
         ref={inputRef}
         value={editValue}

@@ -21,7 +21,7 @@ interface AddCourseDialogProps {
 export function AddCourseDialog({ open, onOpenChange }: AddCourseDialogProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const { t } = useTranslation(['courses', 'translation']);
+  const { t, i18n } = useTranslation(["courses", "translation"]);
 
   const createCourseMutation = useCreateCourse();
 
@@ -35,7 +35,7 @@ export function AddCourseDialog({ open, onOpenChange }: AddCourseDialogProps) {
     e.preventDefault();
 
     if (!title.trim()) {
-      toast.error(t('courses:addDialog.validationError'));
+      toast.error(t("courses:addDialog.validationError"));
       return;
     }
 
@@ -46,11 +46,13 @@ export function AddCourseDialog({ open, onOpenChange }: AddCourseDialogProps) {
       },
       {
         onSuccess: () => {
-          toast.success(t('courses:addDialog.successMessage'));
+          toast.success(t("courses:addDialog.successMessage"));
           handleClose();
         },
         onError: (error: Error) => {
-          toast.error(t('courses:addDialog.errorMessage', { message: error.message }));
+          toast.error(
+            t("courses:addDialog.errorMessage", { message: error.message })
+          );
         },
       }
     );
@@ -58,21 +60,22 @@ export function AddCourseDialog({ open, onOpenChange }: AddCourseDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px]">
-        <DialogHeader>
-          <DialogTitle>{t('courses:addDialog.title')}</DialogTitle>
+      <DialogContent className="sm:max-w-[525px]" dir={i18n.dir()}>
+        <DialogHeader dir={i18n.dir()}>
+          <DialogTitle>{t("courses:addDialog.title")}</DialogTitle>
           <DialogDescription>
-            {t('courses:addDialog.description')}
+            {t("courses:addDialog.description")}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} dir={i18n.dir()}>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <label
                 htmlFor="title"
                 className="text-sm font-medium leading-none"
+                dir={i18n.dir()}
               >
-                {t('courses:addDialog.titleLabel')}
+                {t("courses:addDialog.titleLabel")}
                 <span className="text-destructive ml-1">*</span>
               </label>
               <Input
@@ -80,7 +83,8 @@ export function AddCourseDialog({ open, onOpenChange }: AddCourseDialogProps) {
                 name="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder={t('courses:addDialog.titlePlaceholder')}
+                placeholder={t("courses:addDialog.titlePlaceholder")}
+                dir={i18n.dir()}
                 required
               />
             </div>
@@ -88,15 +92,17 @@ export function AddCourseDialog({ open, onOpenChange }: AddCourseDialogProps) {
               <label
                 htmlFor="description"
                 className="text-sm font-medium leading-none"
+                dir={i18n.dir()}
               >
-                {t('courses:addDialog.descriptionLabel')}
+                {t("courses:addDialog.descriptionLabel")}
               </label>
               <textarea
                 id="description"
                 name="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder={t('courses:addDialog.descriptionPlaceholder')}
+                placeholder={t("courses:addDialog.descriptionPlaceholder")}
+                dir={i18n.dir()}
                 className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
@@ -108,12 +114,12 @@ export function AddCourseDialog({ open, onOpenChange }: AddCourseDialogProps) {
               onClick={handleClose}
               disabled={createCourseMutation.isPending}
             >
-              {t('courses:addDialog.cancel')}
+              {t("courses:addDialog.cancel")}
             </Button>
             <Button type="submit" disabled={createCourseMutation.isPending}>
-              {createCourseMutation.isPending 
-                ? t('courses:addDialog.submitting')
-                : t('courses:addDialog.submit')}
+              {createCourseMutation.isPending
+                ? t("courses:addDialog.submitting")
+                : t("courses:addDialog.submit")}
             </Button>
           </DialogFooter>
         </form>
