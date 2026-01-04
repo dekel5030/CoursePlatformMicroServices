@@ -1,7 +1,11 @@
 import { Routes, Route } from "react-router-dom";
 import { Layout, ManagementLayout } from "@/components";
 import { ProtectedRoute } from "@/components/common";
-import { CourseCatalogPage, CoursePage, AllCoursesPage } from "@/features/courses";
+import {
+  CourseCatalogPage,
+  CoursePage,
+  AllCoursesPage,
+} from "@/features/courses";
 import { LessonPage } from "@/features/lessons";
 import { UserProfilePage } from "@/features/users";
 import { LandingPage } from "@/features/landing";
@@ -28,10 +32,9 @@ export default function AppRoutes() {
         <Route path="/users/:id" element={<UserProfilePage />} />
       </Route>
 
-      {/* Protected Management Routes */}
       <Route
         element={
-          <ProtectedRoute requiredRoles={["Admin", "Instructor"]}>
+          <ProtectedRoute requiredRoles={["admin", "instructor"]}>
             <ManagementLayout />
           </ProtectedRoute>
         }

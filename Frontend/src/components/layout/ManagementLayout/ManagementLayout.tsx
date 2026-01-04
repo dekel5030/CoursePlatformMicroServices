@@ -164,9 +164,7 @@ export default function ManagementLayout() {
           >
             <Menu className="h-5 w-5" />
           </button>
-          <h1 className="text-xl font-semibold">
-            {t("management.title")}
-          </h1>
+          <h1 className="text-xl font-semibold">{t("management.title")}</h1>
         </header>
 
         {/* Page Content */}
