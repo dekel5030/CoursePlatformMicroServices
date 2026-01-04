@@ -30,8 +30,8 @@ export function CourseActions({ courseId }: CourseActionsProps) {
     try {
       await deleteCourse.mutateAsync(courseId);
       toast.success(t('courses:actions.deleteSuccess'));
-      // Navigate back to catalog after successful deletion
-      navigate('/catalog');
+      // Navigate back to all courses page after successful deletion
+      navigate('/courses');
     } catch (error) {
       toast.error(t('courses:actions.deleteFailed'));
       console.error('Failed to delete course:', error);
