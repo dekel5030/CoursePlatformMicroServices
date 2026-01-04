@@ -1,6 +1,7 @@
 {
   "profileMenu": {
     "profile": "Profile Page",
+    "management": "Management",
     "logout": "Logout"
   },
   "common": {
@@ -268,5 +269,25 @@
       "sitemap": "Sitemap"
     },
     "rightsReserved": "CourseHub Inc. All rights reserved."
+  },
+  "management": {
+    "title": "Management Dashboard",
+    "backToLearning": "Back to Learning",
+    "nav": {
+      "dashboard": "Dashboard",
+      "users": "User Management",
+      "roles": "Role Management",
+      "courses": "Course Management",
+      "analytics": "Analytics",
+      "enrollments": "Enrollments"
+    }
+  },
+  "errors": {
+    "forbidden": {
+      "title": "403 - Access Denied",
+      "description": "You don't have permission to access this page. This area is restricted to authorized staff members only.",
+      "goHome": "Go to Home",
+      "browseCatalog": "Browse Catalog"
+    }
   }
 }
