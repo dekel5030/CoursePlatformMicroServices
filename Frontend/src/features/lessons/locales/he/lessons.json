@@ -30,6 +30,10 @@
     "titleUpdated": "כותרת השיעור עודכנה בהצלחה",
     "titleUpdateFailed": "נכשל בעדכון כותרת השיעור",
     "descriptionUpdated": "תיאור השיעור עודכן בהצלחה",
-    "descriptionUpdateFailed": "נכשל בעדכון תיאור השיעור"
+    "descriptionUpdateFailed": "נכשל בעדכון תיאור השיעור",
+    "deleteSuccess": "השיעור נמחק בהצלחה",
+    "deleteFailed": "נכשל במחיקת השיעור",
+    "deleteConfirmTitle": "מחק שיעור",
+    "deleteConfirmMessage": "האם אתה בטוח שברצונך למחוק שיעור זה? פעולה זו אינה ניתנת לביטול."
   }
 }

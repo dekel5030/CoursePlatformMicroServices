@@ -45,7 +45,7 @@ export function LandingHero() {
             className="flex flex-col sm:flex-row gap-4 mt-8"
             variants={fadeInUp}
           >
-            <Link to="/catalog">
+            <Link to="/courses">
               <Button
                 size="lg"
                 className="w-full sm:w-auto text-base px-8 h-11 rounded-md shadow-sm"
@@ -53,7 +53,7 @@ export function LandingHero() {
                 {t("landing.hero.getStarted")}
               </Button>
             </Link>
-            <Link to="/catalog">
+            <Link to="/courses">
               <Button
                 variant="outline"
                 size="lg"

@@ -30,6 +30,10 @@
     "titleUpdated": "Lesson title updated successfully",
     "titleUpdateFailed": "Failed to update lesson title",
     "descriptionUpdated": "Lesson description updated successfully",
-    "descriptionUpdateFailed": "Failed to update lesson description"
+    "descriptionUpdateFailed": "Failed to update lesson description",
+    "deleteSuccess": "Lesson deleted successfully",
+    "deleteFailed": "Failed to delete lesson",
+    "deleteConfirmTitle": "Delete Lesson",
+    "deleteConfirmMessage": "Are you sure you want to delete this lesson? This action cannot be undone."
   }
 }

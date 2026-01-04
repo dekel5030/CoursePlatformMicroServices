@@ -49,6 +49,10 @@
   },
   "actions": {
     "editNotImplemented": "פונקציית עריכת קורס טרם מומשה",
-    "deleteNotImplemented": "פונקציית מחיקת קורס טרם מומשה"
+    "deleteNotImplemented": "פונקציית מחיקת קורס טרם מומשה",
+    "deleteSuccess": "הקורס נמחק בהצלחה",
+    "deleteFailed": "נכשל במחיקת הקורס",
+    "deleteConfirmTitle": "מחק קורס",
+    "deleteConfirmMessage": "האם אתה בטוח שברצונך למחוק קורס זה? פעולה זו אינה ניתנת לביטול ותמחק גם את כל השיעורים המשויכים לקורס זה."
   }
 }

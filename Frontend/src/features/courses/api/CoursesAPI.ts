@@ -49,3 +49,16 @@ export async function patchCourse(
 ): Promise<void> {
   await axiosClient.patch(`/courses/${id}`, request);
 }
+
+export async function deleteCourse(id: string): Promise<void> {
+  await axiosClient.delete(`/courses/${id}`);
+}
+
+export async function fetchAllCourses(): Promise<Course[]> {
+  const response = await axiosClient.get<Course[] | { items: Course[] }>(
+    "/courses"
+  );
+  const data = response.data;
+
+  return Array.isArray(data) ? data : data.items || [];
+}

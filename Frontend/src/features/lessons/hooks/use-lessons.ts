@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchLessonById, createLesson, patchLesson } from "../api";
+import { fetchLessonById, createLesson, patchLesson, deleteLesson } from "../api";
 import type { Lesson } from "../types";
 import type { CreateLessonRequest, PatchLessonRequest } from "../api";
 import { coursesQueryKeys } from "@/features/courses/hooks/use-courses";
@@ -39,6 +39,22 @@ export function usePatchLesson(id: string, courseId?: string) {
     onSuccess: () => {
       // Invalidate the specific lesson
       queryClient.invalidateQueries({ queryKey: lessonsQueryKeys.detail(id) });
+      // Also invalidate the course detail if courseId is provided (to update lessons list)
+      if (courseId) {
+        queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(courseId) });
+      }
+    },
+  });
+}
+
+export function useDeleteLesson(courseId?: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteLesson(id),
+    onSuccess: () => {
+      // Invalidate all lessons
+      queryClient.invalidateQueries({ queryKey: lessonsQueryKeys.all });
       // Also invalidate the course detail if courseId is provided (to update lessons list)
       if (courseId) {
         queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(courseId) });
