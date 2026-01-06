@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -77,6 +77,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kernel.UnitTests", "src\Shared\Kernel.UnitTests\Kernel.UnitTests.csproj", "{064FCDFC-7027-023F-5257-D9B0B1AA1D38}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Frontend", "Frontend\Frontend.esproj", "{462EE049-9FE1-B47D-1B3E-22BACA5D9185}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{7A7D0C5C-A4E0-4FEA-8C81-E33DB5C692A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageService", "src\StorageService\StorageService.csproj", "{11887FAE-0D7E-7D93-52F7-AC4F89679CA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -178,6 +182,10 @@ Global
 		{462EE049-9FE1-B47D-1B3E-22BACA5D9185}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{462EE049-9FE1-B47D-1B3E-22BACA5D9185}.Release|Any CPU.Build.0 = Release|Any CPU
 		{462EE049-9FE1-B47D-1B3E-22BACA5D9185}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{11887FAE-0D7E-7D93-52F7-AC4F89679CA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11887FAE-0D7E-7D93-52F7-AC4F89679CA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11887FAE-0D7E-7D93-52F7-AC4F89679CA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11887FAE-0D7E-7D93-52F7-AC4F89679CA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -212,6 +220,8 @@ Global
 		{ED1E3272-3361-F842-DD24-61A976246E9D} = {FC4A8959-F87D-4E08-A6D1-EB25AB76B070}
 		{064FCDFC-7027-023F-5257-D9B0B1AA1D38} = {B857CB67-1D98-482C-A80E-CAE3F061D536}
 		{462EE049-9FE1-B47D-1B3E-22BACA5D9185} = {FF3BA081-B11A-4B94-AA1D-26B6B62A993D}
+		{7A7D0C5C-A4E0-4FEA-8C81-E33DB5C692A5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{11887FAE-0D7E-7D93-52F7-AC4F89679CA3} = {7A7D0C5C-A4E0-4FEA-8C81-E33DB5C692A5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9DB79B1-93CC-4F9E-B232-9AB7C522E5A2}

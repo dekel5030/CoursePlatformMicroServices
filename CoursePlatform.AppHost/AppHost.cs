@@ -1,5 +1,22 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
+var garageConfigPath = Path.Combine(builder.AppHostDirectory, "garage.toml");
+var garage = builder.AddContainer("garage", "dxflrs/garage", "v2.1.0")
+    .WithBindMount(garageConfigPath, "/etc/garage.toml")
+    .WithBindMount(@"C:\AspireVolumes\Garage\meta", "/var/lib/garage/meta")
+    .WithBindMount(@"C:\AspireVolumes\Garage\data", "/var/lib/garage/data")
+    .WithHttpEndpoint(port: 3900, targetPort: 3900, name: "s3")
+    .WithHttpEndpoint(port: 3902, targetPort: 3902, name: "web")
+    .WithHttpEndpoint(port: 3903, targetPort: 3903, name: "admin")
+    .WithEntrypoint("/garage")
+    .WithArgs("server");
+
+
+var storageService = builder.AddProject<Projects.StorageService>("storageservice")
+    .WaitFor(garage)
+    .WithEnvironment("S3__ServiceUrl", garage.GetEndpoint("s3"))
+    .WithEnvironment("S3__PublicUrl", garage.GetEndpoint("s3"));
+
 var redis = builder.AddRedis("redis").WithDataVolume().WithRedisInsight();
 
 // RabbitMq configuration
@@ -84,6 +101,7 @@ var coursesService = builder.AddProject<Projects.Courses_Api>("courseservice")
     .WithEnvironment("ConnectionStrings:ReadDatabase", coursesDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:WriteDatabase", coursesDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression)
+    .WithEnvironment("S3__Endpoint", garage.GetEndpoint("s3"))
     .WithHttpHealthCheck("/health");
 
 // Gateway configuration
@@ -97,7 +115,11 @@ var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
     .WaitFor(authDb)
     .WaitFor(authService)
     .WaitFor(usersService)
-    .WaitFor(coursesService);
+    .WaitFor(coursesService)
+    .WithEnvironment("S3__Endpoint", garage.GetEndpoint("s3"));
+
+var gatewayEndpoint = gateway.GetEndpoint("https");
+coursesService.WithEnvironment("s3__Endpoint", gatewayEndpoint);
 
 // Frontend configuration
 var frontend = builder.AddJavaScriptApp("frontend", "../Frontend", "dev")
