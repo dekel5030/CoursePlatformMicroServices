@@ -1,5 +1,11 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
+// RabbitMq configuration
+var rabbitMq = builder
+    .AddRabbitMQ("rabbitmq")
+    .WithManagementPlugin(15672)
+    .WithDataVolume();
+
 var garageConfigPath = Path.Combine(builder.AppHostDirectory, "garage.toml");
 var garage = builder.AddContainer("garage", "dxflrs/garage", "v2.1.0")
     .WithBindMount(garageConfigPath, "/etc/garage.toml")
@@ -11,19 +17,14 @@ var garage = builder.AddContainer("garage", "dxflrs/garage", "v2.1.0")
     .WithEntrypoint("/garage")
     .WithArgs("server");
 
-
 var storageService = builder.AddProject<Projects.StorageService>("storageservice")
     .WaitFor(garage)
+    .WaitFor(rabbitMq)
     .WithEnvironment("S3__ServiceUrl", garage.GetEndpoint("s3"))
-    .WithEnvironment("S3__PublicUrl", garage.GetEndpoint("s3"));
+    .WithEnvironment("S3__PublicUrl", garage.GetEndpoint("s3"))
+    .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
 
 var redis = builder.AddRedis("redis").WithDataVolume().WithRedisInsight();
-
-// RabbitMq configuration
-var rabbitMq = builder
-    .AddRabbitMQ("rabbitmq")
-    .WithManagementPlugin(15672)
-    .WithDataVolume();
 
 // Keycloak configuration
 

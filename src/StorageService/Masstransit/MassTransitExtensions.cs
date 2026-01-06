@@ -10,8 +10,8 @@ internal static class MassTransitExtensions
     private const string SectionName = "RabbitMQ";
 
     internal static IServiceCollection AddMassTransitInternal(
-    this IServiceCollection services,
-    IConfiguration configuration)
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddMassTransit(config =>
         {
