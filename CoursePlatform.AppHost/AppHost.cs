@@ -113,10 +113,6 @@ var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
     .WithReference(usersService)
     .WithReference(coursesService)
     .WithReference(redis)
-    .WaitFor(authDb)
-    .WaitFor(authService)
-    .WaitFor(usersService)
-    .WaitFor(coursesService)
     .WithEnvironment("S3__Endpoint", garage.GetEndpoint("s3"));
 
 var gatewayEndpoint = gateway.GetEndpoint("https");

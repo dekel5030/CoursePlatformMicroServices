@@ -27,8 +27,4 @@
     <ProjectReference Include="..\Application\Courses.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="MassTransit\Consumers\" />
-  </ItemGroup>
-
 </Project>

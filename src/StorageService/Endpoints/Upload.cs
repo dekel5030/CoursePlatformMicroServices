@@ -11,11 +11,12 @@ public class Upload : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("storage/upload/{ownerService}/{referenceId}/{bucket}/{*key}", async (
+        app.MapPost("storage/upload/{ownerService}/{bucket}/{referenceId}/{referenceType}/{*key}", async (
             string key,
             string ownerService,
             string referenceId,
             string bucket,
+            string referenceType,
             HttpRequest request,
             IStorageProvider storage,
             IEventBus bus) =>
@@ -44,7 +45,8 @@ public class Upload : IEndpoint
                 ContentType = contentType,
                 FileSize = contentLength,
                 OwnerService = ownerService,
-                ReferenceId = referenceId
+                ReferenceId = referenceId,
+                ReferenceType = referenceType,
             });
 
             return Results.Ok(new { Key = fileResult.Value });
