@@ -1,9 +1,10 @@
-﻿using MassTransit;
+﻿using Kernel.EventBus;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Courses.Infrastructure.MassTransit;
 
-internal sealed class MassTransitEventPublisher 
+internal sealed class MassTransitEventPublisher : IEventBus
 {
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly ILogger<MassTransitEventPublisher> _logger;
@@ -16,10 +17,10 @@ internal sealed class MassTransitEventPublisher
         _logger = logger;
     }
 
-    public async Task Publish<T>(T message, CancellationToken cancellationToken = default)
-        where T : notnull
+    public Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
+        where TEvent : class
     {
-        _logger.LogInformation("Publishing message of type {MessageType}: {Message}", message.GetType(), message);
-        await _publishEndpoint.Publish(message, cancellationToken);
+        _logger.LogInformation("Publishing event of type {EventType}", typeof(TEvent).FullName);
+        return _publishEndpoint.Publish(@event, cancellationToken);
     }
 }
