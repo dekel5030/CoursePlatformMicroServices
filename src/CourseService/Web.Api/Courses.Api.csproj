@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\CoursePlatform.ServiceDefaults\CoursePlatform.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Infrastructure\Courses.Infrastructure.csproj" />
   </ItemGroup>
 

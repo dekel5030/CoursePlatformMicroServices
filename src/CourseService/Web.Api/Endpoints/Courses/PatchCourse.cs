@@ -4,7 +4,6 @@ using Courses.Api.Extensions;
 using Courses.Application.Courses.Commands.PatchCourse;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using CoursePlatform.ServiceDefaults.Swagger;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Courses.Api.Endpoints.Courses;
