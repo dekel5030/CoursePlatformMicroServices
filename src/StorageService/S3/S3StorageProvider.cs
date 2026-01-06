@@ -1,5 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
+using Kernel;
+using Kernel.EventBus;
 using Microsoft.Extensions.Options;
 using StorageService.Abstractions;
 
@@ -8,11 +10,13 @@ namespace StorageService.S3;
 public class S3StorageProvider : IStorageProvider
 {
     private readonly IAmazonS3 _s3Client;
+    private readonly IEventBus _eventBus;
     private readonly S3Options _options;
 
-    public S3StorageProvider(IAmazonS3 s3Client, IOptions<S3Options> options)
+    public S3StorageProvider(IAmazonS3 s3Client, IEventBus eventBus, IOptions<S3Options> options)
     {
         _s3Client = s3Client;
+        _eventBus = eventBus;
         _options = options.Value;
     }
 
@@ -42,7 +46,11 @@ public class S3StorageProvider : IStorageProvider
 
         return new PresignedUrlResponse(url, fileKey, request.Expires.Value);
     }
-    public async Task<string> UploadFileAsync(Stream httpRequestStream, string fileKey, string contentType, long contentLength)
+    public async Task<Result<string>> UploadFileAsync(
+        Stream httpRequestStream, 
+        string fileKey, 
+        string contentType, 
+        long contentLength)
     {
         var tempFilePath = Path.GetTempFileName();
 
@@ -67,12 +75,16 @@ public class S3StorageProvider : IStorageProvider
                 await _s3Client.PutObjectAsync(request);
             }
         }
+        catch (Exception)
+        {
+            return Result.Failure<string>(Error.Problem("storageservice.servererror", "server error."));
+        }
         finally
         {
             if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
         }
 
-        return fileKey;
+        return Result.Success(fileKey);
     }
 
     public async Task<bool> DeleteFileAsync(string fileKey)

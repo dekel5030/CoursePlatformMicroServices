@@ -9,9 +9,13 @@
 
     <ItemGroup>
 	    <PackageReference Include="AWSSDK.S3" Version="4.0.16.2" />
+	    <PackageReference Include="MassTransit" Version="8.5.7" />
+	    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.7" />
+	    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />
     </ItemGroup>
 	
   <ItemGroup>
+    <ProjectReference Include="..\..\Contracts\CoursePlatform.Contracts.csproj" />
     <ProjectReference Include="..\..\CoursePlatform.ServiceDefaults\CoursePlatform.ServiceDefaults.csproj" />
   </ItemGroup>
 

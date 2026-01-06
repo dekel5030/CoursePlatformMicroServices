@@ -1,4 +1,7 @@
-﻿using CoursePlatform.ServiceDefaults.Endpoints;
+﻿using CoursePlatform.Contracts.StorageEvent;
+using CoursePlatform.ServiceDefaults.Endpoints;
+using Kernel;
+using Kernel.EventBus;
 using Microsoft.AspNetCore.Mvc;
 using StorageService.Abstractions;
 
@@ -8,21 +11,43 @@ public class Upload : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("storage/upload/{key}", async (
+        app.MapPost("storage/upload/{ownerService}/{referenceId}/{bucket}/{*key}", async (
             string key,
+            string ownerService,
+            string referenceId,
+            string bucket,
             HttpRequest request,
-            IStorageProvider storage) =>
+            IStorageProvider storage,
+            IEventBus bus) =>
         {
             if (!request.HasFormContentType && request.ContentLength == 0)
                 return Results.BadRequest("No file content.");
 
-            var fileKey = await storage.UploadFileAsync(
+            var contentType = request.ContentType ?? "application/octet-stream";
+            var contentLength = request.ContentLength ?? throw new ArgumentException("Content-Length is required");
+
+            Result<string> fileResult = await storage.UploadFileAsync(
                 request.Body,
                 key,
-                request.ContentType ?? "application/octet-stream",
-                request.ContentLength ?? throw new ArgumentNullException(nameof(request.ContentLength)));
+                contentType,
+                contentLength);
 
-            return Results.Ok(new { Key = fileKey });
+            if (fileResult.IsFailure)
+            {
+                return Results.Problem("Failed to upload file to storage.");
+            }
+
+            await bus.PublishAsync(new FileUploadedEvent
+            {
+                FileKey = fileResult.Value,
+                Bucket = bucket,
+                ContentType = contentType,
+                FileSize = contentLength,
+                OwnerService = ownerService,
+                ReferenceId = referenceId
+            });
+
+            return Results.Ok(new { Key = fileResult.Value });
         })
         .WithMetadata(new DisableRequestSizeLimitAttribute());
     }
