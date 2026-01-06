@@ -43,22 +43,36 @@ public class S3StorageProvider : IStorageProvider
 
         return new PresignedUrlResponse(url, fileKey, request.Expires.Value);
     }
-    public async Task<string> UploadFileAsync(Stream stream, string fileKey, string contentType, long contentLength)
+    public async Task<string> UploadFileAsync(Stream httpRequestStream, string fileKey, string contentType, long contentLength)
     {
-        using var ms = new MemoryStream();
-        await stream.CopyToAsync(ms);
-        ms.Position = 0;
+        var tempFilePath = Path.GetTempFileName();
 
-        var request = new PutObjectRequest
+        try
         {
-            BucketName = _options.BucketName,
-            Key = fileKey,
-            InputStream = ms,
-            ContentType = contentType,
-            UseChunkEncoding = false,
-        };
+            using (var fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
+            {
+                await httpRequestStream.CopyToAsync(fileStream);
+            }
 
-        await _s3Client.PutObjectAsync(request);
+            using (var uploadStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read))
+            {
+                var request = new PutObjectRequest
+                {
+                    BucketName = _options.BucketName,
+                    Key = fileKey,
+                    InputStream = uploadStream,
+                    ContentType = contentType,
+                    UseChunkEncoding = false,
+                };
+
+                await _s3Client.PutObjectAsync(request);
+            }
+        }
+        finally
+        {
+            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+        }
+
         return fileKey;
     }
 
