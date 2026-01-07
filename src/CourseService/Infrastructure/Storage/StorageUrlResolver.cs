@@ -12,7 +12,10 @@ internal class StorageUrlResolver : IStorageUrlResolver
         _options = options.Value;
     }
 
-    public Task<ResolvedUrl> ResolveAsync(StorageCategory category, string relativePath)
+    public Task<ResolvedUrl> ResolveAsync(
+        StorageCategory category, 
+        string relativePath, 
+        CancellationToken cancellationToken = default)
     {
         if (!_options.BucketMapping.TryGetValue(category, out var bucketName))
         {
