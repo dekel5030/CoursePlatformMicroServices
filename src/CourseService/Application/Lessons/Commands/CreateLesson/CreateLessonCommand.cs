@@ -1,4 +1,4 @@
-using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Lessons.Queries.Dtos;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Lessons.Commands.CreateLesson;

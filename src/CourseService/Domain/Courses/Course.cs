@@ -18,6 +18,7 @@ public class Course : Entity
     public InstructorId? InstructorId { get; private set; } = null;
     public CourseStatus Status { get; private set; }
     public int EnrollmentCount { get; private set; } = 0;
+    public int LessonCount { get; private set; } = 0;
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
     public Money Price { get; private set; } = Money.Zero();
@@ -73,6 +74,7 @@ public class Course : Entity
         if (_lessons.Remove(lesson))
         {
             UpdatedAtUtc = timeProvider.GetUtcNow();
+            LessonCount = _lessons.Count;
         }
 
         return Result.Success();
@@ -167,6 +169,7 @@ public class Course : Entity
         var lesson = lessonResult.Value;
         
         _lessons.Add(lesson);
+        LessonCount = _lessons.Count;
         UpdatedAtUtc = timeProvider.GetUtcNow();
 
         return Result.Success(lesson);

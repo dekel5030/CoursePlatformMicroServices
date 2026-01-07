@@ -1,4 +1,4 @@
-﻿namespace Courses.Application.Courses.Queries.Dtos;
+﻿namespace Courses.Application.Lessons.Queries.Dtos;
 
 public record LessonSummaryDto(
     Guid Id,

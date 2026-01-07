@@ -1,4 +1,4 @@
-﻿namespace Courses.Application.Courses.Queries.Dtos;
+﻿namespace Courses.Application.Shared.Dtos;
 
 public record PagedResponseDto<T>
 {

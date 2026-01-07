@@ -1,6 +1,9 @@
-using Courses.Application.Abstractions;
 using Courses.Application.Abstractions.Data.Repositories;
+using Courses.Application.Abstractions.Storage;
+using Courses.Application.Courses.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Shared.Dtos;
+using Courses.Domain.Courses;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -9,11 +12,11 @@ namespace Courses.Application.Courses.Queries.GetFeatured;
 public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResponseDto<CourseSummaryDto>>
 {
     private readonly IFeaturedCoursesRepository _featuredCoursesProvider;
-    private readonly IUrlResolver _urlResolver;
+    private readonly IStorageUrlResolver _urlResolver;
 
     public GetFeaturedQueryHandler(
         IFeaturedCoursesRepository featuredCoursesProvider,
-        IUrlResolver urlResolver)
+        IStorageUrlResolver urlResolver)
     {
         _featuredCoursesProvider = featuredCoursesProvider;
         _urlResolver = urlResolver;
@@ -23,18 +26,9 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResp
         GetFeaturedQuery request,
         CancellationToken cancellationToken = default)
     {
-        var courses = await _featuredCoursesProvider.GetFeaturedCourse();
+        IReadOnlyList<Course> courses = await _featuredCoursesProvider.GetFeaturedCourse();
 
-        var courseDtos = courses.Select(course => new CourseSummaryDto(
-            course.Id.Value,
-            course.Title.Value,
-            course.InstructorId?.Value.ToString(), 
-            course.Price.Amount,
-            course.Price.Currency,
-            _urlResolver.Resolve(course.Images.FirstOrDefault()?.Path ?? string.Empty),
-            course.Lessons.Count,
-            course.EnrollmentCount
-        )).ToList();
+        List<CourseSummaryDto> courseDtos = await courses.ToSummaryDtosAsync(_urlResolver, cancellationToken);
 
         var response = new PagedResponseDto<CourseSummaryDto>
         {

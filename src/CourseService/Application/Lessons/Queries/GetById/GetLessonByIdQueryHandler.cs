@@ -1,8 +1,9 @@
-using Courses.Application.Abstractions;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Abstractions.Storage;
+using Courses.Application.Lessons.Extensions;
+using Courses.Application.Lessons.Queries.Dtos;
+using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
-using Courses.Domain.Lessons.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +13,9 @@ namespace Courses.Application.Lessons.Queries.GetById;
 public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, LessonDetailsDto>
 {
     private readonly IReadDbContext _dbContext;
-    private readonly IUrlResolver _urlResolver;
+    private readonly IStorageUrlResolver _urlResolver;
 
-    public GetLessonByIdQueryHandler(IReadDbContext dbContext, IUrlResolver urlResolver)
+    public GetLessonByIdQueryHandler(IReadDbContext dbContext, IStorageUrlResolver urlResolver)
     {
         _dbContext = dbContext;
         _urlResolver = urlResolver;
@@ -24,7 +25,7 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
         GetLessonByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        var lesson = await _dbContext.Lessons
+        Lesson? lesson = await _dbContext.Lessons
             .FirstOrDefaultAsync(l => l.Id == request.Id, cancellationToken);
 
         if (lesson is null)
@@ -32,16 +33,7 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
             return Result.Failure<LessonDetailsDto>(LessonErrors.NotFound);
         }
 
-        var response = new LessonDetailsDto(
-            lesson.Id.Value,
-            lesson.Title.Value,
-            lesson.Description.Value,
-            lesson.Index,
-            lesson.Duration,
-            lesson.Access == LessonAccess.Public,
-            _urlResolver.Resolve(lesson.ThumbnailImageUrl?.Path ?? string.Empty),
-            _urlResolver.Resolve(lesson.VideoUrl?.Path ?? string.Empty)
-        );
+        var response = await lesson.ToDetailsDtoAsync(_urlResolver);
 
         return Result.Success(response);
     }
