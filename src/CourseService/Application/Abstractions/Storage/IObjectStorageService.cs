@@ -1,4 +1,4 @@
-﻿namespace Courses.Application.Abstractions.ObjectStorage;
+﻿namespace Courses.Application.Abstractions.Storage;
 
 public interface IObjectStorageService
 {

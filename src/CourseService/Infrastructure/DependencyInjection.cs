@@ -1,10 +1,11 @@
 ﻿using CoursePlatform.ServiceDefaults.Auth;
-using Courses.Application.Abstractions;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Data.Repositories;
+using Courses.Application.Abstractions.Storage;
 using Courses.Infrastructure.Database;
 using Courses.Infrastructure.MassTransit;
 using Courses.Infrastructure.Repositories;
+using Courses.Infrastructure.Storage;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -48,8 +49,7 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IFeaturedCoursesRepository, FeaturedCoursesRepo>();
-        services.AddScoped<IUrlResolver, UrlResolver.UrlResolver>();
-
+        services.AddStorage();
         return services;
     }
 

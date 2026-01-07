@@ -1,6 +1,7 @@
-using Courses.Application.Abstractions;
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Shared.Dtos;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +11,9 @@ namespace Courses.Application.Courses.Queries.GetCourses;
 public class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, PagedResponseDto<CourseSummaryDto>>
 {
     private readonly IReadDbContext _dbContext;
-    private readonly IUrlResolver _urlResolver;
+    private readonly IStorageUrlResolver _urlResolver;
 
-    public GetCoursesQueryHandler(IReadDbContext dbContext, IUrlResolver urlResolver)
+    public GetCoursesQueryHandler(IReadDbContext dbContext, IStorageUrlResolver urlResolver)
     {
         _dbContext = dbContext;
         _urlResolver = urlResolver;

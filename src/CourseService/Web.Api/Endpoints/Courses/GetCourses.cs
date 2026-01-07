@@ -3,6 +3,7 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Courses.Queries.GetCourses;
+using Courses.Application.Shared.Dtos;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Courses;

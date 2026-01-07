@@ -1,6 +1,6 @@
-using Courses.Application.Abstractions;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Abstractions.Storage;
+using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
@@ -15,12 +15,12 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
 {
     private readonly IWriteDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
-    private readonly IUrlResolver _urlResolver;
+    private readonly IStorageUrlResolver _urlResolver;
 
     public CreateLessonCommandHandler(
         IWriteDbContext dbContext,
         TimeProvider timeProvider,
-        IUrlResolver urlResolver)
+        IStorageUrlResolver urlResolver)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;

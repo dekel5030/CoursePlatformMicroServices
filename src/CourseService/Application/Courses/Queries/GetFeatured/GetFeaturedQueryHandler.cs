@@ -1,6 +1,7 @@
-using Courses.Application.Abstractions;
 using Courses.Application.Abstractions.Data.Repositories;
+using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Shared.Dtos;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -9,11 +10,11 @@ namespace Courses.Application.Courses.Queries.GetFeatured;
 public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, PagedResponseDto<CourseSummaryDto>>
 {
     private readonly IFeaturedCoursesRepository _featuredCoursesProvider;
-    private readonly IUrlResolver _urlResolver;
+    private readonly IStorageUrlResolver _urlResolver;
 
     public GetFeaturedQueryHandler(
         IFeaturedCoursesRepository featuredCoursesProvider,
-        IUrlResolver urlResolver)
+        IStorageUrlResolver urlResolver)
     {
         _featuredCoursesProvider = featuredCoursesProvider;
         _urlResolver = urlResolver;

@@ -1,4 +1,4 @@
-using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Domain.Lessons.Primitives;
 using Kernel.Messaging.Abstractions;
 

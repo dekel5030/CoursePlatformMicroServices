@@ -1,6 +1,6 @@
-using Courses.Application.Abstractions;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Abstractions.Storage;
+using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
 using Kernel;
@@ -12,9 +12,9 @@ namespace Courses.Application.Lessons.Queries.GetById;
 public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, LessonDetailsDto>
 {
     private readonly IReadDbContext _dbContext;
-    private readonly IUrlResolver _urlResolver;
+    private readonly IStorageUrlResolver _urlResolver;
 
-    public GetLessonByIdQueryHandler(IReadDbContext dbContext, IUrlResolver urlResolver)
+    public GetLessonByIdQueryHandler(IReadDbContext dbContext, IStorageUrlResolver urlResolver)
     {
         _dbContext = dbContext;
         _urlResolver = urlResolver;
