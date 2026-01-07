@@ -3,6 +3,7 @@ using Courses.Application.Abstractions;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Data.Repositories;
 using Courses.Infrastructure.Database;
+using Courses.Infrastructure.MassTransit;
 using Courses.Infrastructure.Repositories;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -112,53 +113,6 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        return services;
-    }
-
-    private static IServiceCollection AddMassTransitInternal(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddMassTransit(config =>
-        {
-            config.AddConsumers(typeof(DependencyInjection).Assembly);
-
-            config.AddEntityFrameworkOutbox<WriteDbContext>(o =>
-            {
-                o.UsePostgres();
-                o.UseBusOutbox();
-                o.QueryDelay = TimeSpan.FromSeconds(30);
-            });
-
-
-            config.AddConfigureEndpointsCallback((ctx, endpointName, endpointCfg) =>
-            {
-                endpointCfg.UseEntityFrameworkOutbox<WriteDbContext>(ctx);
-                endpointCfg.UseMessageRetry(r =>
-                {
-                    r.Handle<InvalidOperationException>();
-                    r.Intervals(
-                        TimeSpan.FromSeconds(10),
-                        TimeSpan.FromSeconds(20),
-                        TimeSpan.FromSeconds(40));
-                });
-            });
-
-            config.UsingRabbitMq((context, busConfig) =>
-            {
-                var connectionString = configuration.GetConnectionString(RabbitMqConnectionSection)!;
-
-                busConfig.Host(new Uri(connectionString!), h => { });
-                busConfig.ConfigureEndpoints(context);
-            });
-
-            config.ConfigureHealthCheckOptions(options =>
-            {
-                options.Name = "masstransit";
-                options.MinimalFailureStatus = HealthStatus.Unhealthy;
-                options.Tags.Add("ready");
-            });
-        });
-
-
         return services;
     }
 }

@@ -1,4 +1,5 @@
-﻿using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
+﻿using System.Reflection;
+using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
 using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,7 +25,24 @@ public static class MediatorExtentions
                 .AsImplementedInterfaces()
                 .WithScopedLifetime());
 
+        services.AddEventHandlers(typeof(TMarker).Assembly);
 
         return services;
+    }
+
+    private static IServiceCollection AddEventHandlers(this IServiceCollection services, Assembly assembly)
+    {
+        services.Scan(selector => selector
+                .FromAssemblies(assembly)
+                .AddClasses(classes => classes
+                    .Where(t => t.GetInterfaces().Any(i =>
+                        i.IsGenericType &&
+                        i.GetGenericTypeDefinition() == typeof(IEventHandler<>))),
+                    publicOnly: false)
+                .AsImplementedInterfaces()
+                .WithScopedLifetime());
+
+        return services;
+
     }
 }
