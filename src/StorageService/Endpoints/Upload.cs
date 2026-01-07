@@ -27,11 +27,12 @@ public class Upload : IEndpoint
             var contentType = request.ContentType ?? "application/octet-stream";
             var contentLength = request.ContentLength ?? throw new ArgumentException("Content-Length is required");
 
-            Result<string> fileResult = await storage.UploadFileAsync(
+            Result<string> fileResult = await storage.UploadObjectAsync(
                 request.Body,
                 key,
                 contentType,
-                contentLength);
+                contentLength,
+                bucket);
 
             if (fileResult.IsFailure)
             {

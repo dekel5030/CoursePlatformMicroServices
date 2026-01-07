@@ -1,7 +1,6 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Kernel;
-using Kernel.EventBus;
 using Microsoft.Extensions.Options;
 using StorageService.Abstractions;
 
@@ -10,13 +9,11 @@ namespace StorageService.S3;
 public class S3StorageProvider : IStorageProvider
 {
     private readonly IAmazonS3 _s3Client;
-    private readonly IEventBus _eventBus;
     private readonly S3Options _options;
 
-    public S3StorageProvider(IAmazonS3 s3Client, IEventBus eventBus, IOptions<S3Options> options)
+    public S3StorageProvider(IAmazonS3 s3Client, IOptions<S3Options> options)
     {
         _s3Client = s3Client;
-        _eventBus = eventBus;
         _options = options.Value;
     }
 
@@ -46,11 +43,12 @@ public class S3StorageProvider : IStorageProvider
 
         return new PresignedUrlResponse(url, fileKey, request.Expires.Value);
     }
-    public async Task<Result<string>> UploadFileAsync(
+    public async Task<Result<string>> UploadObjectAsync(
         Stream httpRequestStream, 
         string fileKey, 
         string contentType, 
-        long contentLength)
+        long contentLength,
+        string bucketName)
     {
         var tempFilePath = Path.GetTempFileName();
 
@@ -65,7 +63,7 @@ public class S3StorageProvider : IStorageProvider
             {
                 var request = new PutObjectRequest
                 {
-                    BucketName = _options.BucketName,
+                    BucketName = bucketName,
                     Key = fileKey,
                     InputStream = uploadStream,
                     ContentType = contentType,
@@ -98,5 +96,20 @@ public class S3StorageProvider : IStorageProvider
         {
             return false;
         }
+    }
+
+    public async Task<ObjectResponse> GetObjectAsync(
+        string bucketName, 
+        string key, 
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _s3Client.GetObjectAsync(bucketName, key, cancellationToken);
+
+        return new ObjectResponse
+        {
+            Content = response.ResponseStream,
+            ContentType = response.Headers.ContentType ?? "application/octet-stream",
+            ContentLength = response.ContentLength
+        };
     }
 }

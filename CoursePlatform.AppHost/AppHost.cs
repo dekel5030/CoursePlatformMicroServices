@@ -1,3 +1,5 @@
+using Aspire.Hosting;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 // RabbitMq configuration
@@ -108,12 +110,15 @@ var coursesService = builder.AddProject<Projects.Courses_Api>("courseservice")
 // Gateway configuration
 
 var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
+    .WithEnvironment(
+        "ReverseProxy__Clusters__garage-website-cluster__Destinations__destination1__Address",
+        garage.GetEndpoint("web")
+    )
     .WithReference(authDb)
     .WithReference(authService)
     .WithReference(usersService)
     .WithReference(coursesService)
-    .WithReference(redis)
-    .WithEnvironment("S3__Endpoint", garage.GetEndpoint("s3"));
+    .WithReference(redis);
 
 var gatewayEndpoint = gateway.GetEndpoint("https");
 coursesService.WithEnvironment("s3__Endpoint", gatewayEndpoint);
