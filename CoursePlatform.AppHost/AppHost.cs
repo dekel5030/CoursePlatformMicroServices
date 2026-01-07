@@ -104,9 +104,8 @@ var coursesService = builder.AddProject<Projects.Courses_Api>("courseservice")
     .WithEnvironment("ConnectionStrings:ReadDatabase", coursesDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:WriteDatabase", coursesDb.Resource.ConnectionStringExpression)
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression)
-    .WithEnvironment("S3__Endpoint", garage.GetEndpoint("s3"))
+    .WithEnvironment("Storage:BaseUrl", $"{storageService.GetEndpoint("https")}/storage")
     .WithHttpHealthCheck("/health");
-
 // Gateway configuration
 
 var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
