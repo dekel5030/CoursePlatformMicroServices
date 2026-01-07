@@ -1,9 +1,11 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
+using Courses.Application.Lessons.Extensions;
 using Courses.Application.Lessons.Queries.Dtos;
+using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Lessons;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -33,7 +35,7 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
     {
         var courseId = new CourseId(request.CourseId);
 
-        var course = await _dbContext.Courses
+        Course? course = await _dbContext.Courses
             .Include(c => c.Lessons)
             .FirstOrDefaultAsync(c => c.Id == courseId, cancellationToken);
 
@@ -45,27 +47,18 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
         Title? lessonTitle = request.Title is null ? null : new Title(request.Title);
         Description? lessonDescription = request.Description is null ? null : new Description(request.Description);
 
-        var result = course.AddLesson(lessonTitle, lessonDescription, _timeProvider);
+        Result<Lesson> result = course.AddLesson(lessonTitle, lessonDescription, _timeProvider);
 
         if (result.IsFailure)
         {
             return Result.Failure<LessonDetailsDto>(result.Error);
         }
 
-        var lesson = result.Value;
+        Lesson lesson = result.Value;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var response = new LessonDetailsDto(
-            lesson.Id.Value,
-            lesson.Title.Value,
-            lesson.Description.Value,
-            lesson.Index,
-            lesson.Duration,
-            lesson.Access == LessonAccess.Public,
-            _urlResolver.Resolve(lesson.ThumbnailImageUrl?.Path ?? string.Empty),
-            _urlResolver.Resolve(lesson.VideoUrl?.Path ?? string.Empty)
-        );
+        LessonDetailsDto response = await lesson.ToDetailsDtoAsync(_urlResolver, cancellationToken);
 
         return Result.Success(response);
     }
