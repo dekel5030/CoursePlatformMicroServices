@@ -2,6 +2,7 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
+using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
@@ -27,7 +28,7 @@ internal class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, Cou
     {
         CourseId courseId = new(request.Id);
 
-        var course = await _dbContext.Courses
+        Course? course = await _dbContext.Courses
             .Include(c => c.Lessons)
             .FirstOrDefaultAsync(c => c.Id == courseId, cancellationToken);
 
