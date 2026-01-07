@@ -49,11 +49,11 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
         builder.Property(l => l.ThumbnailImageUrl)
             .HasConversion(
                 url => url != null ? url.Path : null,
-                value => value != null ? ImageUrl.Create(value) : null);
+                value => value != null ? new ImageUrl(value) : null);
 
         builder.Property(lesson => lesson.VideoUrl)
             .HasConversion(
                 url => url != null ? url.Path : null,
-                value => value != null ? VideoUrl.Create(value) : null);
+                value => value != null ? new VideoUrl(value) : null);
     }
 }

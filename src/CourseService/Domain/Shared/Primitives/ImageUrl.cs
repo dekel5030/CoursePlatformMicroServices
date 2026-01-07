@@ -1,27 +1,16 @@
 ﻿namespace Courses.Domain.Shared.Primitives;
 
-public sealed record ImageUrl
+public sealed record ImageUrl : Url
 {
-    private static readonly string[] _allowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+    private static readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
 
-    public Url Value { get; }
+    #pragma warning disable CS8618
+    private ImageUrl() : base() { }
+    #pragma warning restore CS8618
 
-    public string Path => Value.Path;
-
-    #pragma warning disable CS8618 
-    private ImageUrl() { }
-    #pragma warning restore CS8618 
-
-    private ImageUrl(Url value)
+    public ImageUrl(string path) : base(path)
     {
-        Value = value;
-    }
-
-    public static ImageUrl Create(string path)
-    {
-        if (!_allowedExtensions.Any(ext => path.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+        if (!_allowedExtensions.Any(ext => Path.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
             throw new ArgumentException("Invalid image format");
-
-        return new ImageUrl(Url.Create(path));
     }
 }

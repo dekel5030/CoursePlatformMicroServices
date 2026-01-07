@@ -57,7 +57,7 @@ internal class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
             return;
         }
 
-        var imageUrl = ImageUrl.Create(@event.FileKey);
+        var imageUrl = new ImageUrl(@event.FileKey);
         course.AddImage(imageUrl, TimeProvider.System);
 
         await _writeDbContext.SaveChangesAsync(ct);
