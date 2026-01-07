@@ -12,8 +12,11 @@ internal static class LessonMappingExtensions
         IStorageUrlResolver resolver,
         CancellationToken cancellationToken = default)
     {
-        var thumbnailUrl = lesson.ThumbnailImageUrl != null
-            ? (await resolver.ResolveAsync(StorageCategory.Public, lesson.ThumbnailImageUrl.Path, cancellationToken)).Value
+        string? thumbnailUrl = lesson.ThumbnailImageUrl != null
+            ? (await resolver.ResolveAsync(
+                StorageCategory.Public, 
+                lesson.ThumbnailImageUrl.Path, 
+                cancellationToken)).Value
             : null;
 
         return new LessonSummaryDto(
@@ -27,13 +30,32 @@ internal static class LessonMappingExtensions
         );
     }
 
+    public static async Task<List<LessonSummaryDto>> ToSummaryDtosAsync(
+        this IEnumerable<Lesson> lessons,
+        IStorageUrlResolver resolver,
+        CancellationToken cancellationToken = default)
+    {
+        IEnumerable<Task<LessonSummaryDto>> tasks = lessons
+            .Select(l => l.ToSummaryDtoAsync(resolver, cancellationToken));
+
+        LessonSummaryDto[] results = await Task.WhenAll(tasks);
+        return results.ToList();
+    }
+
     public static async Task<LessonDetailsDto> ToDetailsDtoAsync(
         this Lesson lesson,
         IStorageUrlResolver resolver,
         CancellationToken cancellationToken = default)
     {
-        var thumbTask = resolver.ResolveAsync(StorageCategory.Public, lesson.ThumbnailImageUrl?.Path ?? string.Empty, cancellationToken);
-        var videoTask = resolver.ResolveAsync(StorageCategory.Private, lesson.VideoUrl?.Path ?? string.Empty, cancellationToken);
+        Task<ResolvedUrl> thumbTask = resolver
+            .ResolveAsync(StorageCategory.Public, 
+            lesson.ThumbnailImageUrl?.Path ?? string.Empty, 
+            cancellationToken);
+
+        Task<ResolvedUrl> videoTask = resolver.ResolveAsync(
+            StorageCategory.Private, 
+            lesson.VideoUrl?.Path ?? string.Empty, 
+            cancellationToken);
 
         await Task.WhenAll(thumbTask, videoTask);
 

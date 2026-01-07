@@ -1,6 +1,7 @@
 ﻿using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Lessons.Extensions;
+using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Domain.Courses;
 
 namespace Courses.Application.Courses.Extensions;
@@ -12,17 +13,15 @@ internal static class CourseMappingExtensions
         IStorageUrlResolver resolver,
         CancellationToken cancellationToken = default)
     {
-        var imageTasks = course.Images
+        List<Task<ResolvedUrl>> imageTasks = course.Images
             .Select(img => resolver.ResolveAsync(StorageCategory.Public, img.Path, cancellationToken))
             .ToList();
 
-        var lessonTasks = course.Lessons
+        Task<List<LessonSummaryDto>> lessonsTask = course.Lessons
             .OrderBy(l => l.Index)
-            .Select(l => l.ToSummaryDtoAsync(resolver, cancellationToken))
-            .ToList();
+            .ToSummaryDtosAsync(resolver, cancellationToken);
 
-        await Task.WhenAll(imageTasks);
-        await Task.WhenAll(lessonTasks);
+        await Task.WhenAll(Task.WhenAll(imageTasks), lessonsTask);
 
         return new CourseDetailsDto(
             Id: course.Id.Value,
@@ -34,16 +33,20 @@ internal static class CourseMappingExtensions
             EnrollmentCount: course.EnrollmentCount,
             UpdatedAtUtc: course.UpdatedAtUtc,
             ImageUrls: imageTasks.Select(t => t.Result.Value).ToList(),
-            Lessons: lessonTasks.Select(t => t.Result).ToList()
+            Lessons: lessonsTask.Result
         );
     }
+
     public static async Task<CourseSummaryDto> ToSummaryDtoAsync(
         this Course course,
         IStorageUrlResolver resolver,
         CancellationToken cancellationToken = default)
     {
-        var firstImagePath = course.Images.FirstOrDefault()?.Path ?? string.Empty;
-        var resolvedUrl = await resolver.ResolveAsync(StorageCategory.Public, firstImagePath, cancellationToken);
+        string firstImagePath = course.Images.FirstOrDefault()?.Path ?? string.Empty;
+        ResolvedUrl resolvedUrl = await resolver.ResolveAsync(
+            StorageCategory.Public, 
+            firstImagePath, 
+            cancellationToken);
 
         return new CourseSummaryDto(
             Id: course.Id.Value,
@@ -62,7 +65,10 @@ internal static class CourseMappingExtensions
         IStorageUrlResolver resolver,
         CancellationToken cancellationToken = default)
     {
-        var tasks = courses.Select(c => c.ToSummaryDtoAsync(resolver, cancellationToken));
-        return (await Task.WhenAll(tasks)).ToList();
+        IEnumerable<Task<CourseSummaryDto>> tasks = courses
+            .Select(c => c.ToSummaryDtoAsync(resolver, cancellationToken));
+
+        CourseSummaryDto[] results = await Task.WhenAll(tasks);
+        return results.ToList();
     }
 }
