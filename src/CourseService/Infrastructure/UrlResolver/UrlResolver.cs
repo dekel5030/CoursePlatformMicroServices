@@ -6,6 +6,6 @@ internal class UrlResolver : IUrlResolver
 {
     public string Resolve(string relativePath)
     {
-        return string.Empty;
+        return relativePath;
     }
 }

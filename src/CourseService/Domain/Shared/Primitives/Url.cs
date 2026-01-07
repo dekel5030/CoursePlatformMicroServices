@@ -1,31 +1,27 @@
 ﻿namespace Courses.Domain.Shared.Primitives;
 
-public sealed record Url
+public record Url
 {
-    public string Path { get; }
+    public string Path { get; init; }
 
-    #pragma warning disable CS8618 
-    private Url() { }
+    #pragma warning disable CS8618
+    protected Url() { }
     #pragma warning restore CS8618
 
-    private Url(string path)
-    {
-        Path = path;
-    }
-
-    public static Url Create(string path)
+    public Url(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
-            throw new ArgumentException("URL path cannot be empty");
+            throw new ArgumentException("Path cannot be empty");
 
-        return new Url(path.Trim());
+        if (!Uri.IsWellFormedUriString(path, UriKind.Relative))
+        {
+            throw new ArgumentException("Path must be a valid relative URI (no domain allowed)");
+        }
+
+        Path = path.Trim().TrimStart('/');
     }
 
-    public Uri ToUri(string baseDomain)
-    {
-        if (string.IsNullOrWhiteSpace(baseDomain))
-            throw new ArgumentException("Base domain cannot be empty");
+    public Uri ToUri(string baseDomain) => new Uri(new Uri(baseDomain), Path);
 
-        return new Uri($"{baseDomain.TrimEnd('/')}/{Path.TrimStart('/')}");
-    }
+    public override string ToString() => Path;
 }

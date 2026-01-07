@@ -51,7 +51,7 @@ public class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, PagedRespon
                     c.InstructorId?.Value.ToString(),
                     c.Price.Amount,
                     c.Price.Currency,
-                    _urlResolver.Resolve(c.Images?.FirstOrDefault()?.Value.Path ?? string.Empty),
+                    _urlResolver.Resolve(c.Images?.FirstOrDefault()?.Path ?? string.Empty),
                     c.LessonsCount,
                     c.EnrollmentCount
                 )).ToList();
