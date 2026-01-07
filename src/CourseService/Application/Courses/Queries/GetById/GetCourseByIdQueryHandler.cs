@@ -1,9 +1,9 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
+using Courses.Application.Courses.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -36,46 +36,7 @@ internal class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, Cou
             return Result.Failure<CourseDetailsDto>(CourseErrors.NotFound);
         }
 
-        var imageTasks = course.Images
-            .Select(img => _urlResolver.ResolveAsync(StorageCategory.Public, img.Path))
-            .ToList();
-
-        var resolvedImages = await Task.WhenAll(imageTasks);
-
-        var lessonTasks = course.Lessons
-            .OrderBy(l => l.Index)
-            .Select(async lesson =>
-            {
-                var thumbnailUrl = lesson.ThumbnailImageUrl != null
-                    ? (await _urlResolver.ResolveAsync(StorageCategory.Public, lesson.ThumbnailImageUrl.Path)).Value
-                    : string.Empty;
-
-                return new LessonSummaryDto(
-                    Id: lesson.Id.Value,
-                    Title: lesson.Title.Value,
-                    Description: lesson.Description.Value,
-                    Index: lesson.Index,
-                    Duration: lesson.Duration,
-                    IsPreview: lesson.Access == LessonAccess.Public,
-                    ThumbnailUrl: thumbnailUrl
-                );
-            })
-            .ToList();
-
-        var lessons = await Task.WhenAll(lessonTasks);
-
-        var response = new CourseDetailsDto(
-            Id: course.Id.Value,
-            Title: course.Title.Value,
-            Description: course.Description.Value,
-            InstructorName: course.InstructorId?.Value.ToString(),
-            Price: course.Price.Amount,
-            Currency: course.Price.Currency,
-            EnrollmentCount: course.EnrollmentCount,
-            UpdatedAtUtc: course.UpdatedAtUtc,
-            ImageUrls: resolvedImages.Select(r => r.Value).ToList(),
-            Lessons: lessons.ToList()
-        );
+        CourseDetailsDto response = await course.ToDetailsDtoAsync(_urlResolver, cancellationToken);
 
         return Result.Success(response);
     }
