@@ -3,16 +3,17 @@ using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
+using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 
 namespace Courses.Domain.Courses;
 
-public class Course : Entity
+public class Course : Entity<CourseId>
 {
     private readonly List<Lesson> _lessons = new();
     private readonly List<ImageUrl> _images = new();
-    public CourseId Id { get; private set; }
+    public override CourseId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
     public InstructorId? InstructorId { get; private set; } = null;

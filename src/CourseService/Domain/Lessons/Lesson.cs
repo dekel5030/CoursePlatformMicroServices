@@ -4,12 +4,13 @@ using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Courses;
 using Courses.Domain.Shared.Primitives;
 using Courses.Domain.Lessons.Events;
+using Courses.Domain.Shared;
 
 namespace Courses.Domain.Lessons;
 
-public class Lesson : Entity
+public class Lesson : Entity<LessonId>
 {
-    public LessonId Id { get; private set; } = LessonId.CreateNew();
+    public override LessonId Id { get; protected set; } = LessonId.CreateNew();
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
     public LessonAccess Access { get; private set; } = LessonAccess.Private;

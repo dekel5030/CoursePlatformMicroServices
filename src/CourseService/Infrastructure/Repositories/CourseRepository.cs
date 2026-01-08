@@ -5,21 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Repositories;
 
-public class CourseRepository : IRepository<Course, CourseId>
+public class CourseRepository : RepositoryBase<Course, CourseId>
 {
-    private readonly WriteDbContext _dbContext;
-
-    public CourseRepository(WriteDbContext writeDbContext)
+    public CourseRepository(WriteDbContext dbContext) : base(dbContext)
     {
-        _dbContext = writeDbContext;
     }
 
-    public void Add(Course entity)
-    {
-        _dbContext.Courses.Add(entity);
-    }
-
-    public Task<Course?> GetByidAsync(
+    public override Task<Course?> GetByIdAsync(
         CourseId id, 
         CancellationToken cancellationToken = default)
     {
