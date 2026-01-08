@@ -50,53 +50,6 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddDatabases(this IServiceCollection services, IConfiguration configuration)
-    {
-        return services
-            .AddReadDatabase(configuration)
-            .AddWriteDatabase(configuration);
-    }
-
-    private static IServiceCollection AddReadDatabase(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
-        {
-            var connectionString = configuration.GetConnectionString(ReadDatabaseConnectionSection)!;
-
-            options
-                .UseNpgsql(connectionString, npgsqlOptions =>
-                {
-                    npgsqlOptions.MigrationsHistoryTable(
-                        HistoryRepository.DefaultTableName);
-                })
-                .UseSnakeCaseNamingConvention();
-        });
-
-        services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<ReadDbContext>());
-
-        return services;
-    }
-
-    private static IServiceCollection AddWriteDatabase(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
-        {
-            var connectionString = configuration.GetConnectionString(WriteDatabaseConnectionSection)!;
-
-            options
-                .UseNpgsql(connectionString, npgsqlOptions =>
-                {
-                    npgsqlOptions.MigrationsHistoryTable(
-                        HistoryRepository.DefaultTableName);
-                })
-                .UseSnakeCaseNamingConvention();
-        });
-
-        services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<WriteDbContext>());
-
-        return services;
-    }
-
     private static IServiceCollection AddHealthChecksInternal(this IServiceCollection services, IConfiguration configuration)
     {
         //services
