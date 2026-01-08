@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Repositories;
 
-public class FeaturedCoursesRepo: IFeaturedCoursesRepository
+public class FeaturedCoursesRepo : IFeaturedCoursesRepository
 {
     private readonly IReadDbContext _dbContext;
 
