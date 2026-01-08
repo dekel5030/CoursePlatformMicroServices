@@ -1,10 +1,11 @@
-﻿using Courses.Domain.Shared;
+﻿using Courses.Application.Abstractions.Data.Repositories;
+using Courses.Domain.Shared;
 using Courses.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Repositories;
 
-public abstract class RepositoryBase<TEntity, TId>
+public abstract class RepositoryBase<TEntity, TId> : IRepository<TEntity, TId>
     where TEntity : Entity<TId>
     where TId : IEquatable<TId>
 {
