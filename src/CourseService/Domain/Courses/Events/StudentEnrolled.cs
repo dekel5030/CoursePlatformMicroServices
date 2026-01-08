@@ -1,4 +1,5 @@
-﻿using Kernel.Messaging.Abstractions;
+﻿using Courses.Domain.Courses.Primitives;
+using Kernel.Messaging.Abstractions;
 
 namespace Courses.Domain.Courses.Events;
 

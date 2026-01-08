@@ -2,6 +2,8 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons;
+using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel.EventBus;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +16,8 @@ internal class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
     private readonly IWriteDbContext _writeDbContext;
     private readonly ILogger<FileUploadedEventConsumer> _logger;
     private const string CourseServiceName = "courseservice";
+    private const string LessonImage = "lessonimage";
+    private const string CourseImage = "courseimage";
 
     public FileUploadedEventConsumer(IWriteDbContext writeDbContext, ILogger<FileUploadedEventConsumer> logger)
     {
@@ -30,26 +34,28 @@ internal class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
 
         switch (@event.ReferenceType.ToLower())
         {
-            case "courseimage":
+            case CourseImage:
                 await HandleCourseImageAsync(@event, cancellationToken);
                 break;
 
-            case "coursevideo":
+            case LessonImage:
+                await HandleLessonImageAsync(@event, cancellationToken);
                 break;
         }
     }
 
-    private async Task HandleCourseImageAsync(FileUploadedEvent @event, CancellationToken ct)
+    private async Task HandleCourseImageAsync(
+        FileUploadedEvent @event, 
+        CancellationToken cancellationToken = default)
     {
-        if (!Guid.TryParse(@event.ReferenceId, out var guidId))
+        if (!CourseId.TryParse(@event.ReferenceId, out var courseId))
         {
             _logger.LogError("Invalid ReferenceId format: {ReferenceId}", @event.ReferenceId);
             return;
         }
 
-        var courseId = new CourseId(guidId);
         Course? course = await _writeDbContext.Courses
-            .FirstOrDefaultAsync(c => c.Id == courseId, ct);
+            .FirstOrDefaultAsync(c => c.Id == courseId, cancellationToken);
 
         if (course is null)
         {
@@ -60,8 +66,36 @@ internal class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
         var imageUrl = new ImageUrl(@event.FileKey);
         course.AddImage(imageUrl, TimeProvider.System);
 
-        await _writeDbContext.SaveChangesAsync(ct);
+        await _writeDbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Updated image for course {CourseId}", courseId);
+    }
+
+    private async Task HandleLessonImageAsync(
+        FileUploadedEvent @event, 
+        CancellationToken cancellationToken = default)
+    {
+        if (!Guid.TryParse(@event.ReferenceId, out var guidId))
+        {
+            _logger.LogError("Invalid ReferenceId format: {ReferenceId}", @event.ReferenceId);
+            return;
+        }
+
+        var lessonId = new LessonId(guidId);
+        Lesson? lesson = await _writeDbContext.Lessons
+            .FirstOrDefaultAsync(c => c.Id == lessonId, cancellationToken);
+
+        if (lesson is null)
+        {
+            _logger.LogWarning("Lesson with ID {LessonId} not found for uploaded image", lessonId);
+            return;
+        }
+
+        var imageUrl = new ImageUrl(@event.FileKey);
+        lesson.SetThumbnailImage(imageUrl);
+
+        await _writeDbContext.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Updated image for lesson {LessonId}", lessonId);
     }
 }
