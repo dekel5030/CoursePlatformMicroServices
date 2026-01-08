@@ -1,4 +1,4 @@
-﻿using Courses.Domain.Courses;
+﻿using Courses.Domain.Courses.Primitives;
 using Kernel;
 
 namespace Courses.Domain.SubScriptions;

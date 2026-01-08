@@ -3,7 +3,7 @@ using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Courses;
 using Courses.Domain.Shared.Primitives;
-using Kernel.Messaging.Abstractions;
+using Courses.Domain.Lessons.Events;
 
 namespace Courses.Domain.Lessons;
 
@@ -84,5 +84,3 @@ public class Lesson : Entity
         return Result.Success();
     }
 }
-
-public record LessonVideoDataUpdatedDomainEvent(Lesson Lesson) : IDomainEvent;
