@@ -20,7 +20,8 @@ internal static class LessonMappingExtensions
             : null;
 
         return new LessonSummaryDto(
-            Id: lesson.Id.Value,
+            CourseId: lesson.CourseId.Value,
+            LessonId: lesson.Id.Value,
             Title: lesson.Title.Value,
             Description: lesson.Description.Value,
             Index: lesson.Index,
@@ -60,7 +61,8 @@ internal static class LessonMappingExtensions
         await Task.WhenAll(thumbTask, videoTask);
 
         return new LessonDetailsDto(
-            Id: lesson.Id.Value,
+            CourseId: lesson.CourseId.Value,
+            LessonId: lesson.Id.Value,
             Title: lesson.Title.Value,
             Description: lesson.Description.Value,
             Index: lesson.Index,

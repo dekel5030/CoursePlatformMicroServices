@@ -1,11 +1,16 @@
 // Components
-export { default as Lesson } from "./components/LessonCard";
+export { default as LessonCard } from "./components/LessonCard";
 
 // Pages
 export { default as LessonPage } from "./pages/LessonPage";
 
 // Hooks - Consolidated data access with centralized query keys
-export { useLesson, useCreateLesson, usePatchLesson, lessonsQueryKeys } from "./hooks/use-lessons";
+export {
+  useLesson,
+  useCreateLesson,
+  usePatchLesson,
+  lessonsQueryKeys,
+} from "./hooks/use-lessons";
 
 // API
 export * from "./api";

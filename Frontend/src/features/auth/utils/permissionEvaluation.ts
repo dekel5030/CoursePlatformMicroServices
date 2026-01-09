@@ -40,10 +40,11 @@ export function hasPermission(
     typeof requiredResource === "string"
       ? requiredResource.toLowerCase()
       : (requiredResource as string).toLowerCase();
-  const targetId =
-    typeof requiredIdOrResourceId === "string"
-      ? requiredIdOrResourceId.toLowerCase()
-      : requiredIdOrResourceId.value.toLowerCase();
+  const targetId = !requiredIdOrResourceId
+    ? ""
+    : typeof requiredIdOrResourceId === "string"
+    ? requiredIdOrResourceId.toLowerCase()
+    : requiredIdOrResourceId.value?.toLowerCase() ?? "";
 
   for (const permission of permissions) {
     const pAction = permission.action.toLowerCase();
