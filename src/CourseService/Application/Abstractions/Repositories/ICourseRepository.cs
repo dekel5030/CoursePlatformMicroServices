@@ -1,7 +1,7 @@
 ﻿using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 
-namespace Courses.Application.Abstractions.Data.Repositories;
+namespace Courses.Application.Abstractions.Repositories;
 
 public interface ICourseRepository : IRepository<Course, CourseId>
 {
