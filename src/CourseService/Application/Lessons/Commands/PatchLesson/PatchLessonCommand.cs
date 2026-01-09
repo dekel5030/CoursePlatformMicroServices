@@ -8,4 +8,4 @@ public record PatchLessonCommand(
     Guid LessonId,
     string? Title,
     string? Description,
-    LessonAccess Access) : ICommand;
+    LessonAccess? Access) : ICommand;
