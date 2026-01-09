@@ -3,7 +3,7 @@ using Courses.Domain.Shared;
 using Courses.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Infrastructure.Repositories;
+namespace Courses.Infrastructure.Database.Repositories;
 
 public abstract class RepositoryBase<TEntity, TId> : IRepository<TEntity, TId>
     where TEntity : Entity<TId>
@@ -20,6 +20,7 @@ public abstract class RepositoryBase<TEntity, TId> : IRepository<TEntity, TId>
     {
         return _dbContext.Set<TEntity>().FirstOrDefaultAsync(entity => entity.Id.Equals(id), cancellationToken);
     }
+
     public virtual void Add(TEntity entity)
     {
         _dbContext.Set<TEntity>().Add(entity);

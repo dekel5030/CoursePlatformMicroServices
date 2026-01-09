@@ -2,8 +2,8 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Data.Repositories;
 using Courses.Infrastructure.Database;
+using Courses.Infrastructure.Database.Repositories;
 using Courses.Infrastructure.MassTransit;
-using Courses.Infrastructure.Repositories;
 using Courses.Infrastructure.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
