@@ -23,9 +23,7 @@ public class DeleteCourseCommandHandler : ICommandHandler<DeleteCourseCommand>
         DeleteCourseCommand request, 
         CancellationToken cancellationToken = default)
     {
-        CourseId courseId = new CourseId(request.CourseId);
-
-        Course? course = await _courseRepository.GetByIdAsync(courseId, cancellationToken);
+        Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
         
         if (course is null)
         {

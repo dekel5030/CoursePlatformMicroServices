@@ -1,9 +1,10 @@
+using Courses.Domain.Courses.Primitives;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Commands.PatchCourse;
 
 public record PatchCourseCommand(
-    Guid CourseId,
+    CourseId CourseId,
     string? Title,
     string? Description,
     Guid? InstructorId,

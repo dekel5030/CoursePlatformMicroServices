@@ -1,7 +1,9 @@
-﻿namespace Courses.Application.Courses.Queries.Dtos;
+﻿using Courses.Domain.Courses.Primitives;
+
+namespace Courses.Application.Courses.Queries.Dtos;
 
 public record CourseSummaryDto(
-    Guid Id,
+    CourseId Id,
     string Title,
     string? InstructorName,
     decimal Price,

@@ -1,3 +1,5 @@
-﻿namespace Courses.Application.Courses.Commands.CreateCourse;
+﻿using Courses.Domain.Courses.Primitives;
 
-public record CreateCourseResponse(Guid CourseId, string Title);
+namespace Courses.Application.Courses.Commands.CreateCourse;
+
+public record CreateCourseResponse(CourseId CourseId, string Title);

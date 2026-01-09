@@ -30,10 +30,7 @@ internal class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
         PatchLessonCommand request,
         CancellationToken cancellationToken = default)
     {
-        var courseId = new CourseId(request.CourseId);
-        var lessonId = new LessonId(request.LessonId);
-
-        Course? course = await _courseRepository.GetByIdAsync(courseId, cancellationToken);
+        Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
         
         if (course is null)
         {
@@ -41,7 +38,7 @@ internal class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
         }
 
         Result updateResult = course.UpdateLesson(
-            lessonId,
+            request.LessonId,
             request.Title is null ? null : new Title(request.Title),
             request.Description is null ? null : new Description(request.Description),
             request.Access,

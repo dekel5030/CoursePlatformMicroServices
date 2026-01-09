@@ -5,7 +5,6 @@ using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Commands.PatchCourse;
 
@@ -26,9 +25,7 @@ internal class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
         PatchCourseCommand request,
         CancellationToken cancellationToken = default)
     {
-        var courseId = new CourseId(request.CourseId);
-
-        var course = await _courseRepository.GetByIdAsync(courseId, cancellationToken);
+        var course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
 
         if (course is null)
         {

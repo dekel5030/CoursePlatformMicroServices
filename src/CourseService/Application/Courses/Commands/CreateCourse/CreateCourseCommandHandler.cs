@@ -48,7 +48,7 @@ internal class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand,
         await _courseRepository.AddAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var responseDto = new CreateCourseResponse(course.Id.Value, course.Title.Value);
+        var responseDto = new CreateCourseResponse(course.Id, course.Title.Value);
 
         return Result.Success(responseDto);
     }

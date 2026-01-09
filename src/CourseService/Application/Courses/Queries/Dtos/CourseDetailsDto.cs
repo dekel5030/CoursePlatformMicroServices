@@ -1,9 +1,10 @@
 ﻿using Courses.Application.Lessons.Queries.Dtos;
+using Courses.Domain.Courses.Primitives;
 
 namespace Courses.Application.Courses.Queries.Dtos;
 
 public record CourseDetailsDto(
-    Guid Id,
+    CourseId Id,
     string Title,
     string Description,
     string? InstructorName,
