@@ -25,17 +25,18 @@ interface LessonProps {
   index: number;
 }
 
-export default function Lesson({ lesson, index }: LessonProps) {
+export default function LessonCard({ lesson, index }: LessonProps) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(["lessons", "translation"]);
-  const patchLesson = usePatchLesson(lesson.id, lesson.courseId);
-  const deleteLesson = useDeleteLesson(lesson.courseId);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  
-  // Determine text alignment based on interface locale
-  const isRTL = i18n.dir() === 'rtl';
-  const textAlignClass = isRTL ? 'text-right' : 'text-left';
 
+  const patchLesson = usePatchLesson(lesson.courseId, lesson.lessonId);
+
+  const deleteLesson = useDeleteLesson(lesson.courseId);
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const isRTL = i18n.dir() === "rtl";
+  const textAlignClass = isRTL ? "text-right" : "text-left";
   const formatDuration = (duration: string | null | undefined) => {
     if (!duration) return null;
 
@@ -53,7 +54,7 @@ export default function Lesson({ lesson, index }: LessonProps) {
   };
 
   const handleLessonClick = () => {
-    navigate(`/lessons/${lesson.id}`);
+    navigate(`/courses/${lesson.courseId}/lessons/${lesson.lessonId}`);
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -63,11 +64,11 @@ export default function Lesson({ lesson, index }: LessonProps) {
 
   const handleConfirmDelete = async () => {
     try {
-      await deleteLesson.mutateAsync(lesson.id);
+      await deleteLesson.mutateAsync(lesson.lessonId);
       toast.success(t("lessons:actions.deleteSuccess"));
     } catch (error) {
       toast.error(t("lessons:actions.deleteFailed"));
-      console.error('Failed to delete lesson:', error);
+      console.error("Failed to delete lesson:", error);
     } finally {
       setIsDeleteDialogOpen(false);
     }
@@ -101,9 +102,8 @@ export default function Lesson({ lesson, index }: LessonProps) {
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
-          // Prevent navigation if user is editing (inside an input field)
           const target = e.target as HTMLElement;
-          if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+          if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
             return;
           }
           if (e.key === "Enter" || e.key === " ") {
@@ -122,9 +122,12 @@ export default function Lesson({ lesson, index }: LessonProps) {
                 <Authorized
                   action={ActionType.Update}
                   resource={ResourceType.Lesson}
-                  resourceId={ResourceId.create(lesson.id)}
+                  resourceId={ResourceId.create(lesson.lessonId)}
                   fallback={
-                    <h3 className={`font-semibold text-base line-clamp-1 ${textAlignClass}`} dir="auto">
+                    <h3
+                      className={`font-semibold text-base line-clamp-1 ${textAlignClass}`}
+                      dir="auto"
+                    >
                       {lesson.title}
                     </h3>
                   }
@@ -146,16 +149,19 @@ export default function Lesson({ lesson, index }: LessonProps) {
                   </Badge>
                 )}
               </div>
-              {/* Show description inline edit for authorized users, or static text if description exists */}
+
               {lesson.description !== null &&
                 lesson.description !== undefined && (
                   <Authorized
                     action={ActionType.Update}
                     resource={ResourceType.Lesson}
-                    resourceId={ResourceId.create(lesson.id)}
+                    resourceId={ResourceId.create(lesson.lessonId)}
                     fallback={
                       lesson.description ? (
-                        <p className={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`} dir="auto">
+                        <p
+                          className={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`}
+                          dir="auto"
+                        >
                           {lesson.description}
                         </p>
                       ) : null
@@ -186,7 +192,7 @@ export default function Lesson({ lesson, index }: LessonProps) {
                 <Authorized
                   action={ActionType.Delete}
                   resource={ResourceType.Lesson}
-                  resourceId={ResourceId.create(lesson.id)}
+                  resourceId={ResourceId.create(lesson.lessonId)}
                 >
                   <Button
                     variant="ghost"
@@ -209,10 +215,10 @@ export default function Lesson({ lesson, index }: LessonProps) {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleConfirmDelete}
-        title={t('lessons:actions.deleteConfirmTitle')}
-        message={t('lessons:actions.deleteConfirmMessage')}
-        confirmText={t('common.delete')}
-        cancelText={t('common.cancel')}
+        title={t("lessons:actions.deleteConfirmTitle")}
+        message={t("lessons:actions.deleteConfirmMessage")}
+        confirmText={t("common.delete")}
+        cancelText={t("common.cancel")}
         isLoading={deleteLesson.isPending}
       />
     </>

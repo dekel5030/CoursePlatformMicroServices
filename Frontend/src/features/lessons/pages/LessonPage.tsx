@@ -15,21 +15,32 @@ import { Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
+import {
+  Authorized,
+  ActionType,
+  ResourceType,
+  ResourceId,
+} from "@/features/auth";
 
 export default function LessonPage() {
-  const { id } = useParams<{ id: string }>();
-  const { data: lesson, isLoading, error } = useLesson(id);
-  const { data: course } = useCourse(lesson?.courseId);
-  const patchLesson = usePatchLesson(id!, lesson?.courseId);
+  const { courseId, lessonId } = useParams<{
+    courseId: string;
+    lessonId: string;
+  }>();
+
+  const { data: lesson, isLoading, error } = useLesson(courseId!, lessonId);
+  const { data: course } = useCourse(courseId!);
+
+  const patchLesson = usePatchLesson(courseId!, lessonId!);
+
   const { t } = useTranslation();
 
   const handleTitleUpdate = async (newTitle: string) => {
     try {
       await patchLesson.mutateAsync({ title: newTitle });
-      toast.success(t('lessons:actions.titleUpdated'));
+      toast.success(t("lessons:actions.titleUpdated"));
     } catch (error) {
-      toast.error(t('lessons:actions.titleUpdateFailed'));
+      toast.error(t("lessons:actions.titleUpdateFailed"));
       throw error;
     }
   };
@@ -37,9 +48,9 @@ export default function LessonPage() {
   const handleDescriptionUpdate = async (newDescription: string) => {
     try {
       await patchLesson.mutateAsync({ description: newDescription });
-      toast.success(t('lessons:actions.descriptionUpdated'));
+      toast.success(t("lessons:actions.descriptionUpdated"));
     } catch (error) {
-      toast.error(t('lessons:actions.descriptionUpdateFailed'));
+      toast.error(t("lessons:actions.descriptionUpdateFailed"));
       throw error;
     }
   };
@@ -158,7 +169,7 @@ export default function LessonPage() {
                 <Authorized
                   action={ActionType.Update}
                   resource={ResourceType.Lesson}
-                  resourceId={ResourceId.create(lesson.id)}
+                  resourceId={ResourceId.create(lesson.lessonId)}
                   fallback={
                     <CardTitle className="text-3xl" dir="auto">
                       {lesson.title}
@@ -170,7 +181,7 @@ export default function LessonPage() {
                     onSave={handleTitleUpdate}
                     displayClassName="text-3xl font-semibold"
                     inputClassName="text-3xl font-semibold"
-                    placeholder={t('lessons:actions.enterTitle')}
+                    placeholder={t("lessons:actions.enterTitle")}
                     maxLength={200}
                   />
                 </Authorized>
@@ -183,44 +194,41 @@ export default function LessonPage() {
               </div>
             </CardHeader>
 
-            {/* Always show description section to allow adding description if empty */}
-            {id && (
-              <CardContent>
-                <div className="space-y-2">
-                  <h2 className="text-lg font-semibold">
-                    {t("pages.lesson.description")}
-                  </h2>
-                  <Authorized
-                    action={ActionType.Update}
-                    resource={ResourceType.Lesson}
-                    resourceId={ResourceId.create(lesson.id)}
-                    fallback={
-                      lesson.description ? (
-                        <p
-                          className="text-muted-foreground leading-relaxed"
-                          dir="auto"
-                        >
-                          {lesson.description}
-                        </p>
-                      ) : (
-                        <p className="text-muted-foreground italic">
-                          {t('lessons:actions.noDescription')}
-                        </p>
-                      )
-                    }
-                  >
-                    <InlineEditableTextarea
-                      value={lesson.description || ""}
-                      onSave={handleDescriptionUpdate}
-                      displayClassName="text-muted-foreground leading-relaxed"
-                      placeholder={t('lessons:actions.enterDescription')}
-                      rows={5}
-                      maxLength={2000}
-                    />
-                  </Authorized>
-                </div>
-              </CardContent>
-            )}
+            <CardContent>
+              <div className="space-y-2">
+                <h2 className="text-lg font-semibold">
+                  {t("pages.lesson.description")}
+                </h2>
+                <Authorized
+                  action={ActionType.Update}
+                  resource={ResourceType.Lesson}
+                  resourceId={ResourceId.create(lesson.lessonId)}
+                  fallback={
+                    lesson.description ? (
+                      <p
+                        className="text-muted-foreground leading-relaxed"
+                        dir="auto"
+                      >
+                        {lesson.description}
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground italic">
+                        {t("lessons:actions.noDescription")}
+                      </p>
+                    )
+                  }
+                >
+                  <InlineEditableTextarea
+                    value={lesson.description || ""}
+                    onSave={handleDescriptionUpdate}
+                    displayClassName="text-muted-foreground leading-relaxed"
+                    placeholder={t("lessons:actions.enterDescription")}
+                    rows={5}
+                    maxLength={2000}
+                  />
+                </Authorized>
+              </div>
+            </CardContent>
           </Card>
         </motion.div>
       </motion.div>

@@ -1,12 +1,12 @@
 ﻿using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Data.Repositories;
+using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Repositories;
 
-public class FeaturedCoursesRepo: IFeaturedCoursesRepository
+public class FeaturedCoursesRepo : IFeaturedCoursesRepository
 {
     private readonly IReadDbContext _dbContext;
 

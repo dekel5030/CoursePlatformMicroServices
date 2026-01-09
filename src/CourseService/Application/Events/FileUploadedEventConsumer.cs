@@ -75,13 +75,12 @@ internal class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
         FileUploadedEvent @event, 
         CancellationToken cancellationToken = default)
     {
-        if (!Guid.TryParse(@event.ReferenceId, out var guidId))
+        if (!LessonId.TryParse(@event.ReferenceId, out var lessonId))
         {
             _logger.LogError("Invalid ReferenceId format: {ReferenceId}", @event.ReferenceId);
             return;
         }
 
-        var lessonId = new LessonId(guidId);
         Lesson? lesson = await _writeDbContext.Lessons
             .FirstOrDefaultAsync(c => c.Id == lessonId, cancellationToken);
 

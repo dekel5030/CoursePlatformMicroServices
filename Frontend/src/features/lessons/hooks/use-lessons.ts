@@ -1,65 +1,78 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchLessonById, createLesson, patchLesson, deleteLesson } from "../api";
+import {
+  fetchLessonById,
+  createLesson,
+  patchLesson,
+  deleteLesson,
+} from "../api";
 import type { Lesson } from "../types";
 import type { CreateLessonRequest, PatchLessonRequest } from "../api";
 import { coursesQueryKeys } from "@/features/courses/hooks/use-courses";
 
-// Centralized Query Keys
 export const lessonsQueryKeys = {
-  all: ["lessons"] as const,
-  detail: (id: string) => [...lessonsQueryKeys.all, id] as const,
+  all: (courseId: string) =>
+    [...coursesQueryKeys.detail(courseId), "lessons"] as const,
+  detail: (courseId: string, lessonId: string) =>
+    [...lessonsQueryKeys.all(courseId), lessonId] as const,
 } as const;
 
-// Lesson Queries
-export function useLesson(id: string | undefined) {
+export function useLesson(courseId: string, lessonId: string | undefined) {
   return useQuery<Lesson, Error>({
-    queryKey: id ? lessonsQueryKeys.detail(id) : ["lessons", "undefined"],
-    queryFn: () => fetchLessonById(id!),
-    enabled: !!id,
+    queryKey: lessonId
+      ? lessonsQueryKeys.detail(courseId, lessonId)
+      : ["courses", courseId, "lessons", "undefined"],
+    queryFn: () => fetchLessonById(courseId, lessonId!),
+    enabled: !!courseId && !!lessonId,
   });
 }
 
-// Lesson Mutations
 export function useCreateLesson(courseId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: CreateLessonRequest) => createLesson(courseId, request),
+    mutationFn: (request: CreateLessonRequest) =>
+      createLesson(courseId, request),
     onSuccess: () => {
-      // Invalidate the course detail to update the lessons list
-      queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(courseId) });
+      // מעדכן את רשימת השיעורים בתוך הקורס
+      queryClient.invalidateQueries({
+        queryKey: lessonsQueryKeys.all(courseId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.detail(courseId),
+      });
     },
   });
 }
 
-export function usePatchLesson(id: string, courseId?: string) {
+export function usePatchLesson(courseId: string, lessonId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: PatchLessonRequest) => patchLesson(id, request),
+    mutationFn: (request: PatchLessonRequest) =>
+      patchLesson(courseId, lessonId, request),
     onSuccess: () => {
-      // Invalidate the specific lesson
-      queryClient.invalidateQueries({ queryKey: lessonsQueryKeys.detail(id) });
-      // Invalidate the course detail if courseId is provided (to update lessons list)
-      if (courseId) {
-        queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(courseId) });
-      }
+      queryClient.invalidateQueries({
+        queryKey: lessonsQueryKeys.detail(courseId, lessonId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: lessonsQueryKeys.all(courseId),
+      });
     },
   });
 }
 
-export function useDeleteLesson(courseId?: string) {
+export function useDeleteLesson(courseId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteLesson(id),
+    mutationFn: (lessonId: string) => deleteLesson(courseId, lessonId),
     onSuccess: () => {
-      // Invalidate all lessons
-      queryClient.invalidateQueries({ queryKey: lessonsQueryKeys.all });
-      // Invalidate the course detail if courseId is provided (to update lessons list)
-      if (courseId) {
-        queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(courseId) });
-      }
+      queryClient.invalidateQueries({
+        queryKey: lessonsQueryKeys.all(courseId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.detail(courseId),
+      });
     },
   });
 }

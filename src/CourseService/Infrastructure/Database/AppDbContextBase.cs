@@ -1,11 +1,12 @@
-﻿using Courses.Domain.Courses;
+﻿using Courses.Application.Abstractions.Data;
+using Courses.Domain.Courses;
 using Courses.Domain.Lessons;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Database;
 
-public abstract class AppDbContextBase : DbContext
+public abstract class AppDbContextBase : DbContext, IUnitOfWork
 {
     public DbSet<Course> Courses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }

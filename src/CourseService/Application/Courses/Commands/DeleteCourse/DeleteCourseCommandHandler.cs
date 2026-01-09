@@ -1,20 +1,22 @@
 ﻿using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Commands.DeleteCourse;
 
 public class DeleteCourseCommandHandler : ICommandHandler<DeleteCourseCommand>
 {
-    private readonly IWriteDbContext _dbContext;
+    private readonly ICourseRepository _courseRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteCourseCommandHandler(IWriteDbContext dbContext)
+    public DeleteCourseCommandHandler(ICourseRepository courseRepository, IUnitOfWork unitOfWork)
     {
-        _dbContext = dbContext;
+        _courseRepository = courseRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result> Handle(
@@ -23,16 +25,15 @@ public class DeleteCourseCommandHandler : ICommandHandler<DeleteCourseCommand>
     {
         CourseId courseId = new CourseId(request.CourseId);
 
-        Course? course = await _dbContext.Courses
-            .FirstOrDefaultAsync(course => course.Id == courseId, cancellationToken);
+        Course? course = await _courseRepository.GetByIdAsync(courseId, cancellationToken);
         
         if (course is null)
         {
             return Result.Failure(CourseErrors.NotFound);
         }
 
-        _dbContext.Courses.Remove(course);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        course.Delete();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

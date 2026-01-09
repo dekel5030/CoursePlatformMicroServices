@@ -1,5 +1,6 @@
 export interface Lesson {
-  id: string;
+  courseId: string;
+  lessonId: string;
   title: string;
   description?: string | null;
   videoUrl?: string | null;
@@ -7,5 +8,4 @@ export interface Lesson {
   isPreview: boolean;
   order: number;
   duration?: string | null;
-  courseId: string;
 }

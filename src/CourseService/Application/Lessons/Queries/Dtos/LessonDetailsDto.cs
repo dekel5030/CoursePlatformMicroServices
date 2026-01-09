@@ -1,7 +1,8 @@
 namespace Courses.Application.Lessons.Queries.Dtos;
 
 public record LessonDetailsDto(
-    Guid Id,
+    Guid CourseId,
+    Guid LessonId,
     string Title,
     string Description,
     int Index,

@@ -1,8 +1,13 @@
 import { axiosClient } from "@/axios";
 import type { Lesson } from "../types";
 
-export async function fetchLessonById(id: string): Promise<Lesson> {
-  const response = await axiosClient.get<Lesson>(`/lessons/${id}`);
+export async function fetchLessonById(
+  courseId: string,
+  lessonId: string
+): Promise<Lesson> {
+  const response = await axiosClient.get<Lesson>(
+    `/courses/${courseId}/lessons/${lessonId}`
+  );
   return response.data;
 }
 
@@ -29,12 +34,16 @@ export interface PatchLessonRequest {
 }
 
 export async function patchLesson(
-  id: string,
+  courseId: string,
+  lessonId: string,
   request: PatchLessonRequest
 ): Promise<void> {
-  await axiosClient.patch(`/lessons/${id}`, request);
+  await axiosClient.patch(`/courses/${courseId}/lessons/${lessonId}`, request);
 }
 
-export async function deleteLesson(id: string): Promise<void> {
-  await axiosClient.delete(`/lessons/${id}`);
+export async function deleteLesson(
+  courseId: string,
+  lessonId: string
+): Promise<void> {
+  await axiosClient.delete(`/courses/${courseId}/lessons/${lessonId}`);
 }

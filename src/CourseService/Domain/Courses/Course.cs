@@ -3,22 +3,26 @@ using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
+using Courses.Domain.Lessons.Errors;
+using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 
 namespace Courses.Domain.Courses;
 
-public class Course : Entity
+public class Course : Entity<CourseId>
 {
     private readonly List<Lesson> _lessons = new();
     private readonly List<ImageUrl> _images = new();
-    public CourseId Id { get; private set; }
+    public override CourseId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
     public InstructorId? InstructorId { get; private set; } = null;
     public CourseStatus Status { get; private set; }
     public int EnrollmentCount { get; private set; } = 0;
     public int LessonCount { get; private set; } = 0;
+    public bool IsDeleted { get; private set; } = false;
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
     public Money Price { get; private set; } = Money.Zero();
@@ -173,5 +177,65 @@ public class Course : Entity
         UpdatedAtUtc = timeProvider.GetUtcNow();
 
         return Result.Success(lesson);
+    }
+
+    public Result DeleteLesson(LessonId lessonId)
+    {
+        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
+
+        if (lesson is null)
+        {
+            return Result.Failure<Course>(LessonErrors.NotFound);
+        }
+
+        _lessons.Remove(lesson);
+        LessonCount = _lessons.Count;
+        Raise(new CourseLessonDeleted(this, lesson));
+
+        return Result.Success();
+    }
+
+    public Result UpdateLesson(
+        LessonId lessonId,
+        Title? title,
+        Description? description,
+        LessonAccess? access,
+        TimeProvider timeProvider)
+    {
+        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
+
+        if (lesson is null)
+        {
+            return Result.Failure(LessonErrors.NotFound);
+        }
+
+        if (title is not null)
+        {
+            var titleResult = lesson.SetTitle(title);
+            if (titleResult.IsFailure) return titleResult;
+        }
+
+        if (description is not null)
+        {
+            var descriptionResult = lesson.SetDescription(description);
+            if (descriptionResult.IsFailure) return descriptionResult;
+        }
+
+        if (access.HasValue)
+        {
+            var accessResult = lesson.SetAccess(access.Value);
+            if (accessResult.IsFailure) return accessResult;
+        }
+
+        UpdatedAtUtc = timeProvider.GetUtcNow();
+
+        return Result.Success();
+    }
+
+    public Result Delete()
+    {
+        IsDeleted = true;
+        Raise(new CourseDeleted(this));
+        return Result.Success();
     }
 }

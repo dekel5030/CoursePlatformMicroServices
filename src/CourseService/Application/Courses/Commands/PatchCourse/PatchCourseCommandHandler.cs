@@ -1,4 +1,5 @@
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
@@ -10,13 +11,15 @@ namespace Courses.Application.Courses.Commands.PatchCourse;
 
 internal class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
 {
-    private readonly IWriteDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
+    private readonly ICourseRepository _courseRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public PatchCourseCommandHandler(IWriteDbContext dbContext, TimeProvider timeProvider)
+    public PatchCourseCommandHandler(TimeProvider timeProvider, ICourseRepository courseRepository, IUnitOfWork unitOfWork)
     {
-        _dbContext = dbContext;
         _timeProvider = timeProvider;
+        _courseRepository = courseRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result> Handle(
@@ -25,8 +28,7 @@ internal class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
     {
         var courseId = new CourseId(request.CourseId);
 
-        var course = await _dbContext.Courses
-            .FirstOrDefaultAsync(c => c.Id == courseId, cancellationToken);
+        var course = await _courseRepository.GetByIdAsync(courseId, cancellationToken);
 
         if (course is null)
         {
@@ -76,7 +78,7 @@ internal class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
             }
         }
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

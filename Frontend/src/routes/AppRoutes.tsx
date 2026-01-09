@@ -28,7 +28,10 @@ export default function AppRoutes() {
         <Route path="/catalog" element={<CourseCatalogPage />} />
         <Route path="/courses" element={<AllCoursesPage />} />
         <Route path="/courses/:id" element={<CoursePage />} />
-        <Route path="/lessons/:id" element={<LessonPage />} />
+        <Route
+          path="/courses/:courseId/lessons/:lessonId"
+          element={<LessonPage />}
+        />
         <Route path="/users/:id" element={<UserProfilePage />} />
       </Route>
 

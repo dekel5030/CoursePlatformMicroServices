@@ -1,72 +1,53 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Domain.Lessons;
-using Courses.Domain.Lessons.Errors;
+using Courses.Application.Abstractions.Repositories;
+using Courses.Domain.Courses;
+using Courses.Domain.Courses.Errors;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Lessons.Commands.PatchLesson;
 
 internal class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
 {
-    private readonly IWriteDbContext _dbContext;
+    private readonly ICourseRepository _courseRepository;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly TimeProvider _timeProvider;
 
-    public PatchLessonCommandHandler(IWriteDbContext dbContext)
+    public PatchLessonCommandHandler(
+        ICourseRepository courseRepository, 
+        IUnitOfWork unitOfwORK, 
+        TimeProvider timeProvider)
     {
-        _dbContext = dbContext;
+        _courseRepository = courseRepository;
+        _unitOfWork = unitOfwORK;
+        _timeProvider = timeProvider;
     }
 
     public async Task<Result> Handle(
         PatchLessonCommand request,
         CancellationToken cancellationToken = default)
     {
+        var courseId = new CourseId(request.CourseId);
         var lessonId = new LessonId(request.LessonId);
 
-        var lesson = await _dbContext.Lessons
-            .FirstOrDefaultAsync(l => l.Id == lessonId, cancellationToken);
-
-        if (lesson is null)
+        Course? course = await _courseRepository.GetByIdAsync(courseId, cancellationToken);
+        
+        if (course is null)
         {
-            return Result.Failure(LessonErrors.NotFound);
+            return Result.Failure(CourseErrors.NotFound);
         }
 
-        if (request.Title is not null)
-        {
-            var titleResult = lesson.SetTitle(new Title(request.Title));
-            if (titleResult.IsFailure)
-            {
-                return titleResult;
-            }
-        }
+        Result updateResult = course.UpdateLesson(
+            lessonId,
+            request.Title is null ? null : new Title(request.Title),
+            request.Description is null ? null : new Description(request.Description),
+            request.Access,
+            _timeProvider);
 
-        if (request.Description is not null)
-        {
-            var descriptionResult = lesson.SetDescription(new Description(request.Description));
-            if (descriptionResult.IsFailure)
-            {
-                return descriptionResult;
-            }
-        }
-
-        if (request.Access is not null)
-        {
-            if (Enum.TryParse<LessonAccess>(request.Access, ignoreCase: true, out var lessonAccess))
-            {
-                var accessResult = lesson.SetAccess(lessonAccess);
-                if (accessResult.IsFailure)
-                {
-                    return accessResult;
-                }
-            }
-            else
-            {
-                return Result.Failure(Error.Validation("Lesson.InvalidAccess", "Invalid lesson access value."));
-            }
-        }
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
