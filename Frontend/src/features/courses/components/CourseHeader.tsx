@@ -21,7 +21,6 @@ export function CourseHeader({ course }: CourseHeaderProps) {
   const { t, i18n } = useTranslation(["courses", "translation"]);
   const patchCourse = usePatchCourse(course.id);
 
-  // Determine text alignment based on interface locale
   const isRTL = i18n.dir() === "rtl";
   const textAlignClass = isRTL ? "text-right" : "text-left";
 
@@ -51,7 +50,6 @@ export function CourseHeader({ course }: CourseHeaderProps) {
           </div>
         )}
         <div className="space-y-6">
-          {/* Course Title - Made more prominent */}
           <div className={textAlignClass}>
             <Authorized
               action={ActionType.Update}
@@ -77,7 +75,6 @@ export function CourseHeader({ course }: CourseHeaderProps) {
             </Authorized>
           </div>
 
-          {/* Action Buttons */}
           <div
             className={`flex items-center gap-2 ${
               isRTL ? "justify-start" : "justify-end"
@@ -86,7 +83,6 @@ export function CourseHeader({ course }: CourseHeaderProps) {
             <CourseActions courseId={course.id} />
           </div>
 
-          {/* Buy/Cart Buttons */}
           <div className="flex gap-3">
             <motion.div
               className="flex-1"

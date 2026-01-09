@@ -1,8 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchFeaturedCourses, fetchCourseById, createCourse, patchCourse, deleteCourse, fetchAllCourses } from "../api";
-import type { CourseModel, CreateCourseRequestDto, UpdateCourseRequestDto } from "../types";
+import {
+  fetchFeaturedCourses,
+  fetchCourseById,
+  createCourse,
+  patchCourse,
+  deleteCourse,
+  fetchAllCourses,
+} from "../api";
+import type {
+  CourseModel,
+  CreateCourseRequestDto,
+  UpdateCourseRequestDto,
+} from "../types";
 
-// Centralized Query Keys
 export const coursesQueryKeys = {
   all: ["courses"] as const,
   featured: () => [...coursesQueryKeys.all, "featured"] as const,
@@ -10,7 +20,6 @@ export const coursesQueryKeys = {
   detail: (id: string) => [...coursesQueryKeys.all, id] as const,
 } as const;
 
-// Course Queries
 export function useFeaturedCourses() {
   return useQuery<CourseModel[], Error>({
     queryKey: coursesQueryKeys.featured(),
@@ -33,7 +42,6 @@ export function useCourse(id: string | undefined) {
   });
 }
 
-// Course Mutations
 export function useCreateCourse() {
   const queryClient = useQueryClient();
 
@@ -51,10 +59,11 @@ export function usePatchCourse(id: string) {
   return useMutation({
     mutationFn: (request: UpdateCourseRequestDto) => patchCourse(id, request),
     onSuccess: () => {
-      // Invalidate the specific course and featured courses
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.featured() });
-      queryClient.invalidateQueries({ queryKey: coursesQueryKeys.allCourses() });
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.allCourses(),
+      });
     },
   });
 }
@@ -65,7 +74,6 @@ export function useDeleteCourse() {
   return useMutation({
     mutationFn: (id: string) => deleteCourse(id),
     onSuccess: () => {
-      // Invalidate all course lists to ensure UI updates
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.all });
     },
   });

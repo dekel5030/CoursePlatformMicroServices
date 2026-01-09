@@ -2,10 +2,6 @@ import { axiosClient } from "@/axios/axiosClient";
 import type { CurrentUserDto } from "../types/CurrentUserDto";
 import type { UserModel } from "../types/UserModel";
 
-/**
- * Adapter/Mapper: Converts backend CurrentUserDto to UI UserModel
- * This is the single place where backend schema changes need to be handled
- */
 export function mapToUserModel(dto: CurrentUserDto): UserModel {
   return {
     id: dto.id,

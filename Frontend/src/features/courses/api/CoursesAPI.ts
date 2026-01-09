@@ -8,16 +8,13 @@ import type {
 import { axiosClient } from "@/axios/axiosClient";
 import type { LessonSummaryDto, LessonModel } from "@/features/lessons/types";
 
-/**
- * Adapter/Mapper: Converts backend LessonSummaryDto to UI LessonModel
- */
 function mapLessonSummaryToModel(dto: LessonSummaryDto): LessonModel {
   return {
     courseId: dto.courseId,
     lessonId: dto.lessonId,
     title: dto.title,
-    description: dto.description,  // Backend ensures non-null
-    videoUrl: null, // Summary doesn't include videoUrl
+    description: dto.description,
+    videoUrl: null,
     thumbnailImage: dto.thumbnailUrl,
     isPreview: dto.isPreview,
     order: dto.index,
@@ -25,18 +22,14 @@ function mapLessonSummaryToModel(dto: LessonSummaryDto): LessonModel {
   };
 }
 
-/**
- * Adapter/Mapper: Converts backend CourseDetailsDto to UI CourseModel
- * This is the single place where backend schema changes need to be handled
- */
 function mapCourseDetailsToModel(dto: CourseDetailsDto): CourseModel {
   return {
     id: dto.id,
     title: dto.title,
     description: dto.description,
     imageUrl: dto.imageUrls?.[0] || null,
-    instructorName: dto.instructorName,  // Backend sends instructor name
-    isPublished: true, // Backend doesn't send this in details, assuming published
+    instructorName: dto.instructorName,
+    isPublished: true,
     price: {
       amount: dto.price,
       currency: dto.currency,
@@ -46,29 +39,25 @@ function mapCourseDetailsToModel(dto: CourseDetailsDto): CourseModel {
   };
 }
 
-/**
- * Adapter/Mapper: Converts backend CourseSummaryDto to UI CourseModel
- */
 function mapCourseSummaryToModel(dto: CourseSummaryDto): CourseModel {
   return {
     id: dto.id,
     title: dto.title,
-    description: "",  // Summary doesn't include description
+    description: "",
     imageUrl: dto.thumbnailUrl,
-    instructorName: dto.instructorName,  // Backend sends instructor name
-    isPublished: true, // Backend doesn't send this in summary, assuming published
+    instructorName: dto.instructorName,
+    isPublished: true,
     price: {
       amount: dto.price,
       currency: dto.currency,
     },
-    // Note: lessons and updatedAtUtc are optional and not included in summary
   };
 }
 
 export async function fetchFeaturedCourses(): Promise<CourseModel[]> {
-  const response = await axiosClient.get<CourseSummaryDto[] | { items: CourseSummaryDto[] }>(
-    "/courses/featured"
-  );
+  const response = await axiosClient.get<
+    CourseSummaryDto[] | { items: CourseSummaryDto[] }
+  >("/courses/featured");
   const data = response.data;
   const dtos = Array.isArray(data) ? data : data.items || [];
   return dtos.map(mapCourseSummaryToModel);
@@ -86,10 +75,7 @@ export interface CreateCourseResponse {
 export async function createCourse(
   request: CreateCourseRequestDto
 ): Promise<CreateCourseResponse> {
-  const response = await axiosClient.post<{ id: string }>(
-    "/courses",
-    request
-  );
+  const response = await axiosClient.post<{ id: string }>("/courses", request);
   return { courseId: response.data.id };
 }
 
@@ -105,9 +91,9 @@ export async function deleteCourse(id: string): Promise<void> {
 }
 
 export async function fetchAllCourses(): Promise<CourseModel[]> {
-  const response = await axiosClient.get<CourseSummaryDto[] | { items: CourseSummaryDto[] }>(
-    "/courses"
-  );
+  const response = await axiosClient.get<
+    CourseSummaryDto[] | { items: CourseSummaryDto[] }
+  >("/courses");
   const data = response.data;
   const dtos = Array.isArray(data) ? data : data.items || [];
   return dtos.map(mapCourseSummaryToModel);

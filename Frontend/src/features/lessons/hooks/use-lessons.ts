@@ -5,7 +5,11 @@ import {
   patchLesson,
   deleteLesson,
 } from "../api";
-import type { LessonModel, CreateLessonRequestDto, UpdateLessonRequestDto } from "../types";
+import type {
+  LessonModel,
+  CreateLessonRequestDto,
+  UpdateLessonRequestDto,
+} from "../types";
 import { coursesQueryKeys } from "@/features/courses/hooks/use-courses";
 
 export const lessonsQueryKeys = {
@@ -32,7 +36,6 @@ export function useCreateLesson(courseId: string) {
     mutationFn: (request: CreateLessonRequestDto) =>
       createLesson(courseId, request),
     onSuccess: () => {
-      // מעדכן את רשימת השיעורים בתוך הקורס
       queryClient.invalidateQueries({
         queryKey: lessonsQueryKeys.all(courseId),
       });

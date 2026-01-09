@@ -6,16 +6,12 @@ import type {
   LessonModel,
 } from "../types";
 
-/**
- * Adapter/Mapper: Converts backend DTO to UI Model
- * This is the single place where backend schema changes need to be handled
- */
 function mapToLessonModel(dto: LessonDetailsDto): LessonModel {
   return {
     courseId: dto.courseId,
     lessonId: dto.lessonId,
     title: dto.title,
-    description: dto.description,  // Backend ensures non-null
+    description: dto.description,
     videoUrl: dto.videoUrl,
     thumbnailImage: dto.thumbnailUrl,
     isPreview: dto.isPreview,
