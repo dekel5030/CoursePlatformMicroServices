@@ -15,5 +15,11 @@ export {
 // API
 export * from "./api";
 
-// Types
+// Constants
+export { LessonRoutes, LessonResources } from "./constants";
+
+// Types (UI Models - stable interfaces)
+export type { LessonModel } from "./types/LessonModel";
+
+// Legacy types (deprecated - use LessonModel instead)
 export type { Lesson as LessonType } from "./types/Lesson";

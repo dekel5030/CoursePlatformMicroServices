@@ -21,6 +21,12 @@ export {
 // API
 export * from "./api";
 
-// Types
-export type { Course } from "./types/course";
+// Constants
+export { CourseRoutes, CourseResources } from "./constants";
+
+// Types (UI Models - stable interfaces)
+export type { CourseModel } from "./types/CourseModel";
 export type { Money } from "./types/money";
+
+// Legacy types (deprecated - use CourseModel instead)
+export type { Course } from "./types/course";

@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchFeaturedCourses } from "@/features/courses/api";
-import type { Course } from "../types";
+import type { CourseModel } from "../types";
 
 export function useFeaturedCourses() {
-  return useQuery<Course[], Error>({
+  return useQuery<CourseModel[], Error>({
     queryKey: ["courses", "featured"],
     queryFn: fetchFeaturedCourses,
   });

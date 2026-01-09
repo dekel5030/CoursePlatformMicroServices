@@ -1,9 +1,9 @@
 import { createContext } from "react";
-import type { CurrentUserDto } from "../types/CurrentUserDto";
+import type { UserModel } from "../types/UserModel";
 import type { PermissionDto } from "../types/PermissionDto";
 
 export interface AuthContextValue {
-  user: CurrentUserDto | null;
+  user: UserModel | null;
   permissions: PermissionDto[];
   isAuthenticated: boolean;
   isLoading: boolean;

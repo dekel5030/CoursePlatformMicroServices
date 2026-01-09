@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { Course } from "../types";
+import type { CourseModel } from "../types";
 import {
   Card,
   CardContent,
@@ -12,11 +12,11 @@ import {
 import { BookOpen, Clock, DollarSign } from "lucide-react";
 
 interface Props {
-  course: Course;
+  course: CourseModel;
 }
 
 export default function CourseCard({ course }: Props) {
-  const { t } = useTranslation(['courses', 'translation']);
+  const { t } = useTranslation(["courses", "translation"]);
 
   return (
     <Link
@@ -51,7 +51,9 @@ export default function CourseCard({ course }: Props) {
               {course.price.amount} {course.price.currency}
             </div>
             <Badge variant={course.isPublished ? "default" : "secondary"}>
-              {course.isPublished ? t('courses:card.published') : t('courses:card.draft')}
+              {course.isPublished
+                ? t("courses:card.published")
+                : t("courses:card.draft")}
             </Badge>
           </div>
         </CardContent>
@@ -59,11 +61,13 @@ export default function CourseCard({ course }: Props) {
         <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <BookOpen className="h-3 w-3" />
-            {t('courses:card.lessonsCount', { count: course.lessons?.length || 0 })}
+            {t("courses:card.lessonsCount", {
+              count: course.lessons?.length || 0,
+            })}
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
-            {new Date(course.updatedAtUtc).toLocaleDateString()}
+            {new Date(course.updatedAtUtc ?? "").toLocaleDateString()}
           </div>
         </CardFooter>
       </Card>

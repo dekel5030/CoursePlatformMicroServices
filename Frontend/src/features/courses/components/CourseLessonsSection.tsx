@@ -11,10 +11,10 @@ import {
 import { LessonCard } from "@/features/lessons";
 import { AddLessonDialog } from "@/features/lessons/components/AddLessonDialog";
 import { motion } from "framer-motion";
-import type { Course } from "../types";
+import type { CourseModel } from "../types";
 
 interface CourseLessonsSectionProps {
-  course: Course;
+  course: CourseModel;
   contentDir: string;
 }
 
