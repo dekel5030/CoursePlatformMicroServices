@@ -1,4 +1,5 @@
 ﻿using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Data.Repositories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
@@ -9,13 +10,18 @@ namespace Courses.Application.Courses.Commands.CreateCourse;
 
 internal class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand, CreateCourseResponse>
 {
-    private readonly IWriteDbContext _dbContext;
+    private readonly ICourseRepository _courseRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly TimeProvider _timeProvider;
 
-    public CreateCourseCommandHandler(IWriteDbContext dbContext, TimeProvider timeProvider)
+    public CreateCourseCommandHandler(
+        ICourseRepository courseRepository, 
+        TimeProvider timeProvider, 
+        IUnitOfWork unitOfWork)
     {
-        _dbContext = dbContext;
+        _courseRepository = courseRepository;
         _timeProvider = timeProvider;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<CreateCourseResponse>> Handle(
@@ -39,8 +45,8 @@ internal class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand,
 
         Course course = courseResult.Value;
 
-        await _dbContext.Courses.AddAsync(course, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _courseRepository.AddAsync(course, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         var responseDto = new CreateCourseResponse(course.Id.Value, course.Title.Value);
 

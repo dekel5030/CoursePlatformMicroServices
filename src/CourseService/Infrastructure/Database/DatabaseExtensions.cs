@@ -48,7 +48,6 @@ internal static class DatabaseExtensions
         services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<ReadDbContext>());
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<WriteDbContext>());
         services.AddScoped<ICourseRepository, CourseRepository>();
-        services.AddScoped<ILessonRepository, LessonRepository>();
 
         return services;
     }

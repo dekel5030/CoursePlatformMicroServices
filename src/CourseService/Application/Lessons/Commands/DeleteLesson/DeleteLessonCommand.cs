@@ -2,4 +2,4 @@
 
 namespace Courses.Application.Lessons.Commands.DeleteLesson;
 
-public record DeleteLessonCommand(Guid LessonId) : ICommand;
+public record DeleteLessonCommand(Guid CourseId, Guid LessonId) : ICommand;

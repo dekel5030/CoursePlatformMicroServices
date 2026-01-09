@@ -3,6 +3,8 @@ using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
+using Courses.Domain.Lessons.Errors;
+using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
@@ -20,6 +22,7 @@ public class Course : Entity<CourseId>
     public CourseStatus Status { get; private set; }
     public int EnrollmentCount { get; private set; } = 0;
     public int LessonCount { get; private set; } = 0;
+    public bool IsDeleted { get; private set; } = false;
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
     public Money Price { get; private set; } = Money.Zero();
@@ -174,5 +177,28 @@ public class Course : Entity<CourseId>
         UpdatedAtUtc = timeProvider.GetUtcNow();
 
         return Result.Success(lesson);
+    }
+
+    public Result DeleteLesson(LessonId lessonId)
+    {
+        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
+
+        if (lesson is null)
+        {
+            return Result.Failure<Course>(LessonErrors.NotFound);
+        }
+
+        _lessons.Remove(lesson);
+        LessonCount = _lessons.Count;
+        Raise(new CourseLessonDeleted(this, lesson));
+
+        return Result.Success();
+    }
+
+    public Result Delete()
+    {
+        IsDeleted = true;
+        Raise(new CourseDeleted(this));
+        return Result.Success();
     }
 }

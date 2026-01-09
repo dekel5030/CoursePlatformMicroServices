@@ -5,6 +5,6 @@ namespace Courses.Application.Abstractions.Data.Repositories;
 
 public interface ICourseRepository : IRepository<Course, CourseId>
 {
-    void Add(Course entity);
+    Task AddAsync(Course entity, CancellationToken cancellationToken = default);
 }
 

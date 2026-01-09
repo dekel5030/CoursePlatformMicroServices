@@ -1,5 +1,4 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared.Primitives;

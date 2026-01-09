@@ -1,4 +1,5 @@
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Data.Repositories;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Extensions;
 using Courses.Application.Lessons.Queries.Dtos;
@@ -15,18 +16,21 @@ namespace Courses.Application.Lessons.Commands.CreateLesson;
 
 public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, LessonDetailsDto>
 {
-    private readonly IWriteDbContext _dbContext;
+    private readonly ICourseRepository _courseRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly TimeProvider _timeProvider;
     private readonly IStorageUrlResolver _urlResolver;
 
     public CreateLessonCommandHandler(
-        IWriteDbContext dbContext,
+        ICourseRepository courseRepository,
         TimeProvider timeProvider,
-        IStorageUrlResolver urlResolver)
+        IStorageUrlResolver urlResolver,
+        IUnitOfWork unitOfWork)
     {
-        _dbContext = dbContext;
+        _courseRepository = courseRepository;
         _timeProvider = timeProvider;
         _urlResolver = urlResolver;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<LessonDetailsDto>> Handle(
@@ -35,9 +39,7 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
     {
         var courseId = new CourseId(request.CourseId);
 
-        Course? course = await _dbContext.Courses
-            .Include(c => c.Lessons)
-            .FirstOrDefaultAsync(c => c.Id == courseId, cancellationToken);
+        Course? course = await _courseRepository.GetByIdAsync(courseId, cancellationToken);
 
         if (course is null)
         {
@@ -56,7 +58,7 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
 
         Lesson lesson = result.Value;
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         LessonDetailsDto response = await lesson.ToDetailsDtoAsync(_urlResolver, cancellationToken);
 
