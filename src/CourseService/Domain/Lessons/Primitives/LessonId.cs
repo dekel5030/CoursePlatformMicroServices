@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Kernel;
 
 namespace Courses.Domain.Lessons.Primitives;
 
-public record struct LessonId(Guid Value) : IParsable<LessonId>
+public record struct LessonId(Guid Value) : IParsable<LessonId>, ISingleValueObject<Guid>
 {
     public static LessonId CreateNew() => new(Guid.CreateVersion7());
 

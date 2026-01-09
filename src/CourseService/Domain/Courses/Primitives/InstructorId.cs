@@ -1,3 +1,5 @@
-﻿namespace Courses.Domain.Courses.Primitives;
+﻿using Kernel;
 
-public record InstructorId(Guid Value);
+namespace Courses.Domain.Courses.Primitives;
+
+public record InstructorId(Guid Value) : ISingleValueObject<Guid>;
