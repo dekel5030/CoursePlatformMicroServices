@@ -1,10 +1,6 @@
-using System.Collections.Concurrent;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure.Routing;
 using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Application.Lessons.Queries.GetById;
 using Courses.Domain.Courses.Primitives;
