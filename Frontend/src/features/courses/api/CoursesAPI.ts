@@ -16,7 +16,7 @@ function mapLessonSummaryToModel(dto: LessonSummaryDto): LessonModel {
     courseId: dto.courseId,
     lessonId: dto.lessonId,
     title: dto.title,
-    description: dto.description || null,
+    description: dto.description,  // Backend ensures non-null
     videoUrl: null, // Summary doesn't include videoUrl
     thumbnailImage: dto.thumbnailUrl,
     isPreview: dto.isPreview,
@@ -35,7 +35,7 @@ function mapCourseDetailsToModel(dto: CourseDetailsDto): CourseModel {
     title: dto.title,
     description: dto.description,
     imageUrl: dto.imageUrls?.[0] || null,
-    instructorUserId: dto.instructorName || null, // Note: backend sends instructorName, we may need instructorId
+    instructorName: dto.instructorName,  // Backend sends instructor name
     isPublished: true, // Backend doesn't send this in details, assuming published
     price: {
       amount: dto.price,
@@ -53,16 +53,15 @@ function mapCourseSummaryToModel(dto: CourseSummaryDto): CourseModel {
   return {
     id: dto.id,
     title: dto.title,
-    description: "", // Summary doesn't include description
+    description: "",  // Summary doesn't include description
     imageUrl: dto.thumbnailUrl,
-    instructorUserId: dto.instructorName || null, // Note: backend sends instructorName, we may need instructorId
+    instructorName: dto.instructorName,  // Backend sends instructor name
     isPublished: true, // Backend doesn't send this in summary, assuming published
     price: {
       amount: dto.price,
       currency: dto.currency,
     },
-    lessons: [], // Summary doesn't include lessons
-    updatedAtUtc: new Date().toISOString(), // Summary doesn't include updatedAtUtc
+    // Note: lessons and updatedAtUtc are optional and not included in summary
   };
 }
 

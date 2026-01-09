@@ -10,9 +10,9 @@ export interface CourseModel {
   title: string;
   description: string;
   imageUrl: string | null;
-  instructorUserId: string | null;
+  instructorName: string | null;  // Backend sends name, not ID
   isPublished: boolean;
   price: Money;
-  lessons: LessonModel[];
-  updatedAtUtc: string;
+  lessons?: LessonModel[];  // Optional - summary doesn't include lessons
+  updatedAtUtc?: string;  // Optional - summary doesn't include timestamp
 }

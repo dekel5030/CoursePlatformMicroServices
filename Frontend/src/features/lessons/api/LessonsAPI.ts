@@ -15,7 +15,7 @@ function mapToLessonModel(dto: LessonDetailsDto): LessonModel {
     courseId: dto.courseId,
     lessonId: dto.lessonId,
     title: dto.title,
-    description: dto.description || null,
+    description: dto.description,  // Backend ensures non-null
     videoUrl: dto.videoUrl,
     thumbnailImage: dto.thumbnailUrl,
     isPreview: dto.isPreview,

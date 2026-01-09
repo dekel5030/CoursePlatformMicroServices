@@ -6,7 +6,7 @@ export interface LessonModel {
   courseId: string;
   lessonId: string;
   title: string;
-  description: string | null;
+  description: string;  // Non-nullable - mapper ensures a value
   videoUrl: string | null;
   thumbnailImage: string | null;
   isPreview: boolean;
