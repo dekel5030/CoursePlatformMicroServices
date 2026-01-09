@@ -195,6 +195,43 @@ public class Course : Entity<CourseId>
         return Result.Success();
     }
 
+    public Result UpdateLesson(
+        LessonId lessonId,
+        Title? title,
+        Description? description,
+        LessonAccess? access,
+        TimeProvider timeProvider)
+    {
+        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
+
+        if (lesson is null)
+        {
+            return Result.Failure(LessonErrors.NotFound);
+        }
+
+        if (title is not null)
+        {
+            var titleResult = lesson.SetTitle(title);
+            if (titleResult.IsFailure) return titleResult;
+        }
+
+        if (description is not null)
+        {
+            var descriptionResult = lesson.SetDescription(description);
+            if (descriptionResult.IsFailure) return descriptionResult;
+        }
+
+        if (access.HasValue)
+        {
+            var accessResult = lesson.SetAccess(access.Value);
+            if (accessResult.IsFailure) return accessResult;
+        }
+
+        UpdatedAtUtc = timeProvider.GetUtcNow();
+
+        return Result.Success();
+    }
+
     public Result Delete()
     {
         IsDeleted = true;
