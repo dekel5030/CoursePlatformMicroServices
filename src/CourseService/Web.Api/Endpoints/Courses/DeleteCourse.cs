@@ -13,12 +13,12 @@ public class DeleteCourse : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("courses/{courseId:CourseId}", async (
-            CourseId courseId,
+        app.MapDelete("courses/{courseId:Guid}", async (
+            Guid courseId,
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var command = new DeleteCourseCommand(courseId);
+            var command = new DeleteCourseCommand(new CourseId(courseId));
             Result result = await mediator.Send(command, cancellationToken);
 
             return result.Match(Results.NoContent, CustomResults.Problem);

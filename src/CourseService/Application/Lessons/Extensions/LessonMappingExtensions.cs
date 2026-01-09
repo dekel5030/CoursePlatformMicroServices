@@ -12,7 +12,7 @@ internal static class LessonMappingExtensions
         IStorageUrlResolver resolver,
         CancellationToken cancellationToken = default)
     {
-        string? thumbnailUrl = lesson.ThumbnailImageUrl != null
+        Uri? thumbnailUrl = lesson.ThumbnailImageUrl != null
             ? (await resolver.ResolveAsync(
                 StorageCategory.Public, 
                 lesson.ThumbnailImageUrl.Path, 
@@ -22,8 +22,8 @@ internal static class LessonMappingExtensions
         return new LessonSummaryDto(
             CourseId: lesson.CourseId,
             LessonId: lesson.Id,
-            Title: lesson.Title.Value,
-            Description: lesson.Description.Value,
+            Title: lesson.Title,
+            Description: lesson.Description,
             Index: lesson.Index,
             Duration: lesson.Duration,
             IsPreview: lesson.Access == LessonAccess.Public,
@@ -48,28 +48,27 @@ internal static class LessonMappingExtensions
         IStorageUrlResolver resolver,
         CancellationToken cancellationToken = default)
     {
-        Task<ResolvedUrl> thumbTask = resolver
-            .ResolveAsync(StorageCategory.Public, 
-            lesson.ThumbnailImageUrl?.Path ?? string.Empty, 
-            cancellationToken);
+        Task<ResolvedUrl>? thumbTask = lesson.ThumbnailImageUrl != null
+            ? resolver.ResolveAsync(StorageCategory.Public, lesson.ThumbnailImageUrl.Path, cancellationToken)
+            : null;
 
-        Task<ResolvedUrl> videoTask = resolver.ResolveAsync(
-            StorageCategory.Private, 
-            lesson.VideoUrl?.Path ?? string.Empty, 
-            cancellationToken);
+        Task<ResolvedUrl>? videoTask = lesson.VideoUrl != null
+            ? resolver.ResolveAsync(StorageCategory.Private, lesson.VideoUrl.Path, cancellationToken)
+            : null;
 
-        await Task.WhenAll(thumbTask, videoTask);
+        var tasks = new[] { thumbTask, videoTask }.Where(t => t != null).Cast<Task<ResolvedUrl>>();
+        await Task.WhenAll(tasks);
 
         return new LessonDetailsDto(
             CourseId: lesson.CourseId,
             LessonId: lesson.Id,
-            Title: lesson.Title.Value,
-            Description: lesson.Description.Value,
+            Title: lesson.Title,
+            Description: lesson.Description,
             Index: lesson.Index,
             Duration: lesson.Duration,
             IsPreview: lesson.Access == LessonAccess.Public,
-            ThumbnailUrl: thumbTask.Result.Value,
-            VideoUrl: videoTask.Result.Value
+            ThumbnailUrl: thumbTask != null ? (await thumbTask).Value : null,
+            VideoUrl: videoTask != null ? (await videoTask).Value : null
         );
     }
 }

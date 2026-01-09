@@ -25,8 +25,8 @@ internal static class CourseMappingExtensions
 
         return new CourseDetailsDto(
             Id: course.Id,
-            Title: course.Title.Value,
-            Description: course.Description.Value,
+            Title: course.Title,
+            Description: course.Description,
             InstructorName: course.InstructorId?.Value.ToString(),
             Price: course.Price.Amount,
             Currency: course.Price.Currency,
@@ -50,11 +50,11 @@ internal static class CourseMappingExtensions
 
         return new CourseSummaryDto(
             Id: course.Id,
-            Title: course.Title.Value,
+            Title: course.Title,
             InstructorName: course.InstructorId?.Value.ToString(),
             Price: course.Price.Amount,
             Currency: course.Price.Currency,
-            ThumbnailUrl: resolvedUrl.Value,
+            ThumbnailUrl: string.IsNullOrEmpty(firstImagePath) ? null : resolvedUrl.Value,
             LessonsCount: course.LessonCount,
             EnrollmentCount: course.EnrollmentCount
         );

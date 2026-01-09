@@ -48,11 +48,13 @@ internal class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
         FileUploadedEvent @event, 
         CancellationToken cancellationToken = default)
     {
-        if (!CourseId.TryParse(@event.ReferenceId, out var courseId))
+        if (!Guid.TryParse(@event.ReferenceId, out var guidId))
         {
             _logger.LogError("Invalid ReferenceId format: {ReferenceId}", @event.ReferenceId);
             return;
         }
+
+        CourseId courseId = new CourseId(guidId);
 
         Course? course = await _writeDbContext.Courses
             .FirstOrDefaultAsync(c => c.Id == courseId, cancellationToken);
@@ -75,11 +77,13 @@ internal class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
         FileUploadedEvent @event, 
         CancellationToken cancellationToken = default)
     {
-        if (!LessonId.TryParse(@event.ReferenceId, out var lessonId))
+        if (!Guid.TryParse(@event.ReferenceId, out var guidId))
         {
             _logger.LogError("Invalid ReferenceId format: {ReferenceId}", @event.ReferenceId);
             return;
         }
+
+        LessonId lessonId = new LessonId(guidId);
 
         Lesson? lesson = await _writeDbContext.Lessons
             .FirstOrDefaultAsync(c => c.Id == lessonId, cancellationToken);

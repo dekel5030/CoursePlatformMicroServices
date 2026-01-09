@@ -15,13 +15,13 @@ public class CreateLesson : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("courses/{courseid:CourseId}/lessons", async (
-            CourseId courseid,
+        app.MapPost("courses/{courseid:Guid}/lessons", async (
+            Guid courseid,
             CreateLessonRequest request,
             IMediator mediator) =>
         {
             var command = new CreateLessonCommand(
-                courseid,
+                new CourseId(courseid),
                 request.Title,
                 request.Description);
 
@@ -30,7 +30,7 @@ public class CreateLesson : IEndpoint
             return result.Match(
                 lessonDto => Results.CreatedAtRoute(
                     nameof(GetLessonById),
-                    new { courseId = courseid, lessonId = lessonDto.LessonId },
+                    new { courseId = courseid, lessonId = lessonDto.LessonId.Value },
                     lessonDto
                 ),
                 CustomResults.Problem);

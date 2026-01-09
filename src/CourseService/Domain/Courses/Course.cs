@@ -209,15 +209,15 @@ public class Course : Entity<CourseId>
             return Result.Failure(LessonErrors.NotFound);
         }
 
-        if (title is not null)
+        if (title.HasValue)
         {
-            var titleResult = lesson.SetTitle(title);
+            var titleResult = lesson.SetTitle(title.Value);
             if (titleResult.IsFailure) return titleResult;
         }
 
-        if (description is not null)
+        if (description.HasValue)
         {
-            var descriptionResult = lesson.SetDescription(description);
+            var descriptionResult = lesson.SetDescription(description.Value);
             if (descriptionResult.IsFailure) return descriptionResult;
         }
 

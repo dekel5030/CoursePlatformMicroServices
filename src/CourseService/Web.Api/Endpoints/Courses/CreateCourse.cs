@@ -21,7 +21,7 @@ public class CreateCourse : IEndpoint
             return result.Match(
                 response => Results.CreatedAtRoute(
                     nameof(GetCourseById),
-                    new { id = response.CourseId },
+                    new { id = response.CourseId.Value },
                     response
                 ),
                 CustomResults.Problem);

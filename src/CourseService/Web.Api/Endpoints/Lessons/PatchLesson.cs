@@ -19,15 +19,15 @@ public class PatchLesson : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("courses/{courseId:CourseId}/lessons/{lessonId:LessonId}", async (
-            CourseId courseId,
-            LessonId lessonId,
+        app.MapPatch("courses/{courseId:Guid}/lessons/{lessonId:Guid}", async (
+            Guid courseId,
+            Guid lessonId,
             PatchLessonRequest request,
             IMediator mediator) =>
         {
             var command = new PatchLessonCommand(
-                courseId,
-                lessonId,
+                new CourseId(courseId),
+                new LessonId(lessonId),
                 request.Title,
                 request.Description,
                 request.Access);

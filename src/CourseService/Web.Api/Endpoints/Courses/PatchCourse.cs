@@ -20,13 +20,13 @@ public class PatchCourse : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("courses/{id:CourseId}", async (
-            CourseId id,
+        app.MapPatch("courses/{id:Guid}", async (
+            Guid id,
             PatchCourseRequest request,
             IMediator mediator) =>
         {
             var command = new PatchCourseCommand(
-                id,
+                new CourseId(id),
                 request.Title,
                 request.Description,
                 request.InstructorId,

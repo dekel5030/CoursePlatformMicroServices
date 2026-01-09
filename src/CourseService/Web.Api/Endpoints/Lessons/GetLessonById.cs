@@ -14,13 +14,13 @@ internal sealed class GetLessonById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("courses/{courseId:CourseId}/lessons/{lessonId:LessonId}", async (
-            CourseId courseId,
-            LessonId lessonId,
+        app.MapGet("courses/{courseId:Guid}/lessons/{lessonId:Guid}", async (
+            Guid courseId,
+            Guid lessonId,
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetLessonByIdQuery(courseId, lessonId);
+            var query = new GetLessonByIdQuery(new CourseId(courseId), new LessonId(lessonId));
 
             Result<LessonDetailsDto> result = await mediator.Send(query, cancellationToken);
 
