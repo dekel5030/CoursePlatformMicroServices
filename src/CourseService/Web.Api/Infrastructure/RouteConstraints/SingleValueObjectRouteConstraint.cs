@@ -44,6 +44,11 @@ public class SingleValueObjectRouteConstraint : IRouteConstraint
             // Try to convert the string to the inner value type
             object? innerValue = Convert.ChangeType(valueString, _valueType);
 
+            if (innerValue is null)
+            {
+                return false;
+            }
+
             // Try to create the value object - if this succeeds, the constraint is satisfied
             _ = _constructor.Invoke(new[] { innerValue });
 

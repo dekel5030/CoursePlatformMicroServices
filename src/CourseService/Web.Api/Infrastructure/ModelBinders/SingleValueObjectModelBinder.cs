@@ -45,6 +45,14 @@ public class SingleValueObjectModelBinder : IModelBinder
             // Convert the string value to the inner value type
             object? innerValue = Convert.ChangeType(rawValue, _valueType);
 
+            if (innerValue is null)
+            {
+                bindingContext.ModelState.TryAddModelError(
+                    modelName,
+                    $"Cannot convert '{rawValue}' to {_valueType.Name}.");
+                return Task.CompletedTask;
+            }
+
             // Create an instance of the value object using the constructor
             var valueObject = _constructor.Invoke(new[] { innerValue });
 
