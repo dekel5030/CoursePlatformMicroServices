@@ -3,6 +3,7 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Application.Lessons.Queries.GetById;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -13,12 +14,13 @@ internal sealed class GetLessonById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("lessons/{id:Guid}", async (
-            Guid id,
+        app.MapGet("courses/{courseId:Guid}/lessons/{lessonId:Guid}", async (
+            Guid courseId,
+            Guid lessonId,
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetLessonByIdQuery(new LessonId(id));
+            var query = new GetLessonByIdQuery(new CourseId(courseId), new LessonId(lessonId));
 
             Result<LessonDetailsDto> result = await mediator.Send(query, cancellationToken);
 

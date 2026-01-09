@@ -26,7 +26,10 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
         CancellationToken cancellationToken = default)
     {
         Lesson? lesson = await _dbContext.Lessons
-            .FirstOrDefaultAsync(l => l.Id == request.Id, cancellationToken);
+            .FirstOrDefaultAsync(l =>
+                l.Id == request.LessonId &&
+                l.CourseId == request.CourseId,
+                cancellationToken);
 
         if (lesson is null)
         {

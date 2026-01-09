@@ -28,8 +28,8 @@ public class CreateLesson : IEndpoint
 
             return result.Match(
                 lessonDto => Results.CreatedAtRoute(
-                    nameof(CreateLesson),
-                    new { id = lessonDto.Id },
+                    nameof(GetLessonById),
+                    new { courseId = courseid, lessonId = lessonDto.Id },
                     lessonDto
                 ),
                 CustomResults.Problem);
