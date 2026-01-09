@@ -61,8 +61,8 @@ internal static class LessonMappingExtensions
         await Task.WhenAll(thumbTask, videoTask);
 
         return new LessonDetailsDto(
-            CourseId: lesson.CourseId.Value,
-            LessonId: lesson.Id.Value,
+            CourseId: lesson.CourseId,
+            LessonId: lesson.Id,
             Title: lesson.Title.Value,
             Description: lesson.Description.Value,
             Index: lesson.Index,

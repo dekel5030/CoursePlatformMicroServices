@@ -3,7 +3,7 @@ using Kernel;
 
 namespace Courses.Domain.Lessons.Primitives;
 
-public record struct LessonId(Guid Value) : IParsable<LessonId>, ISingleValueObject<Guid>
+public record struct LessonId(Guid Value) : ISingleValueObject<LessonId, Guid>
 {
     public static LessonId CreateNew() => new(Guid.CreateVersion7());
 

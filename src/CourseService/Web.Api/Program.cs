@@ -1,6 +1,7 @@
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Endpoints;
 using Courses.Api.Extensions;
+using Courses.Api.Infrastructure.JsonConverters;
 using Courses.Api.Infrastructure.Routing;
 using Courses.Application;
 using Courses.Infrastructure;
@@ -15,6 +16,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
 builder.Services.AddRoutingConstraints();
+builder.Services.AddJsonConverters();
 
 var app = builder.Build();
 
