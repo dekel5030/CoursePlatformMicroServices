@@ -4,6 +4,7 @@ using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.PatchLesson;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
@@ -25,11 +26,14 @@ public class PatchLesson : IEndpoint
             PatchLessonRequest request,
             IMediator mediator) =>
         {
+            Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
+            Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
+
             var command = new PatchLessonCommand(
                 new CourseId(courseId),
                 new LessonId(lessonId),
-                request.Title,
-                request.Description,
+                title,
+                description,
                 request.Access);
 
             Result result = await mediator.Send(command);

@@ -32,18 +32,18 @@ internal class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
             return Result.Failure(CourseErrors.NotFound);
         }
 
-        if (request.Title is not null)
+        if (request.Title.HasValue)
         {
-            var titleResult = course.UpdateTitle(new Title(request.Title), _timeProvider);
+            var titleResult = course.UpdateTitle(request.Title.Value, _timeProvider);
             if (titleResult.IsFailure)
             {
                 return titleResult;
             }
         }
 
-        if (request.Description is not null)
+        if (request.Description.HasValue)
         {
-            var descriptionResult = course.UpdateDescription(new Description(request.Description), _timeProvider);
+            var descriptionResult = course.UpdateDescription(request.Description.Value, _timeProvider);
             if (descriptionResult.IsFailure)
             {
                 return descriptionResult;

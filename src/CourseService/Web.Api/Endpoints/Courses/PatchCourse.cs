@@ -3,6 +3,7 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Commands.PatchCourse;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
@@ -25,10 +26,13 @@ public class PatchCourse : IEndpoint
             PatchCourseRequest request,
             IMediator mediator) =>
         {
+            Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
+            Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
+
             var command = new PatchCourseCommand(
                 new CourseId(id),
-                request.Title,
-                request.Description,
+                title,
+                description,
                 request.InstructorId,
                 request.PriceAmount,
                 request.PriceCurrency);

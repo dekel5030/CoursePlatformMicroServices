@@ -43,10 +43,7 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
             return Result.Failure<LessonDetailsDto>(CourseErrors.NotFound);
         }
 
-        Title? lessonTitle = request.Title is null ? null : new Title(request.Title);
-        Description? lessonDescription = request.Description is null ? null : new Description(request.Description);
-
-        Result<Lesson> result = course.AddLesson(lessonTitle, lessonDescription, _timeProvider);
+        Result<Lesson> result = course.AddLesson(request.Title, request.Description, _timeProvider);
 
         if (result.IsFailure)
         {

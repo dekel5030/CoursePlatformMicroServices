@@ -4,6 +4,7 @@ using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.CreateLesson;
 using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -20,10 +21,13 @@ public class CreateLesson : IEndpoint
             CreateLessonRequest request,
             IMediator mediator) =>
         {
+            Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
+            Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
+
             var command = new CreateLessonCommand(
                 new CourseId(courseid),
-                request.Title,
-                request.Description);
+                title,
+                description);
 
             Result<LessonDetailsDto> result = await mediator.Send(command);
 

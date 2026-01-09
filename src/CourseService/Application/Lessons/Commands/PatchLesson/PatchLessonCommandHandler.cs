@@ -2,9 +2,6 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
-using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -39,8 +36,8 @@ internal class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
 
         Result updateResult = course.UpdateLesson(
             request.LessonId,
-            request.Title is null ? null : new Title(request.Title),
-            request.Description is null ? null : new Description(request.Description),
+            request.Title,
+            request.Description,
             request.Access,
             _timeProvider);
 
