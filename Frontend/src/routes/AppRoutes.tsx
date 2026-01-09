@@ -10,6 +10,7 @@ import { LessonPage } from "@/features/lessons";
 import { UserProfilePage } from "@/features/users";
 import { LandingPage } from "@/features/landing";
 import { ForbiddenPage } from "@/features/errors";
+import { LoginPage, RegisterPage } from "@/features/auth";
 import {
   AdminDashboardPage,
   RoleManagementPage,
@@ -22,6 +23,8 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/forbidden" element={<ForbiddenPage />} />
 
       <Route element={<Layout />}>
