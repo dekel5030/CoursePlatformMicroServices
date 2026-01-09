@@ -11,10 +11,10 @@ import {
   ResourceType,
   ResourceId,
 } from "@/features/auth";
-import type { Course } from "../types";
+import type { CourseModel } from "../types";
 
 interface CourseHeaderProps {
-  course: Course;
+  course: CourseModel;
 }
 
 export function CourseHeader({ course }: CourseHeaderProps) {

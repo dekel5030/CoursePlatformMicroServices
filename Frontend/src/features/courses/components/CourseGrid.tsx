@@ -2,10 +2,10 @@ import { useTranslation } from "react-i18next";
 import { CourseCard } from "@/features/courses";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-import type { Course } from "../types";
+import type { CourseModel } from "../types";
 
 interface CourseGridProps {
-  courses: Course[];
+  courses: CourseModel[];
   isLoading: boolean;
   error: Error | null;
 }

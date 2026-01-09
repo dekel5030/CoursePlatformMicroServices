@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { Lesson as LessonType } from "../types/Lesson";
+import type { LessonModel } from "../types/LessonModel";
 import {
   Card,
   CardContent,
@@ -21,7 +21,7 @@ import { usePatchLesson, useDeleteLesson } from "../hooks/use-lessons";
 import { toast } from "sonner";
 
 interface LessonProps {
-  lesson: LessonType;
+  lesson: LessonModel;
   index: number;
 }
 

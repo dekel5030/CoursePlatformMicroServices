@@ -5,8 +5,7 @@ import {
   patchLesson,
   deleteLesson,
 } from "../api";
-import type { Lesson } from "../types";
-import type { CreateLessonRequest, PatchLessonRequest } from "../api";
+import type { LessonModel, CreateLessonRequestDto, UpdateLessonRequestDto } from "../types";
 import { coursesQueryKeys } from "@/features/courses/hooks/use-courses";
 
 export const lessonsQueryKeys = {
@@ -17,7 +16,7 @@ export const lessonsQueryKeys = {
 } as const;
 
 export function useLesson(courseId: string, lessonId: string | undefined) {
-  return useQuery<Lesson, Error>({
+  return useQuery<LessonModel, Error>({
     queryKey: lessonId
       ? lessonsQueryKeys.detail(courseId, lessonId)
       : ["courses", courseId, "lessons", "undefined"],
@@ -30,7 +29,7 @@ export function useCreateLesson(courseId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: CreateLessonRequest) =>
+    mutationFn: (request: CreateLessonRequestDto) =>
       createLesson(courseId, request),
     onSuccess: () => {
       // מעדכן את רשימת השיעורים בתוך הקורס
@@ -48,7 +47,7 @@ export function usePatchLesson(courseId: string, lessonId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: PatchLessonRequest) =>
+    mutationFn: (request: UpdateLessonRequestDto) =>
       patchLesson(courseId, lessonId, request),
     onSuccess: () => {
       queryClient.invalidateQueries({

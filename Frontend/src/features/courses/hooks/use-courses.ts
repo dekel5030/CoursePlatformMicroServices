@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchFeaturedCourses, fetchCourseById, createCourse, patchCourse, deleteCourse, fetchAllCourses } from "../api";
-import type { Course } from "../types";
-import type { CreateCourseRequest, PatchCourseRequest } from "../api";
+import type { CourseModel, CreateCourseRequestDto, UpdateCourseRequestDto } from "../types";
 
 // Centralized Query Keys
 export const coursesQueryKeys = {
@@ -13,21 +12,21 @@ export const coursesQueryKeys = {
 
 // Course Queries
 export function useFeaturedCourses() {
-  return useQuery<Course[], Error>({
+  return useQuery<CourseModel[], Error>({
     queryKey: coursesQueryKeys.featured(),
     queryFn: fetchFeaturedCourses,
   });
 }
 
 export function useAllCourses() {
-  return useQuery<Course[], Error>({
+  return useQuery<CourseModel[], Error>({
     queryKey: coursesQueryKeys.allCourses(),
     queryFn: fetchAllCourses,
   });
 }
 
 export function useCourse(id: string | undefined) {
-  return useQuery<Course, Error>({
+  return useQuery<CourseModel, Error>({
     queryKey: id ? coursesQueryKeys.detail(id) : ["courses", "undefined"],
     queryFn: () => fetchCourseById(id!),
     enabled: !!id,
@@ -39,7 +38,7 @@ export function useCreateCourse() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: CreateCourseRequest) => createCourse(request),
+    mutationFn: (request: CreateCourseRequestDto) => createCourse(request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.all });
     },
@@ -50,7 +49,7 @@ export function usePatchCourse(id: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: PatchCourseRequest) => patchCourse(id, request),
+    mutationFn: (request: UpdateCourseRequestDto) => patchCourse(id, request),
     onSuccess: () => {
       // Invalidate the specific course and featured courses
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(id) });

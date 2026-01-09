@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { Course } from "../types";
+import type { CourseModel } from "../types";
 import {
   Card,
   CardContent,
@@ -12,7 +12,7 @@ import {
 import { BookOpen, Clock, DollarSign } from "lucide-react";
 
 interface Props {
-  course: Course;
+  course: CourseModel;
 }
 
 export default function CourseCard({ course }: Props) {
