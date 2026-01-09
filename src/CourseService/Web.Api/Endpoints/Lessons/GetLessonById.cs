@@ -1,6 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
+using Courses.Api.Infrastructure.Routing;
 using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Application.Lessons.Queries.GetById;
 using Courses.Domain.Courses.Primitives;
@@ -14,7 +15,7 @@ internal sealed class GetLessonById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("courses/{courseId:Guid}/lessons/{lessonId:Guid}", async (
+        app.MapGet("courses/{courseId:CourseId}/lessons/{lessonId:LessonId}", async (
             CourseId courseId,
             LessonId lessonId,
             IMediator mediator,

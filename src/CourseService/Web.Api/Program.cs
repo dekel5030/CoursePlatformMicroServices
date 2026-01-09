@@ -1,6 +1,7 @@
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Endpoints;
 using Courses.Api.Extensions;
+using Courses.Api.Infrastructure.Routing;
 using Courses.Application;
 using Courses.Infrastructure;
 using Courses.Infrastructure.Extensions;
@@ -13,6 +14,7 @@ builder.AddDefaultOpenApi();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
+builder.Services.AddRoutingConstraints();
 
 var app = builder.Build();
 
