@@ -24,9 +24,9 @@ internal static class CourseMappingExtensions
         await Task.WhenAll(Task.WhenAll(imageTasks), lessonsTask);
 
         return new CourseDetailsDto(
-            Id: course.Id.Value,
-            Title: course.Title.Value,
-            Description: course.Description.Value,
+            Id: course.Id,
+            Title: course.Title,
+            Description: course.Description,
             InstructorName: course.InstructorId?.Value.ToString(),
             Price: course.Price.Amount,
             Currency: course.Price.Currency,
@@ -49,12 +49,12 @@ internal static class CourseMappingExtensions
             cancellationToken);
 
         return new CourseSummaryDto(
-            Id: course.Id.Value,
-            Title: course.Title.Value,
+            Id: course.Id,
+            Title: course.Title,
             InstructorName: course.InstructorId?.Value.ToString(),
             Price: course.Price.Amount,
             Currency: course.Price.Currency,
-            ThumbnailUrl: resolvedUrl.Value,
+            ThumbnailUrl: string.IsNullOrEmpty(firstImagePath) ? null : resolvedUrl.Value,
             LessonsCount: course.LessonCount,
             EnrollmentCount: course.EnrollmentCount
         );

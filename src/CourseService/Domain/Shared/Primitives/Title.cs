@@ -1,6 +1,8 @@
-﻿namespace Courses.Domain.Shared.Primitives;
+﻿using Kernel;
 
-public record Title(string Value)
+namespace Courses.Domain.Shared.Primitives;
+
+public record struct Title(string Value) : ISingleValueObject<string>
 {
     public static Title Empty => new Title(string.Empty);
 }

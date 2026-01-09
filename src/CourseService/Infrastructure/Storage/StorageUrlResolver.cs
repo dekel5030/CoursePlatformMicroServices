@@ -22,8 +22,11 @@ internal class StorageUrlResolver : IStorageUrlResolver
             throw new InvalidOperationException($"No bucket mapped for category: {category}");
         }
 
+        var urlString = $"{_options.BaseUrl.TrimEnd('/')}/{bucketName}/{relativePath.TrimStart('/')}";
+        var uri = new Uri(urlString);
+
         var resolvedUrl = new ResolvedUrl(
-            Value: $"{_options.BaseUrl.TrimEnd('/')}/{bucketName}/{relativePath.TrimStart('/')}",
+            Value: uri,
             Category: category
         );
 

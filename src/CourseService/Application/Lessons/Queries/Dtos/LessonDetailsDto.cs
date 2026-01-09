@@ -1,13 +1,17 @@
+using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Shared.Primitives;
+
 namespace Courses.Application.Lessons.Queries.Dtos;
 
 public record LessonDetailsDto(
-    Guid CourseId,
-    Guid LessonId,
-    string Title,
-    string Description,
+    CourseId CourseId,
+    LessonId LessonId,
+    Title Title,
+    Description Description,
     int Index,
     TimeSpan? Duration,
     bool IsPreview,
-    string? ThumbnailUrl,
-    string? VideoUrl
+    Uri? ThumbnailUrl,
+    Uri? VideoUrl
 );

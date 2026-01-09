@@ -28,14 +28,12 @@ internal class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand,
         CreateCourseCommand request,
         CancellationToken cancellationToken = default)
     {
-        Title? title = string.IsNullOrEmpty(request.Title) ? null : new(request.Title);
-        Description? description = string.IsNullOrEmpty(request.Description) ? null : new(request.Description);
         InstructorId? instructorId = request.InstructorId.HasValue ? new(request.InstructorId.Value) : null;
 
         Result<Course> courseResult = Course.CreateCourse(
             _timeProvider,
-            title,
-            description,
+            request.Title,
+            request.Description,
             instructorId);
 
         if (courseResult.IsFailure)
@@ -48,7 +46,7 @@ internal class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand,
         await _courseRepository.AddAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var responseDto = new CreateCourseResponse(course.Id.Value, course.Title.Value);
+        var responseDto = new CreateCourseResponse(course.Id, course.Title.Value);
 
         return Result.Success(responseDto);
     }
