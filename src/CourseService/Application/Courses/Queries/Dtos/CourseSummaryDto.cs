@@ -1,12 +1,15 @@
-﻿namespace Courses.Application.Courses.Queries.Dtos;
+﻿using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Shared.Primitives;
+
+namespace Courses.Application.Courses.Queries.Dtos;
 
 public record CourseSummaryDto(
-    Guid Id,
-    string Title,
+    CourseId Id,
+    Title Title,
     string? InstructorName,
     decimal Price,
     string Currency,
-    string? ThumbnailUrl,
+    Uri? ThumbnailUrl,
     int LessonsCount,
     int EnrollmentCount
 );

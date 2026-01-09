@@ -26,16 +26,13 @@ public class DeleteLessonCommandHandler : ICommandHandler<DeleteLessonCommand>
         DeleteLessonCommand request, 
         CancellationToken cancellationToken = default)
     {
-        LessonId lessonId = new LessonId(request.LessonId);
-        CourseId courseId = new CourseId(request.CourseId);
-
-        Course? course = await _courseRepository.GetByIdAsync(courseId, cancellationToken);
+        Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
         if (course is null)
         {
             return Result.Failure(CourseErrors.NotFound);
         }
 
-        Result deletionResult = course.DeleteLesson(lessonId);
+        Result deletionResult = course.DeleteLesson(request.LessonId);
         if (deletionResult.IsFailure)
         {
             return Result.Failure(deletionResult.Error);

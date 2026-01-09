@@ -2,7 +2,9 @@ using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.PatchLesson;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
@@ -18,17 +20,20 @@ public class PatchLesson : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("courses/{courseId:guid}/lessons/{lessonId:guid}", async (
+        app.MapPatch("courses/{courseId:Guid}/lessons/{lessonId:Guid}", async (
             Guid courseId,
             Guid lessonId,
             PatchLessonRequest request,
             IMediator mediator) =>
         {
+            Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
+            Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
+
             var command = new PatchLessonCommand(
-                courseId,
-                lessonId,
-                request.Title,
-                request.Description,
+                new CourseId(courseId),
+                new LessonId(lessonId),
+                title,
+                description,
                 request.Access);
 
             Result result = await mediator.Send(command);

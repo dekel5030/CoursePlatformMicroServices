@@ -2,7 +2,6 @@
 using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
-using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -23,9 +22,7 @@ public class DeleteCourseCommandHandler : ICommandHandler<DeleteCourseCommand>
         DeleteCourseCommand request, 
         CancellationToken cancellationToken = default)
     {
-        CourseId courseId = new CourseId(request.CourseId);
-
-        Course? course = await _courseRepository.GetByIdAsync(courseId, cancellationToken);
+        Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
         
         if (course is null)
         {

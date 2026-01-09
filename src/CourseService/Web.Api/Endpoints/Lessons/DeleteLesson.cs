@@ -1,6 +1,8 @@
 ﻿using CoursePlatform.ServiceDefaults.CustomResults;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.DeleteLesson;
+using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -16,7 +18,7 @@ public class DeleteLesson : IEndpoint
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var command = new DeleteLessonCommand(courseId, lessonId);
+            var command = new DeleteLessonCommand(new CourseId(courseId), new LessonId(lessonId));
             Result result = await mediator.Send(command, cancellationToken);
             return result.Match(Results.NoContent, CustomResults.Problem);
         })

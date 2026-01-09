@@ -3,6 +3,7 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Courses.Queries.GetById;
+using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -17,7 +18,7 @@ internal sealed class GetCourseById : IEndpoint
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetCourseByIdQuery(id);
+            var query = new GetCourseByIdQuery(new CourseId(id));
 
             Result<CourseDetailsDto> result = await mediator.Send(query, cancellationToken);
 

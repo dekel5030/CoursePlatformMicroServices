@@ -26,11 +26,9 @@ internal class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, Cou
         GetCourseByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        CourseId courseId = new(request.Id);
-
         Course? course = await _dbContext.Courses
             .Include(c => c.Lessons)
-            .FirstOrDefaultAsync(c => c.Id == courseId, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
         if (course is null)
         {

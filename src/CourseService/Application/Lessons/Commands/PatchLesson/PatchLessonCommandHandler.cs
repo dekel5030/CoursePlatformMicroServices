@@ -2,9 +2,6 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
-using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -30,10 +27,7 @@ internal class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
         PatchLessonCommand request,
         CancellationToken cancellationToken = default)
     {
-        var courseId = new CourseId(request.CourseId);
-        var lessonId = new LessonId(request.LessonId);
-
-        Course? course = await _courseRepository.GetByIdAsync(courseId, cancellationToken);
+        Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
         
         if (course is null)
         {
@@ -41,9 +35,9 @@ internal class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
         }
 
         Result updateResult = course.UpdateLesson(
-            lessonId,
-            request.Title is null ? null : new Title(request.Title),
-            request.Description is null ? null : new Description(request.Description),
+            request.LessonId,
+            request.Title,
+            request.Description,
             request.Access,
             _timeProvider);
 

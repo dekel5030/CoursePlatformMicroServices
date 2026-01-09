@@ -1,12 +1,16 @@
-﻿namespace Courses.Application.Lessons.Queries.Dtos;
+﻿using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Shared.Primitives;
+
+namespace Courses.Application.Lessons.Queries.Dtos;
 
 public record LessonSummaryDto(
-    Guid CourseId,
-    Guid LessonId,
-    string Title,
-    string Description,
+    CourseId CourseId,
+    LessonId LessonId,
+    Title Title,
+    Description Description,
     int Index,
     TimeSpan? Duration,
     bool IsPreview,
-    string? ThumbnailUrl
+    Uri? ThumbnailUrl
 );
