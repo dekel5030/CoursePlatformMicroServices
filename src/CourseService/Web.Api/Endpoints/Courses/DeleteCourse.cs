@@ -2,6 +2,7 @@
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Commands.DeleteCourse;
+using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +13,8 @@ public class DeleteCourse : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("courses/{courseId:guid}", async (
-            Guid courseId,
+        app.MapDelete("courses/{courseId:CourseId}", async (
+            CourseId courseId,
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {

@@ -2,6 +2,7 @@ using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.PatchLesson;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -18,9 +19,9 @@ public class PatchLesson : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("courses/{courseId:guid}/lessons/{lessonId:guid}", async (
-            Guid courseId,
-            Guid lessonId,
+        app.MapPatch("courses/{courseId:CourseId}/lessons/{lessonId:LessonId}", async (
+            CourseId courseId,
+            LessonId lessonId,
             PatchLessonRequest request,
             IMediator mediator) =>
         {

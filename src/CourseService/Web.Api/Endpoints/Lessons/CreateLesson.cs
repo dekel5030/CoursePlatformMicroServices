@@ -3,6 +3,7 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.CreateLesson;
 using Courses.Application.Lessons.Queries.Dtos;
+using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -14,8 +15,8 @@ public class CreateLesson : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("courses/{courseid:guid}/lessons", async (
-            Guid courseid,
+        app.MapPost("courses/{courseid:CourseId}/lessons", async (
+            CourseId courseid,
             CreateLessonRequest request,
             IMediator mediator) =>
         {
@@ -28,7 +29,7 @@ public class CreateLesson : IEndpoint
 
             return result.Match(
                 lessonDto => Results.CreatedAtRoute(
-                    nameof(CreateLesson),//nameof(GetLessonById),
+                    nameof(GetLessonById),
                     new { courseId = courseid, lessonId = lessonDto.LessonId },
                     lessonDto
                 ),

@@ -10,11 +10,25 @@ internal class ValueObjectIdConstraint<T> : IRouteConstraint
         RouteValueDictionary values,
         RouteDirection routeDirection)
     {
-        if (values.TryGetValue(routeKey, out var value) && value is string s)
-        {
-            return T.TryParse(s, null, out _);
-        }
+        //if (values.TryGetValue(routeKey, out var value) && value is string s)
+        //{
+        //    return T.TryParse(s, null, out _);
+        //}
 
-        return false;
+        //return false;
+
+        if (!values.TryGetValue(routeKey, out var value) || value is null)
+            return false;
+
+        // Inbound: string from URL
+        if (value is string s)
+            return T.TryParse(s, null, out _);
+
+        // Outbound: Value Object
+        if (value is T)
+            return true;
+
+        // Fallback: try ToString
+        return T.TryParse(value.ToString(), null, out _);
     }
 }

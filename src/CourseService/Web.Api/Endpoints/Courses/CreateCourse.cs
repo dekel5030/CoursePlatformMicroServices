@@ -1,9 +1,9 @@
 ﻿using CoursePlatform.ServiceDefaults.CustomResults;
+using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Commands.CreateCourse;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using CoursePlatform.ServiceDefaults.Swagger;
 
 namespace Courses.Api.Endpoints.Courses;
 
@@ -20,9 +20,9 @@ public class CreateCourse : IEndpoint
 
             return result.Match(
                 response => Results.CreatedAtRoute(
-                    "GetCourseById",
+                    nameof(GetCourseById),
                     new { id = response.CourseId },
-                    new { Id = response.CourseId }
+                    response
                 ),
                 CustomResults.Problem);
         })

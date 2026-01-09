@@ -56,6 +56,8 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             price.Property(p => p.Currency).HasColumnName("price_currency").IsRequired();
         });
 
+        builder.HasQueryFilter(course => !course.IsDeleted);
+
         builder.Ignore(course => course.DomainEvents);
     }
 }

@@ -2,6 +2,7 @@ using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Commands.PatchCourse;
+using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
@@ -19,8 +20,8 @@ public class PatchCourse : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("courses/{id:guid}", async (
-            Guid id,
+        app.MapPatch("courses/{id:CourseId}", async (
+            CourseId id,
             PatchCourseRequest request,
             IMediator mediator) =>
         {
