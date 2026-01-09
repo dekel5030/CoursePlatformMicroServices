@@ -7,6 +7,7 @@ using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Courses.Api.Endpoints.Lessons;
 
@@ -16,8 +17,8 @@ public class CreateLesson : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("courses/{courseid:Guid}/lessons", async (
-            Guid courseid,
+        app.MapPost("courses/{courseid}/lessons", async (
+            [FromRoute] CourseId courseid,
             CreateLessonRequest request,
             IMediator mediator) =>
         {
@@ -25,7 +26,7 @@ public class CreateLesson : IEndpoint
             Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
 
             var command = new CreateLessonCommand(
-                new CourseId(courseid),
+                courseid,
                 title,
                 description);
 
@@ -34,7 +35,7 @@ public class CreateLesson : IEndpoint
             return result.Match(
                 lessonDto => Results.CreatedAtRoute(
                     nameof(GetLessonById),
-                    new { courseId = courseid, lessonId = lessonDto.LessonId.Value },
+                    new { courseId = courseid.Value, lessonId = lessonDto.LessonId.Value },
                     lessonDto
                 ),
                 CustomResults.Problem);

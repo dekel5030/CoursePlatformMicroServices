@@ -5,6 +5,7 @@ using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Courses.Api.Endpoints.Lessons;
 
@@ -12,13 +13,13 @@ public class DeleteLesson : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("courses/{courseId:Guid}/lessons/{lessonId:Guid}", async (
-            Guid courseId,
-            Guid lessonId,
+        app.MapDelete("courses/{courseId}/lessons/{lessonId}", async (
+            [FromRoute] CourseId courseId,
+            [FromRoute] LessonId lessonId,
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var command = new DeleteLessonCommand(new CourseId(courseId), new LessonId(lessonId));
+            var command = new DeleteLessonCommand(courseId, lessonId);
             Result result = await mediator.Send(command, cancellationToken);
             return result.Match(Results.NoContent, CustomResults.Problem);
         })

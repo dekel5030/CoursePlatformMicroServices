@@ -21,8 +21,8 @@ public class PatchCourse : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("courses/{id:Guid}", async (
-            Guid id,
+        app.MapPatch("courses/{id}", async (
+            [FromRoute] CourseId id,
             PatchCourseRequest request,
             IMediator mediator) =>
         {
@@ -30,7 +30,7 @@ public class PatchCourse : IEndpoint
             Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
 
             var command = new PatchCourseCommand(
-                new CourseId(id),
+                id,
                 title,
                 description,
                 request.InstructorId,

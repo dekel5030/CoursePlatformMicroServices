@@ -7,6 +7,7 @@ using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Courses.Api.Endpoints.Lessons;
 
@@ -14,13 +15,13 @@ internal sealed class GetLessonById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("courses/{courseId:Guid}/lessons/{lessonId:Guid}", async (
-            Guid courseId,
-            Guid lessonId,
+        app.MapGet("courses/{courseId}/lessons/{lessonId}", async (
+            [FromRoute] CourseId courseId,
+            [FromRoute] LessonId lessonId,
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetLessonByIdQuery(new CourseId(courseId), new LessonId(lessonId));
+            var query = new GetLessonByIdQuery(courseId, lessonId);
 
             Result<LessonDetailsDto> result = await mediator.Send(query, cancellationToken);
 
