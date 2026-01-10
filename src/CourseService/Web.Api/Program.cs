@@ -1,7 +1,6 @@
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Endpoints;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure;
 using Courses.Api.Infrastructure.JsonConverters;
 using Courses.Application;
 using Courses.Infrastructure;
@@ -16,7 +15,6 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
 builder.Services.AddValueObjectConverter();
-builder.Services.AddValueObjectModelBinding();
 
 var app = builder.Build();
 
