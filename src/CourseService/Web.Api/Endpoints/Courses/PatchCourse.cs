@@ -1,6 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
+using Courses.Api.Infrastructure.Extensions;
 using Courses.Application.Courses.Commands.PatchCourse;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
@@ -21,8 +22,8 @@ public class PatchCourse : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("courses/{id}", async (
-            [FromRoute] CourseId id,
+        app.MapPatch("courses/{id:Guid}", async (
+            Guid id,
             PatchCourseRequest request,
             IMediator mediator) =>
         {
@@ -30,7 +31,7 @@ public class PatchCourse : IEndpoint
             Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
 
             var command = new PatchCourseCommand(
-                id,
+                id.MapValueObject<CourseId>(),
                 title,
                 description,
                 request.InstructorId,

@@ -1,6 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
+using Courses.Api.Infrastructure.Extensions;
 using Courses.Application.Lessons.Commands.CreateLesson;
 using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Domain.Courses.Primitives;
@@ -17,8 +18,8 @@ public class CreateLesson : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("courses/{courseid}/lessons", async (
-            [FromRoute] CourseId courseid,
+        app.MapPost("courses/{courseid:Guid}/lessons", async (
+            Guid courseid,
             CreateLessonRequest request,
             IMediator mediator) =>
         {
@@ -26,7 +27,7 @@ public class CreateLesson : IEndpoint
             Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
 
             var command = new CreateLessonCommand(
-                courseid,
+                courseid.MapValueObject<CourseId>(),
                 title,
                 description);
 
@@ -35,7 +36,7 @@ public class CreateLesson : IEndpoint
             return result.Match(
                 lessonDto => Results.CreatedAtRoute(
                     nameof(GetLessonById),
-                    new { courseId = courseid.Value, lessonId = lessonDto.LessonId.Value },
+                    new { courseId = courseid, lessonId = lessonDto.LessonId.Value },
                     lessonDto
                 ),
                 CustomResults.Problem);
