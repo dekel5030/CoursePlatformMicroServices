@@ -19,7 +19,7 @@ public class Lesson : Entity<LessonId>
     public CourseId CourseId { get; private set; }
     public Course Course { get; private set; } = null!;
 
-    public int Index { get; private set; } = 0;
+    public int Index { get; private set; }
 
     public ImageUrl? ThumbnailImageUrl { get; private set; }
     public VideoUrl? VideoUrl { get; private set; }
