@@ -1,13 +1,10 @@
 ﻿using CoursePlatform.ServiceDefaults.Auth;
-using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
 using Courses.Infrastructure.Database;
 using Courses.Infrastructure.MassTransit;
 using Courses.Infrastructure.Repositories;
 using Courses.Infrastructure.Storage;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

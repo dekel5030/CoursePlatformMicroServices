@@ -6,7 +6,7 @@ using Kernel.Auth;
 
 namespace Gateway.Api.Middleware;
 
-public class UserEnrichmentMiddleware : IMiddleware
+internal sealed class UserEnrichmentMiddleware : IMiddleware
 {
     private readonly ICacheService _cacheService;
     private readonly IAuthClient _authClient;
@@ -71,7 +71,7 @@ public class UserEnrichmentMiddleware : IMiddleware
             return cachedToken;
         }
 
-        var keycloakToken = context.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+        var keycloakToken = context.Request.Headers.Authorization.ToString().Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
         if (string.IsNullOrEmpty(keycloakToken))
         {
             return null;

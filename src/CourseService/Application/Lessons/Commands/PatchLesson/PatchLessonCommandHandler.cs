@@ -7,7 +7,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Lessons.Commands.PatchLesson;
 
-internal class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
+internal sealed class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
 {
     private readonly ICourseRepository _courseRepository;
     private readonly IUnitOfWork _unitOfWork;

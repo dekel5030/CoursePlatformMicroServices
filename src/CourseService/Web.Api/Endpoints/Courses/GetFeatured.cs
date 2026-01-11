@@ -8,7 +8,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Courses;
 
-public class GetFeatured : IEndpoint
+internal sealed class GetFeatured : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

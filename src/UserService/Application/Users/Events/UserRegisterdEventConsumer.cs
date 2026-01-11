@@ -7,7 +7,7 @@ using Users.Application.Abstractions.Data;
 
 namespace Users.Application.Users.Events;
 
-internal class UserRegisterdEventConsumer : IEventConsumer<UserRegisteredEvent>
+internal sealed class UserRegisterdEventConsumer : IEventConsumer<UserRegisteredEvent>
 {
     private readonly IWriteDbContext _dbContext;
 

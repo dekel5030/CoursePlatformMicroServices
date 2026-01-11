@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Api.Extensions;
 
-public static class MigrationExtensions
+internal static class MigrationExtensions
 {
     public static void ApplyMigrations(this IApplicationBuilder app)
     {

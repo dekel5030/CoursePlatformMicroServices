@@ -6,7 +6,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Auth.Api.Endpoints.Roles;
 
-public class GetRoleByName : IEndpoint
+internal sealed class GetRoleByName : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

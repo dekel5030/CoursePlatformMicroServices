@@ -7,7 +7,7 @@ using ApplicationCourseDetailsDto = Courses.Application.Courses.Queries.Dtos.Cou
 
 namespace Courses.Api.Extensions;
 
-public static class CourseMappingExtensions
+internal static class CourseMappingExtensions
 {
     public static CreateCourseResponse ToApiContract(this ApplicationCreateCourseResponse dto)
     {

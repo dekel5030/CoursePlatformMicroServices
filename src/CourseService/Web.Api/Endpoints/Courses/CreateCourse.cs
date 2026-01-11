@@ -8,9 +8,9 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Courses;
 
-public class CreateCourse : IEndpoint
+internal sealed class CreateCourse : IEndpoint
 {
-    public record CreateCourseRequest(
+    internal sealed record CreateCourseRequest(
         string? Title,
         string? Description,
         Guid? InstructorId);

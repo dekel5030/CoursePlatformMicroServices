@@ -3,7 +3,7 @@ using Courses.Application.Lessons.Queries.Dtos;
 
 namespace Courses.Api.Extensions;
 
-public static class LessonMappingExtensions
+internal static class LessonMappingExtensions
 {
     public static LessonSummaryResponse ToApiContract(this LessonSummaryDto dto)
     {

@@ -2,13 +2,12 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Commands.PatchCourse;
 
-internal class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
+internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
 {
     private readonly TimeProvider _timeProvider;
     private readonly ICourseRepository _courseRepository;

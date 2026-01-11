@@ -6,7 +6,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Auth.Api.Endpoints.Users;
 
-public class UserAddPermission : IEndpoint
+internal sealed class UserAddPermission : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

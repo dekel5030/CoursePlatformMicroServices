@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Application.Roles.Queries.GetAllRoles;
 
-internal class GetAllRolesQueryHandler : IQueryHandler<GetAllRolesQuery, IReadOnlyCollection<RoleDto>>
+internal sealed class GetAllRolesQueryHandler : IQueryHandler<GetAllRolesQuery, IReadOnlyCollection<RoleDto>>
 {
     private readonly IReadDbContext _readDbContext;
 

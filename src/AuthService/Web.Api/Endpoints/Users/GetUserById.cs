@@ -7,7 +7,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Auth.Api.Endpoints.Users;
 
-public class GetUserById : IEndpoint
+internal sealed class GetUserById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

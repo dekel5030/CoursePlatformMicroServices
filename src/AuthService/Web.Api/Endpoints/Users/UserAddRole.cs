@@ -2,11 +2,10 @@
 using Auth.Api.Infrastructure;
 using Kernel.Messaging.Abstractions;
 using Auth.Application.AuthUsers.Commands.UserAddRole;
-using Auth.Application.AuthUsers.Dtos;
 
 namespace Auth.Api.Endpoints.Users;
 
-public class UserAddRole : IEndpoint
+internal sealed class UserAddRole : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

@@ -2,7 +2,7 @@
 
 namespace StorageService.Abstractions;
 
-public interface IStorageProvider
+internal interface IStorageProvider
 {
     PresignedUrlResponse GenerateViewUrl(string fileKey, TimeSpan expiry);
 
@@ -17,7 +17,7 @@ public interface IStorageProvider
 
 }
 
-public class ObjectResponse
+internal sealed class ObjectResponse
 {
     public Stream Content { get; set; } = default!;
     public string ContentType { get; set; } = "application/octet-stream";

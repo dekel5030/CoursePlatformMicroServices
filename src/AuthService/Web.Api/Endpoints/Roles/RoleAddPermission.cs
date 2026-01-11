@@ -6,7 +6,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Auth.Api.Endpoints.Roles;
 
-public class AddRolePermission : IEndpoint
+internal sealed class AddRolePermission : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

@@ -6,7 +6,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Auth.Application.AuthUsers.Events;
 
-internal class UserRegisteredDomainEventHandler : IDomainEventHandler<UserRegisteredDomainEvent>
+internal sealed class UserRegisteredDomainEventHandler : IDomainEventHandler<UserRegisteredDomainEvent>
 {
     private readonly IEventBus _eventPublisher;
 

@@ -5,7 +5,7 @@ using Kernel;
 
 namespace Courses.Api.Infrastructure.JsonConverters;
 
-public class SingleValueObjectJsonConverterFactory : JsonConverterFactory
+internal sealed class SingleValueObjectJsonConverterFactory : JsonConverterFactory
 {
     private static readonly ConcurrentDictionary<Type, Type?> _valueTypeCache = new();
 

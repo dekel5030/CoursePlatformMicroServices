@@ -34,7 +34,7 @@ public class User : Entity
         // Raise domain event for user profile creation
         user.Raise(new UserProfileCreatedDomainEvent(
             user.Id,
-            user.AuthUserId,
+            user.AuthUserId!,
             user.Email,
             DateTime.UtcNow));
 

@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace CoursePlatform.ServiceDefaults.Messaging.Behaviors;
 
-internal class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+internal sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
     where TResponse : Result
 {

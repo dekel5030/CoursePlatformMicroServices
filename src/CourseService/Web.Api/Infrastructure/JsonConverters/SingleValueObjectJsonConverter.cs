@@ -4,7 +4,7 @@ using Kernel;
 
 namespace Courses.Api.Infrastructure.JsonConverters;
 
-public sealed class SingleValueObjectJsonConverter<TObject, TValue> : JsonConverter<TObject>
+internal sealed class SingleValueObjectJsonConverter<TObject, TValue> : JsonConverter<TObject>
     where TObject : ISingleValueObject<TValue>
 {
     public override TObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

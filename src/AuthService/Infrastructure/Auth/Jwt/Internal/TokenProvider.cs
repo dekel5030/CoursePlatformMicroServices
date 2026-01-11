@@ -24,8 +24,8 @@ internal class TokenProvider : ITokenProvider
         IEnumerable<string> effectivePermissions, 
         DateTime expiration)
     {
-        RsaSecurityKey key = _keyManager.GetPrivateKey();
-        key.KeyId = _keyManager.GetKeyId();
+        RsaSecurityKey key = _keyManager.PrivateKey;
+        key.KeyId = KeyManager.KeyId;
         var credentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
 
         var claims = new List<Claim>

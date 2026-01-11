@@ -2,7 +2,7 @@
 
 namespace Courses.Api.Extensions;
 
-public static class MiddlewareExtensions
+internal static class MiddlewareExtensions
 {
     public static IApplicationBuilder UseRequestContextLogging(this IApplicationBuilder app)
     {

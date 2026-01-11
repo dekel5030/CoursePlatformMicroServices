@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Auth.Api.Endpoints.Auth;
 
-public class JwksEndpoint : IEndpoint
+internal sealed class JwksEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -20,7 +20,7 @@ public class JwksEndpoint : IEndpoint
                     {
                         kty = "RSA",
                         use = "sig",
-                        kid = keyManager.GetKeyId(),
+                        kid = KeyManager.KeyId,
                         n = Base64UrlEncoder.Encode(parameters.Modulus),
                         e = Base64UrlEncoder.Encode(parameters.Exponent),
                         alg = "RS256"

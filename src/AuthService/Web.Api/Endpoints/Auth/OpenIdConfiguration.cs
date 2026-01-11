@@ -1,6 +1,6 @@
 ﻿namespace Auth.Api.Endpoints.Auth;
 
-public class OpenIdConfigurationEndpoint : IEndpoint
+internal sealed class OpenIdConfigurationEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

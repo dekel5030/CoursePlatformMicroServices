@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Courses.Api.Endpoints.Courses;
 
-public class PatchCourse : IEndpoint
+internal sealed class PatchCourse : IEndpoint
 {
-    public record PatchCourseRequest(
+    internal sealed record PatchCourseRequest(
         string? Title,
         string? Description,
         Guid? InstructorId,

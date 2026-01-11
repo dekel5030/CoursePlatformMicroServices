@@ -11,9 +11,9 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Lessons;
 
-public class CreateLesson : IEndpoint
+internal sealed class CreateLesson : IEndpoint
 {
-    public record CreateLessonRequest(string? Title, string? Description);
+    internal sealed record CreateLessonRequest(string? Title, string? Description);
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

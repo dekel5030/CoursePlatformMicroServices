@@ -31,4 +31,6 @@ app.UseInfrastructure();
 
 app.Run();
 
+#pragma warning disable CA1515 // Consider making public types internal
 public partial class Program { }
+#pragma warning restore CA1515 // Consider making public types internal

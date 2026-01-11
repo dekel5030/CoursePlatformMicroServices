@@ -9,20 +9,20 @@ public abstract class RepositoryBase<TEntity, TId> : IRepository<TEntity, TId>
     where TEntity : Entity<TId>
     where TId : IEquatable<TId>
 {
-    protected readonly AppDbContextBase _dbContext;
+    protected AppDbContextBase DbContext { get; }
 
     protected RepositoryBase(WriteDbContext dbContext)
     {
-        _dbContext = dbContext;
+        DbContext = dbContext;
     }
 
     public virtual Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
-        return _dbContext.Set<TEntity>().FirstOrDefaultAsync(entity => entity.Id.Equals(id), cancellationToken);
+        return DbContext.Set<TEntity>().FirstOrDefaultAsync(entity => entity.Id.Equals(id), cancellationToken);
     }
 
     public virtual Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        return _dbContext.Set<TEntity>().AddAsync(entity, cancellationToken).AsTask();
+        return DbContext.Set<TEntity>().AddAsync(entity, cancellationToken).AsTask();
     }
 }

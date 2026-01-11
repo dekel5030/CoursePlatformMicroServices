@@ -7,7 +7,7 @@ using StorageService.Abstractions;
 
 namespace StorageService.Endpoints;
 
-public class Upload : IEndpoint
+internal sealed class Upload : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

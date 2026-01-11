@@ -2,7 +2,7 @@ using Courses.Api.Contracts.Lessons;
 
 namespace Courses.Api.Contracts.Courses;
 
-public record CourseDetailsResponse(
+internal sealed record CourseDetailsResponse(
     Guid Id,
     string Title,
     string Description,

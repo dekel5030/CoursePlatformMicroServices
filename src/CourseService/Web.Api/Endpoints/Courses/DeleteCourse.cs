@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Courses.Api.Endpoints.Courses;
 
-public class DeleteCourse : IEndpoint
+internal sealed class DeleteCourse : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

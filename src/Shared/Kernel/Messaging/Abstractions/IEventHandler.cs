@@ -3,5 +3,5 @@
 public interface IEventHandler<in TEvent> 
     where TEvent : class
 {
-    Task HandleAsync(TEvent @event, CancellationToken cancellationToken = default);
+    Task HandleAsync(TEvent message, CancellationToken cancellationToken = default);
 }

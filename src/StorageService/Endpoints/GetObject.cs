@@ -3,7 +3,7 @@ using StorageService.Abstractions;
 
 namespace StorageService.Endpoints;
 
-public class GetObject : IEndpoint
+internal sealed class GetObject : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

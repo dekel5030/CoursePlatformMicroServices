@@ -6,13 +6,14 @@ namespace Auth.Infrastructure.Auth;
 public class KeyManager
 {
     private readonly RSA _rsa;
+    public static string KeyId => "internal-auth-key-v1";
 
     public KeyManager()
     {
         _rsa = RSA.Create(2048);
     }
 
-    public RsaSecurityKey GetPrivateKey() => new RsaSecurityKey(_rsa);
+    public RsaSecurityKey PrivateKey => new RsaSecurityKey(_rsa);
 
     public RsaSecurityKey GetPublicKey()
     {
@@ -20,6 +21,4 @@ public class KeyManager
         publicRsa.ImportParameters(_rsa.ExportParameters(false));
         return new RsaSecurityKey(publicRsa);
     }
-
-    public string GetKeyId() => "internal-auth-key-v1";
 }

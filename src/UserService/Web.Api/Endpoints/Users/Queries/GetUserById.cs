@@ -7,7 +7,7 @@ using Users.Application.Users.Queries.GetUserByid;
 
 namespace Users.Api.Endpoints.Users.Queries;
 
-public class GetUserById : IEndpoint
+internal sealed class GetUserById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

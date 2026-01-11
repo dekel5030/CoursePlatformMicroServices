@@ -1,6 +1,6 @@
 ﻿namespace Gateway.Api.Jwt;
 
-public static class JwtExtensions
+internal static class JwtExtensions
 {
     public static IServiceCollection ConfigureKeycloakAuthentication(
         this IServiceCollection services,

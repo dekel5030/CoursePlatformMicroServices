@@ -3,7 +3,7 @@ using StorageService.Abstractions;
 
 namespace StorageService.Endpoints;
 
-public class GetReadUrl : IEndpoint
+internal sealed class GetReadUrl : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
