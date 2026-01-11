@@ -26,7 +26,7 @@ public class RoleAddPermissionCommandHandler : ICommandHandler<RoleAddPermission
         CancellationToken cancellationToken = default)
     {
         var role = await _writeDbContext.Roles
-            .FirstOrDefaultAsync(role => role.Name == new RoleName(request.RoleName));
+            .FirstOrDefaultAsync(role => role.Name == new RoleName(request.RoleName), cancellationToken);
 
         if (role is null)
         {

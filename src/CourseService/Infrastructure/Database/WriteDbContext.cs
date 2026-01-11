@@ -28,8 +28,9 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext
         DbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        IEnumerable<Entity> entities = dbContext.ChangeTracker.Entries<Entity>()
-            .Select(entry => entry.Entity);
+        List<Entity> entities = dbContext.ChangeTracker.Entries<Entity>()
+            .Select(entry => entry.Entity)
+            .ToList();
 
         var domainEvents = entities
             .SelectMany(entity => entity.DomainEvents)

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Gateway.Api;
 
-public static class DependencyInjection
+internal static class DependencyInjection
 {
     private const string RedisConnectionString = "redis";
     public const string AuthServiceName = "authservice";

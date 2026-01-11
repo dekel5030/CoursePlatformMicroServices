@@ -2,7 +2,7 @@
 
 public record PagedResponseDto<T>
 {
-    public List<T> Items { get; init; } = new();
+    public IReadOnlyCollection<T> Items { get; init; } = Array.Empty<T>();
     public int PageNumber { get; init; }
     public int PageSize { get; init; }
     public int TotalItems { get; init; }

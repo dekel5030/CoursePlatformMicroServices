@@ -2,13 +2,14 @@
 using Auth.Domain.AuthUsers.Primitives;
 using Auth.Domain.Permissions;
 using Auth.Domain.Roles;
+using Auth.Domain.Roles.Primitives;
 using Auth.Infrastructure.Database;
 using Kernel.Auth.AuthTypes;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Api.Extensions;
 
-public static class MigrationExtensions
+internal static class MigrationExtensions
 {
     public static async Task ApplyMigrationsAsync(this IApplicationBuilder app)
     {
@@ -20,14 +21,14 @@ public static class MigrationExtensions
 
         if (!await dbContext.Roles.AnyAsync())
         {
-            Role userRole = Role.Create(new Domain.Roles.Primitives.RoleName("user")).Value;
-            await dbContext.Roles.AddAsync(userRole);
+            Role? userRole = Role.Create(new RoleName("user")).Value;
+            await dbContext.Roles.AddAsync(userRole!);
         }
         AuthUser? user = await dbContext.Users
             .Include(user => user.Roles)
             .FirstOrDefaultAsync(user => user.IdentityId == new IdentityProviderId("asdasdfd"));
 
-        user.AddPermission(new Permission(
+        user?.AddPermission(new Permission(
             EffectType.Allow,
             ActionType.Create,
             ResourceType.Course,

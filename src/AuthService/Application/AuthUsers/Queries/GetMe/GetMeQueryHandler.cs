@@ -1,9 +1,7 @@
 using Auth.Application.Abstractions.Data;
 using Auth.Application.AuthUsers.Queries.Dtos;
-using Auth.Domain.AuthUsers;
 using Auth.Domain.AuthUsers.Errors;
 using Auth.Domain.AuthUsers.Primitives;
-using Auth.Domain.Permissions;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
@@ -11,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Application.AuthUsers.Queries.GetMe;
 
-internal class GetMeQueryHandler : IQueryHandler<GetMeQuery, UserDto>
+internal sealed class GetMeQueryHandler : IQueryHandler<GetMeQuery, UserDto>
 {
     private readonly IReadDbContext _dbContext;
     private readonly IUserContext _userContext;

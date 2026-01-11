@@ -9,7 +9,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Courses;
 
-public class GetCourses : IEndpoint
+internal sealed class GetCourses : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

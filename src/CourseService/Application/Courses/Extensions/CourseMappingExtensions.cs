@@ -33,7 +33,7 @@ internal static class CourseMappingExtensions
             EnrollmentCount: course.EnrollmentCount,
             UpdatedAtUtc: course.UpdatedAtUtc,
             ImageUrls: imageTasks.Select(t => t.Result.Value).ToList(),
-            Lessons: lessonsTask.Result
+            Lessons: await lessonsTask
         );
     }
 

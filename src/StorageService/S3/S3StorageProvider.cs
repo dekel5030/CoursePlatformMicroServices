@@ -6,7 +6,7 @@ using StorageService.Abstractions;
 
 namespace StorageService.S3;
 
-public class S3StorageProvider : IStorageProvider
+internal sealed class S3StorageProvider : IStorageProvider
 {
     private readonly IAmazonS3 _s3Client;
     private readonly S3Options _options;
@@ -73,13 +73,25 @@ public class S3StorageProvider : IStorageProvider
                 await _s3Client.PutObjectAsync(request);
             }
         }
+        catch (AmazonS3Exception)
+        {
+            return Result.Failure<string>(Error.Problem("s3.upload_failed", "Storage service rejected the request."));
+        }
+        catch (IOException)
+        {
+            return Result.Failure<string>(Error.Problem("s3.io_error", "Internal server storage error."));
+        }
         catch (Exception)
         {
-            return Result.Failure<string>(Error.Problem("storageservice.servererror", "server error."));
+            throw;
         }
         finally
         {
-            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            if (File.Exists(tempFilePath))
+            {
+                try { File.Delete(tempFilePath); }
+                catch (IOException) { }
+            }
         }
 
         return Result.Success(fileKey);

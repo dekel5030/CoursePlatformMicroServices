@@ -1,6 +1,6 @@
 ﻿namespace Gateway.Api.Services.CacheService;
 
-public interface ICacheService
+internal interface ICacheService
 {
     Task<T?> GetAsync<T>(
         string cacheKey,

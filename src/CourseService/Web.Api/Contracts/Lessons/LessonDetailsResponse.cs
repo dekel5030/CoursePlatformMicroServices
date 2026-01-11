@@ -1,6 +1,6 @@
 namespace Courses.Api.Contracts.Lessons;
 
-public record LessonDetailsResponse(
+internal sealed record LessonDetailsResponse(
     Guid CourseId,
     Guid LessonId,
     string Title,

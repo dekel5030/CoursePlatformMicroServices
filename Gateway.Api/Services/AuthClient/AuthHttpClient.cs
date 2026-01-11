@@ -1,10 +1,11 @@
 ﻿using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace Gateway.Api.Services.AuthClient;
 
-public record TokenResponse(string InternalToken);
+internal sealed record TokenResponse(string InternalToken);
 
-public class AuthHttpClient : IAuthClient
+internal sealed class AuthHttpClient : IAuthClient
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<AuthHttpClient> _logger;
@@ -36,9 +37,19 @@ public class AuthHttpClient : IAuthClient
 
             return internalToken?.InternalToken;
         }
-        catch (Exception ex)
+        catch (HttpRequestException ex)
         {
-            _logger.LogError(ex, "Failed to fetch permissions from AuthService via HTTP");
+            _logger.LogError(ex, "Network error while exchanging token with AuthService");
+            return null;
+        }
+        catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogError(ex, "Timeout occurred while communicating with AuthService");
+            return null;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "AuthService returned an invalid JSON response");
             return null;
         }
     }

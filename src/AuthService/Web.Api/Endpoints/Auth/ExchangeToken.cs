@@ -6,7 +6,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Auth.Api.Endpoints.Auth;
 
-public class ExchangeToken : IEndpoint
+internal sealed class ExchangeToken : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

@@ -11,9 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Courses.Api.Endpoints.Lessons;
 
-public class PatchLesson : IEndpoint
+internal sealed class PatchLesson : IEndpoint
 {
-    public record PatchLessonRequest(
+    internal sealed record PatchLessonRequest(
         string? Title,
         string? Description,
         LessonAccess? Access);

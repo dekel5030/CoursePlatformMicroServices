@@ -1,5 +1,4 @@
-﻿using MassTransit;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +6,6 @@ using Users.Application.Abstractions.Context;
 using Users.Application.Abstractions.Data;
 using Users.Infrastructure.Auth;
 using Users.Infrastructure.Database;
-using Users.Infrastructure.DomainEvents;
 using Users.Infrastructure.MassTransit;
 
 namespace Users.Infrastructure;

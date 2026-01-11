@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Application.AuthUsers.Commands.ExchangeToken;
 
-internal class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenCommand, TokenResponse>
+internal sealed class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenCommand, TokenResponse>
 {
     private readonly IExternalUserContext _externalUserContext;
     private readonly IWriteDbContext _dbContext;
@@ -82,7 +82,7 @@ internal class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenComman
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return newUser;
         }
-        catch (DbUpdateException ex)
+        catch (DbUpdateException)
         {
             var existingUser = await _dbContext.Users
                         .Include(u => u.Roles)

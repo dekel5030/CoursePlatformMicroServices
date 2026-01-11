@@ -1,6 +1,5 @@
 ﻿using Auth.Application.Abstractions.Data;
 using Auth.Application.AuthUsers.Queries.Dtos;
-using Auth.Domain.AuthUsers;
 using Auth.Domain.AuthUsers.Errors;
 using Auth.Domain.AuthUsers.Primitives;
 using Kernel;
@@ -9,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Application.AuthUsers.Queries.GetUserById;
 
-internal class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, UserDto>
+internal sealed class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, UserDto>
 {
     private readonly IReadDbContext _dbContext;
 

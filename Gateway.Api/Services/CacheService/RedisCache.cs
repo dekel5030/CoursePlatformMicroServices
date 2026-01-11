@@ -3,7 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Gateway.Api.Services.CacheService;
 
-internal class RedisCache : ICacheService
+internal sealed class RedisCache : ICacheService
 {
     private readonly IDistributedCache _distributedCache;
     private static readonly JsonSerializerOptions _serializerOptions = new()

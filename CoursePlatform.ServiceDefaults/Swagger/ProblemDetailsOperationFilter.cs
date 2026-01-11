@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -53,7 +54,7 @@ public class ProblemDetailsOperationFilter : IOperationFilter
 
     private static void AddResponse(OpenApiOperation operation, OperationFilterContext context, int statusCode, string description)
     {
-        var code = statusCode.ToString();
+        var code = statusCode.ToString(CultureInfo.InvariantCulture);
         if (!operation.Responses.ContainsKey(code))
         {
             operation.Responses.Add(code, new OpenApiResponse

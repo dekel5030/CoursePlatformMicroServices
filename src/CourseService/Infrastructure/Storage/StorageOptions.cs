@@ -6,5 +6,5 @@ public class StorageOptions
 {
     public const string SectionName = "Storage";
     public string BaseUrl { get; set; } = string.Empty;
-    public Dictionary<StorageCategory, string> BucketMapping { get; set; } = new();
+    public Dictionary<StorageCategory, string> BucketMapping { get; } = new();
 }

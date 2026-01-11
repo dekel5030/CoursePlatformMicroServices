@@ -8,7 +8,7 @@ using Users.Application.Abstractions.Data;
 
 namespace Users.Application.Users.Commands.CreateUser;
 
-public class CreateUserCommandHandler(IWriteDbContext dbContext)
+internal sealed class CreateUserCommandHandler(IWriteDbContext dbContext)
     : ICommandHandler<CreateUserCommand, CreatedUserRespondDto>
 {
     public async Task<Result<CreatedUserRespondDto>> Handle(

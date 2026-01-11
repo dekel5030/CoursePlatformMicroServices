@@ -29,7 +29,7 @@ public class UserRemoveRoleCommandHandler : ICommandHandler<UserRemoveRoleComman
         CancellationToken cancellationToken = default)
     {
         AuthUser? user = await _dbContext.Users.Include(u => u.Roles)
-            .FirstOrDefaultAsync(u => u.Id == new AuthUserId(request.UserId));
+            .FirstOrDefaultAsync(u => u.Id == new AuthUserId(request.UserId), cancellationToken);
 
         if (user is null)
         {

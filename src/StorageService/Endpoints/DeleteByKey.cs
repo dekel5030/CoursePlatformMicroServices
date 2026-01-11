@@ -3,7 +3,7 @@ using StorageService.Abstractions;
 
 namespace StorageService.Endpoints;
 
-public class DeleteByKey : IEndpoint
+internal sealed class DeleteByKey : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

@@ -7,13 +7,12 @@ namespace Users.Infrastructure;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
-    private const int _emailMaxLength = 256;
-    private const int _authUserIdMaxLength = 50;
-    private const string _tableName = "users";
+    private const int EmailMaxLength = 256;
+    private const string TableName = "users";
 
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable(_tableName);
+        builder.ToTable(TableName);
 
         builder.HasKey(u => u.Id);
 
@@ -30,7 +29,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasIndex(u => u.AuthUserId).IsUnique();
 
-        builder.Property(u => u.Email).IsRequired().HasMaxLength(_emailMaxLength);
+        builder.Property(u => u.Email).IsRequired().HasMaxLength(EmailMaxLength);
         builder.HasIndex(u => u.Email).IsUnique();
 
         builder.OwnsOne(user => user.FullName);

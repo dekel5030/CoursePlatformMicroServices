@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace Courses.Infrastructure.Storage;
 
-internal class StorageUrlResolver : IStorageUrlResolver
+internal sealed class StorageUrlResolver : IStorageUrlResolver
 {
     private readonly StorageOptions _options;
 

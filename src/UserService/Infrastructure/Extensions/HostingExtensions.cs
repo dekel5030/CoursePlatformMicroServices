@@ -27,7 +27,7 @@ public static class HostingExtensions
 
         var readDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.ReadDatabaseConnectionStringName);
         if (!string.IsNullOrEmpty(readDbConnectionString)
-            && !string.Equals(readDbConnectionString, writeDbConnectionString))
+            && !string.Equals(readDbConnectionString, writeDbConnectionString, StringComparison.Ordinal))
         {
             healthChecks.AddNpgSql(
                 readDbConnectionString,

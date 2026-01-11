@@ -1,6 +1,6 @@
 namespace Courses.Api.Contracts.Shared;
 
-public record PagedResponse<T>
+internal sealed record PagedResponse<T>
 {
     public List<T> Items { get; init; } = [];
     public int PageNumber { get; init; }

@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Gateway.Api.Jwt;
 
-public class KeyCloakOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
+internal sealed class KeyCloakOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
 {
     private readonly KeycloakJwtOptions _jwtOptions;
 

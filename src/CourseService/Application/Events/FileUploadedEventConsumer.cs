@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Courses.Application.Events;
 
-internal class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
+internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
 {
     private readonly IWriteDbContext _writeDbContext;
     private readonly ILogger<FileUploadedEventConsumer> _logger;
@@ -32,7 +32,7 @@ internal class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
             return;
         }
 
-        switch (@event.ReferenceType.ToLower())
+        switch (@event.ReferenceType.ToLowerInvariant())
         {
             case CourseImage:
                 await HandleCourseImageAsync(@event, cancellationToken);

@@ -7,7 +7,7 @@ using Users.Application.Users.Commands.CreateUser;
 
 namespace Users.Api.Endpoints.Users.Commands;
 
-public class CreateUser : IEndpoint
+internal sealed class CreateUser : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

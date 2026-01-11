@@ -16,7 +16,7 @@ public class CourseRepository : RepositoryBase<Course, CourseId>, ICourseReposit
         CourseId id, 
         CancellationToken cancellationToken = default)
     {
-        return _dbContext.Courses
+        return DbContext.Courses
             .Include(course => course.Lessons)
             .FirstOrDefaultAsync(course => course.Id == id, cancellationToken);
     }

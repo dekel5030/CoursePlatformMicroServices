@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Application.Roles.Queries.GetRoleByName;
 
-internal class GetRoleByNameQueryHandler : IQueryHandler<GetRoleByNameQuery, RoleDto>
+internal sealed class GetRoleByNameQueryHandler : IQueryHandler<GetRoleByNameQuery, RoleDto>
 {
     private readonly IReadDbContext _dbContext;
 

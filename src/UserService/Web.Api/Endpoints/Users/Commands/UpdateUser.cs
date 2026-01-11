@@ -8,8 +8,14 @@ using Users.Application.Users.Commands.UpdateUser;
 
 namespace Users.Api.Endpoints.Users.Commands;
 
-public class UpdateUser : IEndpoint
+internal sealed class UpdateUser : IEndpoint
 {
+    internal sealed record UpdateUserRequest(
+        string? FirstName,
+        string? LastName,
+        PhoneNumber? PhoneNumber,
+        DateTime? DateOfBirth);
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPut("/users/{id:guid}", async (
@@ -31,9 +37,3 @@ public class UpdateUser : IEndpoint
         }).RequireAuthorization();
     }
 }
-
-public record UpdateUserRequest(
-    string? FirstName,
-    string? LastName,
-    PhoneNumber? PhoneNumber,
-    DateTime? DateOfBirth);

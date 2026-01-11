@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Users.Api.Extensions;
 
-public static class AuthenticationExtensions
+internal static class AuthenticationExtensions
 {
     public static IServiceCollection AddJwtCookieAuthentication(this IServiceCollection services)
     {

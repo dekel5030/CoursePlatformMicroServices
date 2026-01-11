@@ -1,3 +1,3 @@
 namespace Courses.Api.Contracts.Courses;
 
-public record CreateCourseResponse(Guid CourseId, string Title);
+internal sealed record CreateCourseResponse(Guid CourseId, string Title);

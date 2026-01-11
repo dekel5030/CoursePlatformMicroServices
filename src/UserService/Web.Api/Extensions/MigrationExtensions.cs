@@ -3,7 +3,7 @@ using Users.Infrastructure.Database;
 
 namespace Users.Api.Extensions;
 
-public static class MigrationExtensions
+internal static class MigrationExtensions
 {
     public static async Task ApplyMigrationsAsync(this IApplicationBuilder app)
     {

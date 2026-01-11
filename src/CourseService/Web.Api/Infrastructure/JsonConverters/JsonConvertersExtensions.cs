@@ -1,6 +1,6 @@
 ﻿namespace Courses.Api.Infrastructure.JsonConverters;
 
-public static class JsonConvertersExtensions
+internal static class JsonConvertersExtensions
 {
     public static IServiceCollection AddValueObjectConverter(this IServiceCollection services)
     {
