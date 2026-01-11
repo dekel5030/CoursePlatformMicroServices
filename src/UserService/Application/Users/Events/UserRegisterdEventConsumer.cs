@@ -20,13 +20,13 @@ internal sealed class UserRegisterdEventConsumer : IEventConsumer<UserRegistered
         UserRegisteredEvent @event, 
         CancellationToken cancellationToken = default)
     {
-        UserId userId = new UserId { Value = @event.UserId };
+        var userId = new UserId { Value = @event.UserId };
         User? user = await _dbContext.Users
             .FirstOrDefaultAsync(user => user.Id == userId, cancellationToken: cancellationToken);
 
         if (user is null)
         {
-            FullName userName = new FullName(@event.FirstName ?? string.Empty, @event.LastName ?? string.Empty);
+            var userName = new FullName(@event.FirstName ?? string.Empty, @event.LastName ?? string.Empty);
             var userCreationResult = User.CreateUser(userId, @event.Email, userName);
 
             if (userCreationResult.IsSuccess)

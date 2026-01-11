@@ -17,7 +17,7 @@ internal static class MassTransitExtensions
         {
             config.AddConsumers(typeof(DependencyInjection).Assembly);
 
-            config.RegisterApplicationConsumers(services);
+            config.RegisterApplicationConsumers();
 
             config.AddEntityFrameworkOutbox<WriteDbContext>(o =>
             {
@@ -63,8 +63,7 @@ internal static class MassTransitExtensions
     }
 
     private static void RegisterApplicationConsumers(
-            this IBusRegistrationConfigurator registrationConfigurator,
-            IServiceCollection services)
+            this IBusRegistrationConfigurator registrationConfigurator)
     {
         var applicationAssembly = typeof(Application.AssemblyMarker).Assembly;
 

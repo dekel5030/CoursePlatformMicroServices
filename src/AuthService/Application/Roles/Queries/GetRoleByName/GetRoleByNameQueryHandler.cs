@@ -21,7 +21,7 @@ internal sealed class GetRoleByNameQueryHandler : IQueryHandler<GetRoleByNameQue
         GetRoleByNameQuery request, 
         CancellationToken cancellationToken = default)
     {
-        RoleName roleName = new RoleName(request.RoleName);
+        var roleName = new RoleName(request.RoleName);
 
         var role = await _dbContext.Roles
             .FirstOrDefaultAsync(r => r.Name == roleName, cancellationToken);
@@ -31,7 +31,7 @@ internal sealed class GetRoleByNameQueryHandler : IQueryHandler<GetRoleByNameQue
             return Result<RoleDto>.Failure(RoleErrors.NotFound);
         }
 
-        RoleDto roleDto = new RoleDto(
+        var roleDto = new RoleDto(
             role.Id.Value, 
             role.Name.Value,
             role.Permissions

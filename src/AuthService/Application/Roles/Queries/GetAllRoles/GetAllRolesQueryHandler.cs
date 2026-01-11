@@ -26,7 +26,7 @@ internal sealed class GetAllRolesQueryHandler : IQueryHandler<GetAllRolesQuery, 
 
         var roles = await _readDbContext.Roles.ToListAsync(cancellationToken);
 
-        List<RoleDto> roleDtos = roles.Select(role => new RoleDto(
+        var roleDtos = roles.Select(role => new RoleDto(
             role.Id.Value,
             role.Name.Value,
             role.Permissions.Count,

@@ -29,6 +29,6 @@ internal sealed class KeyCloakOptionsSetup : IConfigureNamedOptions<JwtBearerOpt
 
     public void Configure(JwtBearerOptions options)
     {
-        return;
+        
     }
 }

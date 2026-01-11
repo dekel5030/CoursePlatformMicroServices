@@ -28,12 +28,11 @@ public class Lesson : Entity<LessonId>
     private Lesson() { }
 
     internal static Result<Lesson> Create(
-        CourseId courseId,
         Title? title,
         Description? description,
         int index = 0)
     {
-        Lesson newLesson = new Lesson()
+        var newLesson = new Lesson()
         {
             Title = title ?? Title.Empty,
             Description = description ?? Description.Empty,

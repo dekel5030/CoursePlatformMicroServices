@@ -58,7 +58,7 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
             }
         }
 
-        if ((request.PriceAmount.HasValue) != (request.PriceCurrency is not null))
+        if (request.PriceAmount.HasValue != request.PriceCurrency is not null)
         {
             return Result.Failure(Error.Validation(
                 "Course.IncompletePriceUpdate", 

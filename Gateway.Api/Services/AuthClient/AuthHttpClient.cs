@@ -30,7 +30,10 @@ internal sealed class AuthHttpClient : IAuthClient
 
             var response = await client.SendAsync(request, cancellationToken);
 
-            if (!response.IsSuccessStatusCode) return null;
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
 
             var internalToken = await response.Content
                .ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);

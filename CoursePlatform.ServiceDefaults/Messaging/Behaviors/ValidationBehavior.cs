@@ -19,12 +19,12 @@ internal sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavio
 
     public async Task<TResponse> Handle(
         TRequest request,
-        RequestHandlerDelegate<TResponse> next,
+        RequestHandlerDelegate<TResponse> nextHandler,
         CancellationToken cancellationToken)
     {
         if (!_validators.Any())
         {
-            return await next();
+            return await nextHandler();
         }
 
         var context = new ValidationContext<TRequest>(request);
@@ -32,7 +32,7 @@ internal sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavio
         ValidationResult[] validationResults = await Task.WhenAll(
             _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
 
-        List<Error> errors = validationResults
+        var errors = validationResults
             .SelectMany(r => r.Errors)
             .Where(f => f != null)
             .Select(f => Error.Validation(f.ErrorCode, f.ErrorMessage))
@@ -44,7 +44,7 @@ internal sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavio
             return CreateValidationResult(errors);
         }
 
-        return await next();
+        return await nextHandler();
     }
 
     private static TResponse CreateValidationResult(List<Error> errors)

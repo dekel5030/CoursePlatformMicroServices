@@ -25,4 +25,4 @@ app.MapEndpoints();
 
 app.UseHttpsRedirection();
 
-app.Run();
+await app.RunAsync();

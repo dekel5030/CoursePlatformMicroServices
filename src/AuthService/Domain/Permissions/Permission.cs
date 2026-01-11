@@ -46,15 +46,15 @@ public record Permission
         string resourceSegment, 
         string resourceIdSegment)
     {
-        if (PermissionParser.TryParseEffect(effectSegment, out var effect) == false)
+        if (!PermissionParser.TryParseEffect(effectSegment, out var effect))
         {
             return Result<Permission>.Failure(PermissionErrors.InvalidEffect);
         }
-        if (PermissionParser.TryParseAction(actionSegment, out var action) == false)
+        if (!PermissionParser.TryParseAction(actionSegment, out var action))
         {
             return Result<Permission>.Failure(PermissionErrors.InvalidAction);
         }
-        if (PermissionParser.TryParseResource(resourceSegment, out var resource) == false)
+        if (!PermissionParser.TryParseResource(resourceSegment, out var resource))
         {
             return Result<Permission>.Failure(PermissionErrors.InvalidResource);
         }
@@ -71,7 +71,10 @@ public record Permission
 
     public bool Covers(Permission other)
     {
-        if (Effect != other.Effect) return false;
+        if (Effect != other.Effect)
+        {
+            return false;
+        }
 
         var actionMatches = Action == ActionType.Wildcard || Action == other.Action;
 

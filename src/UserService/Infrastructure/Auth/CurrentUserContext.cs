@@ -39,7 +39,10 @@ public class CurrentUserContext : ICurrentUserContext
 
     public bool HasPermissionOnUsersResource(ActionType action, Guid resourceId)
     {
-        if (User == null) return false;
+        if (User == null)
+        {
+            return false;
+        }
 
         var resourceIdObj = ResourceId.Create(resourceId.ToString());
 

@@ -41,6 +41,11 @@ internal sealed class PatchLessonCommandHandler : ICommandHandler<PatchLessonCom
             request.Access,
             _timeProvider);
 
+        if (updateResult.IsFailure)
+        {
+            return updateResult;
+        }
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

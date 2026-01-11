@@ -13,7 +13,7 @@ internal static class CourseMappingExtensions
         IStorageUrlResolver resolver,
         CancellationToken cancellationToken = default)
     {
-        List<Task<ResolvedUrl>> imageTasks = course.Images
+        var imageTasks = course.Images
             .Select(img => resolver.ResolveAsync(StorageCategory.Public, img.Path, cancellationToken))
             .ToList();
 

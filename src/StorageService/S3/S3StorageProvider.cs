@@ -44,34 +44,32 @@ internal sealed class S3StorageProvider : IStorageProvider
         return new PresignedUrlResponse(url, fileKey, request.Expires.Value);
     }
     public async Task<Result<string>> UploadObjectAsync(
-        Stream httpRequestStream, 
+        Stream stream, 
         string fileKey, 
         string contentType, 
         long contentLength,
-        string bucketName)
+        string bucket)
     {
-        var tempFilePath = Path.GetTempFileName();
+        var tempFilePath = Path.GetRandomFileName();
 
         try
         {
             using (var fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
             {
-                await httpRequestStream.CopyToAsync(fileStream);
+                await stream.CopyToAsync(fileStream);
             }
 
-            using (var uploadStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read))
+            using var uploadStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read);
+            var request = new PutObjectRequest
             {
-                var request = new PutObjectRequest
-                {
-                    BucketName = bucketName,
-                    Key = fileKey,
-                    InputStream = uploadStream,
-                    ContentType = contentType,
-                    UseChunkEncoding = false,
-                };
+                BucketName = bucket,
+                Key = fileKey,
+                InputStream = uploadStream,
+                ContentType = contentType,
+                UseChunkEncoding = false,
+            };
 
-                await _s3Client.PutObjectAsync(request);
-            }
+            await _s3Client.PutObjectAsync(request);
         }
         catch (AmazonS3Exception)
         {
@@ -81,16 +79,11 @@ internal sealed class S3StorageProvider : IStorageProvider
         {
             return Result.Failure<string>(Error.Problem("s3.io_error", "Internal server storage error."));
         }
-        catch (Exception)
-        {
-            throw;
-        }
         finally
         {
             if (File.Exists(tempFilePath))
             {
-                try { File.Delete(tempFilePath); }
-                catch (IOException) { }
+                File.Delete(tempFilePath);
             }
         }
 

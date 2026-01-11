@@ -23,7 +23,7 @@ internal sealed class QueryCachingBehavior<TRequest, TResponse>
 
     public async Task<TResponse> Handle(
         TRequest request, 
-        RequestHandlerDelegate<TResponse> next, 
+        RequestHandlerDelegate<TResponse> nextHandler, 
         CancellationToken cancellationToken)
     {
         TResponse? cachedResult = await _cacheService.GetAsync<TResponse>(request.CacheKey, cancellationToken);
@@ -37,7 +37,7 @@ internal sealed class QueryCachingBehavior<TRequest, TResponse>
 
         _logger.LogInformation("Cache miss for query {QueryType} with key {CacheKey}.", typeof(TRequest).Name, request.CacheKey);
 
-        TResponse result = await next();
+        TResponse result = await nextHandler();
 
         if (result.IsSuccess)
         {

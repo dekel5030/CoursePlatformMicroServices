@@ -11,7 +11,9 @@ public record Url
     public Url(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
+        {
             throw new ArgumentException("Path cannot be empty");
+        }
 
         if (!Uri.IsWellFormedUriString(path, UriKind.Relative))
         {

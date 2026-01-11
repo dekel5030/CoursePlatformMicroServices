@@ -1,6 +1,6 @@
 namespace Kernel.Messaging.Abstractions;
 
-public interface IDomainEventHandler<TEvent> : IEventHandler<TEvent>
+public interface IDomainEventHandler<in TEvent> : IEventHandler<TEvent>
     where TEvent : class, IDomainEvent
 {
 }

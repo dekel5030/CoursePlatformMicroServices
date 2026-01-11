@@ -2,7 +2,7 @@
 
 namespace Kernel.EventBus;
 
-public interface IEventConsumer<TEvent> : IEventHandler<TEvent>
+public interface IEventConsumer<in TEvent> : IEventHandler<TEvent>
     where TEvent : class
 {
 
