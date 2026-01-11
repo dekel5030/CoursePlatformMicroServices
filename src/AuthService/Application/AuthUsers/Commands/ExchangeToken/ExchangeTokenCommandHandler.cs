@@ -46,10 +46,7 @@ internal sealed class ExchangeTokenCommandHandler : ICommandHandler<ExchangeToke
         AuthUser? user = await _dbContext.Users.Include(user => user.Roles)
             .FirstOrDefaultAsync(user => user.IdentityId == externalId, cancellationToken);
 
-        if (user == null)
-        {
-            user = await ProvisionUserAsync(cancellationToken);
-        }
+        user ??= await ProvisionUserAsync(cancellationToken);
 
         var effectivePermissions = _permissionResolver.ResolveEffectivePermissions(user);
 

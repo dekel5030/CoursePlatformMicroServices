@@ -36,8 +36,8 @@ internal sealed class UserEnrichmentMiddleware : IMiddleware
             return;
         }
 
-        var internalToken = await _exchangeTasks.GetOrAdd(identityUserId, _ =>
-            GetOrExchangeInternalTokenWithCleanupAsync(context, identityUserId));
+        var internalToken = await _exchangeTasks.GetOrAdd(identityUserId, (key) =>
+            GetOrExchangeInternalTokenWithCleanupAsync(context, key));
 
         if (string.IsNullOrEmpty(internalToken))
         {

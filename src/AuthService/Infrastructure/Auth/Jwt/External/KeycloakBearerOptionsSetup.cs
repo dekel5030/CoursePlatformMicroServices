@@ -15,7 +15,10 @@ internal class KeycloakBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOpti
 
     public void Configure(string? name, JwtBearerOptions options)
     {
-        if (name != AuthSchemes.Keycloak) return;
+        if (name != AuthSchemes.Keycloak)
+        {
+            return;
+        }
 
         options.Authority = _options.Authority;
         options.Audience = _options.Audience;
@@ -32,6 +35,5 @@ internal class KeycloakBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOpti
 
     public void Configure(JwtBearerOptions options)
     {
-        return;
     }
 }

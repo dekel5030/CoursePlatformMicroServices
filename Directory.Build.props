@@ -8,23 +8,13 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-	<NoWarn>$(NoWarn);CA2007</NoWarn>
-	<NoWarn>$(NoWarn);CA1812</NoWarn>
-	<NoWarn>$(NoWarn);CA1040</NoWarn>
-	<NoWarn>$(NoWarn);CA1030</NoWarn>
-	<NoWarn>$(NoWarn);CA1062</NoWarn>
-	<NoWarn>$(NoWarn);CA1848</NoWarn>
-	<NoWarn>$(NoWarn);CA1308</NoWarn>
-	<NoWarn>$(NoWarn);CA2225</NoWarn>
-	<NoWarn>$(NoWarn);CA1707</NoWarn>
-	<NoWarn>$(NoWarn);CA1000</NoWarn>
-	<NoWarn>$(NoWarn);CA1056</NoWarn>
-	<NoWarn>$(NoWarn);CA1054</NoWarn>
-	<NoWarn>$(NoWarn);CA1805</NoWarn>
-	<NoWarn>$(NoWarn);CA1861</NoWarn>
-	<NoWarn>$(NoWarn);CA1716</NoWarn>
-	<NoWarn>$(NoWarn);CA1711</NoWarn>
-	<NoWarn>$(NoWarn);CA2000</NoWarn>
-	<NoWarn>$(NoWarn);CA1724</NoWarn>
   </PropertyGroup>
+
+	<ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj'">
+		<PackageReference Include="SonarAnalyzer.CSharp">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
 </Project>

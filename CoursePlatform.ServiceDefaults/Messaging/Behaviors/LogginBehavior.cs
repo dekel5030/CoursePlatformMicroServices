@@ -21,7 +21,7 @@ internal sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<T
 
     public async Task<TResponse> Handle(
         TRequest request,
-        RequestHandlerDelegate<TResponse> next,
+        RequestHandlerDelegate<TResponse> nextHandler,
         CancellationToken cancellationToken)
     {
         var requestName = typeof(TRequest).Name;
@@ -40,7 +40,7 @@ internal sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<T
             var sw = Stopwatch.StartNew();
             try
             {
-                TResponse response = await next();
+                TResponse response = await nextHandler();
                 sw.Stop();
 
                 if (response.IsSuccess)

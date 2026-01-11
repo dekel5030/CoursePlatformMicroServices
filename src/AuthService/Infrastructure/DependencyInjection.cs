@@ -41,12 +41,11 @@ public static class DependencyInjection
             .AddAuthServices(configuration)
             .AddDatabase(configuration)
             .AddMassTransitInternal(configuration)
-            .AddHealthChecksInternal(configuration);
+            .AddHealthChecksInternal();
     }
 
     private static IServiceCollection AddHealthChecksInternal(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
         return services;
     }

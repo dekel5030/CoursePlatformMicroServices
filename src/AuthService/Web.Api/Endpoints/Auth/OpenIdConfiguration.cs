@@ -2,6 +2,9 @@
 
 internal sealed class OpenIdConfigurationEndpoint : IEndpoint
 {
+    internal static readonly string[] value = new[] { "id_token" };
+    internal static readonly string[] valueArray = new[] { "RS256" };
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("/.well-known/openid-configuration", (HttpContext context) =>
@@ -12,8 +15,8 @@ internal sealed class OpenIdConfigurationEndpoint : IEndpoint
             {
                 issuer = "course-platform-auth",
                 jwks_uri = $"{baseUrl}/.well-known/jwks.json",
-                response_types_supported = new[] { "id_token" },
-                id_token_signing_alg_values_supported = new[] { "RS256" }
+                response_types_supported = value,
+                id_token_signing_alg_values_supported = valueArray
             });
         })
         .AllowAnonymous()

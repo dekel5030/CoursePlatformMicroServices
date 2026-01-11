@@ -123,10 +123,10 @@ var gatewayEndpoint = gateway.GetEndpoint("https");
 coursesService.WithEnvironment("s3__Endpoint", gatewayEndpoint);
 
 // Frontend configuration
-var frontend = builder.AddJavaScriptApp("frontend", "../Frontend", "dev")
+var _ = builder.AddJavaScriptApp("frontend", "../Frontend", "dev")
     .WithReference(gateway)
     .WaitFor(gateway)
     .WithHttpEndpoint(port: 5067, env: "PORT")
     .WithExternalHttpEndpoints();
 
-builder.Build().Run();
+await builder.Build().RunAsync();

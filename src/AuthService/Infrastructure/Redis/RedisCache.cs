@@ -30,8 +30,8 @@ internal class RedisCache : ICacheService
     }
 
     public async Task SetAsync<TResponse>(
-        string cacheKey, 
-        TResponse value, 
+        string cacheKey,
+        TResponse result,
         TimeSpan? expiration, 
         CancellationToken cancellationToken)
     {
@@ -40,7 +40,7 @@ internal class RedisCache : ICacheService
             AbsoluteExpirationRelativeToNow = expiration ?? TimeSpan.FromMinutes(5)
         };
 
-        var serializedData = JsonSerializer.SerializeToUtf8Bytes(value, _serializerOptions);
+        var serializedData = JsonSerializer.SerializeToUtf8Bytes(result, _serializerOptions);
 
         await _distributedCache.SetAsync(cacheKey, serializedData, options, cancellationToken);
     }

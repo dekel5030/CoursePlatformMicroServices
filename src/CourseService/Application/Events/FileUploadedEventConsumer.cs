@@ -54,7 +54,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
             return;
         }
 
-        CourseId courseId = new CourseId(guidId);
+        var courseId = new CourseId(guidId);
 
         Course? course = await _writeDbContext.Courses
             .FirstOrDefaultAsync(c => c.Id == courseId, cancellationToken);
@@ -83,7 +83,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
             return;
         }
 
-        LessonId lessonId = new LessonId(guidId);
+        var lessonId = new LessonId(guidId);
 
         Lesson? lesson = await _writeDbContext.Lessons
             .FirstOrDefaultAsync(c => c.Id == lessonId, cancellationToken);

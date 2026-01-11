@@ -1,6 +1,6 @@
 ﻿namespace Kernel;
 
-public interface ISingleValueObject<TValue>
+public interface ISingleValueObject<out TValue>
 {
     TValue Value { get; }
 }

@@ -28,8 +28,8 @@ public static class DependencyInjection
             .AddServices()
             .AddDatabases(configuration)
             .AddMassTransitInternal(configuration)
-            .AddHealthChecksInternal(configuration)
-            .AddAuthenticationInternal(configuration)
+            .AddHealthChecksInternal()
+            .AddAuthenticationInternal()
             .AddInternalAuth(authUrl);
     }
 
@@ -47,7 +47,7 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddHealthChecksInternal(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddHealthChecksInternal(this IServiceCollection services)
     {
         //services
         //    .AddHealthChecks()
@@ -57,8 +57,7 @@ public static class DependencyInjection
     }
 
     private static IServiceCollection AddAuthenticationInternal(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
         return services;
     }

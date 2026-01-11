@@ -12,7 +12,15 @@ public class Subscription : Entity
 
     #pragma warning disable CS8618 
     private Subscription() { }
-    #pragma warning restore CS8618 
+
+    public Subscription(Guid id, StudentId studentId, DateTimeOffset startsAtUtc, DateTimeOffset endsAtUtc)
+    {
+        Id = id;
+        StudentId = studentId;
+        StartsAtUtc = startsAtUtc;
+        EndsAtUtc = endsAtUtc;
+    }
+#pragma warning restore CS8618
 
     public bool IsActive(DateTimeOffset now) => now >= StartsAtUtc && now <= EndsAtUtc;
 }

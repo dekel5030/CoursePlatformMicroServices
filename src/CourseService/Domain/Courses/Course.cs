@@ -18,11 +18,11 @@ public class Course : Entity<CourseId>
     public override CourseId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
-    public InstructorId? InstructorId { get; private set; } = null;
+    public InstructorId? InstructorId { get; private set; }
     public CourseStatus Status { get; private set; }
-    public int EnrollmentCount { get; private set; } = 0;
-    public int LessonCount { get; private set; } = 0;
-    public bool IsDeleted { get; private set; } = false;
+    public int EnrollmentCount { get; private set; }
+    public int LessonCount { get; private set; }
+    public bool IsDeleted { get; private set; }
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
     public Money Price { get; private set; } = Money.Zero();
@@ -40,7 +40,7 @@ public class Course : Entity<CourseId>
         InstructorId? instructorId = null,
         Money? price = null)
     {
-        Course newCourse = new Course
+        var newCourse = new Course
         {
             Id = CourseId.CreateNew(),
             Title = title ?? Title.Empty,
@@ -161,9 +161,9 @@ public class Course : Entity<CourseId>
         Description? description,
         TimeProvider timeProvider)
     {
-        int index = _lessons.Count; 
-        
-        var lessonResult = Lesson.Create(Id, title, description, index);
+        int index = _lessons.Count;
+
+        var lessonResult = Lesson.Create(title, description, index);
 
         if (lessonResult.IsFailure)
         {
@@ -212,19 +212,28 @@ public class Course : Entity<CourseId>
         if (title.HasValue)
         {
             var titleResult = lesson.SetTitle(title.Value);
-            if (titleResult.IsFailure) return titleResult;
+            if (titleResult.IsFailure)
+            {
+                return titleResult;
+            }
         }
 
         if (description.HasValue)
         {
             var descriptionResult = lesson.SetDescription(description.Value);
-            if (descriptionResult.IsFailure) return descriptionResult;
+            if (descriptionResult.IsFailure)
+            {
+                return descriptionResult;
+            }
         }
 
         if (access.HasValue)
         {
             var accessResult = lesson.SetAccess(access.Value);
-            if (accessResult.IsFailure) return accessResult;
+            if (accessResult.IsFailure)
+            {
+                return accessResult;
+            }
         }
 
         UpdatedAtUtc = timeProvider.GetUtcNow();

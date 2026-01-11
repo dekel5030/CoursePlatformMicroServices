@@ -37,12 +37,10 @@ public class Result
 
 public sealed class Result<TValue> : Result
 {
-    private readonly TValue? _value;
-
     private Result(TValue? value, bool isSuccess, Error? error)
         : base(isSuccess, error)
     {
-        _value = value;
+        Value = value;
     }
 
     [MemberNotNullWhen(true, nameof(Value))]
@@ -54,7 +52,7 @@ public sealed class Result<TValue> : Result
     public new Error? Error => base.Error;
 
     public TValue? Value => IsSuccess
-        ? _value
+        ? field
         : throw new InvalidOperationException("The value of a failure result can't be accessed.");
 
     public static Result<TValue> Success(TValue value) =>

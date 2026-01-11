@@ -11,6 +11,8 @@ public sealed record ImageUrl : Url
     public ImageUrl(string path) : base(path)
     {
         if (!_allowedExtensions.Any(ext => Path.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+        {
             throw new ArgumentException("Invalid image format");
+        }
     }
 }

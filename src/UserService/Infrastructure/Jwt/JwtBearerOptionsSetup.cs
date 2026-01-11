@@ -16,7 +16,7 @@ public class JwtBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
 
     public void Configure(string? name, JwtBearerOptions options)
     {
-        var rsa = RSA.Create();
+        using var rsa = RSA.Create();
         rsa.ImportFromPem(_jwtOptions.PublicKey);
 
         options.TokenValidationParameters = new TokenValidationParameters

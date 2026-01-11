@@ -17,4 +17,4 @@ app.UseHttpsRedirection();
 
 app.UseGatway();
 
-app.Run();
+await app.RunAsync();

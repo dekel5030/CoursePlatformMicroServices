@@ -16,10 +16,10 @@ internal sealed class MassTransitEventPublisher : IEventBus
         _logger = logger;
     }
 
-    public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
+    public async Task PublishAsync<TEvent>(TEvent message, CancellationToken cancellationToken = default)
         where TEvent : class
     {
-        _logger.LogInformation("Publishing event of type {EventType}: {Event}", @event.GetType(), @event);
-        await _publishEndpoint.Publish(@event, cancellationToken);
+        _logger.LogInformation("Publishing event of type {EventType}: {Event}", message.GetType(), message);
+        await _publishEndpoint.Publish(message, cancellationToken);
     }
 }

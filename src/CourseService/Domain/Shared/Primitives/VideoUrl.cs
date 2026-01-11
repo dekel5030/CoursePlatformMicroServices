@@ -11,6 +11,8 @@ public sealed record VideoUrl : Url
     public VideoUrl(string path) : base(path)
     {
         if (!_allowedExtensions.Any(ext => path.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+        {
             throw new ArgumentException("Invalid video format");
+        }
     }
 }

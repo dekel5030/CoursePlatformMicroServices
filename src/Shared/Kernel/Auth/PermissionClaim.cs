@@ -53,12 +53,16 @@ public static partial class PermissionClaim
         result = default!;
 
         if (string.IsNullOrWhiteSpace(claimValue))
+        {
             return false;
+        }
 
         var segments = claimValue.Split(':');
 
         if (segments.Length != 4)
+        {
             return false;
+        }
 
         var effectSegment = segments[0];
         var actionSegment = segments[1];
@@ -66,15 +70,21 @@ public static partial class PermissionClaim
         var idSegment = segments[3];
 
         if (!PermissionParser.TryParseEffect(effectSegment, out var effect))
+        {
             return false;
+        }
 
         if (!PermissionParser.TryParseAction(actionSegment, out var action))
+        {
             return false;
+        }
 
         if (!PermissionParser.TryParseResource(resourceSegment, out var resource))
+        {
             return false;
+        }
 
-        ResourceId id = ResourceId.Create(idSegment);
+        var id = ResourceId.Create(idSegment);
 
         result = Create(effect, action, resource, id);
         return true;

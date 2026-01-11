@@ -19,13 +19,7 @@ public class UserContext : IUserContext
 
     public bool IsAuthenticated => User?.Identity?.IsAuthenticated ?? false;
 
-    public Guid? Id
-    {
-        get
-        {
-            return Guid.TryParse(User?.FindFirst(CoursePlatformClaims.UserId)?.Value, out var id) ? id : null;
-        }
-    }
+    public Guid? Id => Guid.TryParse(User?.FindFirst(CoursePlatformClaims.UserId)?.Value, out var id) ? id : null;
 
     public string? Email => User?.FindFirst(CoursePlatformClaims.Email)?.Value;
 

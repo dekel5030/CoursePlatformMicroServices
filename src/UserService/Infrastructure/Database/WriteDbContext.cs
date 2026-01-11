@@ -33,7 +33,7 @@ public sealed class WriteDbContext(
         DbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        List<Entity> entities = dbContext.ChangeTracker.Entries<Entity>()
+        var entities = dbContext.ChangeTracker.Entries<Entity>()
             .Select(entry => entry.Entity)
             .ToList();
 

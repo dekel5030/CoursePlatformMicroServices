@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Auth.Infrastructure.Auth;
 
-public class KeyManager
+public class KeyManager : IDisposable
 {
     private readonly RSA _rsa;
     public static string KeyId => "internal-auth-key-v1";
@@ -17,8 +17,14 @@ public class KeyManager
 
     public RsaSecurityKey GetPublicKey()
     {
-        var publicRsa = RSA.Create();
-        publicRsa.ImportParameters(_rsa.ExportParameters(false));
-        return new RsaSecurityKey(publicRsa);
+        var publicParams = _rsa.ExportParameters(false);
+        return new RsaSecurityKey(publicParams);
+    }
+
+    public RSAParameters GetPublicKeyParameters() => _rsa.ExportParameters(false);
+
+    public void Dispose()
+    {
+        _rsa.Dispose();
     }
 }

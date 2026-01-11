@@ -22,7 +22,10 @@ internal class InternalJwtOptionsSetup : IConfigureNamedOptions<JwtBearerOptions
 
     public void Configure(string? name, JwtBearerOptions options)
     {
-        if (name != AuthSchemes.Internal) return;
+        if (name != AuthSchemes.Internal)
+        {
+            return;
+        }
 
         options.MapInboundClaims = false;
 

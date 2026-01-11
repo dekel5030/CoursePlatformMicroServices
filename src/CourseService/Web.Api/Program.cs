@@ -29,7 +29,7 @@ app.MapEndpoints();
 app.UseInfrastructureDefaultEndpoints();
 app.UseInfrastructure();
 
-app.Run();
+await app.RunAsync();
 
 #pragma warning disable CA1515 // Consider making public types internal
 public partial class Program { }

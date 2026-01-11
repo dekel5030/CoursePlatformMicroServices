@@ -22,7 +22,9 @@ internal sealed class Upload : IEndpoint
             IEventBus bus) =>
         {
             if (!request.HasFormContentType && request.ContentLength == 0)
+            {
                 return Results.BadRequest("No file content.");
+            }
 
             var contentType = request.ContentType ?? "application/octet-stream";
             var contentLength = request.ContentLength ?? throw new ArgumentException("Content-Length is required");

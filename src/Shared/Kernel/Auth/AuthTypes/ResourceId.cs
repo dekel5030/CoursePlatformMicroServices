@@ -14,7 +14,9 @@ public record ResourceId
     public static ResourceId Create(string value)
     {
         if (value == "*")
+        {
             return Wildcard;
+        }
 
         return new ResourceId(value);
     }
