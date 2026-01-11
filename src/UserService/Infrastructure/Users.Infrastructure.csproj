@@ -1,20 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="MassTransit\Consumers\**" />
-    <Compile Remove="Users\**" />
-    <EmbeddedResource Remove="MassTransit\Consumers\**" />
-    <EmbeddedResource Remove="Users\**" />
-    <None Remove="MassTransit\Consumers\**" />
-    <None Remove="Users\**" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
     <PackageReference Include="MassTransit" Version="8.5.5" />
