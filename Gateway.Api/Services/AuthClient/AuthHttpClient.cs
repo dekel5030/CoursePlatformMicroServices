@@ -25,7 +25,7 @@ internal sealed class AuthHttpClient : IAuthClient
         try
         {
             var client = _httpClientFactory.CreateClient(DependencyInjection.AuthServiceName);
-            var request = new HttpRequestMessage(HttpMethod.Post, path);
+            using var request = new HttpRequestMessage(HttpMethod.Post, path);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", idpToken);
 
             var response = await client.SendAsync(request, cancellationToken);
