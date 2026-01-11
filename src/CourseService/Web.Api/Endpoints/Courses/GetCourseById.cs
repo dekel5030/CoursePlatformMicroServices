@@ -1,5 +1,6 @@
 ﻿using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
+using Courses.Api.Contracts.Courses;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Courses.Queries.GetById;
@@ -22,9 +23,11 @@ internal sealed class GetCourseById : IEndpoint
 
             Result<CourseDetailsDto> result = await mediator.Send(query, cancellationToken);
 
-            return result.Match(Results.Ok, CustomResults.Problem);
+            return result.Match(
+                dto => Results.Ok(dto.ToApiContract()),
+                CustomResults.Problem);
         })
-        .WithMetadata<CourseDetailsDto>(
+        .WithMetadata<CourseDetailsResponse>(
             nameof(GetCourseById),
             tag: Tags.Courses,
             summary: "Gets a course by its ID.");

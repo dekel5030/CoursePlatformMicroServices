@@ -23,14 +23,14 @@ import { toast } from "sonner";
 interface LessonProps {
   lesson: LessonModel;
   index: number;
+  courseId: string;
 }
 
-export default function LessonCard({ lesson, index }: LessonProps) {
+export default function LessonCard({ lesson, index, courseId }: LessonProps) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(["lessons", "translation"]);
 
-  const patchLesson = usePatchLesson(lesson.courseId, lesson.lessonId);
-
+  const patchLesson = usePatchLesson(courseId, lesson.lessonId);
   const deleteLesson = useDeleteLesson(lesson.courseId);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -54,7 +54,7 @@ export default function LessonCard({ lesson, index }: LessonProps) {
   };
 
   const handleLessonClick = () => {
-    navigate(`/courses/${lesson.courseId}/lessons/${lesson.lessonId}`);
+    navigate(`/courses/${courseId}/lessons/${lesson.lessonId}`);
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
