@@ -64,7 +64,11 @@ export function CourseLessonsSection({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <LessonCard lesson={lesson} index={index} />
+                <LessonCard
+                  lesson={lesson}
+                  index={index}
+                  courseId={course.id}
+                />
               </motion.div>
             ))
           ) : (

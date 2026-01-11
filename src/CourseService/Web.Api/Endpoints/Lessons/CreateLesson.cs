@@ -1,5 +1,6 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
+using Courses.Api.Contracts.Lessons;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.CreateLesson;
 using Courses.Application.Lessons.Queries.Dtos;
@@ -35,11 +36,11 @@ public class CreateLesson : IEndpoint
                 lessonDto => Results.CreatedAtRoute(
                     nameof(GetLessonById),
                     new { courseId = courseid, lessonId = lessonDto.LessonId.Value },
-                    lessonDto
+                    lessonDto.ToApiContract()
                 ),
                 CustomResults.Problem);
         })
-        .WithMetadata<LessonDetailsDto>(
+        .WithMetadata<LessonDetailsResponse>(
             nameof(CreateLesson), 
             Tags.Lessons, 
             "Create a lesson", 

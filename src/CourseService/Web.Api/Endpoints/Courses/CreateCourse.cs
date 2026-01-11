@@ -33,7 +33,7 @@ public class CreateCourse : IEndpoint
                 response => Results.CreatedAtRoute(
                     nameof(GetCourseById),
                     new { id = response.CourseId.Value },
-                    response
+                    response.ToApiContract()
                 ),
                 CustomResults.Problem);
         })
