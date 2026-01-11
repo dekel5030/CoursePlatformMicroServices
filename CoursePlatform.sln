@@ -49,8 +49,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Api", "src\AuthService
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FC4A8959-F87D-4E08-A6D1-EB25AB76B070}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{FF3BA081-B11A-4B94-AA1D-26B6B62A993D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoursePlatform.AppHost", "CoursePlatform.AppHost\CoursePlatform.AppHost.csproj", "{3BC27763-F802-4B65-BA5D-ACBBECB43E2B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoursePlatform.ServiceDefaults", "CoursePlatform.ServiceDefaults\CoursePlatform.ServiceDefaults.csproj", "{2A1B7D7B-B920-E5B7-6944-0628AA9237E0}"
@@ -63,6 +61,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Domain.UnitTests", "src\AuthService\Tests\Domain.UnitTests\Auth.Domain.UnitTests.csproj", "{2479ED86-CA68-0B46-BB9A-898D57A05E98}"
@@ -76,8 +75,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoursePlatform.Contracts", "Contracts\CoursePlatform.Contracts.csproj", "{51C29C43-3734-BE30-CA14-863A4B424ECC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kernel.UnitTests", "src\Shared\Kernel.UnitTests\Kernel.UnitTests.csproj", "{064FCDFC-7027-023F-5257-D9B0B1AA1D38}"
-EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Frontend", "Frontend\Frontend.esproj", "{462EE049-9FE1-B47D-1B3E-22BACA5D9185}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{7A7D0C5C-A4E0-4FEA-8C81-E33DB5C692A5}"
 EndProject
@@ -177,12 +174,6 @@ Global
 		{064FCDFC-7027-023F-5257-D9B0B1AA1D38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{064FCDFC-7027-023F-5257-D9B0B1AA1D38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{064FCDFC-7027-023F-5257-D9B0B1AA1D38}.Release|Any CPU.Build.0 = Release|Any CPU
-		{462EE049-9FE1-B47D-1B3E-22BACA5D9185}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{462EE049-9FE1-B47D-1B3E-22BACA5D9185}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{462EE049-9FE1-B47D-1B3E-22BACA5D9185}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{462EE049-9FE1-B47D-1B3E-22BACA5D9185}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{462EE049-9FE1-B47D-1B3E-22BACA5D9185}.Release|Any CPU.Build.0 = Release|Any CPU
-		{462EE049-9FE1-B47D-1B3E-22BACA5D9185}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{11887FAE-0D7E-7D93-52F7-AC4F89679CA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11887FAE-0D7E-7D93-52F7-AC4F89679CA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11887FAE-0D7E-7D93-52F7-AC4F89679CA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -220,7 +211,6 @@ Global
 		{DE3F1AC6-53C7-9960-699B-53FF9E2439EC} = {FC4A8959-F87D-4E08-A6D1-EB25AB76B070}
 		{ED1E3272-3361-F842-DD24-61A976246E9D} = {FC4A8959-F87D-4E08-A6D1-EB25AB76B070}
 		{064FCDFC-7027-023F-5257-D9B0B1AA1D38} = {B857CB67-1D98-482C-A80E-CAE3F061D536}
-		{462EE049-9FE1-B47D-1B3E-22BACA5D9185} = {FF3BA081-B11A-4B94-AA1D-26B6B62A993D}
 		{7A7D0C5C-A4E0-4FEA-8C81-E33DB5C692A5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{11887FAE-0D7E-7D93-52F7-AC4F89679CA3} = {7A7D0C5C-A4E0-4FEA-8C81-E33DB5C692A5}
 	EndGlobalSection

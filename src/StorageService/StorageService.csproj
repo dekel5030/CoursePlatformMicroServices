@@ -1,16 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
-
-
     <ItemGroup>
-	    <PackageReference Include="MassTransit" Version="8.5.7" />
-	    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.7" />
-	    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />
+	    <PackageReference Include="MassTransit.RabbitMQ" />
+		<PackageReference Include="AWSSDK.S3" />
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />
     </ItemGroup>
 	
   <ItemGroup>

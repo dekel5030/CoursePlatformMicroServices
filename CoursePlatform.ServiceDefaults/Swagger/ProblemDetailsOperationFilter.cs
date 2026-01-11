@@ -1,26 +1,22 @@
 ﻿using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace CoursePlatform.ServiceDefaults.Swagger;
 
-public class ProblemDetailsOperationFilter : IOperationFilter
+public sealed class ProblemDetailsOperationFilter(string securitySchemeId) : IOperationFilter
 {
-    private readonly string _securitySchemeId;
-
-    public ProblemDetailsOperationFilter(string securitySchemeId)
-    {
-        _securitySchemeId = securitySchemeId;
-    }
-
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        AddResponse(operation, context, StatusCodes.Status400BadRequest, "Bad Request (Validation or Logic Error)");
-        AddResponse(operation, context, StatusCodes.Status404NotFound, "The requested resource was not found");
-        AddResponse(operation, context, StatusCodes.Status409Conflict, "A business conflict occurred");
-        AddResponse(operation, context, StatusCodes.Status500InternalServerError, "An unexpected server error occurred");
+        ArgumentNullException.ThrowIfNull(operation);
+        ArgumentNullException.ThrowIfNull(context);
+
+        AddResponse(operation, context, StatusCodes.Status400BadRequest, "Bad Request");
+        AddResponse(operation, context, StatusCodes.Status404NotFound, "Not Found");
+        AddResponse(operation, context, StatusCodes.Status409Conflict, "Conflict");
+        AddResponse(operation, context, StatusCodes.Status500InternalServerError, "Server Error");
 
         var authMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata
             .OfType<Microsoft.AspNetCore.Authorization.IAuthorizeData>();
@@ -30,31 +26,31 @@ public class ProblemDetailsOperationFilter : IOperationFilter
 
         if (authMetadata.Any() && !allowAnonymous)
         {
-            AddResponse(operation, context, StatusCodes.Status401Unauthorized, "Unauthorized access");
+            AddResponse(operation, context, StatusCodes.Status401Unauthorized, "Unauthorized");
 
-            operation.Security = new List<OpenApiSecurityRequirement>
-            {
-                new()
+            var schemeReference = new OpenApiSecuritySchemeReference(securitySchemeId, null, null);
+
+            operation.Security =
+            [
+                new OpenApiSecurityRequirement
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = _securitySchemeId
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
+                    [schemeReference] = []
                 }
-            };
+            ];
         }
     }
 
     private static void AddResponse(OpenApiOperation operation, OperationFilterContext context, int statusCode, string description)
     {
+        if (operation?.Responses == null ||
+            context?.SchemaGenerator == null ||
+            context.SchemaRepository == null)
+        {
+            return;
+        }
+
         var code = statusCode.ToString(CultureInfo.InvariantCulture);
+
         if (!operation.Responses.ContainsKey(code))
         {
             operation.Responses.Add(code, new OpenApiResponse

@@ -37,7 +37,7 @@ internal sealed class CreateCourse : IEndpoint
                 ),
                 CustomResults.Problem);
         })
-        .WithMetadata<CreateCourseResponse>(
+        .WithMetadata<Contracts.Courses.CreateCourseResponse>(
             nameof(CreateCourse),
             tag: Tags.Courses,
             summary: "Creates a new course.",
