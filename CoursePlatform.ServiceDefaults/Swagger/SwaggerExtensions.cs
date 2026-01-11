@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace CoursePlatform.ServiceDefaults.Swagger;
 
@@ -11,12 +11,15 @@ public static class SwaggerExtensions
         string securitySchemeId = "Keycloak")
             where TBuilder : IHostApplicationBuilder
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         builder.Services.AddProblemDetails();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
             options.OperationFilter<ProblemDetailsOperationFilter>(securitySchemeId);
-            options.CustomSchemaIds(id => id.FullName!.Replace('+', '-'));
+
+            options.CustomSchemaIds(id => id.FullName?.Replace("+", "-", StringComparison.Ordinal));
 
             var scheme = new OpenApiSecurityScheme
             {

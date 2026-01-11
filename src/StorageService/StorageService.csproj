@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <ItemGroup>
-	    <PackageReference Include="MassTransit" Version="8.5.7" />
-	    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.7" />
-	    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />
+	    <PackageReference Include="MassTransit" />
+	    <PackageReference Include="MassTransit.RabbitMQ" />
+	    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />
     </ItemGroup>
 	
   <ItemGroup>
