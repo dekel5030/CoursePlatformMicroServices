@@ -9,9 +9,9 @@ internal sealed class JwksEndpoint : IEndpoint
     {
         app.MapGet("/.well-known/jwks.json", (KeyManager keyManager) =>
         {
-            var publicKey = keyManager.GetPublicKey();
+            RsaSecurityKey publicKey = keyManager.GetPublicKey();
 
-            var jwk = JsonWebKeyConverter.ConvertFromSecurityKey(publicKey);
+            JsonWebKey jwk = JsonWebKeyConverter.ConvertFromSecurityKey(publicKey);
 
             jwk.Kid = KeyManager.KeyId;
             jwk.Use = "sig";

@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Auth.Application.Abstractions.Auth;
 using Auth.Domain.AuthUsers;
+using Auth.Domain.Roles;
 using Kernel.Auth;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -37,7 +38,7 @@ internal class TokenProvider : ITokenProvider
             CoursePlatformClaims.CreateIdentityIdClaim(user.IdentityId.ProviderId),
         };
 
-        foreach (var role in user.Roles)
+        foreach (Role role in user.Roles)
         {
             claims.Add(CoursePlatformClaims.CreateRoleClaim(role.Name.Value));
         }

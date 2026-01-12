@@ -1,4 +1,5 @@
-﻿using Kernel;
+﻿using Domain.Users;
+using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Users.Application.Abstractions.Data;
@@ -18,11 +19,11 @@ public class GetUsersQueryHandler(IReadDbContext DbContext) : IQueryHandler<GetU
                 Error.Validation("Users.InvalidPagination", "PageNumber and PageSize must be greater than 0."));
         }
 
-        var query = DbContext.Users.AsNoTracking();
+        IQueryable<User> query = DbContext.Users.AsNoTracking();
 
         var totalCount = await query.CountAsync(cancellationToken);
 
-        var items = await query
+        List<UserReadDto> items = await query
             .OrderBy(u => u.Id)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)

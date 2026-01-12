@@ -25,32 +25,32 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
         _logger = logger;
     }
 
-    public async Task HandleAsync(FileUploadedEvent @event, CancellationToken cancellationToken = default)
+    public async Task HandleAsync(FileUploadedEvent message, CancellationToken cancellationToken = default)
     {
-        if (!@event.OwnerService.Equals(CourseServiceName, StringComparison.OrdinalIgnoreCase))
+        if (!message.OwnerService.Equals(CourseServiceName, StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
 
-        switch (@event.ReferenceType.ToLowerInvariant())
+        switch (message.ReferenceType.ToLowerInvariant())
         {
             case CourseImage:
-                await HandleCourseImageAsync(@event, cancellationToken);
+                await HandleCourseImageAsync(message, cancellationToken);
                 break;
 
             case LessonImage:
-                await HandleLessonImageAsync(@event, cancellationToken);
+                await HandleLessonImageAsync(message, cancellationToken);
                 break;
         }
     }
 
     private async Task HandleCourseImageAsync(
-        FileUploadedEvent @event, 
+        FileUploadedEvent message, 
         CancellationToken cancellationToken = default)
     {
-        if (!Guid.TryParse(@event.ReferenceId, out var guidId))
+        if (!Guid.TryParse(message.ReferenceId, out Guid guidId))
         {
-            _logger.LogError("Invalid ReferenceId format: {ReferenceId}", @event.ReferenceId);
+            _logger.LogError("Invalid ReferenceId format: {ReferenceId}", message.ReferenceId);
             return;
         }
 
@@ -65,7 +65,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
             return;
         }
 
-        var imageUrl = new ImageUrl(@event.FileKey);
+        var imageUrl = new ImageUrl(message.FileKey);
         course.AddImage(imageUrl, TimeProvider.System);
 
         await _writeDbContext.SaveChangesAsync(cancellationToken);
@@ -74,12 +74,12 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
     }
 
     private async Task HandleLessonImageAsync(
-        FileUploadedEvent @event, 
+        FileUploadedEvent message, 
         CancellationToken cancellationToken = default)
     {
-        if (!Guid.TryParse(@event.ReferenceId, out var guidId))
+        if (!Guid.TryParse(message.ReferenceId, out Guid guidId))
         {
-            _logger.LogError("Invalid ReferenceId format: {ReferenceId}", @event.ReferenceId);
+            _logger.LogError("Invalid ReferenceId format: {ReferenceId}", message.ReferenceId);
             return;
         }
 
@@ -94,7 +94,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
             return;
         }
 
-        var imageUrl = new ImageUrl(@event.FileKey);
+        var imageUrl = new ImageUrl(message.FileKey);
         lesson.SetThumbnailImage(imageUrl);
 
         await _writeDbContext.SaveChangesAsync(cancellationToken);

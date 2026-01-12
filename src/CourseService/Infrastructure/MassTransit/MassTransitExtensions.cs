@@ -1,4 +1,5 @@
-﻿using Courses.Infrastructure.Database;
+﻿using System.Reflection;
+using Courses.Infrastructure.Database;
 using Kernel.EventBus;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
@@ -65,7 +66,7 @@ internal static class MassTransitExtensions
     private static void RegisterApplicationConsumers(
             this IBusRegistrationConfigurator registrationConfigurator)
     {
-        var applicationAssembly = typeof(Application.AssemblyMarker).Assembly;
+        Assembly applicationAssembly = typeof(Application.AssemblyMarker).Assembly;
 
         var consumerDefinitions = applicationAssembly.GetTypes()
             .Where(t => !t.IsAbstract && !t.IsInterface)
@@ -76,9 +77,9 @@ internal static class MassTransitExtensions
 
         foreach (var entry in consumerDefinitions)
         {
-            var eventType = entry.interfaceType.GetGenericArguments()[0];
+            Type eventType = entry.interfaceType.GetGenericArguments()[0];
 
-            var closedBridgeType = typeof(GenericConsumerBridge<>).MakeGenericType(eventType);
+            Type closedBridgeType = typeof(GenericConsumerBridge<>).MakeGenericType(eventType);
 
             registrationConfigurator.AddConsumer(closedBridgeType);
         }

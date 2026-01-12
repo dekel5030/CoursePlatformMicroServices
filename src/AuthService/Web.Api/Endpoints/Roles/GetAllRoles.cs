@@ -1,6 +1,7 @@
 ﻿using Auth.Api.Extensions;
 using Auth.Api.Infrastructure;
 using Auth.Application.Roles.Queries.GetAllRoles;
+using Kernel;
 using Kernel.Messaging.Abstractions;
 
 namespace Auth.Api.Endpoints.Roles;
@@ -14,7 +15,7 @@ internal sealed class GetAllRoles : IEndpoint
         {
             var query = new GetAllRolesQuery();
 
-            var result = await mediator.Send(query);
+            Result<IReadOnlyCollection<RoleDto>> result = await mediator.Send(query);
 
             return result.Match(
                 roles => Results.Ok(roles),

@@ -14,7 +14,7 @@ internal static class S3Extensions
 
         services.AddSingleton<IAmazonS3>(sp =>
         {
-            var options = sp.GetRequiredService<IOptions<S3Options>>().Value;
+            S3Options options = sp.GetRequiredService<IOptions<S3Options>>().Value;
 
             var config = new AmazonS3Config
             {

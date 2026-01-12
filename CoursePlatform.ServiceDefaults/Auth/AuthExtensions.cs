@@ -45,7 +45,7 @@ public static class AuthExtensions
                 {
                     OnAuthenticationFailed = context =>
                     {
-                        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<JwtBearerHandler>>();
+                        ILogger<JwtBearerHandler> logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<JwtBearerHandler>>();
                         logger.LogError(context.Exception, "Internal Authentication failed.");
                         return Task.CompletedTask;
                     }

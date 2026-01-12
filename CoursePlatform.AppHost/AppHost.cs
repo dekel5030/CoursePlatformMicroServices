@@ -1,15 +1,16 @@
 using Aspire.Hosting;
+using Aspire.Hosting.JavaScript;
 
-var builder = DistributedApplication.CreateBuilder(args);
+IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
 // RabbitMq configuration
-var rabbitMq = builder
+IResourceBuilder<RabbitMQServerResource> rabbitMq = builder
     .AddRabbitMQ("rabbitmq")
     .WithManagementPlugin(15672)
     .WithDataVolume();
 
 var garageConfigPath = Path.Combine(builder.AppHostDirectory, "garage.toml");
-var garage = builder.AddContainer("garage", "dxflrs/garage", "v2.1.0")
+IResourceBuilder<ContainerResource> garage = builder.AddContainer("garage", "dxflrs/garage", "v2.1.0")
     .WithBindMount(garageConfigPath, "/etc/garage.toml")
     .WithBindMount(@"C:\AspireVolumes\Garage\meta", "/var/lib/garage/meta")
     .WithBindMount(@"C:\AspireVolumes\Garage\data", "/var/lib/garage/data")
@@ -19,18 +20,18 @@ var garage = builder.AddContainer("garage", "dxflrs/garage", "v2.1.0")
     .WithEntrypoint("/garage")
     .WithArgs("server");
 
-var storageService = builder.AddProject<Projects.StorageService>("storageservice")
+IResourceBuilder<ProjectResource> storageService = builder.AddProject<Projects.StorageService>("storageservice")
     .WaitFor(garage)
     .WaitFor(rabbitMq)
     .WithEnvironment("S3__ServiceUrl", garage.GetEndpoint("s3"))
     .WithEnvironment("S3__PublicUrl", garage.GetEndpoint("s3"))
     .WithEnvironment("ConnectionStrings:RabbitMq", rabbitMq.Resource.ConnectionStringExpression);
 
-var redis = builder.AddRedis("redis").WithDataVolume().WithRedisInsight();
+IResourceBuilder<RedisResource> redis = builder.AddRedis("redis").WithDataVolume().WithRedisInsight();
 
 // Keycloak configuration
 
-var keycloak = builder.AddContainer("keycloak", "quay.io/keycloak/keycloak", "26.4.7")
+IResourceBuilder<ContainerResource> keycloak = builder.AddContainer("keycloak", "quay.io/keycloak/keycloak", "26.4.7")
     .WithEnvironment("KC_BOOTSTRAP_ADMIN_USERNAME", "admin")
     .WithEnvironment("KC_BOOTSTRAP_ADMIN_PASSWORD", "admin")
     .WithEnvironment("KC_HTTP_MANAGEMENT_HEALTH_ENABLED", "false")
@@ -49,13 +50,13 @@ var keycloak = builder.AddContainer("keycloak", "quay.io/keycloak/keycloak", "26
 
 // AuthService configuration
 
-var authDb = builder
+IResourceBuilder<PostgresDatabaseResource> authDb = builder
     .AddPostgres("authservice-db")
     .WithPgAdmin()
     .WithBindMount(@"C:\AspireVolumes\AuthService", "/var/lib/postgresql/data")
     .AddDatabase("authdb");
 
-var authService = builder
+IResourceBuilder<ProjectResource> authService = builder
     .AddProject<Projects.Auth_Api>("authservice")
     .WithReference(authDb)
     .WithReference(rabbitMq)
@@ -73,12 +74,12 @@ var authService = builder
 
 // UserService configuration
 
-var usersDb = builder
+IResourceBuilder<PostgresDatabaseResource> usersDb = builder
     .AddPostgres("userservice-db")
     .WithBindMount(@"C:\AspireVolumes\UsersService", "/var/lib/postgresql/data")
     .AddDatabase("usersdb");
 
-var usersService = builder.AddProject<Projects.Users_Api>("userservice")
+IResourceBuilder<ProjectResource> usersService = builder.AddProject<Projects.Users_Api>("userservice")
     .WithReference(usersDb)
     .WithReference(rabbitMq)
     .WaitFor(usersDb)
@@ -90,12 +91,12 @@ var usersService = builder.AddProject<Projects.Users_Api>("userservice")
 
 // CourseService configuration
 
-var coursesDb = builder
+IResourceBuilder<PostgresDatabaseResource> coursesDb = builder
     .AddPostgres("courseservice-db")
     .WithBindMount(@"C:\AspireVolumes\CoursesService", "/var/lib/postgresql/data")
     .AddDatabase("coursesdb");
 
-var coursesService = builder.AddProject<Projects.Courses_Api>("courseservice")
+IResourceBuilder<ProjectResource> coursesService = builder.AddProject<Projects.Courses_Api>("courseservice")
     .WithReference(coursesDb)
     .WithReference(rabbitMq)
     .WithReference(authService)
@@ -108,7 +109,7 @@ var coursesService = builder.AddProject<Projects.Courses_Api>("courseservice")
     .WithHttpHealthCheck("/health");
 // Gateway configuration
 
-var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
+IResourceBuilder<ProjectResource> gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
     .WithEnvironment(
         "ReverseProxy__Clusters__garage-website-cluster__Destinations__destination1__Address",
         garage.GetEndpoint("web")
@@ -119,11 +120,11 @@ var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
     .WithReference(coursesService)
     .WithReference(redis);
 
-var gatewayEndpoint = gateway.GetEndpoint("https");
+EndpointReference gatewayEndpoint = gateway.GetEndpoint("https");
 coursesService.WithEnvironment("s3__Endpoint", gatewayEndpoint);
 
 // Frontend configuration
-var _ = builder.AddJavaScriptApp("frontend", "../Frontend", "dev")
+IResourceBuilder<JavaScriptAppResource> _ = builder.AddJavaScriptApp("frontend", "../Frontend", "dev")
     .WithReference(gateway)
     .WaitFor(gateway)
     .WithHttpEndpoint(port: 5067, env: "PORT")

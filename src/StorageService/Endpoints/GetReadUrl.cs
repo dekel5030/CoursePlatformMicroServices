@@ -11,7 +11,7 @@ internal sealed class GetReadUrl : IEndpoint
             string key,
             IStorageProvider storage) =>
         {
-            var url = storage.GenerateViewUrl(key, TimeSpan.FromMinutes(30));
+            PresignedUrlResponse url = storage.GenerateViewUrl(key, TimeSpan.FromMinutes(30));
             return Results.Ok(new { Url = url });
         });
     }

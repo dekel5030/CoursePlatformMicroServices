@@ -1,9 +1,10 @@
 using Auth.Api.Endpoints;
 using Auth.Api.Extensions;
 using Auth.Application;
+using Auth.Domain.AuthUsers;
 using Auth.Infrastructure;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
@@ -21,7 +22,7 @@ builder.AddInfrastructure();
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {

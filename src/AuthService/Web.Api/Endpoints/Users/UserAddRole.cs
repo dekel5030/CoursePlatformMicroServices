@@ -2,6 +2,7 @@
 using Auth.Api.Infrastructure;
 using Kernel.Messaging.Abstractions;
 using Auth.Application.AuthUsers.Commands.UserAddRole;
+using Kernel;
 
 namespace Auth.Api.Endpoints.Users;
 
@@ -17,7 +18,7 @@ internal sealed class UserAddRole : IEndpoint
         {
             var command = new UserAddRoleCommand(userId, request.RoleName);
 
-            var result = await mediator.Send(command, cancellationToken);
+            Result result = await mediator.Send(command, cancellationToken);
 
             return result.Match(() => Results.Ok(), CustomResults.Problem);
         })

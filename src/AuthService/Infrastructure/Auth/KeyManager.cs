@@ -17,7 +17,7 @@ public class KeyManager : IDisposable
 
     public RsaSecurityKey GetPublicKey()
     {
-        var publicParams = _rsa.ExportParameters(false);
+        RSAParameters publicParams = _rsa.ExportParameters(false);
         return new RsaSecurityKey(publicParams);
     }
 

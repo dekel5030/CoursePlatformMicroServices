@@ -9,7 +9,7 @@ internal sealed class SingleValueObjectJsonConverter<TObject, TValue> : JsonConv
 {
     public override TObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var value = JsonSerializer.Deserialize<TValue>(ref reader, options);
+        TValue? value = JsonSerializer.Deserialize<TValue>(ref reader, options);
         if (value is null)
         {
             return default;

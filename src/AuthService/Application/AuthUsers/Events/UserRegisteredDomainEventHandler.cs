@@ -16,10 +16,10 @@ internal sealed class UserRegisteredDomainEventHandler : IDomainEventHandler<Use
     }
 
     public Task HandleAsync(
-        UserRegisteredDomainEvent @event, 
+        UserRegisteredDomainEvent message,
         CancellationToken cancellationToken = default)
     {
-        AuthUser user = @event.User;
+        AuthUser user = message.User;
         var contract = new UserRegisteredEvent(
             user.Id.Value, 
             user.FullName.FirstName.Name, 

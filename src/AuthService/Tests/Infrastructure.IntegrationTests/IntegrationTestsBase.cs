@@ -29,6 +29,13 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
     protected HttpClient Client { get; private set; } = null!;
     protected IBusControl ExternalBus { get; private set; } = null!;
 
+#pragma warning disable CA1041 // Provide ObsoleteAttribute message
+#pragma warning disable S1123 // "Obsolete" attributes should include explanations
+#pragma warning disable S1133 // Deprecated code should be removed
+    [Obsolete]
+#pragma warning restore S1133 // Deprecated code should be removed
+#pragma warning restore S1123 // "Obsolete" attributes should include explanations
+#pragma warning restore CA1041 // Provide ObsoleteAttribute message
     protected IntegrationTestsBase()
     {
         _postgres = new PostgreSqlBuilder()
@@ -55,24 +62,24 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
         await _rabbitMq.StartAsync();
         await _redis.StartAsync();
 
-        Factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureAppConfiguration((context, config) =>
-                {
-                    var dict = new Dictionary<string, string?>
-                    {
-                        ["ConnectionStrings:WriteDatabase"] = _postgres.GetConnectionString(),
-                        ["ConnectionStrings:ReadDatabase"] = _postgres.GetConnectionString(),
-                        ["ConnectionStrings:RabbitMq"] = _rabbitMq.GetConnectionString(),
-                        ["ConnectionStrings:redis"] = _redis.GetConnectionString()
-                    };
+        //Factory = new WebApplicationFactory<Program>()
+        //    .WithWebHostBuilder(builder =>
+        //    {
+        //        builder.ConfigureAppConfiguration((context, config) =>
+        //        {
+        //            var dict = new Dictionary<string, string?>
+        //            {
+        //                ["ConnectionStrings:WriteDatabase"] = _postgres.GetConnectionString(),
+        //                ["ConnectionStrings:ReadDatabase"] = _postgres.GetConnectionString(),
+        //                ["ConnectionStrings:RabbitMq"] = _rabbitMq.GetConnectionString(),
+        //                ["ConnectionStrings:redis"] = _redis.GetConnectionString()
+        //            };
 
-                    config.AddInMemoryCollection(dict);
-                });
-            });
+        //            config.AddInMemoryCollection(dict);
+        //        });
+        //    });
 
-        Client = Factory.CreateClient();
+        //Client = Factory.CreateClient();
 
         ExternalBus = Bus.Factory.CreateUsingRabbitMq(cfg =>
         {
@@ -80,8 +87,8 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
         });
         await ExternalBus.StartAsync();
 
-        using var scope = Factory.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+        using IServiceScope scope = Factory.Services.CreateScope();
+        WriteDbContext dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
         await dbContext.Database.EnsureDeletedAsync();
         await dbContext.Database.EnsureCreatedAsync();
     }

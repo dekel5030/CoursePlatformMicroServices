@@ -4,7 +4,7 @@ using Users.Infrastructure;
 using Users.Infrastructure.Extensions;
 using Users.Application;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddInfrastructureDefaults();
 
@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
     );
 });
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {

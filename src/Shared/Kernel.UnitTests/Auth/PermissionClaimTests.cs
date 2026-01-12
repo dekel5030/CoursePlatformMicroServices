@@ -15,7 +15,7 @@ public class PermissionClaimTests
     public void Create_ShouldNormalizeToLowercase()
     {
         // Arrange & Act
-        var claim = PermissionClaim.Create(
+        Claim claim = PermissionClaim.Create(
             EffectType.Allow,
             ActionType.Read,
             ResourceType.Course,
@@ -31,7 +31,7 @@ public class PermissionClaimTests
     public void Create_ShouldHandleWildcardAction()
     {
         // Arrange & Act
-        var claim = PermissionClaim.Create(
+        Claim claim = PermissionClaim.Create(
             EffectType.Allow,
             ActionType.Wildcard,
             ResourceType.Course,
@@ -45,7 +45,7 @@ public class PermissionClaimTests
     public void Create_ShouldHandleWildcardResource()
     {
         // Arrange & Act
-        var claim = PermissionClaim.Create(
+        Claim claim = PermissionClaim.Create(
             EffectType.Allow,
             ActionType.Read,
             ResourceType.Wildcard,
@@ -59,7 +59,7 @@ public class PermissionClaimTests
     public void Create_ShouldHandleWildcardId()
     {
         // Arrange & Act
-        var claim = PermissionClaim.Create(
+        Claim claim = PermissionClaim.Create(
             EffectType.Allow,
             ActionType.Read,
             ResourceType.Course,
@@ -73,7 +73,7 @@ public class PermissionClaimTests
     public void Create_ShouldAllowWildcardIdEvenThoughItContainsNoColon()
     {
         // Arrange & Act
-        var claim = PermissionClaim.Create(
+        Claim claim = PermissionClaim.Create(
             EffectType.Deny,
             ActionType.Delete,
             ResourceType.User,
@@ -97,7 +97,7 @@ public class PermissionClaimTests
         var claimValue = "allow:read:course:123";
 
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out var claim);
+        var result = PermissionClaim.TryParse(claimValue, out Claim? claim);
 
         // Assert
         result.Should().BeTrue();
@@ -113,7 +113,7 @@ public class PermissionClaimTests
     public void TryParse_ShouldHandleWildcards(string claimValue)
     {
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out var claim);
+        var result = PermissionClaim.TryParse(claimValue, out Claim? claim);
 
         // Assert
         result.Should().BeTrue();
@@ -126,10 +126,11 @@ public class PermissionClaimTests
     [InlineData("allow:create:*:*")]
     [InlineData("allow:*:course:*")]
     [InlineData("allow:*:*:123")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S4144:Methods should not have identical implementations", Justification = "<Pending>")]
     public void TryParse_ShouldHandleVariousWildcardCombinations(string claimValue)
     {
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out var claim);
+        var result = PermissionClaim.TryParse(claimValue, out Claim? claim);
 
         // Assert
         result.Should().BeTrue();
@@ -143,7 +144,7 @@ public class PermissionClaimTests
         var claimValue = "allow:read:course"; // Missing ID segment entirely
 
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out var claim);
+        var result = PermissionClaim.TryParse(claimValue, out Claim? claim);
 
         // Assert
         result.Should().BeFalse();
@@ -156,8 +157,9 @@ public class PermissionClaimTests
         // Arrange
         var claimValue = "allow:read:course:123:extra";
 
+
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out var claim);
+        var result = PermissionClaim.TryParse(claimValue, out _);
 
         // Assert
         result.Should().BeFalse();
@@ -170,7 +172,7 @@ public class PermissionClaimTests
     public void TryParse_ShouldReturnFalse_OnInvalidEnums(string claimValue)
     {
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out var claim);
+        var result = PermissionClaim.TryParse(claimValue, out _);
 
         // Assert
         result.Should().BeFalse();
@@ -180,7 +182,7 @@ public class PermissionClaimTests
     public void TryParse_ShouldReturnFalse_ForNullInput()
     {
         // Act
-        var result = PermissionClaim.TryParse(null!, out var claim);
+        var result = PermissionClaim.TryParse(null!, out _);
 
         // Assert
         result.Should().BeFalse();

@@ -1,5 +1,6 @@
 using Auth.Application.Abstractions.Data;
 using Auth.Application.AuthUsers.Queries.Dtos;
+using Auth.Domain.AuthUsers;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,7 @@ internal sealed class GetAllUsersQueryHandler : IQueryHandler<GetAllUsersQuery, 
         GetAllUsersQuery request,
         CancellationToken cancellationToken = default)
     {
-        var users = await _dbContext.Users
+        List<AuthUser> users = await _dbContext.Users
             .Include(u => u.Roles)
             .OrderBy(u => u.Email)
             .ToListAsync(cancellationToken);

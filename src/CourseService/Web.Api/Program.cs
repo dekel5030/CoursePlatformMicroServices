@@ -5,7 +5,7 @@ using Courses.Application;
 using Courses.Infrastructure;
 using Courses.Infrastructure.Extensions;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddInfrastructureDefaults();
 builder.AddDefaultOpenApi();
@@ -14,7 +14,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {

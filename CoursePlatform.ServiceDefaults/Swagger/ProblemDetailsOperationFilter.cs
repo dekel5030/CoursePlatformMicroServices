@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi;
@@ -18,7 +19,7 @@ public sealed class ProblemDetailsOperationFilter(string securitySchemeId) : IOp
         AddResponse(operation, context, StatusCodes.Status409Conflict, "Conflict");
         AddResponse(operation, context, StatusCodes.Status500InternalServerError, "Server Error");
 
-        var authMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata
+        IEnumerable<IAuthorizeData> authMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata
             .OfType<Microsoft.AspNetCore.Authorization.IAuthorizeData>();
 
         var allowAnonymous = context.ApiDescription.ActionDescriptor.EndpointMetadata

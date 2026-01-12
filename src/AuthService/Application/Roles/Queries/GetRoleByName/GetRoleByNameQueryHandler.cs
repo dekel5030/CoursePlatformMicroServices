@@ -1,5 +1,6 @@
 ﻿using Auth.Application.Abstractions.Data;
 using Auth.Application.AuthUsers.Queries.Dtos;
+using Auth.Domain.Roles;
 using Auth.Domain.Roles.Errors;
 using Auth.Domain.Roles.Primitives;
 using Kernel;
@@ -23,7 +24,7 @@ internal sealed class GetRoleByNameQueryHandler : IQueryHandler<GetRoleByNameQue
     {
         var roleName = new RoleName(request.RoleName);
 
-        var role = await _dbContext.Roles
+        Role? role = await _dbContext.Roles
             .FirstOrDefaultAsync(r => r.Name == roleName, cancellationToken);
 
         if (role == null)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Kernel;
@@ -16,16 +17,16 @@ internal sealed class SingleValueObjectJsonConverterFactory : JsonConverterFacto
 
     public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
-        var valueType = GetInnerValueType(typeToConvert)!;
+        Type valueType = GetInnerValueType(typeToConvert)!;
 
-        var ctor = typeToConvert.GetConstructor(new[] { valueType });
+        ConstructorInfo? ctor = typeToConvert.GetConstructor(new[] { valueType });
         if (ctor == null)
         {
             throw new InvalidOperationException(
                 $"Type {typeToConvert.Name} must have a constructor that accepts {valueType.Name}");
         }
 
-        var converterType = typeof(SingleValueObjectJsonConverter<,>).MakeGenericType(typeToConvert, valueType);
+        Type converterType = typeof(SingleValueObjectJsonConverter<,>).MakeGenericType(typeToConvert, valueType);
         return (JsonConverter)Activator.CreateInstance(converterType)!;
     }
 
@@ -33,7 +34,7 @@ internal sealed class SingleValueObjectJsonConverterFactory : JsonConverterFacto
     {
         return _valueTypeCache.GetOrAdd(type, t =>
         {
-            var svoInterface = t.GetInterfaces()
+            Type? svoInterface = t.GetInterfaces()
                 .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ISingleValueObject<>));
 
             return svoInterface?.GetGenericArguments()[0];

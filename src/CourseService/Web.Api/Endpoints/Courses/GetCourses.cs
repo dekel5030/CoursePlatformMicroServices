@@ -3,8 +3,10 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Contracts.Courses;
 using Courses.Api.Contracts.Shared;
 using Courses.Api.Extensions;
+using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Courses.Queries.GetCourses;
 using Courses.Application.Shared.Dtos;
+using Kernel;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Courses;
@@ -19,7 +21,7 @@ internal sealed class GetCourses : IEndpoint
             CancellationToken cancellationToken) =>
         {
             var query = new GetCoursesQuery(pagedQuery);
-            var result = await mediator.Send(query, cancellationToken);
+            Result<PagedResponseDto<CourseSummaryDto>> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
                 dto => Results.Ok(dto.ToApiContract()),

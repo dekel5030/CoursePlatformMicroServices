@@ -2,6 +2,7 @@
 using Auth.Api.Infrastructure;
 using Auth.Application.AuthUsers.Commands.ExchangeToken;
 using Auth.Infrastructure.Auth.Jwt;
+using Kernel;
 using Kernel.Messaging.Abstractions;
 
 namespace Auth.Api.Endpoints.Auth;
@@ -13,7 +14,7 @@ internal sealed class ExchangeToken : IEndpoint
         app.MapPost("/auth/exchange-token", async (
             IMediator mediator) =>
         {
-            var result = await mediator.Send(new ExchangeTokenCommand());
+            Result<TokenResponse> result = await mediator.Send(new ExchangeTokenCommand());
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .RequireAuthorization(AuthSchemes.Keycloak)

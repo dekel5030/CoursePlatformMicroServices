@@ -161,16 +161,16 @@ public class Course : Entity<CourseId>
         Description? description,
         TimeProvider timeProvider)
     {
-        int index = _lessons.Count;
+        var index = _lessons.Count;
 
-        var lessonResult = Lesson.Create(title, description, index);
+        Result<Lesson> lessonResult = Lesson.Create(title, description, index);
 
         if (lessonResult.IsFailure)
         {
             return Result.Failure<Lesson>(lessonResult.Error);
         }
 
-        var lesson = lessonResult.Value;
+        Lesson lesson = lessonResult.Value;
         
         _lessons.Add(lesson);
         LessonCount = _lessons.Count;
@@ -211,7 +211,7 @@ public class Course : Entity<CourseId>
 
         if (title.HasValue)
         {
-            var titleResult = lesson.SetTitle(title.Value);
+            Result titleResult = lesson.SetTitle(title.Value);
             if (titleResult.IsFailure)
             {
                 return titleResult;
@@ -220,7 +220,7 @@ public class Course : Entity<CourseId>
 
         if (description.HasValue)
         {
-            var descriptionResult = lesson.SetDescription(description.Value);
+            Result descriptionResult = lesson.SetDescription(description.Value);
             if (descriptionResult.IsFailure)
             {
                 return descriptionResult;
@@ -229,7 +229,7 @@ public class Course : Entity<CourseId>
 
         if (access.HasValue)
         {
-            var accessResult = lesson.SetAccess(access.Value);
+            Result accessResult = lesson.SetAccess(access.Value);
             if (accessResult.IsFailure)
             {
                 return accessResult;

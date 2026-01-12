@@ -36,7 +36,7 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
             return Result.Failure<LessonDetailsDto>(LessonErrors.NotFound);
         }
 
-        var response = await lesson.ToDetailsDtoAsync(_urlResolver, cancellationToken);
+        LessonDetailsDto response = await lesson.ToDetailsDtoAsync(_urlResolver, cancellationToken);
 
         return Result.Success(response);
     }

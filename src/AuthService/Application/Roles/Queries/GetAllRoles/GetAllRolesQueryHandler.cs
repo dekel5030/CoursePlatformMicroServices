@@ -1,4 +1,5 @@
 ﻿using Auth.Application.Abstractions.Data;
+using Auth.Domain.Roles;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,7 @@ internal sealed class GetAllRolesQueryHandler : IQueryHandler<GetAllRolesQuery, 
             .Select(g => new { RoleId = g.Key, UserCount = g.Count() })
             .ToListAsync(cancellationToken);
 
-        var roles = await _readDbContext.Roles.ToListAsync(cancellationToken);
+        List<Role> roles = await _readDbContext.Roles.ToListAsync(cancellationToken);
 
         var roleDtos = roles.Select(role => new RoleDto(
             role.Id.Value,

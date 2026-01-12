@@ -12,7 +12,7 @@ public static class HostingExtensions
         where TBuilder : IHostApplicationBuilder
     {
         builder.AddServiceDefaults();
-        var healthChecks = builder.Services.AddHealthChecks();
+        IHealthChecksBuilder healthChecks = builder.Services.AddHealthChecks();
 
         var writeDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.WriteDatabaseConnectionSection);
         if (!string.IsNullOrEmpty(writeDbConnectionString))

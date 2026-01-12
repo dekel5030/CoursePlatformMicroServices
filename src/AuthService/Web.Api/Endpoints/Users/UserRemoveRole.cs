@@ -2,6 +2,7 @@
 using Auth.Api.Infrastructure;
 using Kernel.Messaging.Abstractions;
 using Auth.Application.AuthUsers.Commands.UserRemoveRole;
+using Kernel;
 
 namespace Auth.Api.Endpoints.Users;
 
@@ -17,7 +18,7 @@ internal sealed class UserRemoveRole : IEndpoint
         {
             var command = new UserRemoveRoleCommand(userId, roleName);
 
-            var result = await mediator.Send(command, cancellationToken);
+            Result result = await mediator.Send(command, cancellationToken);
 
             return result.Match(Results.NoContent, CustomResults.Problem);
         })

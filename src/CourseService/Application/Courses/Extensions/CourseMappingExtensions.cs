@@ -42,7 +42,7 @@ internal static class CourseMappingExtensions
         IStorageUrlResolver resolver,
         CancellationToken cancellationToken = default)
     {
-        string firstImagePath = course.Images.FirstOrDefault()?.Path ?? string.Empty;
+        var firstImagePath = course.Images.FirstOrDefault()?.Path ?? string.Empty;
         ResolvedUrl resolvedUrl = await resolver.ResolveAsync(
             StorageCategory.Public, 
             firstImagePath, 

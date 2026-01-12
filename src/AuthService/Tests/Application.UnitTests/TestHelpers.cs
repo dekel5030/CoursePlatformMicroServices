@@ -14,6 +14,7 @@ public static class TestHelpers
     /// </summary>
     public static Mock<DbSet<T>> CreateMockDbSet<T>(List<T> data) where T : class
     {
-        return data.AsQueryable().BuildMockDbSet();
+        //return data.AsQueryable().BuildMockDbSet();
+        return new Mock<DbSet<T>>(data);
     }
 }
