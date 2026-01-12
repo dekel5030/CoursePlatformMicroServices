@@ -69,7 +69,7 @@ public class AuthUser : Entity
 
     public Result RemoveRole(Role role)
     {
-        var roleToRemove = _roles.FirstOrDefault(r => r.Id == role.Id);
+        Role? roleToRemove = _roles.FirstOrDefault(r => r.Id == role.Id);
 
         if (roleToRemove is not null)
         {
@@ -107,7 +107,7 @@ public class AuthUser : Entity
 
     public Result RemovePermission(string permissionKey)
     {
-        var permission = _permissions.FirstOrDefault(p => p.Key == permissionKey);
+        Permission? permission = _permissions.FirstOrDefault(p => p.Key == permissionKey);
 
         if (permission is null)
         {

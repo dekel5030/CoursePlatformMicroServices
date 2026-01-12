@@ -1,6 +1,7 @@
 ﻿using CoursePlatform.Contracts.AuthEvents;
 using Domain.Users;
 using Domain.Users.Primitives;
+using Kernel;
 using Kernel.EventBus;
 using Microsoft.EntityFrameworkCore;
 using Users.Application.Abstractions.Data;
@@ -27,7 +28,7 @@ internal sealed class UserRegisterdEventConsumer : IEventConsumer<UserRegistered
         if (user is null)
         {
             var userName = new FullName(@event.FirstName ?? string.Empty, @event.LastName ?? string.Empty);
-            var userCreationResult = User.CreateUser(userId, @event.Email, userName);
+            Result<User> userCreationResult = User.CreateUser(userId, @event.Email, userName);
 
             if (userCreationResult.IsSuccess)
             {

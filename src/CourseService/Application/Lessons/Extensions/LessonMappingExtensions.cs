@@ -56,7 +56,9 @@ internal static class LessonMappingExtensions
             ? resolver.ResolveAsync(StorageCategory.Private, lesson.VideoUrl.Path, cancellationToken)
             : null;
 
-        var tasks = new[] { thumbTask, videoTask }.Where(t => t != null).Cast<Task<ResolvedUrl>>();
+        IEnumerable<Task<ResolvedUrl>> tasks = new[] { thumbTask, videoTask }
+            .Where(t => t != null).Cast<Task<ResolvedUrl>>();
+        
         await Task.WhenAll(tasks);
 
         return new LessonDetailsDto(

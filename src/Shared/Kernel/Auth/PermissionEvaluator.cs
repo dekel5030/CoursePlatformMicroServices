@@ -27,7 +27,7 @@ public static class PermissionEvaluator
         ResourceType resource, 
         ResourceId resourceId)
     {
-        var patternsToCheck = new[] {
+        (ActionType Action, ResourceType Resource, ResourceId ResourceId)[] patternsToCheck = new[] {
             (Action: action, Resource: resource, ResourceId: resourceId),
             (Action: action, Resource: resource, ResourceId: ResourceId.Wildcard),
             (Action: action, Resource: ResourceType.Wildcard, ResourceId: resourceId), 
@@ -39,7 +39,7 @@ public static class PermissionEvaluator
             (Action: ActionType.Wildcard, Resource: ResourceType.Wildcard, ResourceId: ResourceId.Wildcard)
         };
 
-        foreach (var (checkAction, checkResource, checkResourceId) in patternsToCheck)
+        foreach ((ActionType checkAction, ResourceType checkResource, ResourceId? checkResourceId) in patternsToCheck)
         {
             var claimValue = PermissionClaim.ToClaimValue(effect, checkAction, checkResource, checkResourceId);
 

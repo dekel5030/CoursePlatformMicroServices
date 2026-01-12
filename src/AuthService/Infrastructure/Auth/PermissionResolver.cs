@@ -15,8 +15,8 @@ public class PermissionResolver : IPermissionResolver
             .Distinct()
             .ToList();
 
-        var flattened = FlattenHierarchy(allPermissions);
-        var resolved = ApplyDenyOverrides(flattened);
+        List<Permission> flattened = FlattenHierarchy(allPermissions);
+        List<Permission> resolved = ApplyDenyOverrides(flattened);
 
         return resolved.Select(p =>
             PermissionClaim.ToClaimValue(p.Effect, p.Action, p.Resource, p.ResourceId));
@@ -27,9 +27,9 @@ public class PermissionResolver : IPermissionResolver
         var denyPermissions = source.Where(p => p.Effect == EffectType.Deny).ToList();
         var allowPermissions = source.Where(p => p.Effect == EffectType.Allow).ToHashSet();
 
-        foreach (var denyPerm in  denyPermissions)
+        foreach (Permission? denyPerm in denyPermissions)
         {
-            foreach (var allowPerm in allowPermissions.ToList())
+            foreach (Permission? allowPerm in allowPermissions.ToList())
             {
                 if (PermissionWiderThan(denyPerm, allowPerm))
                 {
@@ -45,9 +45,9 @@ public class PermissionResolver : IPermissionResolver
     {
         var result = new HashSet<Permission>(source);
 
-        foreach (var parent in source)
+        foreach (Permission parent in source)
         {
-            foreach (var child in source)
+            foreach (Permission child in source)
             {
                 if (parent != child && 
                     parent.Effect == child.Effect &&

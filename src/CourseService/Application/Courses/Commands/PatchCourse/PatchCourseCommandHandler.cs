@@ -1,5 +1,6 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
+using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
@@ -24,7 +25,7 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
         PatchCourseCommand request,
         CancellationToken cancellationToken = default)
     {
-        var course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
+        Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
 
         if (course is null)
         {
@@ -33,7 +34,7 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
 
         if (request.Title.HasValue)
         {
-            var titleResult = course.UpdateTitle(request.Title.Value, _timeProvider);
+            Result titleResult = course.UpdateTitle(request.Title.Value, _timeProvider);
             if (titleResult.IsFailure)
             {
                 return titleResult;
@@ -42,7 +43,7 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
 
         if (request.Description.HasValue)
         {
-            var descriptionResult = course.UpdateDescription(request.Description.Value, _timeProvider);
+            Result descriptionResult = course.UpdateDescription(request.Description.Value, _timeProvider);
             if (descriptionResult.IsFailure)
             {
                 return descriptionResult;
@@ -51,7 +52,7 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
 
         if (request.InstructorId.HasValue)
         {
-            var instructorResult = course.AssignInstructor(new InstructorId(request.InstructorId.Value), _timeProvider);
+            Result instructorResult = course.AssignInstructor(new InstructorId(request.InstructorId.Value), _timeProvider);
             if (instructorResult.IsFailure)
             {
                 return instructorResult;
@@ -67,7 +68,7 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
         
         if (request.PriceAmount.HasValue && request.PriceCurrency is not null)
         {
-            var priceResult = course.SetPrice(new Money(request.PriceAmount.Value, request.PriceCurrency), _timeProvider);
+            Result priceResult = course.SetPrice(new Money(request.PriceAmount.Value, request.PriceCurrency), _timeProvider);
             if (priceResult.IsFailure)
             {
                 return priceResult;

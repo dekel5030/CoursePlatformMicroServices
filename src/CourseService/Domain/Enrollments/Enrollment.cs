@@ -21,8 +21,8 @@ public class Enrollment
         TimeProvider timeProvider,
         TimeSpan? validFor = null)
     {
-        var now = timeProvider.GetUtcNow();
-        var duration = validFor ?? TimeSpan.FromDays(365);
+        DateTimeOffset now = timeProvider.GetUtcNow();
+        TimeSpan duration = validFor ?? TimeSpan.FromDays(365);
 
         return new Enrollment()
         {

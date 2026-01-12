@@ -12,7 +12,7 @@ internal sealed class GetObject : IEndpoint
             string bucketName,
             IStorageProvider storage) =>
         {
-            var response = await storage.GetObjectAsync(bucketName, key);
+            ObjectResponse response = await storage.GetObjectAsync(bucketName, key);
 
             return Results.File(
                 fileStream: response.Content,

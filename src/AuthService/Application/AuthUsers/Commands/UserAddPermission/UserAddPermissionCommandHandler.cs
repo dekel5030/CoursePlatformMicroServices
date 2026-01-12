@@ -34,7 +34,7 @@ public class UserAddPermissionCommandHandler : ICommandHandler<UserAddPermission
             return Result.Failure(AuthUserErrors.NotFound);
         }
 
-        var permissionResult = Permission.Parse(
+        Result<Permission> permissionResult = Permission.Parse(
             request.Effect,
             request.Action,
             request.Resource,

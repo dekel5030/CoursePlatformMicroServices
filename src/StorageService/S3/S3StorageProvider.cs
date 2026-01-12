@@ -108,7 +108,7 @@ internal sealed class S3StorageProvider : IStorageProvider
         string key, 
         CancellationToken cancellationToken = default)
     {
-        var response = await _s3Client.GetObjectAsync(bucketName, key, cancellationToken);
+        GetObjectResponse response = await _s3Client.GetObjectAsync(bucketName, key, cancellationToken);
 
         return new ObjectResponse
         {

@@ -48,7 +48,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
         FileUploadedEvent @event, 
         CancellationToken cancellationToken = default)
     {
-        if (!Guid.TryParse(@event.ReferenceId, out var guidId))
+        if (!Guid.TryParse(@event.ReferenceId, out Guid guidId))
         {
             _logger.LogError("Invalid ReferenceId format: {ReferenceId}", @event.ReferenceId);
             return;
@@ -77,7 +77,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
         FileUploadedEvent @event, 
         CancellationToken cancellationToken = default)
     {
-        if (!Guid.TryParse(@event.ReferenceId, out var guidId))
+        if (!Guid.TryParse(@event.ReferenceId, out Guid guidId))
         {
             _logger.LogError("Invalid ReferenceId format: {ReferenceId}", @event.ReferenceId);
             return;

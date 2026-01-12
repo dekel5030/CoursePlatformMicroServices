@@ -31,7 +31,7 @@ internal sealed class CreateUserCommandHandler(IWriteDbContext dbContext)
 
         // Parse userId if provided, otherwise it will be generated
         UserId? userId = null;
-        if (!string.IsNullOrEmpty(request.UserId) && Guid.TryParse(request.UserId, out var userIdGuid))
+        if (!string.IsNullOrEmpty(request.UserId) && Guid.TryParse(request.UserId, out Guid userIdGuid))
         {
             userId = new UserId(userIdGuid);
         }

@@ -10,10 +10,10 @@ internal static class MigrationExtensions
         using IServiceScope scope = app.ApplicationServices.CreateScope();
         IServiceProvider services = scope.ServiceProvider;
 
-        using var readDb = services.GetRequiredService<ReadDbContext>();
+        using ReadDbContext readDb = services.GetRequiredService<ReadDbContext>();
         await readDb.Database.MigrateAsync();
 
-        using var writeDb = services.GetRequiredService<WriteDbContext>();
+        using WriteDbContext writeDb = services.GetRequiredService<WriteDbContext>();
         await writeDb.Database.MigrateAsync();
     }
 }

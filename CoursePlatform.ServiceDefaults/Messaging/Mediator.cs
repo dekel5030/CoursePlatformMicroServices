@@ -39,8 +39,8 @@ public sealed class Mediator : IMediator
     {
         public async Task<TResponse> Handle(object request, IServiceProvider sp, CancellationToken ct)
         {
-            var handler = sp.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
-            var behaviors = sp.GetServices<IPipelineBehavior<TRequest, TResponse>>();
+            IRequestHandler<TRequest, TResponse> handler = sp.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
+            IEnumerable<IPipelineBehavior<TRequest, TResponse>> behaviors = sp.GetServices<IPipelineBehavior<TRequest, TResponse>>();
 
             RequestHandlerDelegate<TResponse> handlerDelegate = () => handler.Handle((TRequest)request, ct);
 

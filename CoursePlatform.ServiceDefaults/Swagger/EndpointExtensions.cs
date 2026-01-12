@@ -12,7 +12,7 @@ public static class EndpointExtensions
         string summary,
         int successStatusCode = 200)
     {
-        var result = builder
+        RouteHandlerBuilder result = builder
             .WithName(endpointName)
             .WithTags(tag)
             .WithSummary(summary)

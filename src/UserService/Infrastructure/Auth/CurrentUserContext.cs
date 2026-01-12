@@ -28,7 +28,7 @@ public class CurrentUserContext : ICurrentUserContext
             }
 
             var idValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return Guid.TryParse(idValue, out var userId) ? userId : null;
+            return Guid.TryParse(idValue, out Guid userId) ? userId : null;
         }
     }
 

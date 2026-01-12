@@ -1,5 +1,6 @@
 ﻿using Auth.Application.Abstractions.Data;
 using Auth.Domain.Permissions;
+using Auth.Domain.Roles;
 using Auth.Domain.Roles.Errors;
 using Auth.Domain.Roles.Primitives;
 using Kernel;
@@ -25,7 +26,7 @@ public class RoleAddPermissionCommandHandler : ICommandHandler<RoleAddPermission
         RoleAddPermissionCommand request, 
         CancellationToken cancellationToken = default)
     {
-        var role = await _writeDbContext.Roles
+        Role? role = await _writeDbContext.Roles
             .FirstOrDefaultAsync(role => role.Name == new RoleName(request.RoleName), cancellationToken);
 
         if (role is null)
@@ -44,7 +45,7 @@ public class RoleAddPermissionCommandHandler : ICommandHandler<RoleAddPermission
             return permissionParseResult;
         }
 
-        var permissionAddResult = role.AddPermission(permissionParseResult.Value);
+        Result permissionAddResult = role.AddPermission(permissionParseResult.Value);
 
         if (permissionAddResult.IsFailure)
         {

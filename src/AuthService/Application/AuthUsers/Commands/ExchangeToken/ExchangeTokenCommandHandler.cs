@@ -48,7 +48,7 @@ internal sealed class ExchangeTokenCommandHandler : ICommandHandler<ExchangeToke
 
         user ??= await ProvisionUserAsync(cancellationToken);
 
-        var effectivePermissions = _permissionResolver.ResolveEffectivePermissions(user);
+        IEnumerable<string> effectivePermissions = _permissionResolver.ResolveEffectivePermissions(user);
 
         var token = _tokenProvider.GenerateToken(user, effectivePermissions, _externalUserContext.ExpiryUtc);
 
@@ -81,7 +81,7 @@ internal sealed class ExchangeTokenCommandHandler : ICommandHandler<ExchangeToke
         }
         catch (DbUpdateException)
         {
-            var existingUser = await _dbContext.Users
+            AuthUser? existingUser = await _dbContext.Users
                         .Include(u => u.Roles)
                         .FirstOrDefaultAsync(u => u.IdentityId == externalId, cancellationToken);
 

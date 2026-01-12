@@ -49,7 +49,7 @@ internal static class EndpointExtensions
         string description,
         bool requiresAuth = true)
     {
-        var result = builder
+        RouteHandlerBuilder result = builder
             .WithTags(tag)
             .WithName(name)
             .WithSummary(summary)

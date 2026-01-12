@@ -1,5 +1,6 @@
 ﻿using Auth.Application.Abstractions.Data;
 using Auth.Application.AuthUsers.Queries.Dtos;
+using Auth.Domain.AuthUsers;
 using Auth.Domain.AuthUsers.Errors;
 using Auth.Domain.AuthUsers.Primitives;
 using Kernel;
@@ -23,7 +24,7 @@ internal sealed class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, 
     {
         var userId = new AuthUserId(request.UserId);
 
-        var user = await _dbContext.Users.Include(u => u.Roles)
+        AuthUser? user = await _dbContext.Users.Include(u => u.Roles)
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
         if (user is null)

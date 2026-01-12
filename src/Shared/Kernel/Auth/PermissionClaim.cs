@@ -69,17 +69,17 @@ public static partial class PermissionClaim
         var resourceSegment = segments[2];
         var idSegment = segments[3];
 
-        if (!PermissionParser.TryParseEffect(effectSegment, out var effect))
+        if (!PermissionParser.TryParseEffect(effectSegment, out EffectType effect))
         {
             return false;
         }
 
-        if (!PermissionParser.TryParseAction(actionSegment, out var action))
+        if (!PermissionParser.TryParseAction(actionSegment, out ActionType action))
         {
             return false;
         }
 
-        if (!PermissionParser.TryParseResource(resourceSegment, out var resource))
+        if (!PermissionParser.TryParseResource(resourceSegment, out ResourceType resource))
         {
             return false;
         }

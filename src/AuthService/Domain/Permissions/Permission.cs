@@ -46,15 +46,15 @@ public record Permission
         string resourceSegment, 
         string resourceIdSegment)
     {
-        if (!PermissionParser.TryParseEffect(effectSegment, out var effect))
+        if (!PermissionParser.TryParseEffect(effectSegment, out EffectType effect))
         {
             return Result<Permission>.Failure(PermissionErrors.InvalidEffect);
         }
-        if (!PermissionParser.TryParseAction(actionSegment, out var action))
+        if (!PermissionParser.TryParseAction(actionSegment, out ActionType action))
         {
             return Result<Permission>.Failure(PermissionErrors.InvalidAction);
         }
-        if (!PermissionParser.TryParseResource(resourceSegment, out var resource))
+        if (!PermissionParser.TryParseResource(resourceSegment, out ResourceType resource))
         {
             return Result<Permission>.Failure(PermissionErrors.InvalidResource);
         }
