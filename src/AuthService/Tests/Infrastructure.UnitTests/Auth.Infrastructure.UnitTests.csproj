@@ -6,8 +6,4 @@
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
-
 </Project>

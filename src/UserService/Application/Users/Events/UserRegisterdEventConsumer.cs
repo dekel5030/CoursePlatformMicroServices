@@ -18,17 +18,17 @@ internal sealed class UserRegisterdEventConsumer : IEventConsumer<UserRegistered
     }
 
     public async Task HandleAsync(
-        UserRegisteredEvent @event, 
+        UserRegisteredEvent message, 
         CancellationToken cancellationToken = default)
     {
-        var userId = new UserId { Value = @event.UserId };
+        var userId = new UserId { Value = message.UserId };
         User? user = await _dbContext.Users
             .FirstOrDefaultAsync(user => user.Id == userId, cancellationToken: cancellationToken);
 
         if (user is null)
         {
-            var userName = new FullName(@event.FirstName ?? string.Empty, @event.LastName ?? string.Empty);
-            Result<User> userCreationResult = User.CreateUser(userId, @event.Email, userName);
+            var userName = new FullName(message.FirstName ?? string.Empty, message.LastName ?? string.Empty);
+            Result<User> userCreationResult = User.CreateUser(userId, message.Email, userName);
 
             if (userCreationResult.IsSuccess)
             {

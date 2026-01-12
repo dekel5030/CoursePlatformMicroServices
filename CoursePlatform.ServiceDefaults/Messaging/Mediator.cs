@@ -50,16 +50,16 @@ public sealed class Mediator : IMediator
         }
     }
 
-    public async Task Publish<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
+    public async Task Publish<TEvent>(TEvent message, CancellationToken cancellationToken = default)
         where TEvent : class
     {
-        if (@event is null)
+        if (message is null)
         {
             return;
         }
         //using IServiceScope scope = serviceProvider.CreateScope();
 
-        Type eventType = @event.GetType();
+        Type eventType = message.GetType();
 
         Type handlerType = _handlerTypeDictionary.GetOrAdd(
                 eventType,
@@ -77,13 +77,13 @@ public sealed class Mediator : IMediator
 
             var handlerWrapper = HandlerWrapper.Create(handler, eventType);
 
-            await handlerWrapper.HandleAsync(@event, cancellationToken);
+            await handlerWrapper.HandleAsync(message, cancellationToken);
         }
     }
 
     private abstract class HandlerWrapper
     {
-        public abstract Task HandleAsync(object @event, CancellationToken cancellationToken);
+        public abstract Task HandleAsync(object message, CancellationToken cancellationToken);
 
         public static HandlerWrapper Create(object handler, Type domainEventType)
         {
@@ -104,9 +104,9 @@ public sealed class Mediator : IMediator
     {
         private readonly IEventHandler<T> _handler = (IEventHandler<T>)handler;
 
-        public override async Task HandleAsync(object @event, CancellationToken cancellationToken)
+        public override async Task HandleAsync(object message, CancellationToken cancellationToken)
         {
-            await _handler.HandleAsync((T)@event, cancellationToken);
+            await _handler.HandleAsync((T)message, cancellationToken);
         }
     }
 }
