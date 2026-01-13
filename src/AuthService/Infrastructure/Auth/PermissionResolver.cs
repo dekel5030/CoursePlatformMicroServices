@@ -26,7 +26,7 @@ public class PermissionResolver : IPermissionResolver
     {
         var denyPermissions = source.Where(p => p.Effect == EffectType.Deny).ToList();
 
-        var filteredAllowPermissions = source
+        IEnumerable<Permission> filteredAllowPermissions = source
             .Where(p => p.Effect == EffectType.Allow)
             .Where(allow => !denyPermissions.Any(deny => PermissionWiderThan(deny, allow)));
 

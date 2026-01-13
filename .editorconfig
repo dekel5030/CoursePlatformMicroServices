@@ -351,7 +351,7 @@ dotnet_diagnostic.IDE0005.severity = suggestion
 
 # IDE0008: Use explicit type instead of 'var'
 # Reason: Using 'var' is the industry standard for readability when the type is apparent.
-dotnet_diagnostic.IDE0008.severity = none
+# Disabled dotnet_diagnostic.IDE0008.severity = none
 
 # CA1030: Use events where appropriate
 # Reason: This rule incorrectly flags the DDD 'Raise Domain Event' pattern. 

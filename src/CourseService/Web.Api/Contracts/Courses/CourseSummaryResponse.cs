@@ -1,3 +1,6 @@
+using Courses.Api.Contracts.Shared;
+using Courses.Api.Infrastructure.LinkProvider;
+
 namespace Courses.Api.Contracts.Courses;
 
 internal sealed record CourseSummaryResponse(
@@ -8,4 +11,5 @@ internal sealed record CourseSummaryResponse(
     string Currency,
     string? ThumbnailUrl,
     int LessonsCount,
-    int EnrollmentCount);
+    int EnrollmentCount,
+    IReadOnlyCollection<LinkDto> Links) : ILinksResponse;

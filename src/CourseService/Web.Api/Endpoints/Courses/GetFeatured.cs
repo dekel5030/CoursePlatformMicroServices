@@ -3,6 +3,7 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Contracts.Courses;
 using Courses.Api.Contracts.Shared;
 using Courses.Api.Extensions;
+using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Courses.Queries.GetFeatured;
 using Courses.Application.Shared.Dtos;
@@ -17,13 +18,14 @@ internal sealed class GetFeatured : IEndpoint
     {
         app.MapGet("courses/featured", async (
             IMediator mediator,
+            LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
             Result<PagedResponseDto<CourseSummaryDto>> result = await mediator
                 .Send(new GetFeaturedQuery(), cancellationToken);
 
             return result.Match(
-                dto => Results.Ok(dto.ToApiContract()),
+                dto => Results.Ok(dto.ToApiContract(linkProvider)),
                 CustomResults.Problem);
         })
         .WithMetadata<PagedResponse<CourseSummaryResponse>>(
