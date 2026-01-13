@@ -1,7 +1,7 @@
-using Domain.Users.Primitives;
 using Kernel.Messaging.Abstractions;
+using Users.Domain.Users.Primitives;
 
-namespace Domain.Users.Events;
+namespace Users.Domain.Users.Events;
 
 public sealed record UserProfileCreatedDomainEvent(
     UserId UserId,

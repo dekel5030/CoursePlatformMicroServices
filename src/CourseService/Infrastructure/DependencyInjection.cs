@@ -21,7 +21,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
 
-        var authUrl = configuration["services:authservice:https:0"]
+        string authUrl = configuration["services:authservice:https:0"]
               ?? configuration["services:authservice:http:0"] ?? string.Empty;
 
         return services

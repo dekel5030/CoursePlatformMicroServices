@@ -36,7 +36,7 @@ public static partial class PermissionClaim
             ResourceType resource,
             ResourceId id)
     {
-        var value = ToClaimValue(effect, action, resource, id);
+        string? value = ToClaimValue(effect, action, resource, id);
 
         return new Claim(CoursePlatformClaims.Permission, value);
     }
@@ -57,17 +57,17 @@ public static partial class PermissionClaim
             return false;
         }
 
-        var segments = claimValue.Split(':');
+        string[] segments = claimValue.Split(':');
 
         if (segments.Length != 4)
         {
             return false;
         }
 
-        var effectSegment = segments[0];
-        var actionSegment = segments[1];
-        var resourceSegment = segments[2];
-        var idSegment = segments[3];
+        string effectSegment = segments[0];
+        string actionSegment = segments[1];
+        string resourceSegment = segments[2];
+        string idSegment = segments[3];
 
         if (!PermissionParser.TryParseEffect(effectSegment, out EffectType effect))
         {
@@ -101,9 +101,9 @@ public static partial class PermissionClaim
                 ResourceType resource,
                 ResourceId id)
     {
-        var effectString = effect.ToString().ToLowerInvariant();
-        var actionString = action == ActionType.Wildcard ? "*" : action.ToString().ToLowerInvariant();
-        var resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
+        string effectString = effect.ToString().ToLowerInvariant();
+        string actionString = action == ActionType.Wildcard ? "*" : action.ToString().ToLowerInvariant();
+        string resourceString = resource == ResourceType.Wildcard ? "*" : resource.ToString().ToLowerInvariant();
 
         return $"{effectString}:{actionString}:{resourceString}:{id.Value}";
     }

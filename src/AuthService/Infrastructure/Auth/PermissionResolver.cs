@@ -25,20 +25,12 @@ public class PermissionResolver : IPermissionResolver
     private static List<Permission> ApplyDenyOverrides(List<Permission> source)
     {
         var denyPermissions = source.Where(p => p.Effect == EffectType.Deny).ToList();
-        var allowPermissions = source.Where(p => p.Effect == EffectType.Allow).ToHashSet();
 
-        foreach (Permission? denyPerm in denyPermissions)
-        {
-            foreach (Permission? allowPerm in allowPermissions.ToList())
-            {
-                if (PermissionWiderThan(denyPerm, allowPerm))
-                {
-                    allowPermissions.Remove(allowPerm);
-                }
-            }
-        }
+        var filteredAllowPermissions = source
+            .Where(p => p.Effect == EffectType.Allow)
+            .Where(allow => !denyPermissions.Any(deny => PermissionWiderThan(deny, allow)));
 
-        return denyPermissions.Concat(allowPermissions).ToList();
+        return denyPermissions.Concat(filteredAllowPermissions).ToList();
     }
 
     private static List<Permission> FlattenHierarchy(List<Permission> source)
@@ -63,9 +55,9 @@ public class PermissionResolver : IPermissionResolver
 
     private static bool PermissionWiderThan(Permission container, Permission target)
     {
-        var actionMatch = container.Action == ActionType.Wildcard || container.Action == target.Action;
-        var resourceMatch = container.Resource == ResourceType.Wildcard || container.Resource == target.Resource;
-        var idMatch = container.ResourceId == ResourceId.Wildcard || container.ResourceId == target.ResourceId;
+        bool actionMatch = container.Action == ActionType.Wildcard || container.Action == target.Action;
+        bool resourceMatch = container.Resource == ResourceType.Wildcard || container.Resource == target.Resource;
+        bool idMatch = container.ResourceId == ResourceId.Wildcard || container.ResourceId == target.ResourceId;
 
         return actionMatch && resourceMatch && idMatch;
     }

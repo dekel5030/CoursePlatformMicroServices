@@ -1,13 +1,15 @@
-using Domain.Users.Events;
-using Domain.Users.Primitives;
 using Kernel;
+using Users.Domain.Users.Events;
+using Users.Domain.Users.Primitives;
 
-namespace Domain.Users;
+namespace Users.Domain.Users;
 
 public class User : Entity
 {
     public UserId Id { get; private set; }
+#pragma warning disable S1144 // Unused private types or members should be removed
     public AuthUserId? AuthUserId { get; private set; }
+#pragma warning restore S1144 // Unused private types or members should be removed
     public string Email { get; private set; } = null!;
     public FullName? FullName { get; private set; }
     public PhoneNumber? PhoneNumber { get; private set; }

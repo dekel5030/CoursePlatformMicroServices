@@ -14,7 +14,7 @@ public static class HostingExtensions
         builder.AddServiceDefaults();
         IHealthChecksBuilder healthChecks = builder.Services.AddHealthChecks();
 
-        var writeDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.WriteDbSectionName);
+        string? writeDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.WriteDbSectionName);
         if (!string.IsNullOrEmpty(writeDbConnectionString))
         {
             healthChecks.AddNpgSql(
@@ -24,7 +24,7 @@ public static class HostingExtensions
                 timeout: TimeSpan.FromSeconds(3));
         }
 
-        var readDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.ReadDbSectionName);
+        string? readDbConnectionString = builder.Configuration.GetConnectionString(DependencyInjection.ReadDbSectionName);
         if (!string.IsNullOrEmpty(readDbConnectionString)
             && !string.Equals(readDbConnectionString, writeDbConnectionString, StringComparison.Ordinal))
         {

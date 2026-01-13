@@ -43,7 +43,7 @@ internal class TokenProvider : ITokenProvider
             claims.Add(CoursePlatformClaims.CreateRoleClaim(role.Name.Value));
         }
 
-        foreach (var permission in effectivePermissions)
+        foreach (string permission in effectivePermissions)
         {
             claims.Add(CoursePlatformClaims.CreatePermissionClaim(permission));
         }

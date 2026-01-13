@@ -1,5 +1,5 @@
-﻿using Domain.Users;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Users.Domain.Users;
 
 namespace Users.Application.Abstractions.Data;
 

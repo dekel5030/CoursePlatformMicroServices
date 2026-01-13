@@ -50,7 +50,7 @@ internal sealed class ExchangeTokenCommandHandler : ICommandHandler<ExchangeToke
 
         IEnumerable<string> effectivePermissions = _permissionResolver.ResolveEffectivePermissions(user);
 
-        var token = _tokenProvider.GenerateToken(user, effectivePermissions, _externalUserContext.ExpiryUtc);
+        string token = _tokenProvider.GenerateToken(user, effectivePermissions, _externalUserContext.ExpiryUtc);
 
         await _cacheService.SetAsync(
             AuthCacheKeys.UserInternalJwt(externalId.ProviderId),

@@ -1,7 +1,7 @@
-using Domain.Users;
-using Domain.Users.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Users.Domain.Users;
+using Users.Domain.Users.Primitives;
 
 namespace Users.Infrastructure;
 

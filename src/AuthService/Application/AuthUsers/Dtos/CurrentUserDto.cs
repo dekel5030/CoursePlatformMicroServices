@@ -8,4 +8,3 @@ public record CurrentUserDto(
     string? LastName = null,
     string? AvatarUrl = null
 );
-

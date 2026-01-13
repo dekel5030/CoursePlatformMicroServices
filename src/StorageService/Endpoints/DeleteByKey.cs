@@ -11,7 +11,7 @@ internal sealed class DeleteByKey : IEndpoint
             string key,
             IStorageProvider storage) =>
         {
-            var deleted = await storage.DeleteFileAsync(key);
+            bool deleted = await storage.DeleteFileAsync(key);
             return deleted ? Results.NoContent() : Results.NotFound();
         });
     }

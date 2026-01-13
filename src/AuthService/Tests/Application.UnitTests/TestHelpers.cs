@@ -7,7 +7,7 @@ namespace Auth.Application.UnitTests;
 /// <summary>
 /// Helper methods for unit tests
 /// </summary>
-public static class TestHelpers
+internal static class TestHelpers
 {
     /// <summary>
     /// Creates a mock DbSet from a list of entities using MockQueryable for EF Core async support

@@ -41,7 +41,7 @@ internal static class MassTransitExtensions
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                var connectionString = configuration.GetConnectionString(DependencyInjection.RabbitMqSectionName)
+                string connectionString = configuration.GetConnectionString(DependencyInjection.RabbitMqSectionName)
                     ?? throw new InvalidOperationException("RabbitMQ connection string not found");
 
                 busConfig.Host(new Uri(connectionString), h => { });

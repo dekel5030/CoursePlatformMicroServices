@@ -68,7 +68,7 @@ public sealed class Mediator : IMediator
         //IEnumerable<object?> handlers = scope.ServiceProvider.GetServices(handlerType);
         IEnumerable<object?> handlers = _serviceProvider.GetServices(handlerType);
 
-        foreach (var handler in handlers)
+        foreach (object? handler in handlers)
         {
             if (handler is null)
             {
@@ -91,7 +91,7 @@ public sealed class Mediator : IMediator
                 domainEventType,
                 et => typeof(HandlerWrapper<>).MakeGenericType(et));
 
-            var instance = Activator.CreateInstance(wrapperType, handler)
+            object? instance = Activator.CreateInstance(wrapperType, handler)
                       ?? throw new InvalidOperationException(
                           $"Could not create wrapper '{wrapperType.FullName}' for handler '{handler.GetType().FullName}'.");
 

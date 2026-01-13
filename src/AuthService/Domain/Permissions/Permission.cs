@@ -76,11 +76,11 @@ public record Permission
             return false;
         }
 
-        var actionMatches = Action == ActionType.Wildcard || Action == other.Action;
+        bool actionMatches = Action == ActionType.Wildcard || Action == other.Action;
 
-        var resourceMatches = Resource == ResourceType.Wildcard || Resource == other.Resource;
+        bool resourceMatches = Resource == ResourceType.Wildcard || Resource == other.Resource;
 
-        var idMatches = ResourceId.IsWildcard || ResourceId.Value == other.ResourceId.Value;
+        bool idMatches = ResourceId.IsWildcard || ResourceId.Value == other.ResourceId.Value;
 
         return actionMatches && resourceMatches && idMatches;
     }

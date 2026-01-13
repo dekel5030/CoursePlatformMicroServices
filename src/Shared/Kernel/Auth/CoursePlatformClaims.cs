@@ -38,7 +38,7 @@ public static class CoursePlatformClaims
 
     public static Guid? GetUserId(this ClaimsPrincipal user)
     {
-        var value = user.FindFirst(UserId)?.Value;
+        string? value = user.FindFirst(UserId)?.Value;
         return Guid.TryParse(value, out Guid id) ? id : null;
     }
 

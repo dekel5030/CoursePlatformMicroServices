@@ -62,7 +62,7 @@ internal sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavio
             .First(m => m.Name == nameof(Result.Failure) && m.IsGenericMethod)
             .MakeGenericMethod(resultValueType);
 
-        var result = failureMethod.Invoke(null, new object[] { validationError });
+        object? result = failureMethod.Invoke(null, new object[] { validationError });
 
         return (TResponse)result!;
     }

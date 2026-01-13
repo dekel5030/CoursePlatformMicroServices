@@ -1,10 +1,10 @@
 ﻿using CoursePlatform.Contracts.AuthEvents;
-using Domain.Users;
-using Domain.Users.Primitives;
 using Kernel;
 using Kernel.EventBus;
 using Microsoft.EntityFrameworkCore;
 using Users.Application.Abstractions.Data;
+using Users.Domain.Users;
+using Users.Domain.Users.Primitives;
 
 namespace Users.Application.Users.Events;
 

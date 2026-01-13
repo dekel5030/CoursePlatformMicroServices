@@ -1,5 +1,4 @@
-﻿using Auth.Infrastructure.MassTransit;
-using Kernel.EventBus;
+﻿using Kernel.EventBus;
 using MassTransit;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
@@ -19,7 +18,7 @@ internal static class MassTransitExtensions
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                var connectionString = configuration.GetConnectionString(SectionName)
+                string connectionString = configuration.GetConnectionString(SectionName)
                     ?? throw new InvalidOperationException("RabbitMQ connection string not found");
 
                 busConfig.Host(new Uri(connectionString), h =>

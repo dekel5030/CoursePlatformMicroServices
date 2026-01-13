@@ -43,5 +43,9 @@ app.MapEndpoints();
 await app.RunAsync();
 
 #pragma warning disable CA1515 // Consider making public types internal
+#pragma warning disable ASP0027 // Unnecessary public Program class declaration
+#pragma warning disable S1118 // Utility classes should not have public constructors
 public partial class Program { }
+#pragma warning restore S1118 // Utility classes should not have public constructors
+#pragma warning restore ASP0027 // Unnecessary public Program class declaration
 #pragma warning restore CA1515 // Consider making public types internal

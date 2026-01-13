@@ -19,12 +19,8 @@ internal sealed class SingleValueObjectJsonConverterFactory : JsonConverterFacto
     {
         Type valueType = GetInnerValueType(typeToConvert)!;
 
-        ConstructorInfo? ctor = typeToConvert.GetConstructor(new[] { valueType });
-        if (ctor == null)
-        {
-            throw new InvalidOperationException(
+        _ = typeToConvert.GetConstructor(new[] { valueType }) ?? throw new InvalidOperationException(
                 $"Type {typeToConvert.Name} must have a constructor that accepts {valueType.Name}");
-        }
 
         Type converterType = typeof(SingleValueObjectJsonConverter<,>).MakeGenericType(typeToConvert, valueType);
         return (JsonConverter)Activator.CreateInstance(converterType)!;

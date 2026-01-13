@@ -20,7 +20,7 @@ internal sealed class AuthHttpClient : IAuthClient
 
     public async Task<string?> GetInternalToken(string idpToken, CancellationToken cancellationToken = default)
     {
-        var path = $"auth/exchange-token";
+        string path = $"auth/exchange-token";
 
         try
         {

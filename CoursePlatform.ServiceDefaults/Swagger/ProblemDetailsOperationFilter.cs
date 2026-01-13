@@ -22,7 +22,7 @@ public sealed class ProblemDetailsOperationFilter(string securitySchemeId) : IOp
         IEnumerable<IAuthorizeData> authMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata
             .OfType<Microsoft.AspNetCore.Authorization.IAuthorizeData>();
 
-        var allowAnonymous = context.ApiDescription.ActionDescriptor.EndpointMetadata
+        bool allowAnonymous = context.ApiDescription.ActionDescriptor.EndpointMetadata
             .Any(m => m is Microsoft.AspNetCore.Authorization.IAllowAnonymous);
 
         if (authMetadata.Any() && !allowAnonymous)
@@ -50,7 +50,7 @@ public sealed class ProblemDetailsOperationFilter(string securitySchemeId) : IOp
             return;
         }
 
-        var code = statusCode.ToString(CultureInfo.InvariantCulture);
+        string code = statusCode.ToString(CultureInfo.InvariantCulture);
 
         if (!operation.Responses.ContainsKey(code))
         {

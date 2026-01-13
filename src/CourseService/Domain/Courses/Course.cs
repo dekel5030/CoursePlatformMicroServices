@@ -161,7 +161,7 @@ public class Course : Entity<CourseId>
         Description? description,
         TimeProvider timeProvider)
     {
-        var index = _lessons.Count;
+        int index = _lessons.Count;
 
         Result<Lesson> lessonResult = Lesson.Create(title, description, index);
 

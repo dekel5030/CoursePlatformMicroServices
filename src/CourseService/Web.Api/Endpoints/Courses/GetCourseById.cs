@@ -1,4 +1,4 @@
-﻿using CoursePlatform.ServiceDefaults.CustomResults;
+using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Contracts.Courses;
 using Courses.Api.Extensions;
@@ -17,6 +17,8 @@ internal sealed class GetCourseById : IEndpoint
         app.MapGet("courses/{id:Guid}", async (
             Guid id,
             IMediator mediator,
+            HttpContext context,
+            LinkGenerator linkGenerator,
             CancellationToken cancellationToken) =>
         {
             var query = new GetCourseByIdQuery(new CourseId(id));
@@ -33,3 +35,44 @@ internal sealed class GetCourseById : IEndpoint
             summary: "Gets a course by its ID.");
     }
 }
+
+internal sealed record LinkDto
+{
+    public required string Href { get; init; }
+    public required string Rel { get; init; }
+    public required string Method { get; set; }
+}
+
+internal sealed class LinkService
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly LinkGenerator _linkGenerator;
+
+    public LinkService(IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator)
+    {
+        _httpContextAccessor = httpContextAccessor;
+        _linkGenerator = linkGenerator;
+    }
+
+    public LinkDto Create(string endpointName, string rel, string method, object? values = null)
+    {
+        HttpContext httpContext = _httpContextAccessor.HttpContext
+            ?? throw new InvalidOperationException("HTTP context is not available.");
+
+        string? href = _linkGenerator.GetUriByName(
+            httpContext,
+            endpointName,
+            values);
+
+        return new LinkDto
+        {
+            Href = href ?? throw new InvalidOperationException($"Could not generate URL for endpoint '{endpointName}'."),
+            Rel = rel,
+            Method = method
+        };
+    }
+}
+//internal static class LinkServiceExtensions
+//{
+
+//}
