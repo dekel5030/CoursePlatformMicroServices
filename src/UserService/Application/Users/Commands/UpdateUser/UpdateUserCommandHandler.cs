@@ -32,8 +32,8 @@ public class UpdateUserCommandHandler(IWriteDbContext dbContext, ICurrentUserCon
 
         FullName currentFullName = user.FullName ?? new FullName(string.Empty, string.Empty);
 
-        var firstName = request.FirstName ?? currentFullName.FirstName;
-        var lastName = request.LastName ?? currentFullName.LastName;
+        string firstName = request.FirstName ?? currentFullName.FirstName;
+        string lastName = request.LastName ?? currentFullName.LastName;
 
         var updatedFullName = new FullName(firstName, lastName);
 

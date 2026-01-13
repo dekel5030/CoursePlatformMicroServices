@@ -29,14 +29,14 @@ internal sealed class UserEnrichmentMiddleware : IMiddleware
             return;
         }
 
-        var identityUserId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        string identityUserId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(identityUserId))
         {
             await next(context);
             return;
         }
 
-        var internalToken = await _exchangeTasks.GetOrAdd(identityUserId, (key) =>
+        string internalToken = await _exchangeTasks.GetOrAdd(identityUserId, (key) =>
             GetOrExchangeInternalTokenWithCleanupAsync(context, key));
 
         if (string.IsNullOrEmpty(internalToken))
@@ -64,21 +64,21 @@ internal sealed class UserEnrichmentMiddleware : IMiddleware
 
     private async Task<string?> GetOrExchangeInternalTokenAsync(HttpContext context, string identityUserId)
     {
-        var cachedToken = await _cacheService.GetAsync<string>(AuthCacheKeys.UserInternalJwt(identityUserId));
+        string cachedToken = await _cacheService.GetAsync<string>(AuthCacheKeys.UserInternalJwt(identityUserId));
         if (!string.IsNullOrEmpty(cachedToken))
         {
             _logger.LogInformation("Cache hit for user {UserId}", identityUserId);
             return cachedToken;
         }
 
-        var keycloakToken = context.Request.Headers.Authorization.ToString().Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
+        string keycloakToken = context.Request.Headers.Authorization.ToString().Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
         if (string.IsNullOrEmpty(keycloakToken))
         {
             return null;
         }
 
         _logger.LogInformation("Cache miss - Fetching internal token for user {UserId}", identityUserId);
-        var internalToken = await _authClient.GetInternalToken(keycloakToken);
+        string internalToken = await _authClient.GetInternalToken(keycloakToken);
 
         return internalToken;
     }

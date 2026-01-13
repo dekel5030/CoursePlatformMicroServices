@@ -7,7 +7,7 @@ using Users.Domain.Users;
 
 namespace Users.Application.Users.Queries.GetUsers;
 
-public class GetUsersQueryHandler(IReadDbContext DbContext) : IQueryHandler<GetUsersQuery, CollectionDto<UserReadDto>>
+public class GetUsersQueryHandler(IReadDbContext dbContext) : IQueryHandler<GetUsersQuery, CollectionDto<UserReadDto>>
 {
     public async Task<Result<CollectionDto<UserReadDto>>> Handle(
         GetUsersQuery request,
@@ -19,9 +19,9 @@ public class GetUsersQueryHandler(IReadDbContext DbContext) : IQueryHandler<GetU
                 Error.Validation("Users.InvalidPagination", "PageNumber and PageSize must be greater than 0."));
         }
 
-        IQueryable<User> query = DbContext.Users.AsNoTracking();
+        IQueryable<User> query = dbContext.Users.AsNoTracking();
 
-        var totalCount = await query.CountAsync(cancellationToken);
+        int totalCount = await query.CountAsync(cancellationToken);
 
         List<UserReadDto> items = await query
             .OrderBy(u => u.Id)

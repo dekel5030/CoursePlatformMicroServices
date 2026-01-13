@@ -17,12 +17,12 @@ internal sealed class StorageUrlResolver : IStorageUrlResolver
         string relativePath, 
         CancellationToken cancellationToken = default)
     {
-        if (!_options.BucketMapping.TryGetValue(category, out var bucketName))
+        if (!_options.BucketMapping.TryGetValue(category, out string bucketName))
         {
             throw new InvalidOperationException($"No bucket mapped for category: {category}");
         }
 
-        var urlString = $"{_options.BaseUrl.TrimEnd('/')}/{bucketName}/{relativePath.TrimStart('/')}";
+        string urlString = $"{_options.BaseUrl.TrimEnd('/')}/{bucketName}/{relativePath.TrimStart('/')}";
         var uri = new Uri(urlString);
 
         var resolvedUrl = new ResolvedUrl(

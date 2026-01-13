@@ -12,7 +12,7 @@ internal static class DatabaseExtensions
     {
         services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
-            var connectionString = configuration.GetConnectionString(DependencyInjection.WriteDbSectionName)
+            string connectionString = configuration.GetConnectionString(DependencyInjection.WriteDbSectionName)
                 ?? throw new InvalidOperationException("Database connection string not found");
 
             options
@@ -26,7 +26,7 @@ internal static class DatabaseExtensions
 
         services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
         {
-            var connectionString = configuration.GetConnectionString(DependencyInjection.ReadDbSectionName)
+            string connectionString = configuration.GetConnectionString(DependencyInjection.ReadDbSectionName)
                 ?? throw new InvalidOperationException("Database connection string not found");
 
             options

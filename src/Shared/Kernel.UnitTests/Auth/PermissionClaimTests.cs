@@ -94,10 +94,10 @@ public class PermissionClaimTests
     public void TryParse_ShouldReturnTrue_ForValidClaimValue()
     {
         // Arrange
-        var claimValue = "allow:read:course:123";
+        string claimValue = "allow:read:course:123";
 
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out Claim? claim);
+        bool result = PermissionClaim.TryParse(claimValue, out Claim? claim);
 
         // Assert
         result.Should().BeTrue();
@@ -113,7 +113,7 @@ public class PermissionClaimTests
     public void TryParse_ShouldHandleWildcards(string claimValue)
     {
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out Claim? claim);
+        bool result = PermissionClaim.TryParse(claimValue, out Claim? claim);
 
         // Assert
         result.Should().BeTrue();
@@ -130,7 +130,7 @@ public class PermissionClaimTests
     public void TryParse_ShouldHandleVariousWildcardCombinations(string claimValue)
     {
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out Claim? claim);
+        bool result = PermissionClaim.TryParse(claimValue, out Claim? claim);
 
         // Assert
         result.Should().BeTrue();
@@ -141,10 +141,10 @@ public class PermissionClaimTests
     public void TryParse_ShouldReturnFalse_OnInvalidSegmentCount()
     {
         // Arrange
-        var claimValue = "allow:read:course"; // Missing ID segment entirely
+        string claimValue = "allow:read:course"; // Missing ID segment entirely
 
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out Claim? claim);
+        bool result = PermissionClaim.TryParse(claimValue, out Claim? claim);
 
         // Assert
         result.Should().BeFalse();
@@ -155,11 +155,11 @@ public class PermissionClaimTests
     public void TryParse_ShouldReturnFalse_OnTooManySegments()
     {
         // Arrange
-        var claimValue = "allow:read:course:123:extra";
+        string claimValue = "allow:read:course:123:extra";
 
 
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out _);
+        bool result = PermissionClaim.TryParse(claimValue, out _);
 
         // Assert
         result.Should().BeFalse();
@@ -172,7 +172,7 @@ public class PermissionClaimTests
     public void TryParse_ShouldReturnFalse_OnInvalidEnums(string claimValue)
     {
         // Act
-        var result = PermissionClaim.TryParse(claimValue, out _);
+        bool result = PermissionClaim.TryParse(claimValue, out _);
 
         // Assert
         result.Should().BeFalse();
@@ -182,7 +182,7 @@ public class PermissionClaimTests
     public void TryParse_ShouldReturnFalse_ForNullInput()
     {
         // Act
-        var result = PermissionClaim.TryParse(null!, out _);
+        bool result = PermissionClaim.TryParse(null!, out _);
 
         // Assert
         result.Should().BeFalse();

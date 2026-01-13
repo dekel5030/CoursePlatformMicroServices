@@ -9,7 +9,7 @@ IResourceBuilder<RabbitMQServerResource> rabbitMq = builder
     .WithManagementPlugin(15672)
     .WithDataVolume();
 
-var garageConfigPath = Path.Combine(builder.AppHostDirectory, "garage.toml");
+string garageConfigPath = Path.Combine(builder.AppHostDirectory, "garage.toml");
 IResourceBuilder<ContainerResource> garage = builder.AddContainer("garage", "dxflrs/garage", "v2.1.0")
     .WithBindMount(garageConfigPath, "/etc/garage.toml")
     .WithBindMount(@"C:\AspireVolumes\Garage\meta", "/var/lib/garage/meta")

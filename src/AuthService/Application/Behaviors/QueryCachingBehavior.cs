@@ -41,7 +41,7 @@ internal sealed class QueryCachingBehavior<TRequest, TResponse>
 
         if (result.IsSuccess)
         {
-            var cacheKey = request.CacheKey;
+            string cacheKey = request.CacheKey;
 
             await _cacheService.SetAsync(
                 cacheKey,

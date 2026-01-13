@@ -87,7 +87,7 @@ csharp_style_namespace_declarations = file_scoped:warning
 
 # var preferences
 csharp_style_var_elsewhere = false:warning
-csharp_style_var_for_built_in_types = true:warning
+csharp_style_var_for_built_in_types = false:warning
 csharp_style_var_when_type_is_apparent = true:warning
 
 # Expression-bodied members
@@ -401,7 +401,7 @@ dotnet_diagnostic.CS9107.severity = none
 dotnet_diagnostic.IDE0005.severity = none
 
 # IDE0008: Use explicit type
-dotnet_diagnostic.IDE0008.severity = none
+# Disabled dotnet_diagnostic.IDE0008.severity = none
 
 # IDE0046: Convert to conditional expression
 dotnet_diagnostic.IDE0046.severity = none

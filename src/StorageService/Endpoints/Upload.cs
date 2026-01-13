@@ -26,8 +26,8 @@ internal sealed class Upload : IEndpoint
                 return Results.BadRequest("No file content.");
             }
 
-            var contentType = request.ContentType ?? "application/octet-stream";
-            var contentLength = request.ContentLength ?? throw new ArgumentException("Content-Length is required");
+            string contentType = request.ContentType ?? "application/octet-stream";
+            long contentLength = request.ContentLength ?? throw new ArgumentException("Content-Length is required");
 
             Result<string> fileResult = await storage.UploadObjectAsync(
                 request.Body,

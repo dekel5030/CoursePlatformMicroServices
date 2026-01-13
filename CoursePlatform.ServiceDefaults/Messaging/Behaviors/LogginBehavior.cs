@@ -24,9 +24,9 @@ internal sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<T
         RequestHandlerDelegate<TResponse> nextHandler,
         CancellationToken cancellationToken)
     {
-        var requestName = typeof(TRequest).Name;
-        var userIdRaw = _userContext.Id.ToString();
-        var userId = string.IsNullOrEmpty(userIdRaw) ? "Anonymous" : userIdRaw;
+        string requestName = typeof(TRequest).Name;
+        string userIdRaw = _userContext.Id.ToString();
+        string userId = string.IsNullOrEmpty(userIdRaw) ? "Anonymous" : userIdRaw;
 
         using (_logger.BeginScope(new Dictionary<string, object>
         {

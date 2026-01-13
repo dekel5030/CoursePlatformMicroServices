@@ -27,7 +27,7 @@ internal sealed class S3StorageProvider : IStorageProvider
             Expires = DateTime.UtcNow.Add(expiry)
         };
 
-        var url = _s3Client.GetPreSignedURL(request);
+        string url = _s3Client.GetPreSignedURL(request);
 
         if (!string.IsNullOrEmpty(_options.PublicUrl))
         {
@@ -50,7 +50,7 @@ internal sealed class S3StorageProvider : IStorageProvider
         long contentLength,
         string bucket)
     {
-        var tempFilePath = Path.GetRandomFileName();
+        string tempFilePath = Path.GetRandomFileName();
 
         try
         {

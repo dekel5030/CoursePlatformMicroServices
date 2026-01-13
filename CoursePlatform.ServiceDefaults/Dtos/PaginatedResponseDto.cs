@@ -2,7 +2,7 @@
 //using System.Collections.Generic;
 //using System.Text;
 
-namespace CoursePlatform.ServiceDefaults.Dtos;
+//namespace CoursePlatform.ServiceDefaults.Dtos;
 
 //public interface ICollectionResponse<T>
 //{
@@ -38,13 +38,4 @@ namespace CoursePlatform.ServiceDefaults.Dtos;
 //            TotalCount = totalCount
 //        };
 //    }
-//}
-public class User(string name, int age)
-{
-    public string Name => name;
-    public int Age => age;
-}
-
-//public class Admin : User
-//{
 //}

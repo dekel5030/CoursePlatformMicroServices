@@ -25,12 +25,12 @@ public class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, PagedRespon
         GetCoursesQuery request,
         CancellationToken cancellationToken = default)
     {
-        var pageNumber = Math.Max(1, request.PagedQuery.PageNumber ?? 1);
-        var pageSize = Math.Clamp(request.PagedQuery.PageSize ?? 10, 1, 100);
+        int pageNumber = Math.Max(1, request.PagedQuery.PageNumber ?? 1);
+        int pageSize = Math.Clamp(request.PagedQuery.PageSize ?? 10, 1, 100);
 
         DbSet<Course> baseQuery = _dbContext.Courses;
 
-        var totalItems = await baseQuery.CountAsync(cancellationToken);
+        int totalItems = await baseQuery.CountAsync(cancellationToken);
 
         List<Course> courses = await _dbContext.Courses
             .OrderByDescending(c => c.UpdatedAtUtc)

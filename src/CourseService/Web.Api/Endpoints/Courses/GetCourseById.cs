@@ -17,6 +17,8 @@ internal sealed class GetCourseById : IEndpoint
         app.MapGet("courses/{id:Guid}", async (
             Guid id,
             IMediator mediator,
+            HttpContext context,
+            LinkGenerator linkGenerator,
             CancellationToken cancellationToken) =>
         {
             var query = new GetCourseByIdQuery(new CourseId(id));
@@ -31,5 +33,41 @@ internal sealed class GetCourseById : IEndpoint
             nameof(GetCourseById),
             tag: Tags.Courses,
             summary: "Gets a course by its ID.");
+    }
+}
+
+public sealed record LinkDto
+{
+    public required string Url { get; init; }
+    public required string Rel { get; init; }
+    public required string Method { get; set; }
+}
+
+public sealed class LinkService 
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly LinkGenerator _linkGenerator;
+
+    public LinkService(IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator)
+    {
+        _httpContextAccessor = httpContextAccessor;
+        _linkGenerator = linkGenerator;
+    }
+
+    public LinkDto Create(string endpointName, string rel, string method, object? values = null)
+    {
+        HttpContext httpContext = _httpContextAccessor.HttpContext 
+            ?? throw new InvalidOperationException("HTTP context is not available.");
+        string? url = _linkGenerator.GetUriByName(
+            httpContext,
+            endpointName,
+            values);
+
+        return new LinkDto
+        {
+            Url = url ?? throw new InvalidOperationException($"Could not generate URL for endpoint '{endpointName}'."),
+            Rel = rel,
+            Method = method
+        };
     }
 }

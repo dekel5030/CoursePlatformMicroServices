@@ -18,7 +18,7 @@ internal sealed class RedisCache : ICacheService
 
     public async Task<T?> GetAsync<T>(string cacheKey, CancellationToken cancellationToken = default)
     {
-        var cachedValue = await _distributedCache.GetStringAsync(cacheKey, cancellationToken);
+        string cachedValue = await _distributedCache.GetStringAsync(cacheKey, cancellationToken);
 
         if (string.IsNullOrEmpty(cachedValue))
         {
@@ -39,7 +39,7 @@ internal sealed class RedisCache : ICacheService
             AbsoluteExpirationRelativeToNow = expiration ?? TimeSpan.FromMinutes(5)
         };
 
-        var serializedData = JsonSerializer.SerializeToUtf8Bytes(result, _serializerOptions);
+        byte[] serializedData = JsonSerializer.SerializeToUtf8Bytes(result, _serializerOptions);
 
         await _distributedCache.SetAsync(cacheKey, serializedData, options, cancellationToken);
     }

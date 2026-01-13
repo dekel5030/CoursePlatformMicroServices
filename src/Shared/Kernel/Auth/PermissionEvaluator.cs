@@ -41,7 +41,7 @@ public static class PermissionEvaluator
 
         foreach ((ActionType checkAction, ResourceType checkResource, ResourceId? checkResourceId) in patternsToCheck)
         {
-            var claimValue = PermissionClaim.ToClaimValue(effect, checkAction, checkResource, checkResourceId);
+            string claimValue = PermissionClaim.ToClaimValue(effect, checkAction, checkResource, checkResourceId);
 
             if (user.HasClaim(CoursePlatformClaims.Permission, claimValue))
             {

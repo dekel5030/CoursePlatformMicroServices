@@ -43,7 +43,7 @@ internal static class MassTransitExtensions
 
             config.UsingRabbitMq((context, busConfig) =>
             {
-                var connectionString = configuration
+                string connectionString = configuration
                     .GetConnectionString(DependencyInjection.RabbitMqConnectionSection)!;
 
                 busConfig.Host(new Uri(connectionString!), h => { });

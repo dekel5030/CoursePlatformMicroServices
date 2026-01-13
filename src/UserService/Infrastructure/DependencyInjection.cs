@@ -49,7 +49,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<ReadDbContext>((serviceProvider, options) =>
         {
-            var connectionString = configuration.GetConnectionString(ReadDatabaseConnectionStringName)!;
+            string connectionString = configuration.GetConnectionString(ReadDatabaseConnectionStringName)!;
 
             options.UseNpgsql(connectionString);
         });
@@ -63,7 +63,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<WriteDbContext>((serviceProvider, options) =>
         {
-            var connectionString = configuration.GetConnectionString(WriteDatabaseConnectionStringName)!;
+            string connectionString = configuration.GetConnectionString(WriteDatabaseConnectionStringName)!;
 
             options.UseNpgsql(connectionString);
         });
