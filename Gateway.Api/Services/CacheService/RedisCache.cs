@@ -18,7 +18,7 @@ internal sealed class RedisCache : ICacheService
 
     public async Task<T?> GetAsync<T>(string cacheKey, CancellationToken cancellationToken = default)
     {
-        string cachedValue = await _distributedCache.GetStringAsync(cacheKey, cancellationToken);
+        string? cachedValue = await _distributedCache.GetStringAsync(cacheKey, cancellationToken);
 
         if (string.IsNullOrEmpty(cachedValue))
         {

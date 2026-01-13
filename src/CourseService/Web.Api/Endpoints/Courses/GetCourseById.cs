@@ -1,4 +1,4 @@
-﻿using CoursePlatform.ServiceDefaults.CustomResults;
+using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Contracts.Courses;
 using Courses.Api.Extensions;
@@ -36,14 +36,14 @@ internal sealed class GetCourseById : IEndpoint
     }
 }
 
-public sealed record LinkDto
+internal sealed record LinkDto
 {
-    public required string Url { get; init; }
+    public required string Href { get; init; }
     public required string Rel { get; init; }
     public required string Method { get; set; }
 }
 
-public sealed class LinkService 
+internal sealed class LinkService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly LinkGenerator _linkGenerator;
@@ -56,18 +56,23 @@ public sealed class LinkService
 
     public LinkDto Create(string endpointName, string rel, string method, object? values = null)
     {
-        HttpContext httpContext = _httpContextAccessor.HttpContext 
+        HttpContext httpContext = _httpContextAccessor.HttpContext
             ?? throw new InvalidOperationException("HTTP context is not available.");
-        string? url = _linkGenerator.GetUriByName(
+
+        string? href = _linkGenerator.GetUriByName(
             httpContext,
             endpointName,
             values);
 
         return new LinkDto
         {
-            Url = url ?? throw new InvalidOperationException($"Could not generate URL for endpoint '{endpointName}'."),
+            Href = href ?? throw new InvalidOperationException($"Could not generate URL for endpoint '{endpointName}'."),
             Rel = rel,
             Method = method
         };
     }
 }
+//internal static class LinkServiceExtensions
+//{
+
+//}

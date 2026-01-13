@@ -25,20 +25,12 @@ public class PermissionResolver : IPermissionResolver
     private static List<Permission> ApplyDenyOverrides(List<Permission> source)
     {
         var denyPermissions = source.Where(p => p.Effect == EffectType.Deny).ToList();
-        var allowPermissions = source.Where(p => p.Effect == EffectType.Allow).ToHashSet();
 
-        foreach (Permission? denyPerm in denyPermissions)
-        {
-            foreach (Permission? allowPerm in allowPermissions.ToList())
-            {
-                if (PermissionWiderThan(denyPerm, allowPerm))
-                {
-                    allowPermissions.Remove(allowPerm);
-                }
-            }
-        }
+        var filteredAllowPermissions = source
+            .Where(p => p.Effect == EffectType.Allow)
+            .Where(allow => !denyPermissions.Any(deny => PermissionWiderThan(deny, allow)));
 
-        return denyPermissions.Concat(allowPermissions).ToList();
+        return denyPermissions.Concat(filteredAllowPermissions).ToList();
     }
 
     private static List<Permission> FlattenHierarchy(List<Permission> source)

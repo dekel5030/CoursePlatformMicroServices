@@ -17,7 +17,7 @@ internal sealed class StorageUrlResolver : IStorageUrlResolver
         string relativePath, 
         CancellationToken cancellationToken = default)
     {
-        if (!_options.BucketMapping.TryGetValue(category, out string bucketName))
+        if (!_options.BucketMapping.TryGetValue(category, out string? bucketName))
         {
             throw new InvalidOperationException($"No bucket mapped for category: {category}");
         }

@@ -19,7 +19,7 @@ namespace Auth.Infrastructure.IntegrationTests;
 /// Base class for infrastructure integration tests.
 /// Provides Testcontainers setup for PostgreSQL and RabbitMQ to test real database interactions.
 /// </summary>
-public abstract class IntegrationTestsBase : IAsyncLifetime
+internal abstract class IntegrationTestsBase : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgres;
     private readonly RabbitMqContainer _rabbitMq;
@@ -113,7 +113,7 @@ public abstract class IntegrationTestsBase : IAsyncLifetime
     /// <summary>
     /// Helper method to get WriteDbContext
     /// </summary>
-    protected WriteDbContext GetWriteDbContext(IServiceScope scope)
+    protected static WriteDbContext GetWriteDbContext(IServiceScope scope)
     {
         return scope.ServiceProvider.GetRequiredService<WriteDbContext>();
     }

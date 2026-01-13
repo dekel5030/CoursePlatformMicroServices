@@ -29,7 +29,7 @@ internal sealed class ExternalUserContext(IHttpContextAccessor httpContextAccess
     {
         get
         {
-            string expClaim = User?.FindFirstValue("exp");
+            string? expClaim = User?.FindFirstValue("exp");
             if (expClaim != null && long.TryParse(expClaim, out long unixExp))
             {
                 return DateTimeOffset.FromUnixTimeSeconds(unixExp).UtcDateTime;
