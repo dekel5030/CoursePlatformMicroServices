@@ -1,9 +1,9 @@
-﻿using Domain.Users;
-using Kernel;
+﻿using Kernel;
 using Kernel.Messaging.Abstractions;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Users.Application.Abstractions.Data;
+using Users.Domain.Users;
 
 namespace Users.Infrastructure.Database;
 

@@ -1,9 +1,9 @@
-﻿using Domain.Users;
-using Kernel;
+﻿using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Users.Application.Abstractions.Data;
 using Users.Application.Users.Queries.Dtos;
+using Users.Domain.Users;
 
 namespace Users.Application.Users.Queries.GetUsers;
 

@@ -1,7 +1,7 @@
 ﻿using Kernel.EventBus;
 using MassTransit;
 
-namespace Auth.Infrastructure.MassTransit;
+namespace StorageService.Masstransit;
 
 internal sealed class MassTransitEventPublisher : IEventBus
 {

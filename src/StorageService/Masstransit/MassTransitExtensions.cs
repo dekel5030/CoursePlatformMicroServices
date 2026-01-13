@@ -1,5 +1,4 @@
-﻿using Auth.Infrastructure.MassTransit;
-using Kernel.EventBus;
+﻿using Kernel.EventBus;
 using MassTransit;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 

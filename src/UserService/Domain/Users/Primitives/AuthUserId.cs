@@ -1,4 +1,4 @@
-namespace Domain.Users.Primitives;
+namespace Users.Domain.Users.Primitives;
 
 public class AuthUserId
 {

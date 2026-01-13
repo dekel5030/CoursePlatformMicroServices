@@ -1,11 +1,11 @@
-using Domain.Users;
-using Domain.Users.Errors;
-using Domain.Users.Primitives;
 using Kernel;
 using Kernel.Auth.AuthTypes;
 using Kernel.Messaging.Abstractions;
 using Users.Application.Abstractions.Context;
 using Users.Application.Abstractions.Data;
+using Users.Domain.Users;
+using Users.Domain.Users.Errors;
+using Users.Domain.Users.Primitives;
 
 namespace Users.Application.Users.Commands.UpdateUser;
 

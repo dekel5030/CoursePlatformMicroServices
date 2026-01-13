@@ -1,5 +1,5 @@
-﻿using Domain.Users.Primitives;
-using Kernel.Messaging.Abstractions;
+﻿using Kernel.Messaging.Abstractions;
+using Users.Domain.Users.Primitives;
 
 namespace Users.Application.Users.Commands.CreateUser;
 

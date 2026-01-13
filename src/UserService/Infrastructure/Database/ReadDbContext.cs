@@ -1,6 +1,6 @@
-﻿using Domain.Users;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Users.Application.Abstractions.Data;
+using Users.Domain.Users;
 
 namespace Users.Infrastructure.Database;
 

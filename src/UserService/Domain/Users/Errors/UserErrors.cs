@@ -1,6 +1,6 @@
 ﻿using Kernel;
 
-namespace Domain.Users.Errors;
+namespace Users.Domain.Users.Errors;
 
 public static class UserErrors
 {

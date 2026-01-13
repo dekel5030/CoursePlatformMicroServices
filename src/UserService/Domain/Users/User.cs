@@ -1,8 +1,8 @@
-using Domain.Users.Events;
-using Domain.Users.Primitives;
 using Kernel;
+using Users.Domain.Users.Events;
+using Users.Domain.Users.Primitives;
 
-namespace Domain.Users;
+namespace Users.Domain.Users;
 
 public class User : Entity
 {
