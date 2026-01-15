@@ -1,6 +1,5 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Courses.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Domain.Courses;

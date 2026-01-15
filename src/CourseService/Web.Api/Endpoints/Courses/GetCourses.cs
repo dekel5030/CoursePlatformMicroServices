@@ -23,49 +23,16 @@ internal sealed class GetCourses : IEndpoint
             HttpContext context,
             CancellationToken cancellationToken) =>
         {
-            bool includeLinks = context.Items[MediaTypes.IncludeLinks] as bool? ?? false;
-
             var query = new GetCoursesQuery(pagedQuery);
-            Result<PagedResponseDto<CourseSummaryDto>> result = await mediator.Send(query, cancellationToken);
+            Result<CourseCollectionDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
-                dto => Results.Ok(dto.ToApiContract(linksProvider, pagedQuery, includeLinks)),
+                dto => Results.Ok(dto.ToApiContract(linksProvider, pagedQuery)),
                 CustomResults.Problem);
         })
-        .AddEndpointFilter<HateoasFilter>()
         .WithMetadata<PagedResponse<CourseSummaryResponse>>(
             nameof(GetCourses),
             tag: Tags.Courses,
             summary: "Gets a paginated list of courses.");
-    }
-}
-
-internal static class MediaTypes
-{
-    public const string IncludeLinks = "IncludeLinks";
-    internal static class Application
-    {
-        public const string HateoasJson = "application/vnd.courseplatform.hateoas+json";
-    }
-}
-
-internal sealed class HateoasFilter : IEndpointFilter
-{
-    public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
-    {
-        string acceptHeader = context.HttpContext.Request.Headers.Accept.ToString();
-
-        bool prefersHateoas = acceptHeader.Contains(MediaTypes.Application.HateoasJson, StringComparison.OrdinalIgnoreCase);
-
-        context.HttpContext.Items[MediaTypes.IncludeLinks] = prefersHateoas;
-
-        object? result = await next(context);
-
-        if (prefersHateoas && result is IResult)
-        {
-            context.HttpContext.Response.ContentType = MediaTypes.Application.HateoasJson;
-        }
-
-        return result;
     }
 }

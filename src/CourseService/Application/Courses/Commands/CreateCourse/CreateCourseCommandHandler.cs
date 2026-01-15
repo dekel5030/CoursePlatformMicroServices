@@ -7,7 +7,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Commands.CreateCourse;
 
-internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand, CreateCourseResponse>
+internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand, CreateCourseDto>
 {
     private readonly ICourseRepository _courseRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -23,7 +23,7 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<CreateCourseResponse>> Handle(
+    public async Task<Result<CreateCourseDto>> Handle(
         CreateCourseCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -37,7 +37,7 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
 
         if (courseResult.IsFailure)
         {
-            return Result.Failure<CreateCourseResponse>(courseResult.Error);
+            return Result.Failure<CreateCourseDto>(courseResult.Error);
         }
 
         Course course = courseResult.Value;
@@ -45,7 +45,7 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
         await _courseRepository.AddAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var responseDto = new CreateCourseResponse(course.Id, course.Title.Value);
+        var responseDto = new CreateCourseDto(course.Id, course.Title.Value);
 
         return Result.Success(responseDto);
     }

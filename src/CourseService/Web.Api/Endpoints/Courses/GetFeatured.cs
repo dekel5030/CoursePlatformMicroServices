@@ -21,11 +21,11 @@ internal sealed class GetFeatured : IEndpoint
             LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
-            Result<PagedResponseDto<CourseSummaryDto>> result = await mediator
-                .Send(new GetFeaturedQuery(), cancellationToken);
+            var query = new GetFeaturedQuery();
+            Result<CourseCollectionDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
-                dto => Results.Ok(dto.ToApiContract(linkProvider, new PagedQueryDto(), true)),
+                dto => Results.Ok(dto.ToApiContract(linkProvider, new PagedQueryDto())),
                 CustomResults.Problem);
         })
         .WithMetadata<PagedResponse<CourseSummaryResponse>>(

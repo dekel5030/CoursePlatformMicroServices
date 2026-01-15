@@ -27,7 +27,7 @@ internal sealed class CreateCourse : IEndpoint
 
             var command = new CreateCourseCommand(title, description, request.InstructorId);
 
-            Result<CreateCourseResponse> result = await mediator.Send(command, cancellationToken);
+            Result<CreateCourseDto> result = await mediator.Send(command, cancellationToken);
 
             return result.Match(
                 response => Results.CreatedAtRoute(

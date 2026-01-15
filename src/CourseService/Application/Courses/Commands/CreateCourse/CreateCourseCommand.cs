@@ -7,4 +7,4 @@ public record CreateCourseCommand(
     Title? Title,
     Description? Description,
     Guid? InstructorId) 
-        : ICommand<CreateCourseResponse>;
+        : ICommand<CreateCourseDto>;
