@@ -1,7 +1,7 @@
 namespace Courses.Application.Abstractions.Storage;
 
 public record ResolvedUrl(
-    Uri Value,
+    string Value,
     StorageCategory Category,
     DateTime? ExpiresAt = null
 );

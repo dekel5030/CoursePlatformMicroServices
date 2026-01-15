@@ -10,8 +10,4 @@
     <ProjectReference Include="..\Domain\Courses.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Behaviors\" />
-  </ItemGroup>
-
 </Project>

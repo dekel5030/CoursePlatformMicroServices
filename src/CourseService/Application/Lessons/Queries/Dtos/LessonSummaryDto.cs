@@ -12,5 +12,20 @@ public record LessonSummaryDto(
     int Index,
     TimeSpan? Duration,
     bool IsPreview,
-    Uri? ThumbnailUrl
+    ImageUrl? ThumbnailUrl,
+    IReadOnlyList<LessonAction> AllowedActions
 );
+
+public sealed record LessonAction
+{
+    public string Value { get; init; }
+
+    private LessonAction(string value)
+    {
+        Value = value;
+    }
+
+    public static LessonAction Update => new("Update");
+    public static LessonAction Delete => new("Delete");
+    public static LessonAction Create => new("Create");
+}

@@ -20,7 +20,7 @@ internal sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavio
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> nextHandler,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         if (!_validators.Any())
         {

@@ -12,6 +12,6 @@ public record LessonDetailsDto(
     int Index,
     TimeSpan? Duration,
     bool IsPreview,
-    Uri? ThumbnailUrl,
-    Uri? VideoUrl
+    ImageUrl? ThumbnailUrl,
+    VideoUrl? VideoUrl
 );

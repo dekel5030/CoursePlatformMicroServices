@@ -13,6 +13,16 @@ public record CourseDetailsDto(
     string Currency,
     int EnrollmentCount,
     DateTimeOffset UpdatedAtUtc,
-    IReadOnlyList<Uri> ImageUrls,
-    IReadOnlyList<LessonSummaryDto> Lessons
+    IReadOnlyList<ImageUrl> ImageUrls,
+    IReadOnlyList<LessonSummaryDto> Lessons,
+    IReadOnlyList<CourseAction> AllowedActions
 );
+
+public sealed record CourseAction
+{
+    public string Value { get; set; }
+    private CourseAction(string value) => Value = value;
+
+    public static CourseAction Edit => new("Edit");
+    public static CourseAction Delete => new("Delete");
+}

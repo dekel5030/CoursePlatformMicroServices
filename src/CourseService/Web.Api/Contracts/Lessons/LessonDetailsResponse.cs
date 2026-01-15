@@ -1,3 +1,6 @@
+using Courses.Api.Contracts.Shared;
+using Courses.Api.Infrastructure.LinkProvider;
+
 namespace Courses.Api.Contracts.Lessons;
 
 internal sealed record LessonDetailsResponse(
@@ -9,4 +12,5 @@ internal sealed record LessonDetailsResponse(
     TimeSpan? Duration,
     bool IsPreview,
     string? ThumbnailUrl,
-    string? VideoUrl);
+    string? VideoUrl,
+    IReadOnlyCollection<LinkDto> Links) : ILinksResponse;

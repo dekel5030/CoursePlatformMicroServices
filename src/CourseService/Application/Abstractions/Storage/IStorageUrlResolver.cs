@@ -2,8 +2,7 @@ namespace Courses.Application.Abstractions.Storage;
 
 public interface IStorageUrlResolver
 {
-    Task<ResolvedUrl> ResolveAsync(
+    ResolvedUrl Resolve(
         StorageCategory category, 
-        string relativePath, 
-        CancellationToken cancellationToken = default);
+        string relativePath);
 }

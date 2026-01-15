@@ -26,8 +26,8 @@ public class Course : Entity<CourseId>
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
     public Money Price { get; private set; } = Money.Zero();
-    public IReadOnlyCollection<Lesson> Lessons => _lessons.AsReadOnly();
-    public IReadOnlyCollection<ImageUrl> Images => _images.AsReadOnly();
+    public IReadOnlyList<Lesson> Lessons => _lessons.AsReadOnly();
+    public IReadOnlyList<ImageUrl> Images => _images.AsReadOnly();
 
     #pragma warning disable CS8618
     private Course() { }

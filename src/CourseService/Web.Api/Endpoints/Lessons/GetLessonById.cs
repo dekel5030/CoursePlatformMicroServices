@@ -2,6 +2,7 @@ using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Contracts.Lessons;
 using Courses.Api.Extensions;
+using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Application.Lessons.Queries.GetById;
 using Courses.Domain.Courses.Primitives;
@@ -19,14 +20,17 @@ internal sealed class GetLessonById : IEndpoint
             Guid courseId,
             Guid lessonId,
             IMediator mediator,
+            LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetLessonByIdQuery(new CourseId(courseId), new LessonId(lessonId));
+            var courseIdObj = new CourseId(courseId);
+            var lessonIdObj = new LessonId(lessonId);
+            var query = new GetLessonByIdQuery(courseIdObj, lessonIdObj);
 
             Result<LessonDetailsDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
-                dto => Results.Ok(dto.ToApiContract()),
+                dto => Results.Ok(dto.ToApiContract(courseIdObj, linkProvider)),
                 CustomResults.Problem);
         })
         .WithMetadata<LessonDetailsResponse>(

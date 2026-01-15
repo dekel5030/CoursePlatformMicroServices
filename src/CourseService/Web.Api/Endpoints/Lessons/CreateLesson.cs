@@ -2,6 +2,7 @@ using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Contracts.Lessons;
 using Courses.Api.Extensions;
+using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Lessons.Commands.CreateLesson;
 using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Domain.Courses.Primitives;
@@ -20,13 +21,15 @@ internal sealed class CreateLesson : IEndpoint
         app.MapPost("courses/{courseid:Guid}/lessons", async (
             Guid courseid,
             CreateLessonRequest request,
-            IMediator mediator) =>
+            IMediator mediator,
+            LinkProvider linkProvider) =>
         {
             Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
             Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
+            var courseIdObj = new CourseId(courseid);
 
             var command = new CreateLessonCommand(
-                new CourseId(courseid),
+                courseIdObj,
                 title,
                 description);
 
@@ -36,7 +39,7 @@ internal sealed class CreateLesson : IEndpoint
                 lessonDto => Results.CreatedAtRoute(
                     nameof(GetLessonById),
                     new { courseId = courseid, lessonId = lessonDto.LessonId.Value },
-                    lessonDto.ToApiContract()
+                    lessonDto.ToApiContract(courseIdObj, linkProvider)
                 ),
                 CustomResults.Problem);
         })

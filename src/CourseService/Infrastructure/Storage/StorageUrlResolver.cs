@@ -12,10 +12,9 @@ internal sealed class StorageUrlResolver : IStorageUrlResolver
         _options = options.Value;
     }
 
-    public Task<ResolvedUrl> ResolveAsync(
+    public ResolvedUrl Resolve(
         StorageCategory category, 
-        string relativePath, 
-        CancellationToken cancellationToken = default)
+        string relativePath)
     {
         if (!_options.BucketMapping.TryGetValue(category, out string? bucketName))
         {
@@ -26,10 +25,10 @@ internal sealed class StorageUrlResolver : IStorageUrlResolver
         var uri = new Uri(urlString);
 
         var resolvedUrl = new ResolvedUrl(
-            Value: uri,
+            Value: uri.ToString(),
             Category: category
         );
 
-        return Task.FromResult(resolvedUrl);
+        return resolvedUrl;
     }
 }
