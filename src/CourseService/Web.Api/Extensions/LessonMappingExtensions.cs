@@ -20,7 +20,7 @@ internal static class LessonMappingExtensions
             dto.Duration,
             dto.IsPreview,
             dto.ThumbnailUrl?.ToString(),
-            linkProvider.CreateLessonLinks(courseId, dto.LessonId));
+            linkProvider.CreateLessonLinks(courseId, dto.LessonId, dto.AllowedActions));
     }
 
     public static LessonDetailsResponse ToApiContract(
@@ -38,6 +38,6 @@ internal static class LessonMappingExtensions
             dto.IsPreview,
             dto.ThumbnailUrl?.ToString(),
             dto.VideoUrl?.ToString(),
-            linkProvider.CreateLessonLinks(courseId, dto.LessonId));
+            linkProvider.CreateLessonLinks(courseId, dto.LessonId, new List<LessonAction>()));
     }
 }

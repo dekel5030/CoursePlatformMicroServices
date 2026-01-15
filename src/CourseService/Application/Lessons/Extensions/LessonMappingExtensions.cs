@@ -9,25 +9,40 @@ internal static class LessonMappingExtensions
 {
     public static async Task<LessonSummaryDto> ToSummaryDtoAsync(
         this Lesson lesson,
+#pragma warning disable IDE0060 // Remove unused parameter
         IStorageUrlResolver resolver,
+#pragma warning restore IDE0060 // Remove unused parameter
+#pragma warning disable IDE0060 // Remove unused parameter
         CancellationToken cancellationToken = default)
+#pragma warning restore IDE0060 // Remove unused parameter
     {
-        Uri? thumbnailUrl = lesson.ThumbnailImageUrl != null
-            ? (await resolver.ResolveAsync(
-                StorageCategory.Public, 
-                lesson.ThumbnailImageUrl.Path, 
-                cancellationToken)).Value
-            : null;
+        //Uri? thumbnailUrl = lesson.ThumbnailImageUrl != null
+        //    ? (await resolver.Resolve(
+        //        StorageCategory.Public, 
+        //        lesson.ThumbnailImageUrl.Path, 
+        //        cancellationToken)).Value
+        //    : null;
 
+        //return new LessonSummaryDto(
+        //    CourseId: lesson.CourseId,
+        //    LessonId: lesson.Id,
+        //    Title: lesson.Title,
+        //    Description: lesson.Description,
+        //    Index: lesson.Index,
+        //    Duration: lesson.Duration,
+        //    IsPreview: lesson.Access == LessonAccess.Public,
+        //    ThumbnailUrl: thumbnailUrl
+        //);
         return new LessonSummaryDto(
-            CourseId: lesson.CourseId,
-            LessonId: lesson.Id,
-            Title: lesson.Title,
-            Description: lesson.Description,
-            Index: lesson.Index,
-            Duration: lesson.Duration,
-            IsPreview: lesson.Access == LessonAccess.Public,
-            ThumbnailUrl: thumbnailUrl
+                CourseId: lesson.CourseId,
+                LessonId: lesson.Id,
+                Title: lesson.Title,
+                Description: lesson.Description,
+                Index: lesson.Index,
+                Duration: lesson.Duration,
+                IsPreview: lesson.Access == LessonAccess.Public,
+                ThumbnailUrl: lesson.ThumbnailImageUrl,
+                AllowedActions: new List<LessonAction>()
         );
     }
 
@@ -45,21 +60,37 @@ internal static class LessonMappingExtensions
 
     public static async Task<LessonDetailsDto> ToDetailsDtoAsync(
         this Lesson lesson,
+#pragma warning disable IDE0060 // Remove unused parameter
         IStorageUrlResolver resolver,
+#pragma warning restore IDE0060 // Remove unused parameter
+#pragma warning disable IDE0060 // Remove unused parameter
         CancellationToken cancellationToken = default)
+#pragma warning restore IDE0060 // Remove unused parameter
     {
-        Task<ResolvedUrl>? thumbTask = lesson.ThumbnailImageUrl != null
-            ? resolver.ResolveAsync(StorageCategory.Public, lesson.ThumbnailImageUrl.Path, cancellationToken)
-            : null;
+        //Task<ResolvedUrl>? thumbTask = lesson.ThumbnailImageUrl != null
+        //    ? resolver.ResolveAsync(StorageCategory.Public, lesson.ThumbnailImageUrl.Path, cancellationToken)
+        //    : null;
 
-        Task<ResolvedUrl>? videoTask = lesson.VideoUrl != null
-            ? resolver.ResolveAsync(StorageCategory.Private, lesson.VideoUrl.Path, cancellationToken)
-            : null;
+        //Task<ResolvedUrl>? videoTask = lesson.VideoUrl != null
+        //    ? resolver.ResolveAsync(StorageCategory.Private, lesson.VideoUrl.Path, cancellationToken)
+        //    : null;
 
-        IEnumerable<Task<ResolvedUrl>> tasks = new[] { thumbTask, videoTask }
-            .Where(t => t != null).Cast<Task<ResolvedUrl>>();
-        
-        await Task.WhenAll(tasks);
+        //IEnumerable<Task<ResolvedUrl>> tasks = new[] { thumbTask, videoTask }
+        //    .Where(t => t != null).Cast<Task<ResolvedUrl>>();
+
+        //await Task.WhenAll(tasks);
+
+        //return new LessonDetailsDto(
+        //    CourseId: lesson.CourseId,
+        //    LessonId: lesson.Id,
+        //    Title: lesson.Title,
+        //    Description: lesson.Description,
+        //    Index: lesson.Index,
+        //    Duration: lesson.Duration,
+        //    IsPreview: lesson.Access == LessonAccess.Public,
+        //    ThumbnailUrl: thumbTask != null ? (await thumbTask).Value : null,
+        //    VideoUrl: videoTask != null ? (await videoTask).Value : null
+        //);
 
         return new LessonDetailsDto(
             CourseId: lesson.CourseId,
@@ -69,8 +100,8 @@ internal static class LessonMappingExtensions
             Index: lesson.Index,
             Duration: lesson.Duration,
             IsPreview: lesson.Access == LessonAccess.Public,
-            ThumbnailUrl: thumbTask != null ? (await thumbTask).Value : null,
-            VideoUrl: videoTask != null ? (await videoTask).Value : null
+            ThumbnailUrl: lesson.ThumbnailImageUrl,
+            VideoUrl: lesson.VideoUrl
         );
     }
 }

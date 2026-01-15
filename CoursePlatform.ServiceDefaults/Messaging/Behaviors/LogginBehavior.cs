@@ -22,7 +22,7 @@ internal sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<T
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> nextHandler,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         string requestName = typeof(TRequest).Name;
         string? userIdRaw = _userContext.Id?.ToString();

@@ -25,7 +25,7 @@ internal sealed class GetFeatured : IEndpoint
                 .Send(new GetFeaturedQuery(), cancellationToken);
 
             return result.Match(
-                dto => Results.Ok(dto.ToApiContract(linkProvider)),
+                dto => Results.Ok(dto.ToApiContract(linkProvider, new PagedQueryDto(), true)),
                 CustomResults.Problem);
         })
         .WithMetadata<PagedResponse<CourseSummaryResponse>>(

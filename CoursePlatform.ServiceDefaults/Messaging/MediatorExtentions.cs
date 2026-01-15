@@ -11,8 +11,6 @@ public static class MediatorExtentions
         this IServiceCollection services)
     {
         services.AddScoped<IMediator, Mediator>();
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
         services.Scan(selector => 
             selector
