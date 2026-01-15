@@ -29,6 +29,7 @@ public class Course : Entity<CourseId>
     public IReadOnlyList<Lesson> Lessons => _lessons.AsReadOnly();
     public IReadOnlyList<ImageUrl> Images => _images.AsReadOnly();
 
+
     #pragma warning disable CS8618
     private Course() { }
     #pragma warning restore CS8618
@@ -54,15 +55,60 @@ public class Course : Entity<CourseId>
         return Result.Success(newCourse);
     }
 
+    public Result CanBeModified => !IsDeleted
+        ? Result.Success()
+        : Result.Failure(CourseErrors.CannotModifyDeleted);
+
+    public Result CanBeDeleted => !IsDeleted
+        ? Result.Success()
+        : Result.Failure(CourseErrors.NotFound);
+
+    public Result CanEnroll
+    {
+        get
+        {
+            if (IsDeleted)
+            {
+                return Result.Failure(CourseErrors.NotFound);
+            }
+
+            if (Status != CourseStatus.Published)
+            {
+                return Result.Failure(CourseErrors.CourseNotPublished);
+            }
+
+            return Result.Success();
+        }
+    }
+
+    public Result CanBePublished
+    {
+        get
+        {
+            if (IsDeleted)
+            {
+                return Result.Failure(CourseErrors.NotFound);
+            }
+
+            if (Status == CourseStatus.Published)
+            {
+                return Result.Failure(CourseErrors.AlreadyPublished);
+            }
+
+            if (_lessons.Count == 0)
+            {
+                return Result.Failure(CourseErrors.CourseWithoutLessons);
+            }
+
+            return Result.Success();
+        }
+    }
+
     public Result Publish(TimeProvider timeProvider)
     {
-        if (Status == CourseStatus.Published)
+        if (CanBePublished.IsFailure)
         {
-            return Result.Failure<Course>(CourseErrors.AlreadyPublished);
-        }
-        if (_lessons.Count == 0)
-        {
-            return Result.Failure<Course>(CourseErrors.CourseWithoutLessons);
+            return CanBePublished;
         }
 
         Status = CourseStatus.Published;
@@ -119,6 +165,11 @@ public class Course : Entity<CourseId>
 
     public Result UpdateDescription(Description description, TimeProvider timeProvider)
     {
+        if (CanBeModified.IsFailure)
+        {
+            return CanBeModified;
+        }
+
         Description = description;
         UpdatedAtUtc = timeProvider.GetUtcNow();
 
@@ -127,6 +178,11 @@ public class Course : Entity<CourseId>
 
     public Result UpdateTitle(Title title, TimeProvider timeProvider)
     {
+        if (CanBeModified.IsFailure)
+        {
+            return CanBeModified;
+        }
+
         Title = title;
         UpdatedAtUtc = timeProvider.GetUtcNow();
         return Result.Success();
@@ -145,9 +201,9 @@ public class Course : Entity<CourseId>
         TimeProvider timeProvider, 
         TimeSpan validFor)
     {
-        if (Status != CourseStatus.Published)
+        if (CanEnroll.IsFailure)
         {
-            return Result.Failure<Enrollment>(CourseErrors.CourseNotPublished);
+            return Result.Failure<Enrollment>(CanEnroll.Error);
         }
 
         var enrollment = Enrollment.Create(Id, studentId, timeProvider, validFor);
@@ -243,6 +299,11 @@ public class Course : Entity<CourseId>
 
     public Result Delete()
     {
+        if (CanBeDeleted.IsFailure)
+        {
+            return CanBeDeleted;
+        }
+
         IsDeleted = true;
         Raise(new CourseDeleted(this));
         return Result.Success();

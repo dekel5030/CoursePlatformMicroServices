@@ -8,23 +8,27 @@ public static class CourseErrors
         "Course.NotFound",
         "Course Not Found.");
 
-    internal static readonly Error AlreadyPublished = Error.Conflict(
+    public static readonly Error AlreadyPublished = Error.Conflict(
         "Course.AlreadyPublished",
         "Course Already Published.");
 
-    internal static readonly Error CourseWithoutLessons = Error.Validation(
+    public static readonly Error CourseWithoutLessons = Error.Validation(
         "Course.WithoutLessons",
         "Course Could Not Be Published Without Lessons.");
 
-    internal static readonly Error LessonAlreadyExists = Error.Validation(
+    public static readonly Error LessonAlreadyExists = Error.Validation(
         "Course.LessonAlreadyExists",
         "Course Lesson Already Exists.");
 
-    internal static readonly Error InvalidPrice = Error.Validation(
+    public static readonly Error InvalidPrice = Error.Validation(
         "Course.InvalidPrice",
         "Course price is invalid.");
 
-    internal static readonly Error CourseNotPublished = Error.Validation(
+    public static readonly Error CourseNotPublished = Error.Validation(
         "Course.NotPublished",
         "Course isnt published.");
+
+    public static readonly Error CannotModifyDeleted = Error.Validation(
+        "Course.CannotModifyDeleted",
+        "Cannot modify a deleted course.");
 }
