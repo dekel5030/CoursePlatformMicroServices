@@ -1,6 +1,5 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Courses.Extensions;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses;
@@ -10,10 +9,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Queries.GetCourses;
 
-public class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, PagedResponseDto<CourseSummaryDto>>
+internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, CourseCollectionDto>
 {
     private readonly IReadDbContext _dbContext;
+#pragma warning disable S4487 // Unread "private" fields should be removed
     private readonly IStorageUrlResolver _urlResolver;
+#pragma warning restore S4487 // Unread "private" fields should be removed
 
     public GetCoursesQueryHandler(IReadDbContext dbContext, IStorageUrlResolver urlResolver)
     {
@@ -21,8 +22,8 @@ public class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, PagedRespon
         _urlResolver = urlResolver;
     }
 
-    public async Task<Result<PagedResponseDto<CourseSummaryDto>>> Handle(
-        GetCoursesQuery request,
+    public async Task<Result<CourseCollectionDto>> Handle(
+        GetCoursesQuery request, 
         CancellationToken cancellationToken = default)
     {
         int pageNumber = Math.Max(1, request.PagedQuery.PageNumber ?? 1);
@@ -38,15 +39,22 @@ public class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, PagedRespon
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        List<CourseSummaryDto> courseDtos = await courses.ToSummaryDtosAsync(_urlResolver, cancellationToken);
+        var allowedActions = new List<CourseAction> { CourseAction.Edit, CourseAction.CreateLesson };
 
-        var response = new PagedResponseDto<CourseSummaryDto>
-        {
-            Items = courseDtos,
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            TotalItems = totalItems
-        };
+        var courseDtos = courses
+            .Select(course => new CourseSummaryDto(
+                course.Id,
+                course.Title,
+                course.InstructorId?.ToString(),
+                course.Price.Amount,
+                course.Price.Currency,
+                course.Images.Count > 0 ? course.Images[0] : null,
+                course.LessonCount,
+                course.EnrollmentCount,
+                allowedActions))
+            .ToList();
+
+        var response = new CourseCollectionDto(courseDtos, pageNumber, pageSize, totalItems, new List<CourseCollectionAction> { CourseCollectionAction.CreateCourse });
 
         return Result.Success(response);
     }

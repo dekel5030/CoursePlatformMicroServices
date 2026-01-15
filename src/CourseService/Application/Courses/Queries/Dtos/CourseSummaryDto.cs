@@ -9,7 +9,8 @@ public record CourseSummaryDto(
     string? InstructorName,
     decimal Price,
     string Currency,
-    Uri? ThumbnailUrl,
+    ImageUrl? ThumbnailUrl,
     int LessonsCount,
-    int EnrollmentCount
+    int EnrollmentCount,
+    IReadOnlyList<CourseAction> AllowedActions
 );

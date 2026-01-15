@@ -20,9 +20,19 @@ public record CourseDetailsDto(
 
 public sealed record CourseAction
 {
-    public string Value { get; set; }
+    public string Value { get; }
     private CourseAction(string value) => Value = value;
 
-    public static CourseAction Edit => new("Edit");
-    public static CourseAction Delete => new("Delete");
+    public static readonly CourseAction Edit = new("Edit");
+    public static readonly CourseAction Publish = new("Publish");
+    public static readonly CourseAction CreateLesson = new("CreateLesson");
+    public static readonly CourseAction Delete = new("Delete");
+}
+
+public sealed record CourseCollectionAction
+{
+    public string Value { get; }
+    private CourseCollectionAction(string value) => Value = value;
+
+    public static readonly CourseCollectionAction CreateCourse = new("CreateCourse");
 }

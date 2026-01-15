@@ -56,13 +56,6 @@ internal sealed class LinkProvider
         }
 
         return links;
-        
-        //return new List<LinkDto>
-        //{
-        //    Create(nameof(GetCourseById), "self", HttpMethods.Get, new { id = idStr }),
-        //    Create(nameof(CreateLesson), "create-lesson", HttpMethods.Post, new { courseId = idStr }),
-        //    Create(nameof(DeleteCourse), "delete", HttpMethods.Delete, new { id = idStr })
-        //};
     }
 
     public List<LinkDto> CreateLessonLinks(
@@ -95,18 +88,22 @@ internal sealed class LinkProvider
     }
 
     public List<LinkDto> CreateCourseCollectionLinks(
-            PagedResponseDto<CourseSummaryDto> responseDto,
-            PagedQueryDto originalQuery)
+        CourseCollectionDto courseCollection,
+        PagedQueryDto originalQuery)
     {
-        List<LinkDto> links = CreatePagedLinksInternal(responseDto, originalQuery);
+        List<LinkDto> links = CreatePagedLinks(courseCollection, originalQuery);
+        var allowedActionsSet = courseCollection.AllowedActions.ToHashSet();
 
-        links.Add(Create(nameof(CreateCourse), "create", HttpMethods.Post));
+        if (allowedActionsSet.TryGetValue(CourseCollectionAction.CreateCourse, out _))
+        {
+            links.Add(Create(nameof(CreateCourse), "create", HttpMethods.Post));
+        }
 
         return links;
     }
 
-    private List<LinkDto> CreatePagedLinksInternal<T>(
-        PagedResponseDto<T> responseDto,
+    private List<LinkDto> CreatePagedLinks(
+        CourseCollectionDto courseCollection,
         object originalQuery)
     {
         HttpContext httpContext = _httpContextAccessor.HttpContext
@@ -125,22 +122,22 @@ internal sealed class LinkProvider
 
         links.Add(Create(endpointName, "self", HttpMethods.Get, routeValues));
 
-        if (responseDto.HasNextPage)
+        if (courseCollection.HasNextPage)
         {
             var nextValues = new RouteValueDictionary(originalQuery)
             {
-                [nameof(PagedQueryDto.PageNumber)] = responseDto.PageNumber + 1
+                [nameof(PagedQueryDto.PageNumber)] = courseCollection.PageNumber + 1
             };
-            links.Add(Create(endpointName, "next", HttpMethods.Get, nextValues));
+            links.Add(Create(endpointName, "next-page", HttpMethods.Get, nextValues));
         }
 
-        if (responseDto.PageNumber > 1)
+        if (courseCollection.HasPreviousPage)
         {
             var prevValues = new RouteValueDictionary(originalQuery)
             {
-                [nameof(PagedQueryDto.PageNumber)] = responseDto.PageNumber - 1
+                [nameof(PagedQueryDto.PageNumber)] = courseCollection.PageNumber - 1
             };
-            links.Add(Create(endpointName, "prev", HttpMethods.Get, prevValues));
+            links.Add(Create(endpointName, "previous-page", HttpMethods.Get, prevValues));
         }
 
         return links;
