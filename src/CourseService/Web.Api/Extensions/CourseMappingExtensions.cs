@@ -10,13 +10,6 @@ namespace Courses.Api.Extensions;
 
 internal static class CourseMappingExtensions
 {
-    public static CreateCourseResponse ToApiContract(this CreateCourseDto dto)
-    {
-        return new CreateCourseResponse(
-            dto.CourseId.Value,
-            dto.Title);
-    }
-
     public static CourseSummaryResponse ToApiContract(
         this CourseSummaryDto dto,
         LinkProvider linkProvider)
