@@ -148,8 +148,9 @@ public class Course : Entity<CourseId>
             return Result.Success();
         }
 
-        _images.Add(imageUrl);
+        _images.Insert(0, imageUrl);
         UpdatedAtUtc = timeProvider.GetUtcNow();
+        
         return Result.Success();
     }
 
