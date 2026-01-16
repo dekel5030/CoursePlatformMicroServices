@@ -8,6 +8,12 @@ interface UploadImageParams {
   file: File;
 }
 
+/**
+ * Custom hook for handling course image upload flow
+ * Manages the two-step upload process: requesting presigned URL and uploading the file
+ * @param courseId - The ID of the course to upload the image for
+ * @returns Object with uploadImage function, loading state, error state, and reset function
+ */
 export function useCourseImageUpload(courseId: string) {
   const queryClient = useQueryClient();
 

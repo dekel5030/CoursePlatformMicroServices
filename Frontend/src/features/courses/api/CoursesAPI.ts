@@ -125,12 +125,21 @@ export interface GenerateUploadUrlRequest {
   contentType: string;
 }
 
+/**
+ * Response from the backend when requesting an upload URL for a course image
+ */
 export interface GenerateUploadUrlResponse {
   uploadUrl: string;
   fileKey: string;
   expiresAt: string;
 }
 
+/**
+ * Request a presigned upload URL from the backend (Step 1 of upload flow)
+ * @param uploadUrl - The HATEOAS link URL to request the upload URL from
+ * @param request - Contains the file name and content type
+ * @returns The presigned URL and metadata for uploading the file
+ */
 export async function generateImageUploadUrl(
   uploadUrl: string,
   request: GenerateUploadUrlRequest
@@ -142,6 +151,11 @@ export async function generateImageUploadUrl(
   return response.data;
 }
 
+/**
+ * Upload the binary file to the storage service (Step 2 of upload flow)
+ * @param uploadUrl - The presigned URL from Step 1
+ * @param file - The image file to upload
+ */
 export async function uploadImageToStorage(
   uploadUrl: string,
   file: File

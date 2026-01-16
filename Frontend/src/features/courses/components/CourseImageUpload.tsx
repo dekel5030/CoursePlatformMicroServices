@@ -31,6 +31,12 @@ export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
     fileInputRef.current?.click();
   };
 
+  const resetFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -38,10 +44,7 @@ export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
     // Validate file type
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
       toast.error(t("courses:detail.invalidFileType"));
-      // Reset the input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      resetFileInput();
       return;
     }
 
@@ -49,17 +52,11 @@ export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
       reset();
       await uploadImage(file, uploadLink.href);
       toast.success(t("courses:detail.uploadSuccess"));
-      // Reset the input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      resetFileInput();
     } catch (err) {
       toast.error(t("courses:detail.uploadFailed"));
       console.error("Failed to upload image:", err);
-      // Reset the input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      resetFileInput();
     }
   };
 
