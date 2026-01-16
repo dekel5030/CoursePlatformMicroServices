@@ -13,5 +13,5 @@ public record CourseSummaryDto(
     ImageUrl? ThumbnailUrl,
     int LessonsCount,
     int EnrollmentCount,
-    IReadOnlyList<CourseAction> AllowedActions
+    IReadOnlyCollection<CourseAction> AllowedActions
 );

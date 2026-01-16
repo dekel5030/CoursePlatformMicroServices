@@ -30,7 +30,7 @@ internal static class CourseMappingExtensions
             dto.ThumbnailUrl?.ToString(),
             dto.LessonsCount,
             dto.EnrollmentCount,
-            linkProvider.CreateCourseLinks(dto.Id, new List<CourseAction>()));
+            linkProvider.CreateCourseLinks(dto.Id, dto.AllowedActions));
     }
 
     public static CourseDetailsResponse ToApiContract(this CourseDetailsDto dto, LinkProvider linkProvider)
