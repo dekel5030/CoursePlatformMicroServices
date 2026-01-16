@@ -12,14 +12,14 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Commands.GenerateThumbnailUploadUrl;
 
-internal sealed class GenerateThumbnailUploadUrlCommandHandler
-    : ICommandHandler<GenerateThumbnailUploadUrlCommand, GenerateUploadUrlResponse>
+internal sealed class GenerateCourseImageUploadUrlCommandHandler
+    : ICommandHandler<GenerateCourseImageUploadUrlCommand, GenerateUploadUrlResponse>
 {
     private readonly ICourseRepository _courseRepository;
     private readonly IUserContext _userContext;
     private readonly IObjectStorageService _storageService;
 
-    public GenerateThumbnailUploadUrlCommandHandler(
+    public GenerateCourseImageUploadUrlCommandHandler(
         ICourseRepository courseRepository, 
         IUserContext userContext, 
         IObjectStorageService storageService)
@@ -30,7 +30,7 @@ internal sealed class GenerateThumbnailUploadUrlCommandHandler
     }
 
     public async Task<Result<GenerateUploadUrlResponse>> Handle(
-        GenerateThumbnailUploadUrlCommand request,
+        GenerateCourseImageUploadUrlCommand request,
         CancellationToken cancellationToken = default)
     {
         Course? course = await _courseRepository.GetByIdAsync(request.Id, cancellationToken);

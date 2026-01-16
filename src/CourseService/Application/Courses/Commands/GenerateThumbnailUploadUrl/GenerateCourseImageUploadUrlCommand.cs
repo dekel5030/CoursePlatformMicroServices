@@ -6,7 +6,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Commands.GenerateThumbnailUploadUrl;
 
-public record GenerateThumbnailUploadUrlCommand(
+public record GenerateCourseImageUploadUrlCommand(
     CourseId Id,
     string FileName,
     string ContentType) : ICommand<GenerateUploadUrlResponse>;
