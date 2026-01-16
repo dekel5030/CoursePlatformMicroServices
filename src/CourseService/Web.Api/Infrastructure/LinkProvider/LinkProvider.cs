@@ -60,6 +60,11 @@ internal sealed class LinkProvider
             links.Add(Create(nameof(CreateLesson), "create-lesson", HttpMethods.Post, new { courseId = idStr }));
         }
 
+        if (allowedActionsSet.TryGetValue(CourseAction.UploadImageUrl, out _))
+        {
+            links.Add(Create(nameof(GenerateCourseImageUploadUrl), "generate-image-upload-url", HttpMethods.Post, new { id = idStr }));
+        }
+
         return links;
     }
 

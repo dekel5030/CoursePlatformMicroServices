@@ -8,6 +8,12 @@ using Courses.Infrastructure.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All;
+});
+
+
 builder.AddInfrastructureDefaults();
 builder.AddDefaultOpenApi();
 
@@ -17,6 +23,8 @@ builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
 builder.Services.AddLinkProvider();
 
 WebApplication app = builder.Build();
+
+app.UseForwardedHeaders();
 
 if (app.Environment.IsDevelopment())
 {

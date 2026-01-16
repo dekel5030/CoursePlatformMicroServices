@@ -11,7 +11,7 @@ internal sealed class Upload : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("storage/upload/{ownerService}/{bucket}/{referenceId}/{referenceType}/{*key}", async (
+        app.MapPut("storage/upload/{ownerService}/{bucket}/{referenceId}/{referenceType}/{*key}", async (
             string key,
             string ownerService,
             string referenceId,

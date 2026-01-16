@@ -56,12 +56,17 @@ internal static class DependencyInjection
         return services;
     }
 
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable S1172 // Unused method parameters should be removed
     private static IServiceCollection AddYarp(this IServiceCollection services, IConfiguration configuration)
+#pragma warning restore S1172 // Unused method parameters should be removed
+#pragma warning restore IDE0060 // Remove unused parameter
     {
         services.AddServiceDiscovery();
 
         services.AddReverseProxy()
-                .LoadFromConfig(configuration.GetSection("ReverseProxy"))
+                //.LoadFromConfig(configuration.GetSection("ReverseProxy"))
+                .LoadFromMemory(GatewayConfiguration.GetRoutes(), GatewayConfiguration.GetClusters())
                 .AddServiceDiscoveryDestinationResolver();
 
         return services;

@@ -9,6 +9,8 @@ internal static class StorageExtensions
     {
         services.AddOptions<StorageOptions>().BindConfiguration(StorageOptions.SectionName);
         services.AddSingleton<IStorageUrlResolver, StorageUrlResolver>();
+
+        services.AddSingleton<IObjectStorageService>(sp => (StorageUrlResolver)sp.GetRequiredService<IStorageUrlResolver>());
         return services;
     }
 }

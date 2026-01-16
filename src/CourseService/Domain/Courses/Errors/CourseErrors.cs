@@ -31,4 +31,8 @@ public static class CourseErrors
     public static readonly Error CannotModifyDeleted = Error.Validation(
         "Course.CannotModifyDeleted",
         "Cannot modify a deleted course.");
+
+    public static readonly Error Unauthorized = Error.Unauthorized(
+        "Course.Unauthorized",
+        "You are not authorized to perform this action.");
 }
