@@ -1,6 +1,7 @@
 ﻿using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Actions;
+using Courses.Application.Actions.Abstract;
 using Courses.Application.Actions.Primitives;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Domain.Courses;
@@ -15,13 +16,13 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
     private readonly ICourseRepository _courseRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly TimeProvider _timeProvider;
-    private readonly CourseActionProvider _actionProvider;
+    private readonly ICourseActionProvider _actionProvider;
 
     public CreateCourseCommandHandler(
         ICourseRepository courseRepository,
         TimeProvider timeProvider,
         IUnitOfWork unitOfWork,
-        CourseActionProvider courseActionProvider)
+        ICourseActionProvider courseActionProvider)
     {
         _courseRepository = courseRepository;
         _timeProvider = timeProvider;

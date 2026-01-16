@@ -61,9 +61,7 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
 
         if (request.PriceAmount.HasValue != request.PriceCurrency is not null)
         {
-            return Result.Failure(Error.Validation(
-                "Course.IncompletePriceUpdate",
-                "Both price amount and currency must be provided together."));
+            return Result.Failure(CourseErrors.InvalidPrice);
         }
 
         if (request.PriceAmount.HasValue && request.PriceCurrency is not null)
