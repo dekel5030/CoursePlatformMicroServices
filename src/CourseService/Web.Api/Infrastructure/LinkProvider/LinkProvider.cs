@@ -55,6 +55,11 @@ internal sealed class LinkProvider
             links.Add(Create(nameof(DeleteCourse), "delete", HttpMethods.Delete, new { id = idStr }));
         }
 
+        if (allowedActionsSet.TryGetValue(CourseAction.CreateLesson, out _))
+        {
+            links.Add(Create(nameof(CreateLesson), "create-lesson", HttpMethods.Post, new { courseId = idStr }));
+        }
+
         return links;
     }
 

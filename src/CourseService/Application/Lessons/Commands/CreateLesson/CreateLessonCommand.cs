@@ -8,4 +8,4 @@ namespace Courses.Application.Lessons.Commands.CreateLesson;
 public record CreateLessonCommand(
     CourseId CourseId,
     Title? Title,
-    Description? Description) : ICommand<LessonDetailsDto>;
+    Description? Description) : ICommand<LessonSummaryDto>;

@@ -33,7 +33,7 @@ internal sealed class CreateLesson : IEndpoint
                 title,
                 description);
 
-            Result<LessonDetailsDto> result = await mediator.Send(command);
+            Result<LessonSummaryDto> result = await mediator.Send(command);
 
             return result.Match(
                 lessonDto => Results.CreatedAtRoute(
