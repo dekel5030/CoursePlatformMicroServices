@@ -118,3 +118,38 @@ export async function fetchAllCourses(): Promise<FetchAllCoursesResult> {
     links: data.links,
   };
 }
+
+export interface GenerateUploadUrlRequest {
+  fileName: string;
+  contentType: string;
+}
+
+export interface GenerateUploadUrlResponse {
+  uploadUrl: string;
+  fileKey: string;
+  expiresAt: string;
+}
+
+export async function generateImageUploadUrl(
+  uploadUrl: string,
+  request: GenerateUploadUrlRequest
+): Promise<GenerateUploadUrlResponse> {
+  const response = await axiosClient.post<GenerateUploadUrlResponse>(
+    uploadUrl,
+    request
+  );
+  return response.data;
+}
+
+export async function uploadImageToStorage(
+  uploadUrl: string,
+  file: File
+): Promise<void> {
+  // Create a new axios instance without JSON headers for binary upload
+  const binaryAxios = axiosClient.create();
+  await binaryAxios.put(uploadUrl, file, {
+    headers: {
+      "Content-Type": file.type,
+    },
+  });
+}

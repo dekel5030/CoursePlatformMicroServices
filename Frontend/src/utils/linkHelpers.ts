@@ -35,6 +35,7 @@ export const CourseRels = {
   DELETE: "delete",
   CREATE: "create",
   CREATE_LESSON: "create-lesson",
+  GENERATE_IMAGE_UPLOAD_URL: "generate-image-upload-url",
   NEXT_PAGE: "next-page",
   PREVIOUS_PAGE: "previous-page",
 } as const;
