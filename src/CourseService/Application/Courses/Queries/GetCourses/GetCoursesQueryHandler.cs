@@ -51,7 +51,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
                 course.InstructorId?.ToString(),
                 course.Price.Amount,
                 course.Price.Currency,
-                course.Images.Count <= 0 ? null : _urlResolver.Resolve(StorageCategory.Public, course.Images[0].Path).Value,
+                course.Images.Count <= 0 ? null : _urlResolver.Resolve(StorageCategory.Public, course.Images[^1].Path).Value,
                 course.LessonCount,
                 course.EnrollmentCount,
                 _actionProvider.GetAllowedActions(course)))

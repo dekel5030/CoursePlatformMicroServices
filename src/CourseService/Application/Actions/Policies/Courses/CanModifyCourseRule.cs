@@ -24,6 +24,7 @@ internal sealed class CanModifyCourseRule : ICourseActionRule
         {
             yield return CourseAction.Update;
             yield return CourseAction.CreateLesson;
+            yield return CourseAction.UploadImageUrl;
         }
     }
 }

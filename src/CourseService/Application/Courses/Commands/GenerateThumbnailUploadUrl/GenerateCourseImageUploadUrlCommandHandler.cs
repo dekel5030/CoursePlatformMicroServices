@@ -8,6 +8,7 @@ using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Auth.Abstractions;
+using Kernel.Auth.AuthTypes;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Commands.GenerateThumbnailUploadUrl;
@@ -40,8 +41,11 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
             return Result.Failure<GenerateUploadUrlResponse>(CourseErrors.NotFound);
         }
 
+        var resourceId = ResourceId.Create(course.Id.Value.ToString());
+        bool hasPermission = _userContext.HasPermission(ActionType.Update, ResourceType.Course, resourceId);
+
         var currentUser = new UserId(_userContext.Id ?? Guid.Empty);
-        if (course.InstructorId != currentUser)
+        if (course.InstructorId != currentUser && !hasPermission)
         {
             return Result.Failure<GenerateUploadUrlResponse>(CourseErrors.Unauthorized);
         }

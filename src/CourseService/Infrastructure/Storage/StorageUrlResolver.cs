@@ -27,7 +27,7 @@ internal sealed class StorageUrlResolver : IStorageUrlResolver, IObjectStorageSe
         string serviceName = "courseservice";
         string baseUrl = _options.BaseUrl.TrimEnd('/');
 
-        string url = $"{baseUrl}/storage/upload/{serviceName}/{bucketName}/{referenceId}/{referenceType}/{fileKey}";
+        string url = $"{baseUrl}/upload/{serviceName}/{bucketName}/{referenceId}/{referenceType}/{fileKey}";
 
         var response = new PresignedUrlResponse(
             Url: url,
