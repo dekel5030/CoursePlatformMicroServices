@@ -1,4 +1,5 @@
-﻿using Courses.Domain.Shared.Primitives;
+﻿using Courses.Application.Courses.Queries.Dtos;
+using Courses.Domain.Shared.Primitives;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Commands.CreateCourse;
@@ -6,5 +7,4 @@ namespace Courses.Application.Courses.Commands.CreateCourse;
 public record CreateCourseCommand(
     Title? Title,
     Description? Description,
-    Guid? InstructorId)
-        : ICommand<CreateCourseDto>;
+    Guid? InstructorId) : ICommand<CourseSummaryDto>;

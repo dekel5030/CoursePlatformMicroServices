@@ -1,7 +1,9 @@
 ﻿using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
+using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Courses.Commands.CreateCourse;
+using Courses.Application.Courses.Queries.Dtos;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -20,6 +22,7 @@ internal sealed class CreateCourse : IEndpoint
         app.MapPost("courses", async (
             CreateCourseRequest request,
             IMediator mediator,
+            LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
             Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
@@ -27,13 +30,13 @@ internal sealed class CreateCourse : IEndpoint
 
             var command = new CreateCourseCommand(title, description, request.InstructorId);
 
-            Result<CreateCourseDto> result = await mediator.Send(command, cancellationToken);
+            Result<CourseSummaryDto> result = await mediator.Send(command, cancellationToken);
 
             return result.Match(
-                response => Results.CreatedAtRoute(
+                course => Results.CreatedAtRoute(
                     nameof(GetCourseById),
-                    new { id = response.CourseId.Value },
-                    response.ToApiContract()
+                    new { id = course.Id.Value },
+                    course.ToApiContract(linkProvider)
                 ),
                 CustomResults.Problem);
         })

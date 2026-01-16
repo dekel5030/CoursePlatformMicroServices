@@ -11,7 +11,6 @@ public class CreateCourseCommandValidator : AbstractValidator<CreateCourseComman
         //    .NotNull()
         //    .WithMessage("Title is required.");
 
-        //// במידה והכותרת אינה null, נבדוק את הערך הפנימי שלה
         //When(x => x.Title is not null, () =>
         //{
         //    RuleFor(x => x.Title!.Value)
