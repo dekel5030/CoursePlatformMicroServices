@@ -1,3 +1,4 @@
+using Courses.Application.Actions.Primitives;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared.Primitives;
@@ -13,5 +14,6 @@ public record LessonDetailsDto(
     TimeSpan? Duration,
     bool IsPreview,
     ImageUrl? ThumbnailUrl,
-    VideoUrl? VideoUrl
+    VideoUrl? VideoUrl,
+    IReadOnlyCollection<LessonAction> AllowedActions
 );

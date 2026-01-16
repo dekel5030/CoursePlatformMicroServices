@@ -39,6 +39,6 @@ internal static class LessonMappingExtensions
             dto.IsPreview,
             dto.ThumbnailUrl?.ToString(),
             dto.VideoUrl?.ToString(),
-            linkProvider.CreateLessonLinks(courseId, dto.LessonId, new List<LessonAction>()));
+            linkProvider.CreateLessonLinks(courseId, dto.LessonId, dto.AllowedActions));
     }
 }

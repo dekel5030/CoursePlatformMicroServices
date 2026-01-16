@@ -59,15 +59,15 @@ internal static class LessonMappingExtensions
         return results.ToList();
     }
 
-    public static async Task<LessonDetailsDto> ToDetailsDtoAsync(
-        this Lesson lesson,
-#pragma warning disable IDE0060 // Remove unused parameter
-        IStorageUrlResolver resolver,
-#pragma warning restore IDE0060 // Remove unused parameter
-#pragma warning disable IDE0060 // Remove unused parameter
-        CancellationToken cancellationToken = default)
-#pragma warning restore IDE0060 // Remove unused parameter
-    {
+//    public static async Task<LessonDetailsDto> ToDetailsDtoAsync(
+//        this Lesson lesson,
+//#pragma warning disable IDE0060 // Remove unused parameter
+//        IStorageUrlResolver resolver,
+//#pragma warning restore IDE0060 // Remove unused parameter
+//#pragma warning disable IDE0060 // Remove unused parameter
+//        CancellationToken cancellationToken = default)
+////#pragma warning restore IDE0060 // Remove unused parameter
+//    {
         //Task<ResolvedUrl>? thumbTask = lesson.ThumbnailImageUrl != null
         //    ? resolver.ResolveAsync(StorageCategory.Public, lesson.ThumbnailImageUrl.Path, cancellationToken)
         //    : null;
@@ -93,16 +93,16 @@ internal static class LessonMappingExtensions
         //    VideoUrl: videoTask != null ? (await videoTask).Value : null
         //);
 
-        return new LessonDetailsDto(
-            CourseId: lesson.CourseId,
-            LessonId: lesson.Id,
-            Title: lesson.Title,
-            Description: lesson.Description,
-            Index: lesson.Index,
-            Duration: lesson.Duration,
-            IsPreview: lesson.Access == LessonAccess.Public,
-            ThumbnailUrl: lesson.ThumbnailImageUrl,
-            VideoUrl: lesson.VideoUrl
-        );
-    }
+        //return new LessonDetailsDto(
+        //    CourseId: lesson.CourseId,
+        //    LessonId: lesson.Id,
+        //    Title: lesson.Title,
+        //    Description: lesson.Description,
+        //    Index: lesson.Index,
+        //    Duration: lesson.Duration,
+        //    IsPreview: lesson.Access == LessonAccess.Public,
+        //    ThumbnailUrl: lesson.ThumbnailImageUrl,
+        //    VideoUrl: lesson.VideoUrl
+        //);
+    //}
 }
