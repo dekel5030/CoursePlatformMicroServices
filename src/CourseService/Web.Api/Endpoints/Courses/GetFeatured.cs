@@ -4,7 +4,7 @@ using Courses.Api.Contracts.Courses;
 using Courses.Api.Contracts.Shared;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
-using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetFeatured;
 using Courses.Application.Shared.Dtos;
 using Kernel;

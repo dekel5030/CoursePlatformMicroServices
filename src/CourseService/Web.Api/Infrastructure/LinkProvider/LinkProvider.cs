@@ -1,7 +1,7 @@
 using Courses.Api.Endpoints.Courses;
 using Courses.Api.Endpoints.Lessons;
 using Courses.Application.Actions.Primitives;
-using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;

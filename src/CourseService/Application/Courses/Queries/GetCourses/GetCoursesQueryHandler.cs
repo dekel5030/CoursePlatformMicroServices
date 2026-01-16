@@ -1,8 +1,7 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Actions.Abstract;
-using Courses.Application.Actions.Primitives;
-using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Courses.Dtos;
 using Courses.Domain.Courses;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -19,8 +18,8 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
     private readonly ICourseActionProvider _actionProvider;
 
     public GetCoursesQueryHandler(
-        IReadDbContext dbContext, 
-        IStorageUrlResolver urlResolver, 
+        IReadDbContext dbContext,
+        IStorageUrlResolver urlResolver,
         ICourseActionProvider courseActionProvider)
     {
         _dbContext = dbContext;
@@ -52,17 +51,17 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
                 course.InstructorId?.ToString(),
                 course.Price.Amount,
                 course.Price.Currency,
-                course.Images.Count > 0 ? course.Images[0] : null,
+                course.Images.Count <= 0 ? null : _urlResolver.Resolve(StorageCategory.Public, course.Images[0].Path).Value,
                 course.LessonCount,
                 course.EnrollmentCount,
                 _actionProvider.GetAllowedActions(course)))
             .ToList();
 
         var response = new CourseCollectionDto(
-            courseDtos, 
-            pageNumber, 
-            pageSize, 
-            totalItems, 
+            courseDtos,
+            pageNumber,
+            pageSize,
+            totalItems,
             _actionProvider.GetAllowedCollectionActions());
 
         return Result.Success(response);

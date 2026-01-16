@@ -1,8 +1,7 @@
 using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Actions.Abstract;
-using Courses.Application.Courses.Queries.Dtos;
-using Courses.Application.Shared.Dtos;
+using Courses.Application.Courses.Dtos;
 using Courses.Domain.Courses;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -40,7 +39,7 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, CourseCol
                  course.InstructorId?.ToString(),
                  course.Price.Amount,
                  course.Price.Currency,
-                 course.Images.Count > 0 ? course.Images[0] : null,
+                 course.Images.Count <= 0 ? null : _urlResolver.Resolve(StorageCategory.Public, course.Images[0].Path).Value,
                  course.LessonCount,
                  course.EnrollmentCount,
                  _actionProvider.GetAllowedActions(course)))

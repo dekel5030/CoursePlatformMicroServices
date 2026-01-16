@@ -3,7 +3,7 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Contracts.Lessons;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
-using Courses.Application.Lessons.Queries.Dtos;
+using Courses.Application.Lessons.Dtos;
 using Courses.Application.Lessons.Queries.GetById;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;

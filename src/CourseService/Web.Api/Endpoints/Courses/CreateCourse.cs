@@ -1,9 +1,10 @@
 ﻿using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
+using Courses.Api.Contracts.Courses;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Courses.Commands.CreateCourse;
-using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Courses.Dtos;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -40,7 +41,7 @@ internal sealed class CreateCourse : IEndpoint
                 ),
                 CustomResults.Problem);
         })
-        .WithMetadata<Contracts.Courses.CreateCourseResponse>(
+        .WithMetadata<CourseSummaryResponse>(
             nameof(CreateCourse),
             tag: Tags.Courses,
             summary: "Creates a new course.",

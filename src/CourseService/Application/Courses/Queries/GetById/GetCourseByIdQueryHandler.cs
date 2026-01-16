@@ -2,9 +2,8 @@ using System.Linq;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Actions.Abstract;
-using Courses.Application.Actions.Primitives;
-using Courses.Application.Courses.Queries.Dtos;
-using Courses.Application.Lessons.Queries.Dtos;
+using Courses.Application.Courses.Dtos;
+using Courses.Application.Lessons.Dtos;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Lessons.Primitives;
@@ -23,8 +22,8 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
     private readonly ICourseActionProvider _courseActionProvider;
 
     public GetCourseByIdQueryHandler(
-        IReadDbContext dbContext, 
-        IStorageUrlResolver urlResolver, 
+        IReadDbContext dbContext,
+        IStorageUrlResolver urlResolver,
         ICourseActionProvider courseActionProvider)
     {
         _dbContext = dbContext;
@@ -55,7 +54,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             course.Price.Currency,
             course.EnrollmentCount,
             course.UpdatedAtUtc,
-            course.Images,
+            course.Images.Select(image => _urlResolver.Resolve(StorageCategory.Public, image.Path).Value).ToList(),
             AllowedActions: _courseActionProvider.GetAllowedActions(course),
             Lessons: course.Lessons
                 .Select(lesson => new LessonSummaryDto(
@@ -66,7 +65,8 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
                     lesson.Index,
                     lesson.Duration,
                     lesson.Access == LessonAccess.Public,
-                    lesson.ThumbnailImageUrl,
+                    lesson.ThumbnailImageUrl == null ? null
+                        : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
                     _courseActionProvider.GetAllowedActions(course, lesson)))
                 .ToList()
         );
