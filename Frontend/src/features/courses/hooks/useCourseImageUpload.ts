@@ -31,7 +31,6 @@ export function useCourseImageUpload(courseId: string) {
     mutationFn: ({ uploadUrl, file }: UploadImageParams) =>
       uploadImageToStorage(uploadUrl, file),
     onSuccess: () => {
-      // Invalidate course queries to refresh the image
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(courseId) });
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.featured() });
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.allCourses() });
@@ -39,7 +38,6 @@ export function useCourseImageUpload(courseId: string) {
   });
 
   const uploadImage = async (file: File, uploadEndpoint: string) => {
-    // Step 1: Request upload URL
     const response = await generateUrlMutation.mutateAsync({
       uploadUrl: uploadEndpoint,
       request: {
@@ -48,7 +46,6 @@ export function useCourseImageUpload(courseId: string) {
       },
     });
 
-    // Step 2: Upload file to the presigned URL
     await uploadMutation.mutateAsync({
       uploadUrl: response.uploadUrl,
       file,
