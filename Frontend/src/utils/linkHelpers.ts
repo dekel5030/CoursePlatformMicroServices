@@ -46,5 +46,4 @@ export const LessonRels = {
   SELF: "self",
   PARTIAL_UPDATE: "partial-update",
   DELETE: "delete",
-  CREATE: "create",
 } as const;
