@@ -85,14 +85,14 @@ export async function createCourse(
 }
 
 export async function patchCourse(
-  id: string,
+  url: string,
   request: UpdateCourseRequestDto
 ): Promise<void> {
-  await axiosClient.patch(`/courses/${id}`, request);
+  await axiosClient.patch(url, request);
 }
 
-export async function deleteCourse(id: string): Promise<void> {
-  await axiosClient.delete(`/courses/${id}`);
+export async function deleteCourse(url: string): Promise<void> {
+  await axiosClient.delete(url);
 }
 
 export interface FetchAllCoursesResult {

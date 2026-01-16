@@ -21,6 +21,7 @@ import {
   ResourceType,
   ResourceId,
 } from "@/features/auth";
+import { getLink, LessonRels } from "@/utils/linkHelpers";
 
 export default function LessonPage() {
   const { courseId, lessonId } = useParams<{
@@ -36,8 +37,14 @@ export default function LessonPage() {
   const { t } = useTranslation();
 
   const handleTitleUpdate = async (newTitle: string) => {
+    const updateLink = getLink(lesson?.links, LessonRels.PARTIAL_UPDATE);
+    if (!updateLink) {
+      console.error("No update link found for this lesson");
+      return;
+    }
+    
     try {
-      await patchLesson.mutateAsync({ title: newTitle });
+      await patchLesson.mutateAsync({ url: updateLink.href, request: { title: newTitle } });
       toast.success(t("lessons:actions.titleUpdated"));
     } catch (error) {
       toast.error(t("lessons:actions.titleUpdateFailed"));
@@ -46,8 +53,14 @@ export default function LessonPage() {
   };
 
   const handleDescriptionUpdate = async (newDescription: string) => {
+    const updateLink = getLink(lesson?.links, LessonRels.PARTIAL_UPDATE);
+    if (!updateLink) {
+      console.error("No update link found for this lesson");
+      return;
+    }
+    
     try {
-      await patchLesson.mutateAsync({ description: newDescription });
+      await patchLesson.mutateAsync({ url: updateLink.href, request: { description: newDescription } });
       toast.success(t("lessons:actions.descriptionUpdated"));
     } catch (error) {
       toast.error(t("lessons:actions.descriptionUpdateFailed"));

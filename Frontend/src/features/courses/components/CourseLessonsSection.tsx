@@ -73,6 +73,7 @@ export function CourseLessonsSection({
 
       <AddLessonDialog
         courseId={course.id}
+        links={course.links}
         open={isAddLessonOpen}
         onOpenChange={setIsAddLessonOpen}
       />

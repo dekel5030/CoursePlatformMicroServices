@@ -34,8 +34,8 @@ export function useCreateLesson(courseId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: CreateLessonRequestDto) =>
-      createLesson(courseId, request),
+    mutationFn: ({ url, request }: { url: string; request: CreateLessonRequestDto }) =>
+      createLesson(url, request),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: lessonsQueryKeys.all(courseId),
@@ -51,8 +51,8 @@ export function usePatchLesson(courseId: string, lessonId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: UpdateLessonRequestDto) =>
-      patchLesson(courseId, lessonId, request),
+    mutationFn: ({ url, request }: { url: string; request: UpdateLessonRequestDto }) =>
+      patchLesson(url, request),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: lessonsQueryKeys.detail(courseId, lessonId),

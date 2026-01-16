@@ -6,7 +6,7 @@ import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { Edit, Trash2 } from "lucide-react";
 import { useDeleteCourse } from "../hooks/use-courses";
 import { toast } from "sonner";
-import { hasLink, CourseRels } from "@/utils/linkHelpers";
+import { hasLink, CourseRels, getLink } from "@/utils/linkHelpers";
 import type { LinkDto } from "@/types/LinkDto";
 
 interface CourseActionsProps {
@@ -14,7 +14,7 @@ interface CourseActionsProps {
   links?: LinkDto[];
 }
 
-export function CourseActions({ courseId, links }: CourseActionsProps) {
+export function CourseActions({ links }: CourseActionsProps) {
   const { t } = useTranslation(['courses', 'translation']);
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -23,6 +23,7 @@ export function CourseActions({ courseId, links }: CourseActionsProps) {
   // Determine available actions based on HATEOAS links
   const canUpdate = hasLink(links, CourseRels.PARTIAL_UPDATE);
   const canDelete = hasLink(links, CourseRels.DELETE);
+  const deleteLink = getLink(links, CourseRels.DELETE);
 
   const handleEdit = () => {
     toast.info(t('courses:actions.editNotImplemented'));
@@ -33,8 +34,13 @@ export function CourseActions({ courseId, links }: CourseActionsProps) {
   };
 
   const handleConfirmDelete = async () => {
+    if (!deleteLink) {
+      console.error("No delete link found for this course");
+      return;
+    }
+    
     try {
-      await deleteCourse.mutateAsync(courseId);
+      await deleteCourse.mutateAsync(deleteLink.href);
       toast.success(t('courses:actions.deleteSuccess'));
       // Navigate back to all courses page after successful deletion
       navigate('/courses');
