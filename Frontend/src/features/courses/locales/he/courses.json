@@ -31,7 +31,12 @@
     "titleUpdated": "כותרת הקורס עודכנה בהצלחה",
     "titleUpdateFailed": "נכשל בעדכון כותרת הקורס",
     "descriptionUpdated": "תיאור הקורס עודכן בהצלחה",
-    "descriptionUpdateFailed": "נכשל בעדכון תיאור הקורס"
+    "descriptionUpdateFailed": "נכשל בעדכון תיאור הקורס",
+    "uploadImage": "העלה תמונה",
+    "uploading": "מעלה...",
+    "uploadSuccess": "התמונה הועלתה בהצלחה",
+    "uploadFailed": "נכשל בהעלאת התמונה",
+    "invalidFileType": "סוג קובץ לא חוקי. אנא בחר קובץ תמונה (JPEG, PNG, GIF או WebP)"
   },
   "addDialog": {
     "title": "הוסף קורס חדש",

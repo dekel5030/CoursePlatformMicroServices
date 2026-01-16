@@ -3,6 +3,7 @@ import { Button, Card, InlineEditableText } from "@/components";
 import { ShoppingCart, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
 import { CourseActions } from "./CourseActions";
+import { CourseImageUpload } from "./CourseImageUpload";
 import { usePatchCourse } from "../hooks/use-courses";
 import { toast } from "sonner";
 import { hasLink, CourseRels } from "@/utils/linkHelpers";
@@ -73,6 +74,7 @@ export function CourseHeader({ course }: CourseHeaderProps) {
               isRTL ? "justify-start" : "justify-end"
             }`}
           >
+            <CourseImageUpload courseId={course.id} links={course.links} />
             <CourseActions courseId={course.id} links={course.links} />
           </div>
 

@@ -31,7 +31,12 @@
     "titleUpdated": "Course title updated successfully",
     "titleUpdateFailed": "Failed to update course title",
     "descriptionUpdated": "Course description updated successfully",
-    "descriptionUpdateFailed": "Failed to update course description"
+    "descriptionUpdateFailed": "Failed to update course description",
+    "uploadImage": "Upload Image",
+    "uploading": "Uploading...",
+    "uploadSuccess": "Image uploaded successfully",
+    "uploadFailed": "Failed to upload image",
+    "invalidFileType": "Invalid file type. Please select an image file (JPEG, PNG, GIF, or WebP)"
   },
   "addDialog": {
     "title": "Add New Course",

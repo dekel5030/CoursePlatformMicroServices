@@ -11,6 +11,7 @@ import type {
   UpdateLessonRequestDto,
 } from "../types";
 import { coursesQueryKeys } from "@/features/courses/hooks/use-courses";
+import { toast } from "sonner";
 
 export const lessonsQueryKeys = {
   all: (courseId: string) =>
@@ -67,14 +68,17 @@ export function useDeleteLesson(courseId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (lessonId: string) => deleteLesson(courseId, lessonId),
+    mutationFn: (deleteUrl: string) => deleteLesson(deleteUrl),
+
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: lessonsQueryKeys.all(courseId),
-      });
       queryClient.invalidateQueries({
         queryKey: coursesQueryKeys.detail(courseId),
       });
+      toast.success("Lesson deleted successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to delete lesson:", error);
+      toast.error("Failed to delete lesson");
     },
   });
 }
