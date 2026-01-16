@@ -6,6 +6,7 @@ import type {
   UpdateCourseRequestDto,
 } from "../types";
 import { axiosClient } from "@/axios/axiosClient";
+import axios from "axios";
 import type { LessonSummaryDto, LessonModel } from "@/features/lessons/types";
 import type { PagedResponse } from "@/types/LinkDto";
 
@@ -145,9 +146,8 @@ export async function uploadImageToStorage(
   uploadUrl: string,
   file: File
 ): Promise<void> {
-  // Create a new axios instance without JSON headers for binary upload
-  const binaryAxios = axiosClient.create();
-  await binaryAxios.put(uploadUrl, file, {
+  // Use a raw axios instance for binary upload to avoid default JSON headers
+  await axios.put(uploadUrl, file, {
     headers: {
       "Content-Type": file.type,
     },
