@@ -150,7 +150,7 @@ public class Course : Entity<CourseId>
 
         _images.Add(imageUrl);
         UpdatedAtUtc = timeProvider.GetUtcNow();
-        
+
         return Result.Success();
     }
 

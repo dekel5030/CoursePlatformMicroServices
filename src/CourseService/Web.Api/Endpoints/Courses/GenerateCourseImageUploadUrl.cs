@@ -1,7 +1,7 @@
 ﻿using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
-using Courses.Application.Courses.Commands.GenerateThumbnailUploadUrl;
+using Courses.Application.Courses.Commands.GenerateCourseImageUploadUrl;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -28,8 +28,8 @@ internal sealed class GenerateCourseImageUploadUrl : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithMetadata<GenerateUploadUrlResponse>(
-            nameof(GenerateCourseImageUploadUrl), 
-            Tags.Courses, 
+            nameof(GenerateCourseImageUploadUrl),
+            Tags.Courses,
             "Generate Course Image Upload URL");
     }
 }

@@ -5,7 +5,6 @@ using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application;
 using Courses.Infrastructure;
 using Courses.Infrastructure.Extensions;
-using Microsoft.Extensions.Primitives;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

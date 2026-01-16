@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Courses.Application.Abstractions.Repositories;
+﻿using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Abstractions.Storage;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
@@ -11,7 +8,7 @@ using Kernel.Auth.Abstractions;
 using Kernel.Auth.AuthTypes;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Application.Courses.Commands.GenerateThumbnailUploadUrl;
+namespace Courses.Application.Courses.Commands.GenerateCourseImageUploadUrl;
 
 internal sealed class GenerateCourseImageUploadUrlCommandHandler
     : ICommandHandler<GenerateCourseImageUploadUrlCommand, GenerateUploadUrlResponse>
@@ -21,8 +18,8 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
     private readonly IObjectStorageService _storageService;
 
     public GenerateCourseImageUploadUrlCommandHandler(
-        ICourseRepository courseRepository, 
-        IUserContext userContext, 
+        ICourseRepository courseRepository,
+        IUserContext userContext,
         IObjectStorageService storageService)
     {
         _courseRepository = courseRepository;

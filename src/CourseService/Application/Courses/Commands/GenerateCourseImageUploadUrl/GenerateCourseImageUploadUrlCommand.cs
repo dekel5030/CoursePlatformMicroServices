@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Courses.Domain.Courses.Primitives;
+﻿using Courses.Domain.Courses.Primitives;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Application.Courses.Commands.GenerateThumbnailUploadUrl;
+namespace Courses.Application.Courses.Commands.GenerateCourseImageUploadUrl;
 
 public record GenerateCourseImageUploadUrlCommand(
     CourseId Id,
