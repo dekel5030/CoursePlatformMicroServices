@@ -2,7 +2,7 @@
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 
-namespace Courses.Application.Courses.Queries.Dtos;
+namespace Courses.Application.Courses.Dtos;
 
 public record CourseSummaryDto(
     CourseId Id,
@@ -10,7 +10,7 @@ public record CourseSummaryDto(
     string? InstructorName,
     decimal Price,
     string Currency,
-    ImageUrl? ThumbnailUrl,
+    string? ThumbnailUrl,
     int LessonsCount,
     int EnrollmentCount,
     IReadOnlyCollection<CourseAction> AllowedActions

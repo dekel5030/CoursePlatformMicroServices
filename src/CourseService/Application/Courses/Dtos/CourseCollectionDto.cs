@@ -1,7 +1,7 @@
 ﻿using Courses.Application.Actions.Primitives;
 using Courses.Application.Shared.Dtos;
 
-namespace Courses.Application.Courses.Queries.Dtos;
+namespace Courses.Application.Courses.Dtos;
 
 public sealed record CourseCollectionDto(
     IReadOnlyCollection<CourseSummaryDto> Items,

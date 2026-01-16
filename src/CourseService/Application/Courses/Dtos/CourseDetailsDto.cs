@@ -1,9 +1,9 @@
 ﻿using Courses.Application.Actions.Primitives;
-using Courses.Application.Lessons.Queries.Dtos;
+using Courses.Application.Lessons.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 
-namespace Courses.Application.Courses.Queries.Dtos;
+namespace Courses.Application.Courses.Dtos;
 
 public record CourseDetailsDto(
     CourseId Id,
@@ -14,7 +14,7 @@ public record CourseDetailsDto(
     string Currency,
     int EnrollmentCount,
     DateTimeOffset UpdatedAtUtc,
-    IReadOnlyList<ImageUrl> ImageUrls,
+    IReadOnlyList<string> ImageUrls,
     IReadOnlyList<LessonSummaryDto> Lessons,
     IReadOnlyCollection<CourseAction> AllowedActions
 );

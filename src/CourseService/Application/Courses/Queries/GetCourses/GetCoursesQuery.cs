@@ -1,4 +1,4 @@
-﻿using Courses.Application.Courses.Queries.Dtos;
+﻿using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
 using Kernel.Messaging.Abstractions;
 

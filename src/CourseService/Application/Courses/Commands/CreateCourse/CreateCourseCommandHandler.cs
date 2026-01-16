@@ -1,9 +1,7 @@
 ﻿using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
-using Courses.Application.Actions;
 using Courses.Application.Actions.Abstract;
-using Courses.Application.Actions.Primitives;
-using Courses.Application.Courses.Queries.Dtos;
+using Courses.Application.Courses.Dtos;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
@@ -58,7 +56,7 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
             course.InstructorId?.ToString(),
             course.Price.Amount,
             course.Price.Currency,
-            course.Images.Count == 0 ? null : course.Images[0],
+            null,
             course.LessonCount,
             course.EnrollmentCount,
             _actionProvider.GetAllowedActions(course)

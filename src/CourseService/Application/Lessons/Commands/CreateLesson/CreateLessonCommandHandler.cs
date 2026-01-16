@@ -2,8 +2,7 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Actions.Abstract;
-using Courses.Application.Lessons.Extensions;
-using Courses.Application.Lessons.Queries.Dtos;
+using Courses.Application.Lessons.Dtos;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Lessons;
@@ -67,7 +66,7 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
             lesson.Index,
             lesson.Duration,
             lesson.Access == LessonAccess.Public,
-            lesson.ThumbnailImageUrl,
+            lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
             _actionProvider.GetAllowedActions(course, lesson));
 
         return Result.Success(response);

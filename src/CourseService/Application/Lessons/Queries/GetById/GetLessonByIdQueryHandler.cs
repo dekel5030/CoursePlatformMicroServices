@@ -1,9 +1,7 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Actions;
 using Courses.Application.Actions.Abstract;
-using Courses.Application.Lessons.Extensions;
-using Courses.Application.Lessons.Queries.Dtos;
+using Courses.Application.Lessons.Dtos;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Lessons;
@@ -24,7 +22,7 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
     private readonly ICourseActionProvider _actionProvider;
 
     public GetLessonByIdQueryHandler(
-        IReadDbContext dbContext, 
+        IReadDbContext dbContext,
         IStorageUrlResolver urlResolver,
         ICourseActionProvider actionProvider)
     {
@@ -60,8 +58,8 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
             lesson.Index,
             lesson.Duration,
             lesson.Access == LessonAccess.Public,
-            lesson.ThumbnailImageUrl,
-            lesson.VideoUrl,
+            lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
+            lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Private, lesson.VideoUrl.Path).Value,
             _actionProvider.GetAllowedActions(course, lesson));
 
         return Result.Success(response);

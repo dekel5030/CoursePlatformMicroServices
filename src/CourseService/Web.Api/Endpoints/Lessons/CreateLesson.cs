@@ -4,7 +4,7 @@ using Courses.Api.Contracts.Lessons;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Lessons.Commands.CreateLesson;
-using Courses.Application.Lessons.Queries.Dtos;
+using Courses.Application.Lessons.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
@@ -43,7 +43,7 @@ internal sealed class CreateLesson : IEndpoint
                 ),
                 CustomResults.Problem);
         })
-        .WithMetadata<LessonDetailsResponse>(
+        .WithMetadata<LessonSummaryResponse>(
             nameof(CreateLesson),
             Tags.Lessons,
             "Create a lesson",
