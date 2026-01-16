@@ -2,12 +2,20 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal, Plus } from "lucide-react";
-import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
 import { AddCourseDialog } from "./AddCourseDialog";
+import { hasLink, CourseRels } from "@/utils/linkHelpers";
+import type { LinkDto } from "@/types/LinkDto";
 
-export function CatalogHeader() {
+interface CatalogHeaderProps {
+  collectionLinks?: LinkDto[];
+}
+
+export function CatalogHeader({ collectionLinks }: CatalogHeaderProps) {
   const { t } = useTranslation(['courses', 'translation']);
   const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
+  
+  // Show create button only if the "create" link exists in collection-level links
+  const canCreateCourse = hasLink(collectionLinks, CourseRels.CREATE);
 
   return (
     <>
@@ -31,11 +39,7 @@ export function CatalogHeader() {
             {t('courses:catalog.filters')}
           </Button>
 
-          <Authorized 
-            action={ActionType.Create} 
-            resource={ResourceType.Course}
-            resourceId={ResourceId.Wildcard}
-          >
+          {canCreateCourse && (
             <Button 
               size="sm" 
               className="gap-2"
@@ -44,7 +48,7 @@ export function CatalogHeader() {
               <Plus className="h-4 w-4" />
               {t('courses:catalog.addCourse')}
             </Button>
-          </Authorized>
+          )}
         </div>
       </header>
 

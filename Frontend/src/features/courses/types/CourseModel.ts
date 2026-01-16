@@ -1,5 +1,6 @@
 import type { Money } from "./money";
 import type { LessonModel } from "@/features/lessons/types/LessonModel";
+import type { LinkDto } from "@/types/LinkDto";
 
 /**
  * UI Model: Stable interface for UI components
@@ -15,4 +16,5 @@ export interface CourseModel {
   price: Money;
   lessons?: LessonModel[];
   updatedAtUtc?: string;
+  links?: LinkDto[];
 }

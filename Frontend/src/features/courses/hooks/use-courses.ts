@@ -6,6 +6,7 @@ import {
   patchCourse,
   deleteCourse,
   fetchAllCourses,
+  type FetchAllCoursesResult,
 } from "../api";
 import type {
   CourseModel,
@@ -28,7 +29,7 @@ export function useFeaturedCourses() {
 }
 
 export function useAllCourses() {
-  return useQuery<CourseModel[], Error>({
+  return useQuery<FetchAllCoursesResult, Error>({
     queryKey: coursesQueryKeys.allCourses(),
     queryFn: fetchAllCourses,
   });

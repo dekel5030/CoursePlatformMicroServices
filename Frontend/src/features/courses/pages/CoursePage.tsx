@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { CourseHeader } from "../components/CourseHeader";
 import { CourseLessonsSection } from "../components/CourseLessonsSection";
 import { toast } from "sonner";
-import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
+import { hasLink, CourseRels } from "@/utils/linkHelpers";
 
 export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
@@ -88,6 +88,9 @@ export default function CoursePage() {
   }
 
   const contentDir = i18n.dir();
+  
+  // Check if user can update course based on HATEOAS links
+  const canUpdate = hasLink(course.links, CourseRels.PARTIAL_UPDATE);
 
   const breadcrumbItems = [
     { label: t("breadcrumbs.home"), path: "/" },
@@ -131,22 +134,7 @@ export default function CoursePage() {
                 <CardTitle className={textAlignClass}>{t('courses:detail.about')}</CardTitle>
               </CardHeader>
               <CardContent className={textAlignClass}>
-                <Authorized
-                  action={ActionType.Update}
-                  resource={ResourceType.Course}
-                  resourceId={ResourceId.create(course.id)}
-                  fallback={
-                    course.description ? (
-                      <p className={`text-muted-foreground ${textAlignClass}`} dir="auto">
-                        {course.description}
-                      </p>
-                    ) : (
-                      <p className={`text-muted-foreground italic ${textAlignClass}`}>
-                        {t('courses:detail.noDescription')}
-                      </p>
-                    )
-                  }
-                >
+                {canUpdate ? (
                   <InlineEditableTextarea
                     value={course.description || ""}
                     onSave={handleDescriptionUpdate}
@@ -155,7 +143,17 @@ export default function CoursePage() {
                     rows={5}
                     maxLength={2000}
                   />
-                </Authorized>
+                ) : (
+                  course.description ? (
+                    <p className={`text-muted-foreground ${textAlignClass}`} dir="auto">
+                      {course.description}
+                    </p>
+                  ) : (
+                    <p className={`text-muted-foreground italic ${textAlignClass}`}>
+                      {t('courses:detail.noDescription')}
+                    </p>
+                  )
+                )}
               </CardContent>
             </Card>
           </motion.div>

@@ -11,14 +11,9 @@ import {
 } from "@/components";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { Clock, Trash2 } from "lucide-react";
-import {
-  Authorized,
-  ActionType,
-  ResourceType,
-  ResourceId,
-} from "@/features/auth";
 import { usePatchLesson, useDeleteLesson } from "../hooks/use-lessons";
 import { toast } from "sonner";
+import { hasLink, LessonRels } from "@/utils/linkHelpers";
 
 interface LessonProps {
   lesson: LessonModel;
@@ -37,6 +32,11 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
 
   const isRTL = i18n.dir() === "rtl";
   const textAlignClass = isRTL ? "text-right" : "text-left";
+  
+  // Determine available actions based on HATEOAS links
+  const canUpdate = hasLink(lesson.links, LessonRels.PARTIAL_UPDATE);
+  const canDelete = hasLink(lesson.links, LessonRels.DELETE);
+  
   const formatDuration = (duration: string | null | undefined) => {
     if (!duration) return null;
 
@@ -119,19 +119,7 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
 
             <div className={`flex-1 space-y-1 min-w-0 ${textAlignClass}`}>
               <div className="flex items-center gap-2 flex-wrap">
-                <Authorized
-                  action={ActionType.Update}
-                  resource={ResourceType.Lesson}
-                  resourceId={ResourceId.create(lesson.lessonId)}
-                  fallback={
-                    <h3
-                      className={`font-semibold text-base line-clamp-1 ${textAlignClass}`}
-                      dir="auto"
-                    >
-                      {lesson.title}
-                    </h3>
-                  }
-                >
+                {canUpdate ? (
                   <div className="flex-1" onClick={(e) => e.stopPropagation()}>
                     <InlineEditableText
                       value={lesson.title}
@@ -142,7 +130,14 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
                       maxLength={200}
                     />
                   </div>
-                </Authorized>
+                ) : (
+                  <h3
+                    className={`font-semibold text-base line-clamp-1 ${textAlignClass}`}
+                    dir="auto"
+                  >
+                    {lesson.title}
+                  </h3>
+                )}
                 {lesson.isPreview && (
                   <Badge variant="secondary" className="text-xs">
                     {t("lessons:card.preview")}
@@ -152,21 +147,7 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
 
               {lesson.description !== null &&
                 lesson.description !== undefined && (
-                  <Authorized
-                    action={ActionType.Update}
-                    resource={ResourceType.Lesson}
-                    resourceId={ResourceId.create(lesson.lessonId)}
-                    fallback={
-                      lesson.description ? (
-                        <p
-                          className={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`}
-                          dir="auto"
-                        >
-                          {lesson.description}
-                        </p>
-                      ) : null
-                    }
-                  >
+                  canUpdate ? (
                     <div onClick={(e) => e.stopPropagation()}>
                       <InlineEditableText
                         value={lesson.description || ""}
@@ -177,7 +158,16 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
                         maxLength={500}
                       />
                     </div>
-                  </Authorized>
+                  ) : (
+                    lesson.description ? (
+                      <p
+                        className={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`}
+                        dir="auto"
+                      >
+                        {lesson.description}
+                      </p>
+                    ) : null
+                  )
                 )}
             </div>
 
@@ -189,11 +179,7 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
                 </div>
               )}
               <div className="flex gap-1">
-                <Authorized
-                  action={ActionType.Delete}
-                  resource={ResourceType.Lesson}
-                  resourceId={ResourceId.create(lesson.lessonId)}
-                >
+                {canDelete && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -204,7 +190,7 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                </Authorized>
+                )}
               </div>
             </div>
           </div>

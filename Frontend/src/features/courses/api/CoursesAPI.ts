@@ -7,6 +7,7 @@ import type {
 } from "../types";
 import { axiosClient } from "@/axios/axiosClient";
 import type { LessonSummaryDto, LessonModel } from "@/features/lessons/types";
+import type { PagedResponse } from "@/types/LinkDto";
 
 function mapLessonSummaryToModel(dto: LessonSummaryDto): LessonModel {
   return {
@@ -19,6 +20,7 @@ function mapLessonSummaryToModel(dto: LessonSummaryDto): LessonModel {
     isPreview: dto.isPreview,
     order: dto.index,
     duration: dto.duration,
+    links: dto.links,
   };
 }
 
@@ -36,6 +38,7 @@ function mapCourseDetailsToModel(dto: CourseDetailsDto): CourseModel {
     },
     lessons: dto.lessons.map(mapLessonSummaryToModel),
     updatedAtUtc: dto.updatedAtUtc,
+    links: dto.links,
   };
 }
 
@@ -51,12 +54,13 @@ function mapCourseSummaryToModel(dto: CourseSummaryDto): CourseModel {
       amount: dto.price,
       currency: dto.currency,
     },
+    links: dto.links,
   };
 }
 
 export async function fetchFeaturedCourses(): Promise<CourseModel[]> {
   const response = await axiosClient.get<
-    CourseSummaryDto[] | { items: CourseSummaryDto[] }
+    CourseSummaryDto[] | PagedResponse<CourseSummaryDto>
   >("/courses/featured");
   const data = response.data;
   const dtos = Array.isArray(data) ? data : data.items || [];
@@ -90,11 +94,27 @@ export async function deleteCourse(id: string): Promise<void> {
   await axiosClient.delete(`/courses/${id}`);
 }
 
-export async function fetchAllCourses(): Promise<CourseModel[]> {
+export interface FetchAllCoursesResult {
+  courses: CourseModel[];
+  links: import("@/types/LinkDto").LinkDto[];
+}
+
+export async function fetchAllCourses(): Promise<FetchAllCoursesResult> {
   const response = await axiosClient.get<
-    CourseSummaryDto[] | { items: CourseSummaryDto[] }
+    CourseSummaryDto[] | PagedResponse<CourseSummaryDto>
   >("/courses");
   const data = response.data;
-  const dtos = Array.isArray(data) ? data : data.items || [];
-  return dtos.map(mapCourseSummaryToModel);
+  
+  // Handle both legacy array format and new PagedResponse format
+  if (Array.isArray(data)) {
+    return {
+      courses: data.map(mapCourseSummaryToModel),
+      links: [],
+    };
+  }
+  
+  return {
+    courses: data.items.map(mapCourseSummaryToModel),
+    links: data.links,
+  };
 }
