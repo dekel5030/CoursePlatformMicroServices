@@ -8,7 +8,7 @@ public sealed record CourseCollectionDto(
     int PageNumber,
     int PageSize,
     int TotalItems,
-    IReadOnlyList<CourseCollectionAction> AllowedActions
+    IReadOnlyCollection<CourseCollectionAction> AllowedActions
 ) : CollectionDto<CourseSummaryDto>(
     Items,
     PageNumber,

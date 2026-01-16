@@ -1,5 +1,6 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
+using Courses.Application.Actions.Abstract;
 using Courses.Application.Actions.Primitives;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Domain.Courses;
@@ -15,11 +16,16 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
 #pragma warning disable S4487 // Unread "private" fields should be removed
     private readonly IStorageUrlResolver _urlResolver;
 #pragma warning restore S4487 // Unread "private" fields should be removed
+    private readonly ICourseActionProvider _actionProvider;
 
-    public GetCoursesQueryHandler(IReadDbContext dbContext, IStorageUrlResolver urlResolver)
+    public GetCoursesQueryHandler(
+        IReadDbContext dbContext, 
+        IStorageUrlResolver urlResolver, 
+        ICourseActionProvider courseActionProvider)
     {
         _dbContext = dbContext;
         _urlResolver = urlResolver;
+        _actionProvider = courseActionProvider;
     }
 
     public async Task<Result<CourseCollectionDto>> Handle(
@@ -39,8 +45,6 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        var allowedActions = new List<CourseAction> { CourseAction.Update, CourseAction.CreateLesson };
-
         var courseDtos = courses
             .Select(course => new CourseSummaryDto(
                 course.Id,
@@ -51,10 +55,15 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
                 course.Images.Count > 0 ? course.Images[0] : null,
                 course.LessonCount,
                 course.EnrollmentCount,
-                allowedActions))
+                _actionProvider.GetAllowedActions(course)))
             .ToList();
 
-        var response = new CourseCollectionDto(courseDtos, pageNumber, pageSize, totalItems, new List<CourseCollectionAction> { CourseCollectionAction.CreateCourse });
+        var response = new CourseCollectionDto(
+            courseDtos, 
+            pageNumber, 
+            pageSize, 
+            totalItems, 
+            _actionProvider.GetAllowedCollectionActions());
 
         return Result.Success(response);
     }
