@@ -1,10 +1,10 @@
-﻿using Kernel;
-using Courses.Domain.Lessons.Primitives;
+﻿using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Courses;
-using Courses.Domain.Shared.Primitives;
 using Courses.Domain.Lessons.Events;
+using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared;
+using Courses.Domain.Shared.Primitives;
+using Kernel;
 
 namespace Courses.Domain.Lessons;
 
@@ -41,7 +41,7 @@ public class Lesson : Entity<LessonId>
 
         return Result.Success(newLesson);
     }
-    
+
     public Result UpdateVideoData(VideoUrl videoUrl, TimeSpan duration)
     {
         VideoUrl = videoUrl;

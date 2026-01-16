@@ -1,8 +1,8 @@
-﻿using FluentValidation;
+﻿using System.Reflection;
+using FluentValidation;
 using FluentValidation.Results;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using System.Reflection;
 
 namespace CoursePlatform.ServiceDefaults.Messaging.Behaviors;
 

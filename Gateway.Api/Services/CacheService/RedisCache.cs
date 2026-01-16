@@ -29,9 +29,9 @@ internal sealed class RedisCache : ICacheService
     }
 
     public async Task SetAsync<TResponse>(
-        string cacheKey, 
-        TResponse result, 
-        TimeSpan? expiration, 
+        string cacheKey,
+        TResponse result,
+        TimeSpan? expiration,
         CancellationToken cancellationToken = default)
     {
         var options = new DistributedCacheEntryOptions

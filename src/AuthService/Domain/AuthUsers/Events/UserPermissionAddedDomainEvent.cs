@@ -1,4 +1,3 @@
-using Auth.Domain.AuthUsers;
 using Auth.Domain.Permissions;
 using Kernel.Messaging.Abstractions;
 

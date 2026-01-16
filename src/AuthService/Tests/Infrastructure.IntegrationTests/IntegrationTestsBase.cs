@@ -1,17 +1,11 @@
 using Auth.Infrastructure.Database;
-using DotNet.Testcontainers.Builders;
-using Infrastructure.Database;
 using MassTransit;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 using Testcontainers.Redis;
-using Xunit;
 
 namespace Auth.Infrastructure.IntegrationTests;
 

@@ -7,10 +7,10 @@ internal interface IStorageProvider
     PresignedUrlResponse GenerateViewUrl(string fileKey, TimeSpan expiry);
 
     Task<Result<string>> UploadObjectAsync(
-        Stream stream, 
-        string fileKey, 
-        string contentType, 
-        long contentLength, 
+        Stream stream,
+        string fileKey,
+        string contentType,
+        long contentLength,
         string bucket);
     Task<bool> DeleteFileAsync(string fileKey);
     Task<ObjectResponse> GetObjectAsync(string bucketName, string key, CancellationToken cancellationToken = default);

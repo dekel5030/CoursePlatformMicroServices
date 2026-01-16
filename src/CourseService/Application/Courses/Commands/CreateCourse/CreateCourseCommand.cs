@@ -6,5 +6,5 @@ namespace Courses.Application.Courses.Commands.CreateCourse;
 public record CreateCourseCommand(
     Title? Title,
     Description? Description,
-    Guid? InstructorId) 
+    Guid? InstructorId)
         : ICommand<CreateCourseDto>;

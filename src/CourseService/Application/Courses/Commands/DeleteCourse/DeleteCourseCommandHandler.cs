@@ -19,11 +19,11 @@ public class DeleteCourseCommandHandler : ICommandHandler<DeleteCourseCommand>
     }
 
     public async Task<Result> Handle(
-        DeleteCourseCommand request, 
+        DeleteCourseCommand request,
         CancellationToken cancellationToken = default)
     {
         Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
-        
+
         if (course is null)
         {
             return Result.Failure(CourseErrors.NotFound);

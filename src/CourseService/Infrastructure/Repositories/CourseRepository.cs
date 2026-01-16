@@ -13,7 +13,7 @@ public class CourseRepository : RepositoryBase<Course, CourseId>, ICourseReposit
     }
 
     public override Task<Course?> GetByIdAsync(
-        CourseId id, 
+        CourseId id,
         CancellationToken cancellationToken = default)
     {
         return DbContext.Courses

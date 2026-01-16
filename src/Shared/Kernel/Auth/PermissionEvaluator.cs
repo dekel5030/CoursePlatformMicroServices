@@ -21,16 +21,16 @@ public static class PermissionEvaluator
     }
 
     private static bool CheckRule(
-        ClaimsPrincipal user, 
-        EffectType effect, 
-        ActionType action, 
-        ResourceType resource, 
+        ClaimsPrincipal user,
+        EffectType effect,
+        ActionType action,
+        ResourceType resource,
         ResourceId resourceId)
     {
         (ActionType Action, ResourceType Resource, ResourceId ResourceId)[] patternsToCheck = new[] {
             (Action: action, Resource: resource, ResourceId: resourceId),
             (Action: action, Resource: resource, ResourceId: ResourceId.Wildcard),
-            (Action: action, Resource: ResourceType.Wildcard, ResourceId: resourceId), 
+            (Action: action, Resource: ResourceType.Wildcard, ResourceId: resourceId),
             (Action: action, Resource: ResourceType.Wildcard, ResourceId: ResourceId.Wildcard),
 
             (Action: ActionType.Wildcard, Resource: resource, ResourceId: resourceId),

@@ -52,7 +52,7 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
 
         if (request.InstructorId.HasValue)
         {
-            Result instructorResult = course.AssignInstructor(new InstructorId(request.InstructorId.Value), _timeProvider);
+            Result instructorResult = course.AssignInstructor(new UserId(request.InstructorId.Value), _timeProvider);
             if (instructorResult.IsFailure)
             {
                 return instructorResult;
@@ -62,10 +62,10 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
         if (request.PriceAmount.HasValue != request.PriceCurrency is not null)
         {
             return Result.Failure(Error.Validation(
-                "Course.IncompletePriceUpdate", 
+                "Course.IncompletePriceUpdate",
                 "Both price amount and currency must be provided together."));
         }
-        
+
         if (request.PriceAmount.HasValue && request.PriceCurrency is not null)
         {
             Result priceResult = course.SetPrice(new Money(request.PriceAmount.Value, request.PriceCurrency), _timeProvider);

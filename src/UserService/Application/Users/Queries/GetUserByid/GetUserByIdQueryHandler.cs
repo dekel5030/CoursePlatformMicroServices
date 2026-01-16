@@ -11,7 +11,7 @@ namespace Users.Application.Users.Queries.GetUserByid;
 public class GetUserByIdQueryHandler(IReadDbContext dbContext) : IQueryHandler<GetUserByIdQuery, UserReadDto>
 {
     public async Task<Result<UserReadDto>> Handle(
-        GetUserByIdQuery request, 
+        GetUserByIdQuery request,
         CancellationToken cancellationToken = default)
     {
         UserReadDto? user = await dbContext.Users

@@ -14,7 +14,7 @@ public class RoleRemovePermissionCommandHandler : ICommandHandler<RoleRemovePerm
     private readonly IUnitOfWork _unitOfWork;
 
     public RoleRemovePermissionCommandHandler(
-        IWriteDbContext dbContext, 
+        IWriteDbContext dbContext,
         IUnitOfWork unitOfWork)
     {
         _dbContext = dbContext;
@@ -22,7 +22,7 @@ public class RoleRemovePermissionCommandHandler : ICommandHandler<RoleRemovePerm
     }
 
     public async Task<Result> Handle(
-        RoleRemovePermissionCommand request, 
+        RoleRemovePermissionCommand request,
         CancellationToken cancellationToken = default)
     {
         Role? role = await _dbContext.Roles

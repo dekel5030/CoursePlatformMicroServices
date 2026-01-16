@@ -44,9 +44,9 @@ internal sealed class CreateLesson : IEndpoint
                 CustomResults.Problem);
         })
         .WithMetadata<LessonDetailsResponse>(
-            nameof(CreateLesson), 
-            Tags.Lessons, 
-            "Create a lesson", 
+            nameof(CreateLesson),
+            Tags.Lessons,
+            "Create a lesson",
             StatusCodes.Status201Created);
     }
 }

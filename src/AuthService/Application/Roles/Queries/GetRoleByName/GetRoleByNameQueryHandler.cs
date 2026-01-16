@@ -19,7 +19,7 @@ internal sealed class GetRoleByNameQueryHandler : IQueryHandler<GetRoleByNameQue
     }
 
     public async Task<Result<RoleDto>> Handle(
-        GetRoleByNameQuery request, 
+        GetRoleByNameQuery request,
         CancellationToken cancellationToken = default)
     {
         var roleName = new RoleName(request.RoleName);
@@ -33,12 +33,12 @@ internal sealed class GetRoleByNameQueryHandler : IQueryHandler<GetRoleByNameQue
         }
 
         var roleDto = new RoleDto(
-            role.Id.Value, 
+            role.Id.Value,
             role.Name.Value,
             role.Permissions
                 .Select(permission => new PermissionDto(
-                    permission.Key, 
-                    permission.Effect.ToString(), 
+                    permission.Key,
+                    permission.Effect.ToString(),
                     permission.Action.ToString(),
                     permission.Resource.ToString(),
                     permission.ResourceId.Value))

@@ -16,9 +16,9 @@ public record Permission
     [JsonInclude]
     public string Key => $"{(int)Effect:D1}{(int)Action:D2}{(int)Resource:D3}{ResourceId.Value}";
 
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     private Permission() { }
-    #pragma warning restore CS8618 
+#pragma warning restore CS8618
 
     public Permission(
         EffectType effect,
@@ -41,9 +41,9 @@ public record Permission
     }
 
     public static Result<Permission> Parse(
-        string effectSegment, 
-        string actionSegment, 
-        string resourceSegment, 
+        string effectSegment,
+        string actionSegment,
+        string resourceSegment,
         string resourceIdSegment)
     {
         if (!PermissionParser.TryParseEffect(effectSegment, out EffectType effect))

@@ -32,7 +32,7 @@ internal class RedisCache : ICacheService
     public async Task SetAsync<TResponse>(
         string cacheKey,
         TResponse result,
-        TimeSpan? expiration, 
+        TimeSpan? expiration,
         CancellationToken cancellationToken)
     {
         var options = new DistributedCacheEntryOptions

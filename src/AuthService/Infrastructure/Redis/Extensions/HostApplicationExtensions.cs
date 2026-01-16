@@ -7,7 +7,7 @@ namespace Auth.Infrastructure.Redis.Extensions;
 internal static class HostApplicationExtensions
 {
     public static IHostApplicationBuilder AddDistributedPermissionStore(
-        this IHostApplicationBuilder builder, 
+        this IHostApplicationBuilder builder,
         string redisConnectionString)
     {
         builder.AddRedisDistributedCache(redisConnectionString);

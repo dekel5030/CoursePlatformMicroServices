@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
 using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +11,7 @@ public static class MediatorExtentions
     {
         services.AddScoped<IMediator, Mediator>();
 
-        services.Scan(selector => 
+        services.Scan(selector =>
             selector
                 .FromAssemblies(typeof(TMarker).Assembly)
                 .AddClasses(classes => classes

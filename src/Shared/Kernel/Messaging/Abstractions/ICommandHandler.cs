@@ -1,5 +1,3 @@
-using Kernel;
-
 namespace Kernel.Messaging.Abstractions;
 
 public interface ICommandHandler<TCommand> : IRequestHandler<TCommand, Result>

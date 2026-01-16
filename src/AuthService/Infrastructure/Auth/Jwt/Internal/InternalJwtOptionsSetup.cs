@@ -1,6 +1,4 @@
-﻿using Auth.Infrastructure.Auth;
-using Auth.Infrastructure.Auth.Jwt;
-using Kernel.Auth;
+﻿using Kernel.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

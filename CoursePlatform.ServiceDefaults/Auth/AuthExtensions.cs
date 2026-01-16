@@ -13,7 +13,7 @@ public static class AuthExtensions
     public const string InternalAudience = "course-platform-internal";
 
     public static IServiceCollection AddInternalAuth(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         string authServiceUrl)
     {
         Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();

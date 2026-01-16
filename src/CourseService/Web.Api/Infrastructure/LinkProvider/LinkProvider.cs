@@ -1,7 +1,7 @@
 using Courses.Api.Endpoints.Courses;
 using Courses.Api.Endpoints.Lessons;
+using Courses.Application.Actions.Primitives;
 using Courses.Application.Courses.Queries.Dtos;
-using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
@@ -37,7 +37,7 @@ internal sealed class LinkProvider
         };
     }
 
-    public List<LinkDto> CreateCourseLinks(CourseId id, IReadOnlyList<CourseAction> allowedActions)
+    public List<LinkDto> CreateCourseLinks(CourseId id, IReadOnlyCollection<CourseAction> allowedActions)
     {
         var allowedActionsSet = allowedActions.ToHashSet();
         var links = new List<LinkDto>();
@@ -45,7 +45,7 @@ internal sealed class LinkProvider
 
         links.Add(Create(nameof(GetCourseById), "self", HttpMethods.Get, new { id = idStr }));
 
-        if (allowedActionsSet.TryGetValue(CourseAction.Edit, out _))
+        if (allowedActionsSet.TryGetValue(CourseAction.Update, out _))
         {
             links.Add(Create(nameof(PatchCourse), "partial-update", HttpMethods.Patch, new { id = idStr }));
         }
@@ -59,9 +59,9 @@ internal sealed class LinkProvider
     }
 
     public List<LinkDto> CreateLessonLinks(
-        CourseId courseId, 
-        LessonId lessonId, 
-        IReadOnlyList<LessonAction> allowedActions)
+        CourseId courseId,
+        LessonId lessonId,
+        IReadOnlyCollection<LessonAction> allowedActions)
     {
         var allowedActionsSet = allowedActions.ToHashSet();
         var links = new List<LinkDto>();

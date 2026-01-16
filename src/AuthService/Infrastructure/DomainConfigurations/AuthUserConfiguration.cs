@@ -23,7 +23,7 @@ internal sealed class AuthUserConfiguration : IEntityTypeConfiguration<AuthUser>
             value => new AuthUserId(value));
 
         builder.Property(user => user.IdentityId).HasConversion(
-            id => id.ProviderId, 
+            id => id.ProviderId,
             value => new IdentityProviderId(value));
 
         builder.Property(user => user.Email).HasConversion(

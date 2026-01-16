@@ -18,7 +18,7 @@ internal sealed class UserRegisterdEventConsumer : IEventConsumer<UserRegistered
     }
 
     public async Task HandleAsync(
-        UserRegisteredEvent message, 
+        UserRegisteredEvent message,
         CancellationToken cancellationToken = default)
     {
         var userId = new UserId { Value = message.UserId };
@@ -34,7 +34,7 @@ internal sealed class UserRegisterdEventConsumer : IEventConsumer<UserRegistered
             {
                 _dbContext.Users.Add(userCreationResult.Value);
                 await _dbContext.SaveChangesAsync(cancellationToken);
-            }    
+            }
         }
     }
 }

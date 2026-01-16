@@ -1,6 +1,7 @@
 using Courses.Api.Contracts.Courses;
 using Courses.Api.Contracts.Shared;
 using Courses.Api.Infrastructure.LinkProvider;
+using Courses.Application.Actions.Primitives;
 using Courses.Application.Courses.Commands.CreateCourse;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Shared.Dtos;

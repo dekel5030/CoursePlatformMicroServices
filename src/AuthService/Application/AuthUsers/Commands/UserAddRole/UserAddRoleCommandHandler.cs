@@ -17,7 +17,7 @@ public class UserAddRoleCommandHandler : ICommandHandler<UserAddRoleCommand>
     private readonly IUnitOfWork _unitOfWork;
 
     public UserAddRoleCommandHandler(
-        IWriteDbContext dbContext, 
+        IWriteDbContext dbContext,
         IUnitOfWork unitOfWork)
     {
         _dbContext = dbContext;
@@ -25,7 +25,7 @@ public class UserAddRoleCommandHandler : ICommandHandler<UserAddRoleCommand>
     }
 
     public async Task<Result> Handle(
-        UserAddRoleCommand request, 
+        UserAddRoleCommand request,
         CancellationToken cancellationToken = default)
     {
         AuthUser? user = await _dbContext.Users.Include(u => u.Roles)
@@ -35,7 +35,7 @@ public class UserAddRoleCommandHandler : ICommandHandler<UserAddRoleCommand>
         {
             return Result.Failure(AuthUserErrors.NotFound);
         }
-        
+
         Role? role = await _dbContext.Roles
             .FirstOrDefaultAsync(r => r.Name == new RoleName(request.RoleName), cancellationToken);
 

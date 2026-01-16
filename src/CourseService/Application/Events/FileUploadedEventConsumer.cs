@@ -45,7 +45,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
     }
 
     private async Task HandleCourseImageAsync(
-        FileUploadedEvent message, 
+        FileUploadedEvent message,
         CancellationToken cancellationToken = default)
     {
         if (!Guid.TryParse(message.ReferenceId, out Guid guidId))
@@ -74,7 +74,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
     }
 
     private async Task HandleLessonImageAsync(
-        FileUploadedEvent message, 
+        FileUploadedEvent message,
         CancellationToken cancellationToken = default)
     {
         if (!Guid.TryParse(message.ReferenceId, out Guid guidId))

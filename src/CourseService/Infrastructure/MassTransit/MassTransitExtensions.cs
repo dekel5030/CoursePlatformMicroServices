@@ -11,7 +11,7 @@ namespace Courses.Infrastructure.MassTransit;
 internal static class MassTransitExtensions
 {
     internal static IServiceCollection AddMassTransitInternal(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration)
     {
         services.AddMassTransit(config =>

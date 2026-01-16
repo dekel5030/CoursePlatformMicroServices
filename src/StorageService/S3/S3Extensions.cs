@@ -7,7 +7,7 @@ namespace StorageService.S3;
 internal static class S3Extensions
 {
     public static IServiceCollection ConfigureS3(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration)
     {
         services.Configure<S3Options>(configuration.GetSection(S3Options.SectionName));

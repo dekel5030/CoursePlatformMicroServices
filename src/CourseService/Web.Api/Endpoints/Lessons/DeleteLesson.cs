@@ -25,9 +25,9 @@ internal sealed class DeleteLesson : IEndpoint
             return result.Match(Results.NoContent, CustomResults.Problem);
         })
         .WithMetadata<EmptyResult>(
-            nameof(DeleteLesson), 
-            Tags.Lessons, 
-            "Deletes a specific lesson from a given course.", 
+            nameof(DeleteLesson),
+            Tags.Lessons,
+            "Deletes a specific lesson from a given course.",
             204);
     }
 }

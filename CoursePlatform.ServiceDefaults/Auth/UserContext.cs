@@ -31,9 +31,9 @@ public class UserContext : IUserContext
 
     public bool HasPermission(ActionType action, ResourceType resource, ResourceId resourceId)
     {
-        if (User == null) 
-        { 
-            return false; 
+        if (User == null)
+        {
+            return false;
         }
 
         return PermissionEvaluator.HasPermission(User, action, resource, resourceId);

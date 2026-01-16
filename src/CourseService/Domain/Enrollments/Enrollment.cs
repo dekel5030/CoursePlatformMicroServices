@@ -11,9 +11,9 @@ public class Enrollment
     public DateTimeOffset EnrolledAtUtc { get; private set; }
     public DateTimeOffset ExpiresAtUtc { get; private set; }
 
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     private Enrollment() { }
-    #pragma warning restore CS8618
+#pragma warning restore CS8618
 
     internal static Enrollment Create(
         CourseId courseId,

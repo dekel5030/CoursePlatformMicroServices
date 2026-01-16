@@ -7,7 +7,7 @@ public class GenericConsumerBridge<TEvent> : IConsumer<TEvent>
     where TEvent : class
 {
     private readonly IMediator _mediator;
-    
+
     public GenericConsumerBridge(IMediator mediator)
     {
         _mediator = mediator;

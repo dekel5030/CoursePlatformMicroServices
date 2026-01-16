@@ -15,7 +15,7 @@ public class UserAddPermissionCommandHandler : ICommandHandler<UserAddPermission
     private readonly IUnitOfWork _unitOfWork;
 
     public UserAddPermissionCommandHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IWriteDbContext dbContext)
     {
         _unitOfWork = unitOfWork;
@@ -23,7 +23,7 @@ public class UserAddPermissionCommandHandler : ICommandHandler<UserAddPermission
     }
 
     public async Task<Result> Handle(
-        UserAddPermissionCommand request, 
+        UserAddPermissionCommand request,
         CancellationToken cancellationToken = default)
     {
         AuthUser? user = await _dbContext.Users

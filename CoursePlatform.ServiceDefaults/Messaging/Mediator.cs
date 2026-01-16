@@ -99,7 +99,7 @@ public sealed class Mediator : IMediator
         }
     }
 
-    private sealed class HandlerWrapper<T>(object handler) : HandlerWrapper 
+    private sealed class HandlerWrapper<T>(object handler) : HandlerWrapper
         where T : class
     {
         private readonly IEventHandler<T> _handler = (IEventHandler<T>)handler;

@@ -5,6 +5,7 @@ using Kernel.Auth;
 using Kernel.Auth.AuthTypes;
 
 namespace Auth.Infrastructure.Auth;
+
 public class PermissionResolver : IPermissionResolver
 {
     public IEnumerable<string> ResolveEffectivePermissions(AuthUser user)
@@ -41,7 +42,7 @@ public class PermissionResolver : IPermissionResolver
         {
             foreach (Permission child in source)
             {
-                if (parent != child && 
+                if (parent != child &&
                     parent.Effect == child.Effect &&
                     PermissionWiderThan(parent, child))
                 {

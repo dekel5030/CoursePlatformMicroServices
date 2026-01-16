@@ -20,10 +20,10 @@ public class CreateRoleCommandHandler
     }
 
     public async Task<Result<CreateRoleResponseDto>> Handle(
-        CreateRoleCommand request, 
+        CreateRoleCommand request,
         CancellationToken cancellationToken = default)
     {
-        RoleName roleName = new (request.RoleName);
+        RoleName roleName = new(request.RoleName);
 
         if (_dbContext.Roles.Any(r => r.Name == roleName))
         {

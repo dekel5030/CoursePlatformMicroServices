@@ -44,9 +44,9 @@ internal sealed class S3StorageProvider : IStorageProvider
         return new PresignedUrlResponse(url, fileKey, request.Expires.Value);
     }
     public async Task<Result<string>> UploadObjectAsync(
-        Stream stream, 
-        string fileKey, 
-        string contentType, 
+        Stream stream,
+        string fileKey,
+        string contentType,
         long contentLength,
         string bucket)
     {
@@ -104,8 +104,8 @@ internal sealed class S3StorageProvider : IStorageProvider
     }
 
     public async Task<ObjectResponse> GetObjectAsync(
-        string bucketName, 
-        string key, 
+        string bucketName,
+        string key,
         CancellationToken cancellationToken = default)
     {
         GetObjectResponse response = await _s3Client.GetObjectAsync(bucketName, key, cancellationToken);

@@ -11,7 +11,7 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext
 
     public WriteDbContext(
         DbContextOptions<WriteDbContext> options,
-        IMediator mediator) 
+        IMediator mediator)
         : base(options)
     {
         _mediator = mediator;
@@ -43,7 +43,7 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext
 
         IEnumerable<Task> tasks = domainEvents
             .Select(domainEvent => _mediator.Publish(domainEvent, cancellationToken));
-    
+
         return Task.WhenAll(tasks);
     }
 }

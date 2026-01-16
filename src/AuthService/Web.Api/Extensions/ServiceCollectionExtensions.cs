@@ -5,7 +5,7 @@ namespace Auth.Api.Extensions;
 
 internal static class ServiceCollectionExtensions
 {
-    internal static TBuilder AddSwaggerGenWithAuth<TBuilder>(this TBuilder builder) 
+    internal static TBuilder AddSwaggerGenWithAuth<TBuilder>(this TBuilder builder)
         where TBuilder : IHostApplicationBuilder
     {
         SwaggerExtensions.AddDefaultOpenApi<TBuilder>(builder, AuthSchemes.Internal);

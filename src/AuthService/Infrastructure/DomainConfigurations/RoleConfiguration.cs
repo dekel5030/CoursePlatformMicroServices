@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Auth.Infrastructure.DomainConfigurations;
 
-internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role> 
-{ 
-    public void Configure(EntityTypeBuilder<Role> builder) 
-    { 
+internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
+{
+    public void Configure(EntityTypeBuilder<Role> builder)
+    {
         builder.ToTable("roles");
 
         builder.HasKey(r => r.Id);
@@ -27,8 +27,8 @@ internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
                 name => name.Value,
                 value => new RoleName(value));
 
-        builder.OwnsMany(r => r.Permissions, permissionBuilder => 
-        { 
+        builder.OwnsMany(r => r.Permissions, permissionBuilder =>
+        {
             permissionBuilder.ToJson("permissions");
             permissionBuilder.Property(p => p.Effect).HasConversion<string>();
             permissionBuilder.Property(p => p.Action).HasConversion<string>();
@@ -38,5 +38,5 @@ internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
         });
 
         builder.Ignore(r => r.DomainEvents);
-    } 
+    }
 }

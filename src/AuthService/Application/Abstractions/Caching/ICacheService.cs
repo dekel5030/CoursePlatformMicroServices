@@ -1,11 +1,9 @@
-﻿using Kernel;
-
-namespace Auth.Application.Abstractions.Caching;
+﻿namespace Auth.Application.Abstractions.Caching;
 
 public interface ICacheService
 {
     Task<T?> GetAsync<T>(
-        string cacheKey, 
+        string cacheKey,
         CancellationToken cancellationToken);
 
     Task SetAsync<TResponse>(
