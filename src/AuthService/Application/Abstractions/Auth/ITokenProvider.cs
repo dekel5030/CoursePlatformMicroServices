@@ -6,6 +6,6 @@ public interface ITokenProvider
 {
     string GenerateToken(
         AuthUser user,
-        IEnumerable<string> effectivePermissions, 
+        IEnumerable<string> effectivePermissions,
         DateTime expiration);
 }

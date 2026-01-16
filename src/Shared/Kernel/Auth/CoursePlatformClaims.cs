@@ -14,7 +14,7 @@ public static class CoursePlatformClaims
 
     public static Claim CreateUserIdClaim(Guid userId)
         => new Claim(UserId, userId.ToString());
-    
+
     public static Claim CreateEmailClaim(string email)
         => new Claim(Email, email);
 

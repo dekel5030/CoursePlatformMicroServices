@@ -14,7 +14,7 @@ internal sealed class QueryCachingBehavior<TRequest, TResponse>
     private readonly ILogger<QueryCachingBehavior<TRequest, TResponse>> _logger;
 
     public QueryCachingBehavior(
-        ICacheService cacheService, 
+        ICacheService cacheService,
         ILogger<QueryCachingBehavior<TRequest, TResponse>> logger)
     {
         _cacheService = cacheService;
@@ -22,8 +22,8 @@ internal sealed class QueryCachingBehavior<TRequest, TResponse>
     }
 
     public async Task<TResponse> Handle(
-        TRequest request, 
-        RequestHandlerDelegate<TResponse> nextHandler, 
+        TRequest request,
+        RequestHandlerDelegate<TResponse> nextHandler,
         CancellationToken cancellationToken = default)
     {
         TResponse? cachedResult = await _cacheService.GetAsync<TResponse>(request.CacheKey, cancellationToken);

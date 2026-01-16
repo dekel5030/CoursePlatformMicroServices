@@ -1,7 +1,6 @@
 using Auth.Api.Endpoints;
 using Auth.Api.Extensions;
 using Auth.Application;
-using Auth.Domain.AuthUsers;
 using Auth.Infrastructure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -10,10 +9,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("LocalDev",
         policy => policy
-            .WithOrigins("http://localhost:5173") 
+            .WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials() 
+            .AllowCredentials()
     );
 });
 

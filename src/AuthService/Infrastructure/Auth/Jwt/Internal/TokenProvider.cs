@@ -21,8 +21,8 @@ internal class TokenProvider : ITokenProvider
     }
 
     public string GenerateToken(
-        AuthUser user, 
-        IEnumerable<string> effectivePermissions, 
+        AuthUser user,
+        IEnumerable<string> effectivePermissions,
         DateTime expiration)
     {
         RsaSecurityKey key = _keyManager.PrivateKey;

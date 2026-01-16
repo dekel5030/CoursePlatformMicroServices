@@ -32,7 +32,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(course => course.InstructorId)
             .HasConversion(
                 id => id != null ? id.Value : (Guid?)null,
-                value => value.HasValue ? new InstructorId(value.Value) : null);
+                value => value.HasValue ? new UserId(value.Value) : null);
 
         builder.Property(course => course.Status)
             .HasConversion<string>();

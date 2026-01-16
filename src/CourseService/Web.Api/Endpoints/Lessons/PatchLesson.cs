@@ -43,8 +43,8 @@ internal sealed class PatchLesson : IEndpoint
                 CustomResults.Problem);
         })
         .WithMetadata<EmptyResult>(
-            nameof(PatchLesson), 
-            Tags.Lessons, 
+            nameof(PatchLesson),
+            Tags.Lessons,
             "Partially updates a lesson with only the fields provided.");
     }
 }

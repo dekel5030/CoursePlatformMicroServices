@@ -18,7 +18,7 @@ public class Course : Entity<CourseId>
     public override CourseId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
-    public InstructorId? InstructorId { get; private set; }
+    public UserId? InstructorId { get; private set; }
     public CourseStatus Status { get; private set; }
     public int EnrollmentCount { get; private set; }
     public int LessonCount { get; private set; }
@@ -30,15 +30,15 @@ public class Course : Entity<CourseId>
     public IReadOnlyList<ImageUrl> Images => _images.AsReadOnly();
 
 
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     private Course() { }
-    #pragma warning restore CS8618
+#pragma warning restore CS8618
 
     public static Result<Course> CreateCourse(
         TimeProvider timeProvider,
         Title? title = null,
         Description? description = null,
-        InstructorId? instructorId = null,
+        UserId? instructorId = null,
         Money? price = null)
     {
         var newCourse = new Course
@@ -188,7 +188,7 @@ public class Course : Entity<CourseId>
         return Result.Success();
     }
 
-    public Result AssignInstructor(InstructorId instructorId, TimeProvider timeProvider)
+    public Result AssignInstructor(UserId instructorId, TimeProvider timeProvider)
     {
         InstructorId = instructorId;
         UpdatedAtUtc = timeProvider.GetUtcNow();
@@ -197,8 +197,8 @@ public class Course : Entity<CourseId>
     }
 
     public Result<Enrollment> CreateEnrollment(
-        StudentId studentId, 
-        TimeProvider timeProvider, 
+        StudentId studentId,
+        TimeProvider timeProvider,
         TimeSpan validFor)
     {
         if (CanEnroll.IsFailure)
@@ -227,7 +227,7 @@ public class Course : Entity<CourseId>
         }
 
         Lesson lesson = lessonResult.Value;
-        
+
         _lessons.Add(lesson);
         LessonCount = _lessons.Count;
         UpdatedAtUtc = timeProvider.GetUtcNow();

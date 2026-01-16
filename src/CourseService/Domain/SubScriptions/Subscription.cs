@@ -10,7 +10,7 @@ public class Subscription : Entity
     public DateTimeOffset StartsAtUtc { get; private set; }
     public DateTimeOffset EndsAtUtc { get; private set; }
 
-    #pragma warning disable CS8618 
+#pragma warning disable CS8618
     private Subscription() { }
 
     public Subscription(Guid id, StudentId studentId, DateTimeOffset startsAtUtc, DateTimeOffset endsAtUtc)

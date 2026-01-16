@@ -3,7 +3,6 @@ using Kernel.EventBus;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Users.Infrastructure.Database;
 
@@ -12,7 +11,7 @@ namespace Users.Infrastructure.MassTransit;
 internal static class MassTransitExtensions
 {
     internal static IServiceCollection AddMassTransitInternal(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration)
     {
         services.AddMassTransit(config =>

@@ -1,5 +1,3 @@
-using Kernel;
-
 namespace Kernel.Messaging.Abstractions;
 
 public interface ICommand : IRequest<Result>;

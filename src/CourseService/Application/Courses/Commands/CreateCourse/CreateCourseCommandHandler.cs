@@ -14,8 +14,8 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
     private readonly TimeProvider _timeProvider;
 
     public CreateCourseCommandHandler(
-        ICourseRepository courseRepository, 
-        TimeProvider timeProvider, 
+        ICourseRepository courseRepository,
+        TimeProvider timeProvider,
         IUnitOfWork unitOfWork)
     {
         _courseRepository = courseRepository;
@@ -27,7 +27,7 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
         CreateCourseCommand request,
         CancellationToken cancellationToken = default)
     {
-        InstructorId? instructorId = request.InstructorId.HasValue ? new(request.InstructorId.Value) : null;
+        UserId? instructorId = request.InstructorId.HasValue ? new(request.InstructorId.Value) : null;
 
         Result<Course> courseResult = Course.CreateCourse(
             _timeProvider,

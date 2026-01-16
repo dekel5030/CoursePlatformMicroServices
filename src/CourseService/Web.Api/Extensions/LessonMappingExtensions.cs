@@ -1,5 +1,6 @@
 using Courses.Api.Contracts.Lessons;
 using Courses.Api.Infrastructure.LinkProvider;
+using Courses.Application.Actions.Primitives;
 using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Domain.Courses.Primitives;
 

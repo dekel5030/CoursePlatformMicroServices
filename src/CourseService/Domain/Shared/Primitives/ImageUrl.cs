@@ -4,9 +4,9 @@ public sealed record ImageUrl : Url
 {
     private static readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
 
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     private ImageUrl() : base() { }
-    #pragma warning restore CS8618
+#pragma warning restore CS8618
 
     public ImageUrl(string path) : base(path)
     {

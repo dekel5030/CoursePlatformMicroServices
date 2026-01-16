@@ -16,7 +16,7 @@ internal sealed class GetAllRolesQueryHandler : IQueryHandler<GetAllRolesQuery, 
     }
 
     public async Task<Result<IReadOnlyCollection<RoleDto>>> Handle(
-        GetAllRolesQuery request, 
+        GetAllRolesQuery request,
         CancellationToken cancellationToken = default)
     {
         var roleUserCounts = await _readDbContext.Users

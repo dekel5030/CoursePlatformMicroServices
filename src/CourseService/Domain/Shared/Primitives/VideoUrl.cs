@@ -4,9 +4,9 @@ public sealed record VideoUrl : Url
 {
     private static readonly string[] _allowedExtensions = [".mp4", ".webm", ".mov"];
 
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     private VideoUrl() : base() { }
-    #pragma warning restore CS8618
+#pragma warning restore CS8618
 
     public VideoUrl(string path) : base(path)
     {

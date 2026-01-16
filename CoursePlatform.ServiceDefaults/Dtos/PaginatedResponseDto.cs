@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CoursePlatform.ServiceDefaults.Dtos;
+﻿namespace CoursePlatform.ServiceDefaults.Dtos;
 
 public interface ICollectionResponse<T>
 {

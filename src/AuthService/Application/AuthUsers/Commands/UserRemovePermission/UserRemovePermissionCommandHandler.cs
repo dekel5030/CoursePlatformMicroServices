@@ -14,7 +14,7 @@ public class UserRemovePermissionCommandHandler : ICommandHandler<UserRemovePerm
     private readonly IUnitOfWork _unitOfWork;
 
     public UserRemovePermissionCommandHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IWriteDbContext dbContext)
     {
         _unitOfWork = unitOfWork;
@@ -22,7 +22,7 @@ public class UserRemovePermissionCommandHandler : ICommandHandler<UserRemovePerm
     }
 
     public async Task<Result> Handle(
-        UserRemovePermissionCommand request, 
+        UserRemovePermissionCommand request,
         CancellationToken cancellationToken = default)
     {
         AuthUser? user = await _dbContext.Users.Include(u => u.Permissions)

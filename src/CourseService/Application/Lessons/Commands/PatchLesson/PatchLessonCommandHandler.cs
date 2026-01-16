@@ -14,8 +14,8 @@ internal sealed class PatchLessonCommandHandler : ICommandHandler<PatchLessonCom
     private readonly TimeProvider _timeProvider;
 
     public PatchLessonCommandHandler(
-        ICourseRepository courseRepository, 
-        IUnitOfWork unitOfwORK, 
+        ICourseRepository courseRepository,
+        IUnitOfWork unitOfwORK,
         TimeProvider timeProvider)
     {
         _courseRepository = courseRepository;
@@ -28,7 +28,7 @@ internal sealed class PatchLessonCommandHandler : ICommandHandler<PatchLessonCom
         CancellationToken cancellationToken = default)
     {
         Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
-        
+
         if (course is null)
         {
             return Result.Failure(CourseErrors.NotFound);

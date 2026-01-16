@@ -1,5 +1,8 @@
+using System.Linq;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
+using Courses.Application.Actions.Abstract;
+using Courses.Application.Actions.Primitives;
 using Courses.Application.Courses.Queries.Dtos;
 using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Domain.Courses;
@@ -17,19 +20,24 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
 #pragma warning disable S4487 // Unread "private" fields should be removed
     private readonly IStorageUrlResolver _urlResolver;
 #pragma warning restore S4487 // Unread "private" fields should be removed
+    private readonly ICourseActionProvider _courseActionProvider;
 
-    public GetCourseByIdQueryHandler(IReadDbContext dbContext, IStorageUrlResolver urlResolver)
+    public GetCourseByIdQueryHandler(
+        IReadDbContext dbContext, 
+        IStorageUrlResolver urlResolver, 
+        ICourseActionProvider courseActionProvider)
     {
         _dbContext = dbContext;
         _urlResolver = urlResolver;
+        _courseActionProvider = courseActionProvider;
     }
 
     public async Task<Result<CourseDetailsDto>> Handle(
         GetCourseByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        var allowedActions = new List<CourseAction> { CourseAction.Edit, CourseAction.Delete };
-        var allowedLessonActions = new List<LessonAction> { LessonAction.Update, LessonAction.Delete };
+        //var allowedActions = new List<CourseAction> { CourseAction.Update, CourseAction.Delete };
+        //var allowedLessonActions = new List<LessonAction> { LessonAction.Update, LessonAction.Delete };
 
         Course? course = await _dbContext.Courses
             .Include(c => c.Lessons)
@@ -51,17 +59,20 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             course.EnrollmentCount,
             course.UpdatedAtUtc,
             course.Images,
-            course.Lessons.Select(lesson => new LessonSummaryDto(
-                course.Id,
-                lesson.Id,
-                lesson.Title,
-                lesson.Description,
-                lesson.Index,
-                lesson.Duration,
-                lesson.Access == LessonAccess.Public,
-                lesson.ThumbnailImageUrl,
-                allowedLessonActions)).ToList(),
-            allowedActions);
+            AllowedActions: _courseActionProvider.GetAllowedActions(course),
+            Lessons: course.Lessons
+                .Select(lesson => new LessonSummaryDto(
+                    course.Id,
+                    lesson.Id,
+                    lesson.Title,
+                    lesson.Description,
+                    lesson.Index,
+                    lesson.Duration,
+                    lesson.Access == LessonAccess.Public,
+                    lesson.ThumbnailImageUrl,
+                    _courseActionProvider.GetAllowedActions(course, lesson)))
+                .ToList()
+        );
 
         return Result.Success(response);
     }

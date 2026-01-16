@@ -1,7 +1,7 @@
-﻿using Kernel.Auth;
+﻿using System.Security.Claims;
+using Kernel.Auth;
 using Kernel.Auth.AuthTypes;
 using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 using Users.Application.Abstractions.Context;
 
 namespace Users.Infrastructure.Auth;

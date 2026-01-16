@@ -14,7 +14,7 @@ internal static class DependencyInjection
     public const string AuthServiceName = "authservice";
     public static IHostApplicationBuilder AddGateway(this IHostApplicationBuilder builder)
     {
-        builder.AddServiceDefaults();   
+        builder.AddServiceDefaults();
         builder.AddRedisDistributedCache(RedisConnectionString);
         builder.Services.AddSingleton<ICacheService, RedisCache>();
         builder.Services.AddGatewayInternalServices();
@@ -63,7 +63,7 @@ internal static class DependencyInjection
         services.AddReverseProxy()
                 .LoadFromConfig(configuration.GetSection("ReverseProxy"))
                 .AddServiceDiscoveryDestinationResolver();
-      
+
         return services;
     }
 

@@ -5,9 +5,7 @@ using Courses.Application.Lessons.Extensions;
 using Courses.Application.Lessons.Queries.Dtos;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
-using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
-using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

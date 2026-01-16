@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using MockQueryable.Moq;
 using Moq;
 
 namespace Auth.Application.UnitTests;

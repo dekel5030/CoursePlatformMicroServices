@@ -35,10 +35,11 @@ await app.RunAsync();
 
 #pragma warning disable ASP0027 // Unnecessary public Program class declaration
 #pragma warning disable CA1515 // Consider making public types internal
-public partial class Program {
+public partial class Program
+{
     private Program()
     {
-        
+
     }
 }
 #pragma warning restore CA1515 // Consider making public types internal

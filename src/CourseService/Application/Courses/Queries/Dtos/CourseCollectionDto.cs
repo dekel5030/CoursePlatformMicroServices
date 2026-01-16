@@ -1,4 +1,5 @@
-﻿using Courses.Application.Shared.Dtos;
+﻿using Courses.Application.Actions.Primitives;
+using Courses.Application.Shared.Dtos;
 
 namespace Courses.Application.Courses.Queries.Dtos;
 

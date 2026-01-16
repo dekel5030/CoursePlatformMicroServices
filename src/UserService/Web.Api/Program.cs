@@ -1,8 +1,8 @@
 using Users.Api.Endpoints;
 using Users.Api.Extensions;
+using Users.Application;
 using Users.Infrastructure;
 using Users.Infrastructure.Extensions;
-using Users.Application;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

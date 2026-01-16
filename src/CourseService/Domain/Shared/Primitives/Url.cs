@@ -4,9 +4,9 @@ public record Url
 {
     public string Path { get; init; }
 
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     protected Url() { }
-    #pragma warning restore CS8618
+#pragma warning restore CS8618
 
     public Url(string path)
     {

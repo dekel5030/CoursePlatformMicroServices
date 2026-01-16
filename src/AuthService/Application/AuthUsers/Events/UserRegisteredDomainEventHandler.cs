@@ -21,9 +21,9 @@ internal sealed class UserRegisteredDomainEventHandler : IDomainEventHandler<Use
     {
         AuthUser user = message.User;
         var contract = new UserRegisteredEvent(
-            user.Id.Value, 
-            user.FullName.FirstName.Name, 
-            user.FullName.LastName.Name, 
+            user.Id.Value,
+            user.FullName.FirstName.Name,
+            user.FullName.LastName.Name,
             user.Email.Address);
 
         return _eventPublisher.PublishAsync(contract, cancellationToken);

@@ -1,7 +1,7 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
+using Courses.Application.Actions.Primitives;
 using Courses.Application.Courses.Queries.Dtos;
-using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -23,7 +23,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
     }
 
     public async Task<Result<CourseCollectionDto>> Handle(
-        GetCoursesQuery request, 
+        GetCoursesQuery request,
         CancellationToken cancellationToken = default)
     {
         int pageNumber = Math.Max(1, request.PagedQuery.PageNumber ?? 1);
@@ -39,7 +39,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        var allowedActions = new List<CourseAction> { CourseAction.Edit, CourseAction.CreateLesson };
+        var allowedActions = new List<CourseAction> { CourseAction.Update, CourseAction.CreateLesson };
 
         var courseDtos = courses
             .Select(course => new CourseSummaryDto(

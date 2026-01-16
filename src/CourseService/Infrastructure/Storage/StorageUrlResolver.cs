@@ -13,7 +13,7 @@ internal sealed class StorageUrlResolver : IStorageUrlResolver
     }
 
     public ResolvedUrl Resolve(
-        StorageCategory category, 
+        StorageCategory category,
         string relativePath)
     {
         if (!_options.BucketMapping.TryGetValue(category, out string? bucketName))

@@ -1,5 +1,4 @@
-﻿using Auth.Domain.Roles;
-using Kernel.Messaging.Abstractions;
+﻿using Kernel.Messaging.Abstractions;
 
 namespace Auth.Domain.Roles.Events;
 

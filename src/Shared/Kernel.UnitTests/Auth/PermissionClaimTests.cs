@@ -1,9 +1,7 @@
-﻿using FluentAssertions;
+﻿using System.Security.Claims;
+using FluentAssertions;
 using Kernel.Auth;
 using Kernel.Auth.AuthTypes;
-using System;
-using System.Security.Claims;
-using Xunit;
 
 namespace Kernel.UnitTests.Auth;
 

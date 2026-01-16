@@ -20,15 +20,15 @@ public class AuthUser : Entity
     public IReadOnlyCollection<Role> Roles => _roles.AsReadOnly();
     public IReadOnlyCollection<Permission> Permissions => _permissions.AsReadOnly();
 
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     private AuthUser() { }
-    #pragma warning restore CS8618
+#pragma warning restore CS8618
 
     private AuthUser(
         AuthUserId id,
         IdentityProviderId identityProviderId,
         FullName fullName,
-        Email email) 
+        Email email)
     {
         Id = id;
         IdentityId = identityProviderId;

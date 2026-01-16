@@ -17,7 +17,7 @@ public class UserRemoveRoleCommandHandler : ICommandHandler<UserRemoveRoleComman
     private readonly IUnitOfWork _unitOfWork;
 
     public UserRemoveRoleCommandHandler(
-        IWriteDbContext dbContext, 
+        IWriteDbContext dbContext,
         IUnitOfWork unitOfWork)
     {
         _dbContext = dbContext;
@@ -25,7 +25,7 @@ public class UserRemoveRoleCommandHandler : ICommandHandler<UserRemoveRoleComman
     }
 
     public async Task<Result> Handle(
-        UserRemoveRoleCommand request, 
+        UserRemoveRoleCommand request,
         CancellationToken cancellationToken = default)
     {
         AuthUser? user = await _dbContext.Users.Include(u => u.Roles)

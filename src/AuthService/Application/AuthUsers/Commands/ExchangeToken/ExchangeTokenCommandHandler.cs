@@ -38,7 +38,7 @@ internal sealed class ExchangeTokenCommandHandler : ICommandHandler<ExchangeToke
     }
 
     public async Task<Result<TokenResponse>> Handle(
-        ExchangeTokenCommand request, 
+        ExchangeTokenCommand request,
         CancellationToken cancellationToken = default)
     {
         IdentityProviderId externalId = new(_externalUserContext.IdentityId);

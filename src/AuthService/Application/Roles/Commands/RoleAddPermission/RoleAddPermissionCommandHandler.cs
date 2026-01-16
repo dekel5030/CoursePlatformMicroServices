@@ -23,7 +23,7 @@ public class RoleAddPermissionCommandHandler : ICommandHandler<RoleAddPermission
     }
 
     public async Task<Result> Handle(
-        RoleAddPermissionCommand request, 
+        RoleAddPermissionCommand request,
         CancellationToken cancellationToken = default)
     {
         Role? role = await _writeDbContext.Roles
@@ -35,9 +35,9 @@ public class RoleAddPermissionCommandHandler : ICommandHandler<RoleAddPermission
         }
 
         Result<Permission> permissionParseResult = Permission.Parse(
-            request.Effect, 
-            request.Action, 
-            request.Resource, 
+            request.Effect,
+            request.Action,
+            request.Resource,
             request.ResourceId);
 
         if (permissionParseResult.IsFailure)

@@ -3,6 +3,6 @@ namespace Courses.Application.Abstractions.Storage;
 public interface IStorageUrlResolver
 {
     ResolvedUrl Resolve(
-        StorageCategory category, 
+        StorageCategory category,
         string relativePath);
 }
