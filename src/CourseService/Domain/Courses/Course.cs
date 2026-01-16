@@ -95,7 +95,7 @@ public class Course : Entity<CourseId>
                 return Result.Failure(CourseErrors.AlreadyPublished);
             }
 
-            if (_lessons.Count == 0)
+            if (LessonCount == 0)
             {
                 return Result.Failure(CourseErrors.CourseWithoutLessons);
             }
