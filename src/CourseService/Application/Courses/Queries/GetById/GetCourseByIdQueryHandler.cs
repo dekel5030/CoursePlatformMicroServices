@@ -36,9 +36,6 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
         GetCourseByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        //var allowedActions = new List<CourseAction> { CourseAction.Update, CourseAction.Delete };
-        //var allowedLessonActions = new List<LessonAction> { LessonAction.Update, LessonAction.Delete };
-
         Course? course = await _dbContext.Courses
             .Include(c => c.Lessons)
             .Where(c => c.Id == request.Id)
