@@ -1,4 +1,5 @@
 import type { LessonSummaryDto } from "@/features/lessons/types/LessonSummaryDto";
+import type { LinkDto } from "@/types/LinkDto";
 
 /**
  * Backend DTO: Matches CourseDetailsDto from CourseService
@@ -15,4 +16,5 @@ export interface CourseDetailsDto {
   updatedAtUtc: string;
   imageUrls: string[];
   lessons: LessonSummaryDto[];
+  links: LinkDto[];
 }

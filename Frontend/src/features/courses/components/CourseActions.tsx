@@ -4,19 +4,25 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { Edit, Trash2 } from "lucide-react";
-import { Authorized, ActionType, ResourceType, ResourceId } from "@/features/auth";
 import { useDeleteCourse } from "../hooks/use-courses";
 import { toast } from "sonner";
+import { hasLink, CourseRels } from "@/utils/linkHelpers";
+import type { LinkDto } from "@/types/LinkDto";
 
 interface CourseActionsProps {
   courseId: string;
+  links?: LinkDto[];
 }
 
-export function CourseActions({ courseId }: CourseActionsProps) {
+export function CourseActions({ courseId, links }: CourseActionsProps) {
   const { t } = useTranslation(['courses', 'translation']);
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const deleteCourse = useDeleteCourse();
+  
+  // Determine available actions based on HATEOAS links
+  const canUpdate = hasLink(links, CourseRels.PARTIAL_UPDATE);
+  const canDelete = hasLink(links, CourseRels.DELETE);
 
   const handleEdit = () => {
     toast.info(t('courses:actions.editNotImplemented'));
@@ -40,14 +46,15 @@ export function CourseActions({ courseId }: CourseActionsProps) {
     }
   };
 
+  // If no actions available, don't render anything
+  if (!canUpdate && !canDelete) {
+    return null;
+  }
+
   return (
     <>
       <div className="flex gap-2">
-        <Authorized 
-          action={ActionType.Update} 
-          resource={ResourceType.Course}
-          resourceId={ResourceId.create(courseId)}
-        >
+        {canUpdate && (
           <Button 
             variant="outline" 
             size="sm" 
@@ -57,12 +64,8 @@ export function CourseActions({ courseId }: CourseActionsProps) {
             <Edit className="h-4 w-4" />
             {t('common.edit')}
           </Button>
-        </Authorized>
-        <Authorized 
-          action={ActionType.Delete} 
-          resource={ResourceType.Course}
-          resourceId={ResourceId.create(courseId)}
-        >
+        )}
+        {canDelete && (
           <Button 
             variant="destructive" 
             size="sm" 
@@ -73,7 +76,7 @@ export function CourseActions({ courseId }: CourseActionsProps) {
             <Trash2 className="h-4 w-4" />
             {t('courses:detail.delete')}
           </Button>
-        </Authorized>
+        )}
       </div>
 
       <ConfirmationModal

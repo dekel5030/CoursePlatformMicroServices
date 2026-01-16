@@ -1,3 +1,5 @@
+import type { LinkDto } from "@/types/LinkDto";
+
 /**
  * Backend DTO: Matches CourseSummaryDto from CourseService
  * Used for network layer communication
@@ -11,4 +13,5 @@ export interface CourseSummaryDto {
   thumbnailUrl: string | null;
   lessonsCount: number;
   enrollmentCount: number;
+  links: LinkDto[];
 }

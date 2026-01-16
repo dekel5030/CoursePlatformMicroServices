@@ -2,15 +2,10 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Card, CardHeader, CardTitle, CardContent } from "@/components";
 import { Plus } from "lucide-react";
-import {
-  Authorized,
-  ActionType,
-  ResourceType,
-  ResourceId,
-} from "@/features/auth";
 import { LessonCard } from "@/features/lessons";
 import { AddLessonDialog } from "@/features/lessons/components/AddLessonDialog";
 import { motion } from "framer-motion";
+import { hasLink, CourseRels } from "@/utils/linkHelpers";
 import type { CourseModel } from "../types";
 
 interface CourseLessonsSectionProps {
@@ -32,6 +27,9 @@ export function CourseLessonsSection({
 
   const isRTL = i18n.dir() === "rtl";
   const textAlignClass = isRTL ? "text-right" : "text-left";
+  
+  // Check if user can create lessons based on HATEOAS links
+  const canCreateLesson = hasLink(course.links, CourseRels.CREATE_LESSON);
 
   return (
     <>
@@ -40,11 +38,7 @@ export function CourseLessonsSection({
           <CardTitle className={textAlignClass}>
             {t("courses:detail.lessons")}
           </CardTitle>
-          <Authorized
-            action={ActionType.Create}
-            resource={ResourceType.Lesson}
-            resourceId={ResourceId.Wildcard}
-          >
+          {canCreateLesson && (
             <Button
               size="sm"
               className="gap-2"
@@ -53,7 +47,7 @@ export function CourseLessonsSection({
               <Plus className="h-4 w-4" />
               {t("courses:detail.addLesson")}
             </Button>
-          </Authorized>
+          )}
         </CardHeader>
         <CardContent className="space-y-2">
           {sortedLessons.length > 0 ? (
@@ -72,7 +66,7 @@ export function CourseLessonsSection({
               </motion.div>
             ))
           ) : (
-            <p className="..."> {t("courses:detail.noLessons")} </p>
+            <p className="text-muted-foreground">{t("courses:detail.noLessons")}</p>
           )}
         </CardContent>
       </Card>

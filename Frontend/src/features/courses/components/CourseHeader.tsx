@@ -5,12 +5,7 @@ import { motion } from "framer-motion";
 import { CourseActions } from "./CourseActions";
 import { usePatchCourse } from "../hooks/use-courses";
 import { toast } from "sonner";
-import {
-  Authorized,
-  ActionType,
-  ResourceType,
-  ResourceId,
-} from "@/features/auth";
+import { hasLink, CourseRels } from "@/utils/linkHelpers";
 import type { CourseModel } from "../types";
 
 interface CourseHeaderProps {
@@ -23,6 +18,9 @@ export function CourseHeader({ course }: CourseHeaderProps) {
 
   const isRTL = i18n.dir() === "rtl";
   const textAlignClass = isRTL ? "text-right" : "text-left";
+  
+  // Check if user can update course based on HATEOAS links
+  const canUpdate = hasLink(course.links, CourseRels.PARTIAL_UPDATE);
 
   const handleTitleUpdate = async (newTitle: string) => {
     try {
@@ -51,19 +49,7 @@ export function CourseHeader({ course }: CourseHeaderProps) {
         )}
         <div className="space-y-6">
           <div className={textAlignClass}>
-            <Authorized
-              action={ActionType.Update}
-              resource={ResourceType.Course}
-              resourceId={ResourceId.create(course.id)}
-              fallback={
-                <h1
-                  dir="auto"
-                  className={`text-4xl md:text-2xl font-bold break-words ${textAlignClass}`}
-                >
-                  {course.title}
-                </h1>
-              }
-            >
+            {canUpdate ? (
               <InlineEditableText
                 value={course.title}
                 onSave={handleTitleUpdate}
@@ -72,7 +58,14 @@ export function CourseHeader({ course }: CourseHeaderProps) {
                 placeholder={t("courses:detail.enterTitle")}
                 maxLength={200}
               />
-            </Authorized>
+            ) : (
+              <h1
+                dir="auto"
+                className={`text-4xl md:text-2xl font-bold break-words ${textAlignClass}`}
+              >
+                {course.title}
+              </h1>
+            )}
           </div>
 
           <div
@@ -80,7 +73,7 @@ export function CourseHeader({ course }: CourseHeaderProps) {
               isRTL ? "justify-start" : "justify-end"
             }`}
           >
-            <CourseActions courseId={course.id} />
+            <CourseActions courseId={course.id} links={course.links} />
           </div>
 
           <div className="flex gap-3">

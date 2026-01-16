@@ -1,3 +1,5 @@
+import type { LinkDto } from "@/types/LinkDto";
+
 /**
  * UI Model: Stable interface for UI components
  * Decoupled from backend API schema
@@ -12,4 +14,5 @@ export interface LessonModel {
   isPreview: boolean;
   order: number;
   duration: string | null;
+  links?: LinkDto[];
 }
