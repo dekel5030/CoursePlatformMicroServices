@@ -49,9 +49,6 @@ export async function patchLesson(
   await axiosClient.patch(`/courses/${courseId}/lessons/${lessonId}`, request);
 }
 
-export async function deleteLesson(
-  courseId: string,
-  lessonId: string
-): Promise<void> {
-  await axiosClient.delete(`/courses/${courseId}/lessons/${lessonId}`);
+export async function deleteLesson(url: string): Promise<void> {
+  await axiosClient.delete(url);
 }

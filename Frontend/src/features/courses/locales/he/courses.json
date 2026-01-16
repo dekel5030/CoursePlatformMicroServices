@@ -32,10 +32,10 @@
     "titleUpdateFailed": "נכשל בעדכון כותרת הקורס",
     "descriptionUpdated": "תיאור הקורס עודכן בהצלחה",
     "descriptionUpdateFailed": "נכשל בעדכון תיאור הקורס",
-    "uploadThumbnail": "העלה תמונת תצוגה מקדימה",
+    "uploadImage": "העלה תמונה",
     "uploading": "מעלה...",
-    "uploadSuccess": "תמונת התצוגה המקדימה הועלתה בהצלחה",
-    "uploadFailed": "נכשל בהעלאת תמונת התצוגה המקדימה",
+    "uploadSuccess": "התמונה הועלתה בהצלחה",
+    "uploadFailed": "נכשל בהעלאת התמונה",
     "invalidFileType": "סוג קובץ לא חוקי. אנא בחר קובץ תמונה (JPEG, PNG, GIF או WebP)"
   },
   "addDialog": {

@@ -12,7 +12,12 @@ interface CourseImageUploadProps {
   links?: LinkDto[];
 }
 
-const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+];
 
 export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
   const { t } = useTranslation(["courses"]);
@@ -37,7 +42,9 @@ export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
     }
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -85,7 +92,7 @@ export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
         ) : (
           <>
             <Upload className="h-4 w-4" />
-            {t("courses:detail.uploadThumbnail")}
+            {t("courses:detail.uploadImage")}
           </>
         )}
       </Button>

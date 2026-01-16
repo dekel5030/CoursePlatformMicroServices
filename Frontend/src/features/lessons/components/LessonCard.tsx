@@ -13,7 +13,7 @@ import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { Clock, Trash2 } from "lucide-react";
 import { usePatchLesson, useDeleteLesson } from "../hooks/use-lessons";
 import { toast } from "sonner";
-import { hasLink, LessonRels } from "@/utils/linkHelpers";
+import { hasLink, LessonRels, getLink } from "@/utils/linkHelpers";
 
 interface LessonProps {
   lesson: LessonModel;
@@ -32,11 +32,12 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
 
   const isRTL = i18n.dir() === "rtl";
   const textAlignClass = isRTL ? "text-right" : "text-left";
-  
+
   // Determine available actions based on HATEOAS links
   const canUpdate = hasLink(lesson.links, LessonRels.PARTIAL_UPDATE);
   const canDelete = hasLink(lesson.links, LessonRels.DELETE);
-  
+  const deleteLink = getLink(lesson.links, LessonRels.DELETE);
+
   const formatDuration = (duration: string | null | undefined) => {
     if (!duration) return null;
 
@@ -63,12 +64,14 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
   };
 
   const handleConfirmDelete = async () => {
+    if (!deleteLink) {
+      console.error("No delete link found for this lesson");
+      return;
+    }
+
     try {
-      await deleteLesson.mutateAsync(lesson.lessonId);
-      toast.success(t("lessons:actions.deleteSuccess"));
+      await deleteLesson.mutateAsync(deleteLink.href);
     } catch (error) {
-      toast.error(t("lessons:actions.deleteFailed"));
-      console.error("Failed to delete lesson:", error);
     } finally {
       setIsDeleteDialogOpen(false);
     }
@@ -146,29 +149,26 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
               </div>
 
               {lesson.description !== null &&
-                lesson.description !== undefined && (
-                  canUpdate ? (
-                    <div onClick={(e) => e.stopPropagation()}>
-                      <InlineEditableText
-                        value={lesson.description || ""}
-                        onSave={handleDescriptionUpdate}
-                        displayClassName={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`}
-                        inputClassName={`text-sm ${textAlignClass}`}
-                        placeholder={t("lessons:actions.enterDescription")}
-                        maxLength={500}
-                      />
-                    </div>
-                  ) : (
-                    lesson.description ? (
-                      <p
-                        className={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`}
-                        dir="auto"
-                      >
-                        {lesson.description}
-                      </p>
-                    ) : null
-                  )
-                )}
+                lesson.description !== undefined &&
+                (canUpdate ? (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <InlineEditableText
+                      value={lesson.description || ""}
+                      onSave={handleDescriptionUpdate}
+                      displayClassName={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`}
+                      inputClassName={`text-sm ${textAlignClass}`}
+                      placeholder={t("lessons:actions.enterDescription")}
+                      maxLength={500}
+                    />
+                  </div>
+                ) : lesson.description ? (
+                  <p
+                    className={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`}
+                    dir="auto"
+                  >
+                    {lesson.description}
+                  </p>
+                ) : null)}
             </div>
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">

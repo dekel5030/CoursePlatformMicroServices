@@ -32,10 +32,10 @@
     "titleUpdateFailed": "Failed to update course title",
     "descriptionUpdated": "Course description updated successfully",
     "descriptionUpdateFailed": "Failed to update course description",
-    "uploadThumbnail": "Upload Thumbnail",
+    "uploadImage": "Upload Image",
     "uploading": "Uploading...",
-    "uploadSuccess": "Thumbnail uploaded successfully",
-    "uploadFailed": "Failed to upload thumbnail",
+    "uploadSuccess": "Image uploaded successfully",
+    "uploadFailed": "Failed to upload image",
     "invalidFileType": "Invalid file type. Please select an image file (JPEG, PNG, GIF, or WebP)"
   },
   "addDialog": {
