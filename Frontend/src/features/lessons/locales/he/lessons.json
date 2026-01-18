@@ -40,5 +40,12 @@
     "deleteFailed": "נכשל במחיקת השיעור",
     "deleteConfirmTitle": "מחק שיעור",
     "deleteConfirmMessage": "האם אתה בטוח שברצונך למחוק שיעור זה? פעולה זו אינה ניתנת לביטול."
+  },
+  "pages": {
+    "lesson": {
+      "description": "תיאור",
+      "deleteLesson": "מחק שיעור",
+      "noVideo": "טרם הועלה וידאו"
+    }
   }
 }
