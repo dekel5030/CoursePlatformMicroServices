@@ -10,6 +10,8 @@ import coursesEN from "./features/courses/locales/en/courses.json";
 import coursesHE from "./features/courses/locales/he/courses.json";
 import lessonsEN from "./features/lessons/locales/en/lessons.json";
 import lessonsHE from "./features/lessons/locales/he/lessons.json";
+import authEN from "./features/auth/locales/en/auth.json";
+import authHE from "./features/auth/locales/he/auth.json";
 
 // Define resources with feature-based structure
 const resources = {
@@ -17,11 +19,13 @@ const resources = {
     translation: translationEN,
     courses: coursesEN,
     lessons: lessonsEN,
+    auth: authEN,
   },
   he: {
     translation: translationHE,
     courses: coursesHE,
     lessons: lessonsHE,
+    auth: authHE,
   },
 };
 
@@ -36,7 +40,7 @@ i18n
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
-    ns: ["translation", "courses", "lessons"], // Add namespaces
+    ns: ["translation", "courses", "lessons", "auth"], // Add namespaces
     defaultNS: "translation",
     fallbackNS: "translation",
     // Return key if translation is missing instead of showing translation key

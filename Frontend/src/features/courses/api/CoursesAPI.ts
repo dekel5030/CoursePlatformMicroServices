@@ -100,10 +100,11 @@ export interface FetchAllCoursesResult {
   links: import("@/types/LinkDto").LinkDto[];
 }
 
-export async function fetchAllCourses(): Promise<FetchAllCoursesResult> {
+export async function fetchAllCourses(url?: string): Promise<FetchAllCoursesResult> {
+  const endpoint = url || "/courses";
   const response = await axiosClient.get<
     CourseSummaryDto[] | PagedResponse<CourseSummaryDto>
-  >("/courses");
+  >(endpoint);
   const data = response.data;
   
   // Handle both legacy array format and new PagedResponse format

@@ -28,7 +28,7 @@ interface UserTableProps {
 }
 
 export default function UserTable({ users, onUserSelect }: UserTableProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -36,7 +36,7 @@ export default function UserTable({ users, onUserSelect }: UserTableProps) {
     () => [
       {
         accessorKey: "firstName",
-        header: t("authManagement.users.table.name"),
+        header: t("auth:authManagement.users.table.name"),
         cell: ({ row }) => (
           <div className="font-medium">
             {row.original.firstName} {row.original.lastName}
@@ -45,20 +45,20 @@ export default function UserTable({ users, onUserSelect }: UserTableProps) {
       },
       {
         accessorKey: "email",
-        header: t("authManagement.users.table.email"),
+        header: t("auth:authManagement.users.table.email"),
         cell: ({ row }) => (
           <span className="text-muted-foreground">{row.original.email}</span>
         ),
       },
       {
         id: "roles",
-        header: t("authManagement.users.table.assignedRoles"),
+        header: t("auth:authManagement.users.table.assignedRoles"),
         accessorFn: (row) => row.roles.map((r) => r.name).join(", "),
         cell: ({ row }) => (
           <div className="flex flex-wrap gap-1">
             {row.original.roles.length === 0 ? (
               <span className="text-sm text-muted-foreground">
-                {t("authManagement.users.table.noRoles")}
+                {t("auth:authManagement.users.table.noRoles")}
               </span>
             ) : (
               row.original.roles.map((role) => (
@@ -76,7 +76,7 @@ export default function UserTable({ users, onUserSelect }: UserTableProps) {
       },
       {
         id: "actions",
-        header: t("authManagement.users.table.actions"),
+        header: t("auth:authManagement.users.table.actions"),
         cell: ({ row }) => (
           <Button
             variant="ghost"
@@ -85,7 +85,7 @@ export default function UserTable({ users, onUserSelect }: UserTableProps) {
             className="gap-2 hover:bg-primary/10 hover:text-primary"
           >
             <Edit2 className="h-4 w-4" />
-            {t("authManagement.users.table.edit")}
+            {t("auth:authManagement.users.table.edit")}
           </Button>
         ),
       },
@@ -113,7 +113,7 @@ export default function UserTable({ users, onUserSelect }: UserTableProps) {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder={t("authManagement.users.searchPlaceholder")}
+          placeholder={t("auth:authManagement.users.searchPlaceholder")}
           value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}
           className="pl-10"
@@ -172,14 +172,14 @@ export default function UserTable({ users, onUserSelect }: UserTableProps) {
                       className="space-y-2"
                     >
                       <p className="text-muted-foreground">
-                        {t("authManagement.users.noUsers")}
+                        {t("auth:authManagement.users.noUsers")}
                       </p>
                       {globalFilter && (
                         <Button
                           variant="link"
                           onClick={() => setGlobalFilter("")}
                         >
-                          {t("authManagement.users.clearSearch")}
+                          {t("auth:authManagement.users.clearSearch")}
                         </Button>
                       )}
                     </motion.div>
@@ -212,7 +212,7 @@ export default function UserTable({ users, onUserSelect }: UserTableProps) {
 
       {table.getRowModel().rows.length > 0 && (
         <div className="text-sm text-muted-foreground">
-          {t("authManagement.users.showingUsers", {
+          {t("auth:authManagement.users.showingUsers", {
             count: table.getRowModel().rows.length,
             total: users.length,
           })}

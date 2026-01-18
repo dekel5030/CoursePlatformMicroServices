@@ -18,6 +18,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
     private const string CourseServiceName = "courseservice";
     private const string LessonImage = "lessonimage";
     private const string CourseImage = "courseimage";
+    private const string LessonVideo = "lessonvideo";
 
     public FileUploadedEventConsumer(IWriteDbContext writeDbContext, ILogger<FileUploadedEventConsumer> logger)
     {
@@ -41,7 +42,38 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
             case LessonImage:
                 await HandleLessonImageAsync(message, cancellationToken);
                 break;
+
+            case LessonVideo:
+                await HandleLessonVideoAsync(message, cancellationToken);
+                break;
         }
+    }
+
+    private async Task HandleLessonVideoAsync(FileUploadedEvent message, CancellationToken cancellationToken)
+    {
+        if (!Guid.TryParse(message.ReferenceId, out Guid guidId))
+        {
+            _logger.LogError("Invalid ReferenceId format: {ReferenceId}", message.ReferenceId);
+            return;
+        }
+
+        var lessonId = new LessonId(guidId);
+
+        Lesson? lesson = await _writeDbContext.Lessons
+            .FirstOrDefaultAsync(c => c.Id == lessonId, cancellationToken);
+
+        if (lesson is null)
+        {
+            _logger.LogWarning("Lesson with ID {LessonId} not found for uploaded image", lessonId);
+            return;
+        }
+
+        var videoUrl = new VideoUrl(message.FileKey);
+        lesson.UpdateVideoData(videoUrl, TimeSpan.FromMinutes(8));
+
+        await _writeDbContext.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Updated image for lesson {LessonId}", lessonId);
     }
 
     private async Task HandleCourseImageAsync(

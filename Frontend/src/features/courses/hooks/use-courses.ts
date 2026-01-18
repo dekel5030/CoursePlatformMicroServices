@@ -13,6 +13,7 @@ import type {
   CreateCourseRequestDto,
   UpdateCourseRequestDto,
 } from "../types";
+import { API_ENDPOINTS } from "@/axios/config";
 
 export const coursesQueryKeys = {
   all: ["courses"] as const,
@@ -28,10 +29,10 @@ export function useFeaturedCourses() {
   });
 }
 
-export function useAllCourses() {
+export function useAllCourses(url?: string) {
   return useQuery<FetchAllCoursesResult, Error>({
-    queryKey: coursesQueryKeys.allCourses(),
-    queryFn: fetchAllCourses,
+    queryKey: [...coursesQueryKeys.allCourses(), url || API_ENDPOINTS.COURSES],
+    queryFn: () => fetchAllCourses(url),
   });
 }
 

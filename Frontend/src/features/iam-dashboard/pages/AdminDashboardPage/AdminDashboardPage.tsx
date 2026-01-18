@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
 export default function AdminDashboardPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
 
   const breadcrumbItems = [
     { label: t("breadcrumbs.home"), path: "/" },
@@ -21,15 +21,15 @@ export default function AdminDashboardPage() {
 
   const cards = [
     {
-      title: t("admin.dashboard.usersCard.title"),
-      description: t("admin.dashboard.usersCard.description"),
+      title: t("auth:admin.dashboard.usersCard.title"),
+      description: t("auth:admin.dashboard.usersCard.description"),
       icon: Users,
       href: "/admin/users",
       color: "bg-blue-500/10 text-blue-500",
     },
     {
-      title: t("admin.dashboard.rolesCard.title"),
-      description: t("admin.dashboard.rolesCard.description"),
+      title: t("auth:admin.dashboard.rolesCard.title"),
+      description: t("auth:admin.dashboard.rolesCard.description"),
       icon: Shield,
       href: "/admin/roles",
       color: "bg-purple-500/10 text-purple-500",
@@ -62,10 +62,10 @@ export default function AdminDashboardPage() {
       >
         <motion.div variants={item} className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">
-            {t("admin.dashboard.title")}
+            {t("auth:admin.dashboard.title")}
           </h1>
           <p className="text-muted-foreground">
-            {t("admin.dashboard.subtitle")}
+            {t("auth:admin.dashboard.subtitle")}
           </p>
         </motion.div>
 

@@ -59,5 +59,17 @@
     "deleteFailed": "נכשל במחיקת הקורס",
     "deleteConfirmTitle": "מחק קורס",
     "deleteConfirmMessage": "האם אתה בטוח שברצונך למחוק קורס זה? פעולה זו אינה ניתנת לביטול ותמחק גם את כל השיעורים המשויכים לקורס זה."
+  },
+  "pages": {
+    "course": {
+      "instructor": "מדריך",
+      "buyNow": "קנה עכשיו",
+      "addToCart": "הוסף לסל",
+      "about": "על הקורס",
+      "lessons": "שיעורים",
+      "noLessons": "אין שיעורים זמינים.",
+      "deleteCourse": "מחק קורס",
+      "addLesson": "הוסף שיעור"
+    }
   }
 }

@@ -3,7 +3,7 @@ import { BreadcrumbNav } from "@/components";
 import { useTranslation } from "react-i18next";
 
 export default function RoleManagementPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
 
   const breadcrumbItems = [
     { label: t("breadcrumbs.home"), path: "/" },

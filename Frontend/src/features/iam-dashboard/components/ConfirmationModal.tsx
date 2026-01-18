@@ -35,7 +35,7 @@ export default function ConfirmationModal({
   isLoading = false,
   error = null,
 }: ConfirmationModalProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -59,7 +59,7 @@ export default function ConfirmationModal({
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
           >
-            {cancelText || t('modals.confirmation.cancel')}
+            {cancelText || t('auth:modals.confirmation.cancel')}
           </Button>
           <Button
             type="button"
@@ -67,7 +67,7 @@ export default function ConfirmationModal({
             onClick={onConfirm}
             disabled={isLoading}
           >
-            {isLoading ? t('modals.confirmation.loading') : (confirmText || 'Confirm')}
+            {isLoading ? t('auth:modals.confirmation.loading') : (confirmText || 'Confirm')}
           </Button>
         </DialogFooter>
       </DialogContent>

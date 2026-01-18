@@ -5,7 +5,12 @@
   "detail": {
     "description": "תיאור",
     "notFound": "שיעור לא נמצא",
-    "delete": "מחק שיעור"
+    "delete": "מחק שיעור",
+    "uploadVideo": "העלה וידאו",
+    "uploadingVideo": "מעלה...",
+    "videoUploadSuccess": "הוידאו הועלה בהצלחה",
+    "videoUploadFailed": "נכשל בהעלאת הוידאו",
+    "invalidVideoType": "סוג קובץ לא תקין. נא לבחור קובץ וידאו (MP4, MPEG, QuickTime, AVI, או WebM)"
   },
   "addDialog": {
     "title": "הוסף שיעור חדש",
@@ -35,5 +40,12 @@
     "deleteFailed": "נכשל במחיקת השיעור",
     "deleteConfirmTitle": "מחק שיעור",
     "deleteConfirmMessage": "האם אתה בטוח שברצונך למחוק שיעור זה? פעולה זו אינה ניתנת לביטול."
+  },
+  "pages": {
+    "lesson": {
+      "description": "תיאור",
+      "deleteLesson": "מחק שיעור",
+      "noVideo": "טרם הועלה וידאו"
+    }
   }
 }

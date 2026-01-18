@@ -15,13 +15,8 @@ import { Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import {
-  Authorized,
-  ActionType,
-  ResourceType,
-  ResourceId,
-} from "@/features/auth";
-import { getLink, LessonRels } from "@/utils/linkHelpers";
+import { getLink, hasLink, LessonRels } from "@/utils/linkHelpers";
+import { LessonVideoUpload } from "../components/LessonVideoUpload";
 
 export default function LessonPage() {
   const { courseId, lessonId } = useParams<{
@@ -34,7 +29,7 @@ export default function LessonPage() {
 
   const patchLesson = usePatchLesson(courseId!, lessonId!);
 
-  const { t } = useTranslation();
+  const { t } = useTranslation(["lessons", "translation"]);
 
   const handleTitleUpdate = async (newTitle: string) => {
     const updateLink = getLink(lesson?.links, LessonRels.PARTIAL_UPDATE);
@@ -159,17 +154,33 @@ export default function LessonPage() {
         initial="hidden"
         animate="show"
       >
-        {lesson.videoUrl && (
+        {lesson.videoUrl ? (
           <motion.div variants={item}>
             <Card className="overflow-hidden border-0 shadow-lg bg-black">
               <CardContent className="p-0">
                 <video
                   className="w-full aspect-video"
                   controls
+                  controlsList="nodownload"
                   poster={lesson.thumbnailImage || undefined}
                 >
                   <source src={lesson.videoUrl} type="video/mp4" />
                 </video>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : (
+          <motion.div variants={item}>
+            <Card className="overflow-hidden border-0 shadow-lg">
+              <CardContent className="p-12 text-center space-y-4">
+                <p className="text-muted-foreground">
+                  {t("lessons:pages.lesson.noVideo")}
+                </p>
+                <LessonVideoUpload
+                  courseId={lesson.courseId}
+                  lessonId={lesson.lessonId}
+                  links={lesson.links}
+                />
               </CardContent>
             </Card>
           </motion.div>
@@ -178,17 +189,8 @@ export default function LessonPage() {
         <motion.div variants={item}>
           <Card>
             <CardHeader className="space-y-3">
-              <div className="flex items-start justify-between">
-                <Authorized
-                  action={ActionType.Update}
-                  resource={ResourceType.Lesson}
-                  resourceId={ResourceId.create(lesson.lessonId)}
-                  fallback={
-                    <CardTitle className="text-3xl" dir="auto">
-                      {lesson.title}
-                    </CardTitle>
-                  }
-                >
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
                   <InlineEditableText
                     value={lesson.title}
                     onSave={handleTitleUpdate}
@@ -197,40 +199,33 @@ export default function LessonPage() {
                     placeholder={t("lessons:actions.enterTitle")}
                     maxLength={200}
                   />
-                </Authorized>
-                {lesson.duration && (
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
-                    <Clock className="h-4 w-4" />
-                    {formatDuration(lesson.duration)}
-                  </div>
+                ) : (
+                  <CardTitle className="text-3xl" dir="auto">
+                    {lesson.title}
+                  </CardTitle>
                 )}
+                <div className="flex items-center gap-2">
+                  {lesson.duration && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
+                      <Clock className="h-4 w-4" />
+                      {formatDuration(lesson.duration)}
+                    </div>
+                  )}
+                  <LessonVideoUpload
+                    courseId={lesson.courseId}
+                    lessonId={lesson.lessonId}
+                    links={lesson.links}
+                  />
+                </div>
               </div>
             </CardHeader>
 
             <CardContent>
               <div className="space-y-2">
                 <h2 className="text-lg font-semibold">
-                  {t("pages.lesson.description")}
+                  {t("lessons:pages.lesson.description")}
                 </h2>
-                <Authorized
-                  action={ActionType.Update}
-                  resource={ResourceType.Lesson}
-                  resourceId={ResourceId.create(lesson.lessonId)}
-                  fallback={
-                    lesson.description ? (
-                      <p
-                        className="text-muted-foreground leading-relaxed"
-                        dir="auto"
-                      >
-                        {lesson.description}
-                      </p>
-                    ) : (
-                      <p className="text-muted-foreground italic">
-                        {t("lessons:actions.noDescription")}
-                      </p>
-                    )
-                  }
-                >
+                {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
                   <InlineEditableTextarea
                     value={lesson.description || ""}
                     onSave={handleDescriptionUpdate}
@@ -239,7 +234,18 @@ export default function LessonPage() {
                     rows={5}
                     maxLength={2000}
                   />
-                </Authorized>
+                ) : lesson.description ? (
+                  <p
+                    className="text-muted-foreground leading-relaxed"
+                    dir="auto"
+                  >
+                    {lesson.description}
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground italic">
+                    {t("lessons:actions.noDescription")}
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>

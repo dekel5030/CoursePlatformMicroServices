@@ -60,7 +60,7 @@ internal sealed class GenerateLessonVideoUploadUrlCommandHandler
             StorageCategory.Public,
             validatedFileKey,
             lesson.Id.ToString(),
-            "lesson/video",
+            "lessonvideo",
             TimeSpan.FromHours(1));
 
         var response = new GenerateUploadUrlDto(uploadUrl.Url, validatedFileKey, uploadUrl.ExpiresAt);

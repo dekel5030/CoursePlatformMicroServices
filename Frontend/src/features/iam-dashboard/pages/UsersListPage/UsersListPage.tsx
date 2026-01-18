@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
 export default function UsersListPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
   const { data: users, isLoading, error } = useUsers();
   const [selectedUser, setSelectedUser] = useState<UserDto | null>(null);
 
@@ -85,16 +85,16 @@ export default function UsersListPage() {
       >
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">
-            {t("authManagement.users.title")}
+            {t("auth:authManagement.users.title")}
           </h1>
           <p className="text-muted-foreground">
-            {t("authManagement.users.subtitle")}
+            {t("auth:authManagement.users.subtitle")}
           </p>
         </div>
 
         {users && users.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            <p>{t("authManagement.users.noUsers")}</p>
+            <p>{t("auth:authManagement.users.noUsers")}</p>
           </div>
         ) : (
           <UserTable users={users || []} onUserSelect={setSelectedUser} />

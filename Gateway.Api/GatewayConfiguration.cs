@@ -17,6 +17,8 @@ internal static class GatewayConfiguration
             // Auth Routes (דוגמה לשימוש חוזר)
             CreateRoute("auth-route", "authservice", "/api/auth/{**catch-all}", "/api"),
             CreateRoute("users-route", "userservice", "/api/users/{**catch-all}", "/api"),
+            CreateRoute("auth-management", "authservice", "/api/admin/{**catch-all}", "/api/admin"),
+            
             
             // Storage Route (שונה מהאחרים, אז נגדיר ידנית)
             new RouteConfig

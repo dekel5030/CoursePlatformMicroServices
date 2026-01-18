@@ -26,7 +26,7 @@ export default function AddRoleModal({
   onSubmit,
   isLoading = false,
 }: AddRoleModalProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
   const [roleName, setRoleName] = useState("");
   const [apiError, setApiError] = useState<ApiErrorResponse | null>(null);
 
@@ -53,7 +53,7 @@ export default function AddRoleModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("modals.addRole.title")}</DialogTitle>
+          <DialogTitle>{t("auth:modals.addRole.title")}</DialogTitle>
         </DialogHeader>
 
         {apiError?.message && (
@@ -67,11 +67,11 @@ export default function AddRoleModal({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <FormField
-            label={t("modals.addRole.roleName")}
+            label={t("auth:modals.addRole.roleName")}
             name="roleName"
             value={roleName}
             onChange={(e) => setRoleName(e.target.value)}
-            placeholder={t("modals.addRole.roleNamePlaceholder")}
+            placeholder={t("auth:modals.addRole.roleNamePlaceholder")}
             error={apiError?.errors?.RoleName?.[0]}
             required
           />
@@ -83,12 +83,12 @@ export default function AddRoleModal({
               onClick={handleClose}
               disabled={isLoading}
             >
-              {t("modals.addRole.cancel")}
+              {t("auth:modals.addRole.cancel")}
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading
-                ? t("modals.addRole.submitLoading")
-                : t("modals.addRole.submit")}
+                ? t("auth:modals.addRole.submitLoading")
+                : t("auth:modals.addRole.submit")}
             </Button>
           </DialogFooter>
         </form>
