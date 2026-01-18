@@ -24,6 +24,7 @@ internal sealed class CanUpdateLessonRule : ILessonActionRule
         if (isOwner || hasPermission)
         {
             yield return LessonAction.Update;
+            yield return LessonAction.UploadVideoUrl;
         }
     }
 }

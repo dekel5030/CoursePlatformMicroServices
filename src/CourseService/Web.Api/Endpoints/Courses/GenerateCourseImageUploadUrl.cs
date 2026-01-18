@@ -2,6 +2,7 @@
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Commands.GenerateCourseImageUploadUrl;
+using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -23,11 +24,11 @@ internal sealed class GenerateCourseImageUploadUrl : IEndpoint
         {
             var courseId = new CourseId(id);
             var command = new GenerateCourseImageUploadUrlCommand(courseId, request.FileName, request.ContentType);
-            Result<GenerateUploadUrlResponse> result = await mediator.Send(command);
+            Result<GenerateUploadUrlDto> result = await mediator.Send(command);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithMetadata<GenerateUploadUrlResponse>(
+        .WithMetadata<GenerateUploadUrlDto>(
             nameof(GenerateCourseImageUploadUrl),
             Tags.Courses,
             "Generate Course Image Upload URL");

@@ -1,5 +1,6 @@
 ﻿using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Abstractions.Storage;
+using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
@@ -12,7 +13,7 @@ using Kernel.Messaging.Abstractions;
 namespace Courses.Application.Courses.Commands.GenerateCourseImageUploadUrl;
 
 internal sealed class GenerateCourseImageUploadUrlCommandHandler
-    : ICommandHandler<GenerateCourseImageUploadUrlCommand, GenerateUploadUrlResponse>
+    : ICommandHandler<GenerateCourseImageUploadUrlCommand, GenerateUploadUrlDto>
 {
     private readonly ICourseRepository _courseRepository;
     private readonly IUserContext _userContext;
@@ -28,7 +29,7 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
         _storageService = storageService;
     }
 
-    public async Task<Result<GenerateUploadUrlResponse>> Handle(
+    public async Task<Result<GenerateUploadUrlDto>> Handle(
         GenerateCourseImageUploadUrlCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -36,7 +37,7 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
 
         if (course is null)
         {
-            return Result.Failure<GenerateUploadUrlResponse>(CourseErrors.NotFound);
+            return Result.Failure<GenerateUploadUrlDto>(CourseErrors.NotFound);
         }
 
         var resourceId = ResourceId.Create(course.Id.ToString());
@@ -45,7 +46,7 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
 
         if (course.InstructorId != currentUser && !hasPermission)
         {
-            return Result.Failure<GenerateUploadUrlResponse>(CourseErrors.Unauthorized);
+            return Result.Failure<GenerateUploadUrlDto>(CourseErrors.Unauthorized);
         }
 
         string extension = Path.GetExtension(request.FileName).ToLowerInvariant();
@@ -56,7 +57,7 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
 
         if (imageUrlResult.IsFailure)
         {
-            return Result.Failure<GenerateUploadUrlResponse>(imageUrlResult.Error);
+            return Result.Failure<GenerateUploadUrlDto>(imageUrlResult.Error);
         }
 
         string validatedFileKey = imageUrlResult.Value.Path;
@@ -69,7 +70,7 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
             TimeSpan.FromMinutes(10)
         );
 
-        var response = new GenerateUploadUrlResponse(
+        var response = new GenerateUploadUrlDto(
             result.Url,
             result.FileKey,
             result.ExpiresAt

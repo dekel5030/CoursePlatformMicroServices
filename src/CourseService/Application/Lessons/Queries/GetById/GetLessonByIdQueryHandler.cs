@@ -35,16 +35,13 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
         GetLessonByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        Course? course = await _dbContext.Courses
-            .Include(c => c.Lessons.Where(l => l.Id == request.LessonId))
-            .FirstOrDefaultAsync(c => c.Id == request.CourseId, cancellationToken);
+        Lesson? lesson = await _dbContext.Lessons
+            .Include(l => l.Course)
+            .FirstOrDefaultAsync(l => 
+                l.Id == request.LessonId && 
+                l.CourseId == request.CourseId, 
+                cancellationToken);
 
-        if (course is null)
-        {
-            return Result.Failure<LessonDetailsDto>(CourseErrors.NotFound);
-        }
-
-        Lesson? lesson = course.Lessons.Count > 0 ? course.Lessons[0] : null;
         if (lesson is null)
         {
             return Result.Failure<LessonDetailsDto>(LessonErrors.NotFound);
@@ -60,7 +57,7 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
             lesson.Access == LessonAccess.Public,
             lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
             lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Private, lesson.VideoUrl.Path).Value,
-            _actionProvider.GetAllowedActions(course, lesson));
+            _actionProvider.GetAllowedActions(lesson.Course, lesson));
 
         return Result.Success(response);
     }

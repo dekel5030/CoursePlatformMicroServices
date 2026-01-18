@@ -2,6 +2,7 @@
 
 public sealed record LessonAction
 {
+
     public string Value { get; init; }
 
     private LessonAction(string value)
@@ -9,8 +10,10 @@ public sealed record LessonAction
         Value = value;
     }
 
-    public static LessonAction Update => new("Update");
-    public static LessonAction Delete => new("Delete");
-    public static LessonAction Create => new("Create");
-    public static LessonAction Read => new("Read");
+    public static readonly LessonAction Update = new("Update");
+    public static readonly LessonAction Delete = new("Delete");
+    public static readonly LessonAction Create = new("Create");
+    public static readonly LessonAction Read = new("Read");
+    public static readonly LessonAction UploadVideoUrl = new("UploadVideoUrl");
+
 }
