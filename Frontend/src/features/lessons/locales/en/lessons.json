@@ -5,7 +5,12 @@
   "detail": {
     "description": "Description",
     "notFound": "Lesson not found",
-    "delete": "Delete Lesson"
+    "delete": "Delete Lesson",
+    "uploadVideo": "Upload Video",
+    "uploadingVideo": "Uploading...",
+    "videoUploadSuccess": "Video uploaded successfully",
+    "videoUploadFailed": "Failed to upload video",
+    "invalidVideoType": "Invalid file type. Please select a video file (MP4, MPEG, QuickTime, AVI, or WebM)"
   },
   "addDialog": {
     "title": "Add New Lesson",

@@ -22,6 +22,7 @@ import {
   ResourceId,
 } from "@/features/auth";
 import { getLink, LessonRels } from "@/utils/linkHelpers";
+import { LessonVideoUpload } from "../components/LessonVideoUpload";
 
 export default function LessonPage() {
   const { courseId, lessonId } = useParams<{
@@ -159,7 +160,7 @@ export default function LessonPage() {
         initial="hidden"
         animate="show"
       >
-        {lesson.videoUrl && (
+        {lesson.videoUrl ? (
           <motion.div variants={item}>
             <Card className="overflow-hidden border-0 shadow-lg bg-black">
               <CardContent className="p-0">
@@ -173,12 +174,27 @@ export default function LessonPage() {
               </CardContent>
             </Card>
           </motion.div>
+        ) : (
+          <motion.div variants={item}>
+            <Card className="overflow-hidden border-0 shadow-lg">
+              <CardContent className="p-12 text-center space-y-4">
+                <p className="text-muted-foreground">
+                  {t("pages.lesson.noVideo")}
+                </p>
+                <LessonVideoUpload
+                  courseId={lesson.courseId}
+                  lessonId={lesson.lessonId}
+                  links={lesson.links}
+                />
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
 
         <motion.div variants={item}>
           <Card>
             <CardHeader className="space-y-3">
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
                 <Authorized
                   action={ActionType.Update}
                   resource={ResourceType.Lesson}
@@ -198,12 +214,19 @@ export default function LessonPage() {
                     maxLength={200}
                   />
                 </Authorized>
-                {lesson.duration && (
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
-                    <Clock className="h-4 w-4" />
-                    {formatDuration(lesson.duration)}
-                  </div>
-                )}
+                <div className="flex items-center gap-2">
+                  {lesson.duration && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
+                      <Clock className="h-4 w-4" />
+                      {formatDuration(lesson.duration)}
+                    </div>
+                  )}
+                  <LessonVideoUpload
+                    courseId={lesson.courseId}
+                    lessonId={lesson.lessonId}
+                    links={lesson.links}
+                  />
+                </div>
               </div>
             </CardHeader>
 

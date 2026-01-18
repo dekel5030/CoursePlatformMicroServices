@@ -137,7 +137,8 @@
     },
     "lesson": {
       "description": "Description",
-      "deleteLesson": "Delete Lesson"
+      "deleteLesson": "Delete Lesson",
+      "noVideo": "No video uploaded yet"
     }
   },
   "modals": {

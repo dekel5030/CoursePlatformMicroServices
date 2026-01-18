@@ -1,4 +1,5 @@
 import { axiosClient } from "@/axios";
+import axios from "axios";
 import type {
   LessonDetailsDto,
   CreateLessonRequestDto,
@@ -51,4 +52,38 @@ export async function patchLesson(
 
 export async function deleteLesson(url: string): Promise<void> {
   await axiosClient.delete(url);
+}
+
+export interface GenerateVideoUploadUrlRequest {
+  fileName: string;
+  contentType: string;
+}
+
+export interface GenerateVideoUploadUrlResponse {
+  uploadUrl: string;
+  fileKey: string;
+  expiresAt: string;
+}
+
+export async function generateVideoUploadUrl(
+  uploadUrl: string,
+  request: GenerateVideoUploadUrlRequest
+): Promise<GenerateVideoUploadUrlResponse> {
+  const response = await axiosClient.post<GenerateVideoUploadUrlResponse>(
+    uploadUrl,
+    request
+  );
+  return response.data;
+}
+
+export async function uploadVideoToStorage(
+  uploadUrl: string,
+  file: File
+): Promise<void> {
+  // Use a raw axios instance for binary upload to avoid default JSON headers
+  await axios.put(uploadUrl, file, {
+    headers: {
+      "Content-Type": file.type,
+    },
+  });
 }

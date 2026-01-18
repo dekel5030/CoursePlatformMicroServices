@@ -137,7 +137,8 @@
     },
     "lesson": {
       "description": "תיאור",
-      "deleteLesson": "מחק שיעור"
+      "deleteLesson": "מחק שיעור",
+      "noVideo": "טרם הועלה וידאו"
     }
   },
   "modals": {

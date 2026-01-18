@@ -1,15 +1,23 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAllCourses } from "@/features/courses";
 import { BreadcrumbNav } from "@/components";
 import { CatalogHeader } from "../components/CatalogHeader";
 import { CourseGrid } from "../components/CourseGrid";
+import { Pagination } from "../components/Pagination";
 
 export default function AllCoursesPage() {
   const { t } = useTranslation(["courses", "translation"]);
-  const { data, isLoading, error } = useAllCourses();
+  const [currentUrl, setCurrentUrl] = useState<string | undefined>(undefined);
+  const { data, isLoading, error } = useAllCourses(currentUrl);
   
   const courses = data?.courses || [];
   const links = data?.links || [];
+
+  const handleNavigate = (url: string) => {
+    setCurrentUrl(url);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const breadcrumbItems = [
     { label: t("breadcrumbs.home"), path: "/" },
@@ -27,6 +35,11 @@ export default function AllCoursesPage() {
             courses={courses}
             isLoading={isLoading}
             error={error}
+          />
+          <Pagination
+            links={links}
+            onNavigate={handleNavigate}
+            isLoading={isLoading}
           />
         </main>
       </div>

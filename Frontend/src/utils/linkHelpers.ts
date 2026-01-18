@@ -47,4 +47,5 @@ export const LessonRels = {
   SELF: "self",
   PARTIAL_UPDATE: "partial-update",
   DELETE: "delete",
+  GENERATE_VIDEO_UPLOAD_URL: "generate-video-upload-url",
 } as const;

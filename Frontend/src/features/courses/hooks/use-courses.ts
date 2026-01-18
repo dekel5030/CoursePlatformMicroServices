@@ -28,10 +28,10 @@ export function useFeaturedCourses() {
   });
 }
 
-export function useAllCourses() {
+export function useAllCourses(url?: string) {
   return useQuery<FetchAllCoursesResult, Error>({
-    queryKey: coursesQueryKeys.allCourses(),
-    queryFn: fetchAllCourses,
+    queryKey: [...coursesQueryKeys.allCourses(), url || "default"],
+    queryFn: () => fetchAllCourses(url),
   });
 }
 
