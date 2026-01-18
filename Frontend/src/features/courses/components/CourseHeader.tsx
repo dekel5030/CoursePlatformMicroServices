@@ -6,7 +6,7 @@ import { CourseActions } from "./CourseActions";
 import { CourseImageUpload } from "./CourseImageUpload";
 import { usePatchCourse } from "../hooks/use-courses";
 import { toast } from "sonner";
-import { hasLink, CourseRels } from "@/utils/linkHelpers";
+import { hasLink, CourseRels, getLink } from "@/utils/linkHelpers";
 import type { CourseModel } from "../types";
 
 interface CourseHeaderProps {
@@ -22,10 +22,16 @@ export function CourseHeader({ course }: CourseHeaderProps) {
   
   // Check if user can update course based on HATEOAS links
   const canUpdate = hasLink(course.links, CourseRels.PARTIAL_UPDATE);
+  const updateLink = getLink(course.links, CourseRels.PARTIAL_UPDATE);
 
   const handleTitleUpdate = async (newTitle: string) => {
+    if (!updateLink) {
+      console.error("No update link found for this course");
+      return;
+    }
+    
     try {
-      await patchCourse.mutateAsync({ title: newTitle });
+      await patchCourse.mutateAsync({ url: updateLink.href, request: { title: newTitle } });
       toast.success(t("courses:detail.titleUpdated"));
     } catch (error) {
       toast.error(t("courses:detail.titleUpdateFailed"));

@@ -58,7 +58,8 @@ export function usePatchCourse(id: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: UpdateCourseRequestDto) => patchCourse(id, request),
+    mutationFn: ({ url, request }: { url: string; request: UpdateCourseRequestDto }) => 
+      patchCourse(url, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.featured() });
@@ -73,7 +74,7 @@ export function useDeleteCourse() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteCourse(id),
+    mutationFn: (url: string) => deleteCourse(url),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.all });
     },

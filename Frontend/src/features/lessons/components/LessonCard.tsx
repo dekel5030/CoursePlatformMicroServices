@@ -36,6 +36,7 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
   // Determine available actions based on HATEOAS links
   const canUpdate = hasLink(lesson.links, LessonRels.PARTIAL_UPDATE);
   const canDelete = hasLink(lesson.links, LessonRels.DELETE);
+  const updateLink = getLink(lesson.links, LessonRels.PARTIAL_UPDATE);
   const deleteLink = getLink(lesson.links, LessonRels.DELETE);
 
   const formatDuration = (duration: string | null | undefined) => {
@@ -71,15 +72,19 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
 
     try {
       await deleteLesson.mutateAsync(deleteLink.href);
-    } catch (error) {
     } finally {
       setIsDeleteDialogOpen(false);
     }
   };
 
   const handleTitleUpdate = async (newTitle: string) => {
+    if (!updateLink) {
+      console.error("No update link found for this lesson");
+      return;
+    }
+    
     try {
-      await patchLesson.mutateAsync({ title: newTitle });
+      await patchLesson.mutateAsync({ url: updateLink.href, request: { title: newTitle } });
       toast.success(t("lessons:actions.titleUpdated"));
     } catch (error) {
       toast.error(t("lessons:actions.titleUpdateFailed"));
@@ -88,8 +93,13 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
   };
 
   const handleDescriptionUpdate = async (newDescription: string) => {
+    if (!updateLink) {
+      console.error("No update link found for this lesson");
+      return;
+    }
+    
     try {
-      await patchLesson.mutateAsync({ description: newDescription });
+      await patchLesson.mutateAsync({ url: updateLink.href, request: { description: newDescription } });
       toast.success(t("lessons:actions.descriptionUpdated"));
     } catch (error) {
       toast.error(t("lessons:actions.descriptionUpdateFailed"));

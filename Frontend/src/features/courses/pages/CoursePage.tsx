@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { CourseHeader } from "../components/CourseHeader";
 import { CourseLessonsSection } from "../components/CourseLessonsSection";
 import { toast } from "sonner";
-import { hasLink, CourseRels } from "@/utils/linkHelpers";
+import { hasLink, CourseRels, getLink } from "@/utils/linkHelpers";
 
 export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
@@ -19,8 +19,14 @@ export default function CoursePage() {
   const textAlignClass = isRTL ? 'text-right' : 'text-left';
 
   const handleDescriptionUpdate = async (newDescription: string) => {
+    const updateLink = getLink(course?.links, CourseRels.PARTIAL_UPDATE);
+    if (!updateLink) {
+      console.error("No update link found for this course");
+      return;
+    }
+    
     try {
-      await patchCourse.mutateAsync({ description: newDescription });
+      await patchCourse.mutateAsync({ url: updateLink.href, request: { description: newDescription } });
       toast.success(t('courses:detail.descriptionUpdated'));
     } catch (error) {
       toast.error(t('courses:detail.descriptionUpdateFailed'));

@@ -17,6 +17,7 @@ function mapToLessonModel(dto: LessonDetailsDto): LessonModel {
     isPreview: dto.isPreview,
     order: dto.index,
     duration: dto.duration,
+    links: dto.links,
   };
 }
 
@@ -31,22 +32,21 @@ export async function fetchLessonById(
 }
 
 export async function createLesson(
-  courseId: string,
+  url: string,
   request: CreateLessonRequestDto
 ): Promise<LessonModel> {
   const response = await axiosClient.post<LessonDetailsDto>(
-    `/courses/${courseId}/lessons`,
+    url,
     request
   );
   return mapToLessonModel(response.data);
 }
 
 export async function patchLesson(
-  courseId: string,
-  lessonId: string,
+  url: string,
   request: UpdateLessonRequestDto
 ): Promise<void> {
-  await axiosClient.patch(`/courses/${courseId}/lessons/${lessonId}`, request);
+  await axiosClient.patch(url, request);
 }
 
 export async function deleteLesson(url: string): Promise<void> {

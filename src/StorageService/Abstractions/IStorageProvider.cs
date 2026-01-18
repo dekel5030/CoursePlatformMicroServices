@@ -22,4 +22,5 @@ internal sealed class ObjectResponse
     public Stream Content { get; set; } = default!;
     public string ContentType { get; set; } = "application/octet-stream";
     public long? ContentLength { get; set; }
+    public string? ETag { get; set; }
 }
