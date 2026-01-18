@@ -53,7 +53,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             course.Price.Currency,
             course.EnrollmentCount,
             course.UpdatedAtUtc,
-            course.Images.Select(image => _urlResolver.Resolve(StorageCategory.Public, image.Path).Value).ToList(),
+            course.Images.Select(image => _urlResolver.Resolve(StorageCategory.Public, image.Path).Value).Reverse().ToList(),
             AllowedActions: _courseActionProvider.GetAllowedActions(course),
             Lessons: course.Lessons
                 .Select(lesson => new LessonSummaryDto(
