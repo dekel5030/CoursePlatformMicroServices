@@ -94,6 +94,11 @@ internal sealed class LinkProvider
             links.Add(Create(nameof(CreateLesson), "create", HttpMethods.Post, new { courseId = courseIdStr }));
         }
 
+        if (allowedActionsSet.TryGetValue(LessonAction.UploadVideoUrl, out _))
+        {
+            links.Add(Create(nameof(GenerateLessonVideoUploadUrl), "generate-video-upload-url", HttpMethods.Post, new { courseIdRaw = courseIdStr, lessonIdRaw = lessonIdStr }));
+        }
+
         return links;
     }
 

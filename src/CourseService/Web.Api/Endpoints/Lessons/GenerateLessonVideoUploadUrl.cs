@@ -32,7 +32,7 @@ internal sealed class GenerateLessonVideoUploadUrl : IEndpoint
 
             Result<GenerateUploadUrlDto> result = await mediator.Send(command, cancellationToken);
 
-            result.Match(Results.Ok, CustomResults.Problem);
+            return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithMetadata<GenerateUploadUrlDto>(
             nameof(GenerateLessonVideoUploadUrl),
