@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 
 export default function RoleDetail() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
   const { roleName } = useParams<{ roleName: string }>();
   const { data: role, isLoading, error } = useRole(roleName);
   const [isMatrixOpen, setIsMatrixOpen] = useState(false);
@@ -35,7 +35,7 @@ export default function RoleDetail() {
           </div>
           <Button onClick={() => navigate("/admin/roles")} variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("authManagement.roles.backToRoles")}
+            {t("auth:authManagement.roles.backToRoles")}
           </Button>
         </div>
       </div>
@@ -47,11 +47,11 @@ export default function RoleDetail() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center space-y-4">
           <p className="text-muted-foreground">
-            {t("authManagement.roles.roleNotFound")}
+            {t("auth:authManagement.roles.roleNotFound")}
           </p>
           <Button onClick={() => navigate("/admin/roles")} variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("authManagement.roles.backToRoles")}
+            {t("auth:authManagement.roles.backToRoles")}
           </Button>
         </div>
       </div>
@@ -74,21 +74,21 @@ export default function RoleDetail() {
           className="mb-4 pl-0 hover:bg-transparent hover:text-primary"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          {t("authManagement.roles.backToRoles")}
+          {t("auth:authManagement.roles.backToRoles")}
         </Button>
         <h1 className="text-3xl font-bold">{role.name}</h1>
         <p className="text-muted-foreground">
           {role.permissions.length}{" "}
           {role.permissions.length === 1
-            ? t("authManagement.roles.permissionCount")
-            : t("authManagement.roles.permissionCount_plural")}
+            ? t("auth:authManagement.roles.permissionCount")
+            : t("auth:authManagement.roles.permissionCount_plural")}
         </p>
       </div>
 
       <div className="border border-border rounded-lg p-6 space-y-4 bg-card shadow-sm">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">
-            {t("authManagement.roles.permissions")}
+            {t("auth:authManagement.roles.permissions")}
           </h2>
           <Button
             onClick={() => setIsMatrixOpen(true)}
@@ -96,13 +96,13 @@ export default function RoleDetail() {
             size="sm"
           >
             <Settings className="mr-2 h-4 w-4" />
-            {t("authManagement.roles.managePermissions")}
+            {t("auth:authManagement.roles.managePermissions")}
           </Button>
         </div>
 
         {role.permissions.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            <p>{t("authManagement.roles.noPermissions")}</p>
+            <p>{t("auth:authManagement.roles.noPermissions")}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -121,7 +121,7 @@ export default function RoleDetail() {
                 variant="link"
                 className="w-full text-primary"
               >
-                {t("authManagement.roles.viewAllPermissions", {
+                {t("auth:authManagement.roles.viewAllPermissions", {
                   count: role.permissions.length,
                 })}{" "}
                 →

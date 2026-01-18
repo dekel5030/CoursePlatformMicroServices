@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function RoleList() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
   const { data: roles, isLoading, error } = useRoles();
 
   const container = {
@@ -76,13 +76,13 @@ export default function RoleList() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold">{t('authManagement.roles.title')}</h2>
-        <p className="text-muted-foreground">{t('authManagement.roles.subtitle')}</p>
+        <h2 className="text-2xl font-bold">{t('auth:authManagement.roles.title')}</h2>
+        <p className="text-muted-foreground">{t('auth:authManagement.roles.subtitle')}</p>
       </div>
 
       {roles && roles.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
-          <p>{t('authManagement.roles.noRoles')}</p>
+          <p>{t('auth:authManagement.roles.noRoles')}</p>
         </div>
       ) : (
         <motion.div 
@@ -109,20 +109,20 @@ export default function RoleList() {
                       <div className="text-2xl font-bold">{role.userCount}</div>
                       <div className="text-sm text-muted-foreground flex items-center gap-1">
                         <Users className="h-3 w-3" />
-                        {role.userCount === 1 ? t('authManagement.roles.userCount') : t('authManagement.roles.userCount_plural')}
+                        {role.userCount === 1 ? t('auth:authManagement.roles.userCount') : t('auth:authManagement.roles.userCount_plural')}
                       </div>
                     </div>
                     <div className="space-y-1">
                       <div className="text-2xl font-bold">{role.permissionCount}</div>
                       <div className="text-sm text-muted-foreground">
-                        {role.permissionCount === 1 ? t('authManagement.roles.permissionCount') : t('authManagement.roles.permissionCount_plural')}
+                        {role.permissionCount === 1 ? t('auth:authManagement.roles.permissionCount') : t('auth:authManagement.roles.permissionCount_plural')}
                       </div>
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter>
                   <Badge variant="secondary" className="text-xs">
-                    {role.permissionCount} {t('authManagement.roles.permissions')}
+                    {role.permissionCount} {t('auth:authManagement.roles.permissions')}
                   </Badge>
                 </CardFooter>
               </Card>

@@ -35,7 +35,7 @@ export default function AddPermissionModal({
   onSubmit,
   isLoading = false,
 }: AddPermissionModalProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
   const [formData, setFormData] = useState<AddPermissionRequest>({
     effect: "Allow",
     action: "",
@@ -83,7 +83,7 @@ export default function AddPermissionModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("modals.addPermission.title")}</DialogTitle>
+          <DialogTitle>{t("auth:modals.addPermission.title")}</DialogTitle>
         </DialogHeader>
 
         {apiError?.message && (
@@ -98,7 +98,7 @@ export default function AddPermissionModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="effect" className="text-sm font-medium">
-              {t("modals.addPermission.effect")}
+              {t("auth:modals.addPermission.effect")}
             </label>
             <Select
               value={formData.effect}
@@ -120,31 +120,31 @@ export default function AddPermissionModal({
           </div>
 
           <FormField
-            label={t("modals.addPermission.action")}
+            label={t("auth:modals.addPermission.action")}
             name="action"
             value={formData.action}
             onChange={handleChange}
-            placeholder={t("modals.addPermission.actionPlaceholder")}
+            placeholder={t("auth:modals.addPermission.actionPlaceholder")}
             error={apiError?.errors?.Action?.[0]}
             required
           />
 
           <FormField
-            label={t("modals.addPermission.resource")}
+            label={t("auth:modals.addPermission.resource")}
             name="resource"
             value={formData.resource}
             onChange={handleChange}
-            placeholder={t("modals.addPermission.resourcePlaceholder")}
+            placeholder={t("auth:modals.addPermission.resourcePlaceholder")}
             error={apiError?.errors?.Resource?.[0]}
             required
           />
 
           <FormField
-            label={t("modals.addPermission.resourceId")}
+            label={t("auth:modals.addPermission.resourceId")}
             name="resourceId"
             value={formData.resourceId}
             onChange={handleChange}
-            placeholder={t("modals.addPermission.resourceIdPlaceholder")}
+            placeholder={t("auth:modals.addPermission.resourceIdPlaceholder")}
             error={apiError?.errors?.ResourceId?.[0]}
           />
 
@@ -155,12 +155,12 @@ export default function AddPermissionModal({
               onClick={handleClose}
               disabled={isLoading}
             >
-              {t("modals.addPermission.cancel")}
+              {t("auth:modals.addPermission.cancel")}
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading
-                ? t("modals.addPermission.submitLoading")
-                : t("modals.addPermission.submit")}
+                ? t("auth:modals.addPermission.submitLoading")
+                : t("auth:modals.addPermission.submit")}
             </Button>
           </DialogFooter>
         </form>

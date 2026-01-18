@@ -13,7 +13,7 @@ import {
 import { Button, Skeleton } from "@/components/ui";
 
 export default function UserManagementPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
 

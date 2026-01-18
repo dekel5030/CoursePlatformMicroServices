@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 export default function RoleDetailPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
   const { roleName } = useParams<{ roleName: string }>();
 
   const breadcrumbItems = [

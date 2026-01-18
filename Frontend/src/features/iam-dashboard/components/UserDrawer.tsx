@@ -18,7 +18,7 @@ export default function UserDrawer({
   onOpenChange,
   user,
 }: UserDrawerProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["auth", "translation"]);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const { data: allRoles, isLoading: rolesLoading } = useRoles();
   const { addRole, removeRole } = useUserManagement(user?.id.toString() || "");
@@ -60,18 +60,18 @@ export default function UserDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{t("authManagement.users.drawer.editUser")}</SheetTitle>
+          <SheetTitle>{t("auth:authManagement.users.drawer.editUser")}</SheetTitle>
         </SheetHeader>
 
         <div className="space-y-6 mt-6">
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-foreground">
-              {t("authManagement.users.drawer.userInfo")}
+              {t("auth:authManagement.users.drawer.userInfo")}
             </h3>
             <div className="space-y-2">
               <div className="flex flex-col">
                 <span className="text-xs text-muted-foreground">
-                  {t("authManagement.users.drawer.name")}
+                  {t("auth:authManagement.users.drawer.name")}
                 </span>
                 <span className="text-sm font-medium">
                   {user.firstName} {user.lastName}
@@ -79,7 +79,7 @@ export default function UserDrawer({
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-muted-foreground">
-                  {t("authManagement.users.drawer.email")}
+                  {t("auth:authManagement.users.drawer.email")}
                 </span>
                 <span className="text-sm font-medium">{user.email}</span>
               </div>
@@ -88,14 +88,14 @@ export default function UserDrawer({
 
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-foreground">
-              {t("authManagement.users.drawer.assignedRoles")}
+              {t("auth:authManagement.users.drawer.assignedRoles")}
             </h3>
 
             {rolesLoading ? (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span className="text-sm">
-                  {t("authManagement.users.drawer.loadingRoles")}
+                  {t("auth:authManagement.users.drawer.loadingRoles")}
                 </span>
               </div>
             ) : (
@@ -103,25 +103,25 @@ export default function UserDrawer({
                 options={roleOptions}
                 value={selectedRoles}
                 onChange={handleRoleChange}
-                placeholder={t("authManagement.users.drawer.selectRoles")}
+                placeholder={t("auth:authManagement.users.drawer.selectRoles")}
               />
             )}
 
             {(addRole.isPending || removeRole.isPending) && (
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>{t("authManagement.users.drawer.saving")}</span>
+                <span>{t("auth:authManagement.users.drawer.saving")}</span>
               </div>
             )}
           </div>
 
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-foreground">
-              {t("authManagement.users.drawer.permissions")}
+              {t("auth:authManagement.users.drawer.permissions")}
             </h3>
             {user.permissions.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                {t("authManagement.users.drawer.noPermissions")}
+                {t("auth:authManagement.users.drawer.noPermissions")}
               </p>
             ) : (
               <div className="space-y-2">

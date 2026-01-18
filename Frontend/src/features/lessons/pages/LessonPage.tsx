@@ -29,7 +29,7 @@ export default function LessonPage() {
 
   const patchLesson = usePatchLesson(courseId!, lessonId!);
 
-  const { t } = useTranslation();
+  const { t } = useTranslation(["lessons", "translation"]);
 
   const handleTitleUpdate = async (newTitle: string) => {
     const updateLink = getLink(lesson?.links, LessonRels.PARTIAL_UPDATE);
@@ -174,7 +174,7 @@ export default function LessonPage() {
             <Card className="overflow-hidden border-0 shadow-lg">
               <CardContent className="p-12 text-center space-y-4">
                 <p className="text-muted-foreground">
-                  {t("pages.lesson.noVideo")}
+                  {t("lessons:pages.lesson.noVideo")}
                 </p>
                 <LessonVideoUpload
                   courseId={lesson.courseId}
@@ -223,7 +223,7 @@ export default function LessonPage() {
             <CardContent>
               <div className="space-y-2">
                 <h2 className="text-lg font-semibold">
-                  {t("pages.lesson.description")}
+                  {t("lessons:pages.lesson.description")}
                 </h2>
                 {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
                   <InlineEditableTextarea
