@@ -56,7 +56,7 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
             lesson.Duration,
             lesson.Access == LessonAccess.Public,
             lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
-            lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Private, lesson.VideoUrl.Path).Value,
+            lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value,
             _actionProvider.GetAllowedActions(lesson.Course, lesson));
 
         return Result.Success(response);
