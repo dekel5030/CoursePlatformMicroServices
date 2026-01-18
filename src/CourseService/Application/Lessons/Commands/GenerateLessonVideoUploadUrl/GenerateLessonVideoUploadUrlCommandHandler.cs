@@ -63,7 +63,7 @@ internal class GenerateLessonVideoUploadUrlCommandHandler
             "lesson/video",
             TimeSpan.FromHours(1));
 
-        var response = new GenerateUploadUrlDto(uploadUrl.FileKey, validatedFileKey, uploadUrl.ExpiresAt);
+        var response = new GenerateUploadUrlDto(uploadUrl.Url, validatedFileKey, uploadUrl.ExpiresAt);
 
         return Result.Success(response);
     }
