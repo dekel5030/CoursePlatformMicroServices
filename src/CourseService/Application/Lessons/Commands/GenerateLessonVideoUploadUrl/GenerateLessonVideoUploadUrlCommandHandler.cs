@@ -11,7 +11,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Lessons.Commands.GenerateLessonVideoUploadUrl;
 
-internal class GenerateLessonVideoUploadUrlCommandHandler
+internal sealed class GenerateLessonVideoUploadUrlCommandHandler
     : ICommandHandler<GenerateLessonVideoUploadUrlCommand, GenerateUploadUrlDto>
 {
     private readonly IObjectStorageService _storageService;
@@ -59,7 +59,7 @@ internal class GenerateLessonVideoUploadUrlCommandHandler
         PresignedUrlResponse uploadUrl = _storageService.GenerateUploadUrlAsync(
             StorageCategory.Public,
             validatedFileKey,
-            lesson.Id,
+            lesson.Id.ToString(),
             "lesson/video",
             TimeSpan.FromHours(1));
 
