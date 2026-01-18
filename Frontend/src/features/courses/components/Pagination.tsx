@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getLink, CourseRels } from "@/utils/linkHelpers";
 import type { LinkDto } from "@/types/LinkDto";
 import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 
 interface PaginationProps {
   links?: LinkDto[];
@@ -15,7 +16,10 @@ export function Pagination({ links, onNavigate, isLoading }: PaginationProps) {
   const previousLink = getLink(links, CourseRels.PREVIOUS_PAGE);
   const nextLink = getLink(links, CourseRels.NEXT_PAGE);
 
-  // Don't render anything if there are no pagination links
+  const isRtl = i18n.dir() === "rtl";
+  const PreviousIcon = isRtl ? ChevronRight : ChevronLeft;
+  const NextIcon = isRtl ? ChevronLeft : ChevronRight;
+
   if (!previousLink && !nextLink) {
     return null;
   }
@@ -29,7 +33,7 @@ export function Pagination({ links, onNavigate, isLoading }: PaginationProps) {
         disabled={!previousLink || isLoading}
         className="gap-1"
       >
-        <ChevronLeft className="h-4 w-4" />
+        <PreviousIcon className="h-4 w-4" />
         {t("common.previous")}
       </Button>
       <Button
@@ -40,7 +44,7 @@ export function Pagination({ links, onNavigate, isLoading }: PaginationProps) {
         className="gap-1"
       >
         {t("common.next")}
-        <ChevronRight className="h-4 w-4" />
+        <NextIcon className="h-4 w-4" />
       </Button>
     </div>
   );
