@@ -65,10 +65,12 @@ export default function CourseCard({ course }: Props) {
               count: course.lessons?.length || 0,
             })}
           </div>
-          <div className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {new Date(course.updatedAtUtc ?? "").toLocaleDateString()}
-          </div>
+          {course.updatedAtUtc && (
+            <div className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {new Date(course.updatedAtUtc).toLocaleDateString()}
+            </div>
+          )}
         </CardFooter>
       </Card>
     </Link>
