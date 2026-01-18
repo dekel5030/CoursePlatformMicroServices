@@ -33,6 +33,7 @@ export function useLessonVideoUpload(courseId: string, lessonId: string) {
       uploadVideoToStorage(uploadUrl, file),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: lessonsQueryKeys.detail(courseId, lessonId) });
+      queryClient.invalidateQueries({ queryKey: lessonsQueryKeys.all(courseId) });
     },
   });
 
