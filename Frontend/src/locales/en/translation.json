@@ -56,119 +56,7 @@
       }
     }
   },
-  "admin": {
-    "dashboard": {
-      "title": "Admin Dashboard",
-      "subtitle": "Overview and management of the platform",
-      "usersCard": {
-        "title": "User Management",
-        "description": "Manage user roles and permissions"
-      },
-      "rolesCard": {
-        "title": "Role Management",
-        "description": "Define and configure security roles"
-      }
-    }
-  },
-  "authManagement": {
-    "roles": {
-      "title": "Roles",
-      "subtitle": "Manage security roles and their permissions",
-      "noRoles": "No roles found",
-      "userCount": "User",
-      "userCount_plural": "Users",
-      "permissionCount": "Permission",
-      "permissionCount_plural": "Permissions",
-      "permissions": "permissions",
-      "backToRoles": "Back to Roles",
-      "managePermissions": "Manage Permissions",
-      "noPermissions": "No permissions assigned",
-      "viewAllPermissions": "View all {{count}} permissions",
-      "roleDetails": "Role Details",
-      "roleNotFound": "Role not found"
-    },
-    "users": {
-      "title": "User Management",
-      "subtitle": "Manage user roles and permissions",
-      "noUsers": "No users found in the system",
-      "searchPlaceholder": "Search users by name, email, or role...",
-      "clearSearch": "Clear search",
-      "showingUsers": "Showing {{count}} of {{total}} users",
-      "table": {
-        "name": "Name",
-        "email": "Email",
-        "assignedRoles": "Assigned Roles",
-        "actions": "Actions",
-        "noRoles": "No roles",
-        "edit": "Edit"
-      },
-      "drawer": {
-        "editUser": "Edit User",
-        "userInfo": "User Information",
-        "name": "Name",
-        "email": "Email",
-        "assignedRoles": "Assigned Roles",
-        "loadingRoles": "Loading roles...",
-        "selectRoles": "Select roles...",
-        "saving": "Saving changes...",
-        "permissions": "Permissions",
-        "noPermissions": "No direct permissions assigned"
-      },
-      "permissions": {
-        "title": "Fine-Grained Permissions",
-        "subtitle": "User-specific permissions override role permissions",
-        "addPermission": "+ Add Permission",
-        "noPermissions": "No fine-grained permissions assigned to this user",
-        "failedToLoad": "Failed to load user data: {{message}}",
-        "removeTitle": "Remove Permission",
-        "removeMessage": "Are you sure you want to remove this permission? This action cannot be undone.",
-        "remove": "Remove"
-      }
-    }
-  },
-  "pages": {
-    "course": {
-      "instructor": "Instructor",
-      "buyNow": "Buy Now",
-      "addToCart": "Add to Cart",
-      "about": "About This Course",
-      "lessons": "Lessons",
-      "noLessons": "No lessons available.",
-      "deleteCourse": "Delete Course",
-      "addLesson": "Add Lesson"
-    },
-    "lesson": {
-      "description": "Description",
-      "deleteLesson": "Delete Lesson",
-      "noVideo": "No video uploaded yet"
-    }
-  },
   "modals": {
-    "addPermission": {
-      "title": "Add Permission",
-      "effect": "Effect",
-      "action": "Action",
-      "actionPlaceholder": "e.g., Read, Write, Delete",
-      "resource": "Resource",
-      "resourcePlaceholder": "e.g., Course, User, Order",
-      "resourceId": "Resource ID",
-      "resourceIdPlaceholder": "* for all, or specific ID",
-      "cancel": "Cancel",
-      "submit": "Add Permission",
-      "submitLoading": "Adding..."
-    },
-    "addRole": {
-      "title": "Add Role",
-      "roleName": "Role Name",
-      "roleNamePlaceholder": "e.g., Admin, Instructor, Student",
-      "cancel": "Cancel",
-      "submit": "Add Role",
-      "submitLoading": "Adding..."
-    },
-    "confirmation": {
-      "cancel": "Cancel",
-      "loading": "Processing..."
-    },
     "editProfile": {
       "title": "Edit Profile",
       "firstName": "First Name",
@@ -227,7 +115,7 @@
     },
     "about": {
       "title": "From Blueprint to Reality",
-      "description": "Architecture is changing. The tools are getting more complex, but the deadlines are getting tighter. CourseHub provides the technical edge you need—whether you're moving from 2D to BIM, mastering photorealistic rendering, or automating tasks with visual scripting.",
+      "description": "Architecture is changing. The tools are getting more complex, but the deadlines are getting tighter. CourseHub provides the technical edge you need\u2014whether you're moving from 2D to BIM, mastering photorealistic rendering, or automating tasks with visual scripting.",
       "points": {
         "curriculum": "Workflows for Revit, Rhino, and AutoCAD",
         "projects": "Create portfolio-ready renderings and sheets",

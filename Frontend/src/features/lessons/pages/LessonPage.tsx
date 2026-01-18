@@ -15,13 +15,7 @@ import { Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import {
-  Authorized,
-  ActionType,
-  ResourceType,
-  ResourceId,
-} from "@/features/auth";
-import { getLink, LessonRels } from "@/utils/linkHelpers";
+import { getLink, hasLink, LessonRels } from "@/utils/linkHelpers";
 import { LessonVideoUpload } from "../components/LessonVideoUpload";
 
 export default function LessonPage() {
@@ -167,6 +161,7 @@ export default function LessonPage() {
                 <video
                   className="w-full aspect-video"
                   controls
+                  controlsList="nodownload"
                   poster={lesson.thumbnailImage || undefined}
                 >
                   <source src={lesson.videoUrl} type="video/mp4" />
@@ -195,16 +190,7 @@ export default function LessonPage() {
           <Card>
             <CardHeader className="space-y-3">
               <div className="flex items-start justify-between gap-4 flex-wrap">
-                <Authorized
-                  action={ActionType.Update}
-                  resource={ResourceType.Lesson}
-                  resourceId={ResourceId.create(lesson.lessonId)}
-                  fallback={
-                    <CardTitle className="text-3xl" dir="auto">
-                      {lesson.title}
-                    </CardTitle>
-                  }
-                >
+                {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
                   <InlineEditableText
                     value={lesson.title}
                     onSave={handleTitleUpdate}
@@ -213,7 +199,11 @@ export default function LessonPage() {
                     placeholder={t("lessons:actions.enterTitle")}
                     maxLength={200}
                   />
-                </Authorized>
+                ) : (
+                  <CardTitle className="text-3xl" dir="auto">
+                    {lesson.title}
+                  </CardTitle>
+                )}
                 <div className="flex items-center gap-2">
                   {lesson.duration && (
                     <div className="flex items-center gap-1 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
@@ -235,25 +225,7 @@ export default function LessonPage() {
                 <h2 className="text-lg font-semibold">
                   {t("pages.lesson.description")}
                 </h2>
-                <Authorized
-                  action={ActionType.Update}
-                  resource={ResourceType.Lesson}
-                  resourceId={ResourceId.create(lesson.lessonId)}
-                  fallback={
-                    lesson.description ? (
-                      <p
-                        className="text-muted-foreground leading-relaxed"
-                        dir="auto"
-                      >
-                        {lesson.description}
-                      </p>
-                    ) : (
-                      <p className="text-muted-foreground italic">
-                        {t("lessons:actions.noDescription")}
-                      </p>
-                    )
-                  }
-                >
+                {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
                   <InlineEditableTextarea
                     value={lesson.description || ""}
                     onSave={handleDescriptionUpdate}
@@ -262,7 +234,18 @@ export default function LessonPage() {
                     rows={5}
                     maxLength={2000}
                   />
-                </Authorized>
+                ) : lesson.description ? (
+                  <p
+                    className="text-muted-foreground leading-relaxed"
+                    dir="auto"
+                  >
+                    {lesson.description}
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground italic">
+                    {t("lessons:actions.noDescription")}
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
