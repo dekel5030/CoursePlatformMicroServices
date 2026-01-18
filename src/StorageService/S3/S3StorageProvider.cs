@@ -109,12 +109,13 @@ internal sealed class S3StorageProvider : IStorageProvider
         CancellationToken cancellationToken = default)
     {
         GetObjectResponse response = await _s3Client.GetObjectAsync(bucketName, key, cancellationToken);
-
+        
         return new ObjectResponse
         {
             Content = response.ResponseStream,
             ContentType = response.Headers.ContentType ?? "application/octet-stream",
-            ContentLength = response.ContentLength
+            ContentLength = response.ContentLength,
+            ETag = response.ETag
         };
     }
 }
