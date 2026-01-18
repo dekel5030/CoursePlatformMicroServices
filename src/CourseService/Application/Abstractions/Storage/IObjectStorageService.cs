@@ -11,5 +11,3 @@ public interface IObjectStorageService
 
     PresignedUrlResponse GenerateViewUrl(string fileKey, TimeSpan expiry);
 }
-
-public record PresignedUrlResponse(string Url, string FileKey, DateTime ExpiresAt);

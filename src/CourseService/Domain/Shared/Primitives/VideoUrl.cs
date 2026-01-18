@@ -1,4 +1,6 @@
-﻿namespace Courses.Domain.Shared.Primitives;
+﻿using Kernel;
+
+namespace Courses.Domain.Shared.Primitives;
 
 public sealed record VideoUrl : Url
 {
@@ -10,9 +12,28 @@ public sealed record VideoUrl : Url
 
     public VideoUrl(string path) : base(path)
     {
-        if (!_allowedExtensions.Any(ext => path.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+        string extension = System.IO.Path.GetExtension(path).ToLowerInvariant();
+
+        if (!_allowedExtensions.Contains(extension))
         {
             throw new ArgumentException("Invalid video format");
         }
+    }
+
+    public static Result<VideoUrl> Create(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Result.Failure<VideoUrl>(Error.Validation("VideoUrl.Empty", "Video URL cannot be empty."));
+        }
+
+        string extension = System.IO.Path.GetExtension(value).ToLowerInvariant();
+
+        if (!_allowedExtensions.Contains(extension))
+        {
+            return Result.Failure<VideoUrl>(Error.Validation("Upload.InvalidFormat", "Invalid video format. Allowed formats: mp4, webm, mov."));
+        }
+
+        return Result.Success(new VideoUrl(value));
     }
 }
