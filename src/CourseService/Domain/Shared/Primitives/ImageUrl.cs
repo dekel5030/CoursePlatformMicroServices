@@ -1,4 +1,6 @@
-﻿namespace Courses.Domain.Shared.Primitives;
+﻿using Kernel;
+
+namespace Courses.Domain.Shared.Primitives;
 
 public sealed record ImageUrl : Url
 {
@@ -14,5 +16,22 @@ public sealed record ImageUrl : Url
         {
             throw new ArgumentException("Invalid image format");
         }
+    }
+
+    public static Result<ImageUrl> Create(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Result.Failure<ImageUrl>(Error.Validation("ImageUrl.Empty", "Image URL cannot be empty."));
+        }
+
+        string extension = System.IO.Path.GetExtension(value).ToLowerInvariant();
+
+        if (!_allowedExtensions.Contains(extension))
+        {
+            return Result.Failure<ImageUrl>(Error.Validation("Upload.InvalidFormat", "Invalid image format. Allowed formats: jpg, jpeg, png, webp."));
+        }
+
+        return Result.Success(new ImageUrl(value));
     }
 }

@@ -3,6 +3,7 @@ using Courses.Application.Abstractions.Storage;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Auth.AuthTypes;
@@ -38,27 +39,31 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
             return Result.Failure<GenerateUploadUrlResponse>(CourseErrors.NotFound);
         }
 
-        var resourceId = ResourceId.Create(course.Id.Value.ToString());
+        var resourceId = ResourceId.Create(course.Id.ToString());
         bool hasPermission = _userContext.HasPermission(ActionType.Update, ResourceType.Course, resourceId);
-
         var currentUser = new UserId(_userContext.Id ?? Guid.Empty);
+
         if (course.InstructorId != currentUser && !hasPermission)
         {
             return Result.Failure<GenerateUploadUrlResponse>(CourseErrors.Unauthorized);
         }
 
         string extension = Path.GetExtension(request.FileName).ToLowerInvariant();
-        if (string.IsNullOrEmpty(extension) || !IsAllowedImageExtension(extension))
+        string uniqueFileName = $"{Guid.NewGuid()}{extension}";
+        string rawFileKey = $"courses/{course.Id.Value}/images/{uniqueFileName}";
+
+        Result<ImageUrl> imageUrlResult = ImageUrl.Create(rawFileKey);
+
+        if (imageUrlResult.IsFailure)
         {
-            return Result.Failure<GenerateUploadUrlResponse>(Error.Validation("Upload.InvalidFormat", "Invalid image format"));
+            return Result.Failure<GenerateUploadUrlResponse>(imageUrlResult.Error);
         }
 
-        string uniqueFileName = $"{Guid.NewGuid()}{extension}";
-        string fileKey = $"courses/{course.Id.Value}/thumbnails/{uniqueFileName}";
+        string validatedFileKey = imageUrlResult.Value.Path;
 
         PresignedUrlResponse result = _storageService.GenerateUploadUrlAsync(
             StorageCategory.Public,
-            fileKey,
+            validatedFileKey,
             course.Id.Value.ToString(),
             "courseimage",
             TimeSpan.FromMinutes(10)
@@ -72,7 +77,4 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
 
         return Result.Success(response);
     }
-
-    private static bool IsAllowedImageExtension(string ext)
-        => new[] { ".jpg", ".jpeg", ".png", ".webp" }.Contains(ext);
 }
