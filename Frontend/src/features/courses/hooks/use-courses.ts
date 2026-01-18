@@ -30,7 +30,7 @@ export function useFeaturedCourses() {
 
 export function useAllCourses(url?: string) {
   return useQuery<FetchAllCoursesResult, Error>({
-    queryKey: [...coursesQueryKeys.allCourses(), url || "default"],
+    queryKey: [...coursesQueryKeys.allCourses(), url || "/courses"],
     queryFn: () => fetchAllCourses(url),
   });
 }

@@ -17,7 +17,9 @@
     "required": "חובה",
     "loading": "טוען...",
     "noData": "אין נתונים זמינים",
-    "unknown": "לא ידוע"
+    "unknown": "לא ידוע",
+    "previous": "קודם",
+    "next": "הבא"
   },
   "breadcrumbs": {
     "home": "בית",

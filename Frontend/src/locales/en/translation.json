@@ -17,7 +17,9 @@
     "required": "Required",
     "loading": "Loading...",
     "noData": "No data available",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "previous": "Previous",
+    "next": "Next"
   },
   "breadcrumbs": {
     "home": "Home",

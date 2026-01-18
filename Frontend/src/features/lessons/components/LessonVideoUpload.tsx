@@ -19,7 +19,9 @@ const ALLOWED_VIDEO_TYPES = [
   "video/quicktime",
   "video/x-msvideo",
   "video/webm",
-];
+] as const;
+
+const ALLOWED_VIDEO_EXTENSIONS = ALLOWED_VIDEO_TYPES.join(",");
 
 export function LessonVideoUpload({ courseId, lessonId, links }: LessonVideoUploadProps) {
   const { t } = useTranslation(["lessons"]);
@@ -74,7 +76,7 @@ export function LessonVideoUpload({ courseId, lessonId, links }: LessonVideoUplo
       <input
         ref={fileInputRef}
         type="file"
-        accept="video/mp4,video/mpeg,video/quicktime,video/x-msvideo,video/webm"
+        accept={ALLOWED_VIDEO_EXTENSIONS}
         onChange={handleFileChange}
         className="hidden"
         disabled={isUploading}

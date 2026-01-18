@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getLink, CourseRels } from "@/utils/linkHelpers";
 import type { LinkDto } from "@/types/LinkDto";
+import { useTranslation } from "react-i18next";
 
 interface PaginationProps {
   links?: LinkDto[];
@@ -10,6 +11,7 @@ interface PaginationProps {
 }
 
 export function Pagination({ links, onNavigate, isLoading }: PaginationProps) {
+  const { t } = useTranslation();
   const previousLink = getLink(links, CourseRels.PREVIOUS_PAGE);
   const nextLink = getLink(links, CourseRels.NEXT_PAGE);
 
@@ -28,7 +30,7 @@ export function Pagination({ links, onNavigate, isLoading }: PaginationProps) {
         className="gap-1"
       >
         <ChevronLeft className="h-4 w-4" />
-        Previous
+        {t("common.previous")}
       </Button>
       <Button
         variant="outline"
@@ -37,7 +39,7 @@ export function Pagination({ links, onNavigate, isLoading }: PaginationProps) {
         disabled={!nextLink || isLoading}
         className="gap-1"
       >
-        Next
+        {t("common.next")}
         <ChevronRight className="h-4 w-4" />
       </Button>
     </div>
