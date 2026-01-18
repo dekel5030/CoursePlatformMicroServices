@@ -9,7 +9,7 @@ using Kernel.EventBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Courses.Application.Events;
+namespace Courses.Application.EventConsumers;
 
 internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
 {
