@@ -7,6 +7,7 @@ using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
+using Courses.Domain.Users;
 using Kernel;
 
 namespace Courses.Domain.Courses;
@@ -18,7 +19,8 @@ public class Course : Entity<CourseId>
     public override CourseId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
-    public UserId? InstructorId { get; private set; }
+    public UserId InstructorId { get; private set; }
+    public User? Instructor { get; private set; }
     public CourseStatus Status { get; private set; }
     public int EnrollmentCount { get; private set; }
     public int LessonCount { get; private set; }
@@ -36,9 +38,9 @@ public class Course : Entity<CourseId>
 
     public static Result<Course> CreateCourse(
         TimeProvider timeProvider,
+        UserId instructorId,
         Title? title = null,
         Description? description = null,
-        UserId? instructorId = null,
         Money? price = null)
     {
         var newCourse = new Course

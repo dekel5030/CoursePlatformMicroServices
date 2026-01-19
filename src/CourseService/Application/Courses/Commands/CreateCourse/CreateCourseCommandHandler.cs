@@ -3,8 +3,10 @@ using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Actions.Abstract;
 using Courses.Application.Courses.Dtos;
 using Courses.Domain.Courses;
+using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
+using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Commands.CreateCourse;
@@ -15,30 +17,38 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
     private readonly IUnitOfWork _unitOfWork;
     private readonly TimeProvider _timeProvider;
     private readonly ICourseActionProvider _actionProvider;
+    private readonly IUserContext _userContext;
 
     public CreateCourseCommandHandler(
         ICourseRepository courseRepository,
         TimeProvider timeProvider,
         IUnitOfWork unitOfWork,
-        ICourseActionProvider courseActionProvider)
+        ICourseActionProvider courseActionProvider,
+        IUserContext userContext)
     {
         _courseRepository = courseRepository;
         _timeProvider = timeProvider;
         _unitOfWork = unitOfWork;
         _actionProvider = courseActionProvider;
+        _userContext = userContext;
     }
 
     public async Task<Result<CourseSummaryDto>> Handle(
         CreateCourseCommand request,
         CancellationToken cancellationToken = default)
     {
-        UserId? instructorId = request.InstructorId.HasValue ? new(request.InstructorId.Value) : null;
+        UserId instructorId = new(_userContext.Id ?? Guid.Empty);
+
+        if (instructorId.Value == Guid.Empty)
+        {
+            return Result.Failure<CourseSummaryDto>(CourseErrors.Unauthorized);
+        }
 
         Result<Course> courseResult = Course.CreateCourse(
             _timeProvider,
+            instructorId,
             request.Title,
-            request.Description,
-            instructorId);
+            request.Description);
 
         if (courseResult.IsFailure)
         {

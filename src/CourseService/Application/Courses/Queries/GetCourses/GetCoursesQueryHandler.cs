@@ -39,6 +39,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
         int totalItems = await baseQuery.CountAsync(cancellationToken);
 
         List<Course> courses = await _dbContext.Courses
+            .Include(course => course.Instructor)
             .OrderByDescending(c => c.UpdatedAtUtc)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
@@ -48,7 +49,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
             .Select(course => new CourseSummaryDto(
                 course.Id,
                 course.Title,
-                course.InstructorId?.ToString(),
+                course.Instructor?.FullName ?? "Unknown Instructor",
                 course.Price.Amount,
                 course.Price.Currency,
                 course.Images.Count <= 0 ? null : _urlResolver.Resolve(StorageCategory.Public, course.Images[^1].Path).Value,
