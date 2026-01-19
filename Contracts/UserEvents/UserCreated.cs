@@ -5,5 +5,5 @@ public sealed record UserCreated(
     string FirstName,
     string LastName,
     string Email,
-    string AvatarUrl
+    string? AvatarUrl
 );

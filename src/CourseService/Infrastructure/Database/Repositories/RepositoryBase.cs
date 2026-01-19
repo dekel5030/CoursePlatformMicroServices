@@ -1,6 +1,5 @@
 ﻿using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Shared;
-using Courses.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Database.Repositories;

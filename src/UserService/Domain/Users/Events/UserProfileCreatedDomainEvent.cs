@@ -1,5 +1,4 @@
 using Kernel.Messaging.Abstractions;
-using Users.Domain.Users.Primitives;
 
 namespace Users.Domain.Users.Events;
 

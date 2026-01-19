@@ -15,8 +15,8 @@ internal sealed class UserCreatedEventConsumer : IEventConsumer<UserCreated>
     private readonly ILogger<UserCreatedEventConsumer> _logger;
 
     public UserCreatedEventConsumer(
-        IUsersRepository userRepo, 
-        IUnitOfWork unitOfWork, 
+        IUsersRepository userRepo,
+        IUnitOfWork unitOfWork,
         ILogger<UserCreatedEventConsumer> logger)
     {
         _userRepo = userRepo;

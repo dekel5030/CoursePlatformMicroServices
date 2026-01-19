@@ -1,7 +1,6 @@
 ﻿
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Endpoints.Courses;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.GenerateLessonVideoUploadUrl;
 using Courses.Application.Shared.Dtos;

@@ -1,6 +1,5 @@
 ﻿using Courses.Domain.Courses;
 using Courses.Domain.Lessons;
-using Courses.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Abstractions.Data;

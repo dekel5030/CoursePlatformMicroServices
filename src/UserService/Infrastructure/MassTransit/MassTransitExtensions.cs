@@ -64,24 +64,50 @@ internal static class MassTransitExtensions
     }
 
     private static void RegisterApplicationConsumers(
-            this IBusRegistrationConfigurator registrationConfigurator)
+        this IBusRegistrationConfigurator registrationConfigurator)
     {
         Assembly applicationAssembly = typeof(Application.DependencyInjection).Assembly;
 
-        var consumerDefinitions = applicationAssembly.GetTypes()
+        var eventTypes = applicationAssembly.GetTypes()
             .Where(t => !t.IsAbstract && !t.IsInterface)
-            .SelectMany(t => t.GetInterfaces(), (concreteType, interfaceType) => new { concreteType, interfaceType })
-            .Where(x => x.interfaceType.IsGenericType &&
-                        x.interfaceType.GetGenericTypeDefinition() == typeof(IEventConsumer<>))
+            .SelectMany(t => t.GetInterfaces())
+            .Where(i => i.IsGenericType &&
+                        i.GetGenericTypeDefinition() == typeof(IEventConsumer<>))
+            .Select(i => i.GetGenericArguments()[0])
+            .Distinct()
             .ToList();
 
-        foreach (var entry in consumerDefinitions)
+        LogBridgedConsumers(applicationAssembly.GetName().Name, eventTypes);
+
+        foreach (Type? eventType in eventTypes)
         {
-            Type eventType = entry.interfaceType.GetGenericArguments()[0];
-
-            Type closedBridgeType = typeof(GenericConsumerBridge<>).MakeGenericType(eventType);
-
-            registrationConfigurator.AddConsumer(closedBridgeType);
+            Type bridgeType = typeof(GenericConsumerBridge<>).MakeGenericType(eventType);
+            registrationConfigurator.AddConsumer(bridgeType);
         }
+    }
+
+    private static void LogBridgedConsumers(string? assemblyName, List<Type> eventTypes)
+    {
+
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("--- [MassTransit Bridge Registration] ---");
+        sb.AppendLine($"Source: {assemblyName ?? "Unknown"}");
+        sb.AppendLine($"Total Bridged Events: {eventTypes.Count}");
+
+        if (eventTypes.Count > 0)
+        {
+            sb.AppendLine("Events Subscribed (via GenericBridge):");
+            foreach (Type type in eventTypes)
+            {
+                sb.AppendLine($" > {type.Name}");
+            }
+        }
+        else
+        {
+            sb.AppendLine("(!) No event consumers found to bridge.");
+        }
+        sb.AppendLine("-----------------------------------------");
+
+        Console.WriteLine(sb.ToString());
     }
 }

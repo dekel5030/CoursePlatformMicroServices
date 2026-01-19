@@ -1,6 +1,4 @@
-﻿using System.IO;
-using CoursePlatform.ServiceDefaults.Endpoints;
-using MassTransit;
+﻿using CoursePlatform.ServiceDefaults.Endpoints;
 using Microsoft.Extensions.Primitives;
 using StorageService.Abstractions;
 
