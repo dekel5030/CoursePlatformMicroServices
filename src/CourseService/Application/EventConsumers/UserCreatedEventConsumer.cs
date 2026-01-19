@@ -42,16 +42,13 @@ internal sealed class UserCreatedEventConsumer : IEventConsumer<UserCreated>
 
         _logger.LogInformation("Creating new user with ID {UserId}", userId);
 
-        string[] splitName = message.Fullname.Split(' ');
-        string firstName = splitName[0];
-        string lastName = splitName.Length > 1 ? splitName[1] : string.Empty;
-
         user = new User
         {
             Id = userId,
             Email = message.Email,
-            FirstName = firstName,
-            LastName = lastName,
+            FirstName = message.FirstName,
+            LastName = message.LastName,
+            AvatarUrl = message.AvatarUrl
         };
 
         await _userRepo.AddAsync(user, cancellationToken);

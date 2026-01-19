@@ -2,7 +2,8 @@ namespace CoursePlatform.Contracts.UserEvents;
 
 public sealed record UserCreated(
     string UserId,
-    string Fullname,
+    string FirstName,
+    string LastName,
     string Email,
-    DateTime CreatedAt
+    string AvatarUrl
 );

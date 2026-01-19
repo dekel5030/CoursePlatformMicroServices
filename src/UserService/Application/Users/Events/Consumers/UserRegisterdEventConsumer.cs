@@ -6,7 +6,7 @@ using Users.Application.Abstractions.Data;
 using Users.Domain.Users;
 using Users.Domain.Users.Primitives;
 
-namespace Users.Application.Users.Events;
+namespace Users.Application.Users.Events.Consumers;
 
 internal sealed class UserRegisterdEventConsumer : IEventConsumer<UserRegisteredEvent>
 {
