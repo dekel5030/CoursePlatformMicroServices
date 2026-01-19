@@ -2,7 +2,9 @@
 
   <ItemGroup>
     <PackageReference Include="Serilog" />
-	  <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />
+	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+
   </ItemGroup>
 
   <ItemGroup>

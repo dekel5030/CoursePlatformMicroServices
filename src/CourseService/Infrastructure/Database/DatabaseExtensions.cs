@@ -1,6 +1,6 @@
 ﻿using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
-using Courses.Infrastructure.Repositories;
+using Courses.Infrastructure.Database.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -48,6 +48,8 @@ internal static class DatabaseExtensions
         services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<ReadDbContext>());
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<WriteDbContext>());
         services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<IUsersRepository, UsersRepository>();
+        services.AddScoped<IFeaturedCoursesRepository, FeaturedCoursesRepository>();
 
         return services;
     }

@@ -4,13 +4,13 @@ using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Infrastructure.Repositories;
+namespace Courses.Infrastructure.Database.Repositories;
 
-public class FeaturedCoursesRepo : IFeaturedCoursesRepository
+public class FeaturedCoursesRepository : IFeaturedCoursesRepository
 {
     private readonly IReadDbContext _dbContext;
 
-    public FeaturedCoursesRepo(IReadDbContext dbContext)
+    public FeaturedCoursesRepository(IReadDbContext dbContext)
     {
         _dbContext = dbContext;
     }

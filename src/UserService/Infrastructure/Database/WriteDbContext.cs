@@ -29,7 +29,7 @@ public sealed class WriteDbContext(
         modelBuilder.AddTransactionalOutboxEntities();
     }
 
-    private Task DispatchDomainEvents(
+    private async Task DispatchDomainEvents(
         DbContext dbContext,
         CancellationToken cancellationToken = default)
     {
@@ -46,6 +46,9 @@ public sealed class WriteDbContext(
             entity.ClearDomainEvents();
         }
 
-        return mediator.Publish(domainEvents, cancellationToken);
+        IEnumerable<Task> tasks = domainEvents
+            .Select(domainEvent => mediator.Publish(domainEvent, cancellationToken));
+
+        await Task.WhenAll(tasks);
     }
 }

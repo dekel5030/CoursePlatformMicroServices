@@ -2,8 +2,6 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Actions.Abstract;
 using Courses.Application.Lessons.Dtos;
-using Courses.Domain.Courses;
-using Courses.Domain.Courses.Errors;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
@@ -37,9 +35,9 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
     {
         Lesson? lesson = await _dbContext.Lessons
             .Include(l => l.Course)
-            .FirstOrDefaultAsync(l => 
-                l.Id == request.LessonId && 
-                l.CourseId == request.CourseId, 
+            .FirstOrDefaultAsync(l =>
+                l.Id == request.LessonId &&
+                l.CourseId == request.CourseId,
                 cancellationToken);
 
         if (lesson is null)

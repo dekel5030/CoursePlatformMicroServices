@@ -14,8 +14,11 @@ public class User : Entity
     public FullName? FullName { get; private set; }
     public PhoneNumber? PhoneNumber { get; private set; }
     public DateTime? DateOfBirth { get; private set; }
+    public string? AvatarUrl { get; set; }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     private User() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
     public static Result<User> CreateUser(
         UserId id,
@@ -34,11 +37,7 @@ public class User : Entity
         };
 
         // Raise domain event for user profile creation
-        user.Raise(new UserProfileCreatedDomainEvent(
-            user.Id,
-            user.AuthUserId!,
-            user.Email,
-            DateTime.UtcNow));
+        user.Raise(new UserProfileCreatedDomainEvent(user));
 
         return Result.Success(user);
     }

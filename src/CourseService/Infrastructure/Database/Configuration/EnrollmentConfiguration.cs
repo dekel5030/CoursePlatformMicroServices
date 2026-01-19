@@ -5,7 +5,7 @@ using Courses.Domain.Enrollments.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Courses.Infrastructure.EfConfiguration;
+namespace Courses.Infrastructure.Database.Configuration;
 
 public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
 {

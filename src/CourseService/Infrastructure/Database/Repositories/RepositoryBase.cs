@@ -1,12 +1,11 @@
 ﻿using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Shared;
-using Courses.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Infrastructure.Repositories;
+namespace Courses.Infrastructure.Database.Repositories;
 
 public abstract class RepositoryBase<TEntity, TId> : IRepository<TEntity, TId>
-    where TEntity : Entity<TId>
+    where TEntity : class, IHasId<TId>
     where TId : IEquatable<TId>
 {
     protected AppDbContextBase DbContext { get; }
