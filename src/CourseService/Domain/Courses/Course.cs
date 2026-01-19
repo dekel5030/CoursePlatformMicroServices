@@ -126,7 +126,7 @@ public class Course : Entity<CourseId>
         if (_lessons.Remove(lesson))
         {
             UpdatedAtUtc = timeProvider.GetUtcNow();
-            LessonCount = _lessons.Count;
+            LessonCount--;
         }
 
         return Result.Success();
@@ -232,7 +232,7 @@ public class Course : Entity<CourseId>
         Lesson lesson = lessonResult.Value;
 
         _lessons.Add(lesson);
-        LessonCount = _lessons.Count;
+        LessonCount++;
         UpdatedAtUtc = timeProvider.GetUtcNow();
 
         return Result.Success(lesson);

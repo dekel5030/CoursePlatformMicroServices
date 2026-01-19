@@ -11,8 +11,8 @@
   "card": {
     "published": "Published",
     "draft": "Draft",
-    "lessonsCount": "{{count}} lesson",
-    "lessonsCount_plural": "{{count}} lessons"
+    "lessonsCount_one": "{{count}} lesson",
+    "lessonsCount_other": "{{count}} lessons"
   },
   "detail": {
     "instructor": "Instructor",

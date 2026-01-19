@@ -62,7 +62,7 @@ export default function CourseCard({ course }: Props) {
           <div className="flex items-center gap-1">
             <BookOpen className="h-3 w-3" />
             {t("courses:card.lessonsCount", {
-              count: course.lessons?.length || 0,
+              count: course.lessonCount || 0,
             })}
           </div>
           {course.updatedAtUtc && (
