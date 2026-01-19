@@ -36,7 +36,7 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, CourseCol
              .Select(course => new CourseSummaryDto(
                  course.Id,
                  course.Title,
-                 course.InstructorId?.ToString(),
+                 course.Instructor?.FullName ?? "Unknown Instructor",
                  course.Price.Amount,
                  course.Price.Currency,
                  course.Images.Count <= 0 ? null : _urlResolver.Resolve(StorageCategory.Public, course.Images[^1].Path).Value,

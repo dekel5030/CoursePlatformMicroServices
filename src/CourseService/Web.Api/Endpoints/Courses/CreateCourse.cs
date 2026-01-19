@@ -15,8 +15,7 @@ internal sealed class CreateCourse : IEndpoint
 {
     internal sealed record CreateCourseRequest(
         string? Title,
-        string? Description,
-        Guid? InstructorId);
+        string? Description);
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -29,7 +28,7 @@ internal sealed class CreateCourse : IEndpoint
             Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
             Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
 
-            var command = new CreateCourseCommand(title, description, request.InstructorId);
+            var command = new CreateCourseCommand(title, description);
 
             Result<CourseSummaryDto> result = await mediator.Send(command, cancellationToken);
 

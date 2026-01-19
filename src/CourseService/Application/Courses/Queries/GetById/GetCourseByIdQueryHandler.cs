@@ -36,6 +36,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
     {
         Course? course = await _dbContext.Courses
             .Include(c => c.Lessons)
+            .Include(c => c.Instructor)
             .Where(c => c.Id == request.Id)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -48,7 +49,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             course.Id,
             course.Title,
             course.Description,
-            course.InstructorId?.ToString(),
+            course.Instructor?.FullName ?? "Unknown Instructor",
             course.Price.Amount,
             course.Price.Currency,
             course.EnrollmentCount,

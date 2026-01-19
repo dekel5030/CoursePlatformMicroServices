@@ -31,8 +31,13 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 
         builder.Property(course => course.InstructorId)
             .HasConversion(
-                id => id != null ? id.Value : (Guid?)null,
-                value => value.HasValue ? new UserId(value.Value) : null);
+                id => id.Value,
+                value => new UserId(value));
+
+        builder.HasOne(course => course.Instructor)
+            .WithMany()
+            .HasForeignKey(course => course.InstructorId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(course => course.Status)
             .HasConversion<string>();
