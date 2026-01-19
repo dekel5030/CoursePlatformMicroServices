@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Courses.Infrastructure.Repositories;
 
 public abstract class RepositoryBase<TEntity, TId> : IRepository<TEntity, TId>
-    where TEntity : Entity<TId>
+    where TEntity : class, IHasId<TId>
     where TId : IEquatable<TId>
 {
     protected AppDbContextBase DbContext { get; }

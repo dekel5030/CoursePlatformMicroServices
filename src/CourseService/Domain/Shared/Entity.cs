@@ -15,7 +15,7 @@ public abstract class Entity<TId> : IHasId<TId>
         _domainEvents.Clear();
     }
 
-    public void Raise(IDomainEvent domainEvent)
+    protected void Raise(IDomainEvent domainEvent)
     {
         _domainEvents.Add(domainEvent);
     }

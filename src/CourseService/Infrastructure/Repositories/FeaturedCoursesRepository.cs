@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Repositories;
 
-public class FeaturedCoursesRepo : IFeaturedCoursesRepository
+public class FeaturedCoursesRepository : IFeaturedCoursesRepository
 {
     private readonly IReadDbContext _dbContext;
 
-    public FeaturedCoursesRepo(IReadDbContext dbContext)
+    public FeaturedCoursesRepository(IReadDbContext dbContext)
     {
         _dbContext = dbContext;
     }

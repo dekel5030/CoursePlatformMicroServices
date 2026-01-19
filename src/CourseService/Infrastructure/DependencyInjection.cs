@@ -42,7 +42,6 @@ public static class DependencyInjection
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IFeaturedCoursesRepository, FeaturedCoursesRepo>();
         services.AddStorage();
         return services;
     }
