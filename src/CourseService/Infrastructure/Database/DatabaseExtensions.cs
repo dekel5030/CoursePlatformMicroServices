@@ -1,6 +1,6 @@
 ﻿using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
-using Courses.Infrastructure.Repositories;
+using Courses.Infrastructure.Database.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
