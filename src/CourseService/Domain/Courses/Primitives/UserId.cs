@@ -1,3 +1,3 @@
 ﻿namespace Courses.Domain.Courses.Primitives;
 
-public record UserId(Guid Value);
+public record UserId(string Value);
