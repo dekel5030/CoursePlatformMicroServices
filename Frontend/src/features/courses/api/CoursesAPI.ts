@@ -55,6 +55,7 @@ function mapCourseSummaryToModel(dto: CourseSummaryDto): CourseModel {
       amount: dto.price,
       currency: dto.currency,
     },
+    lessonCount: dto.lessonsCount,
     links: dto.links,
   };
 }
@@ -78,7 +79,7 @@ export interface CreateCourseResponse {
 }
 
 export async function createCourse(
-  request: CreateCourseRequestDto
+  request: CreateCourseRequestDto,
 ): Promise<CreateCourseResponse> {
   const response = await axiosClient.post<{ id: string }>("/courses", request);
   return { courseId: response.data.id };
@@ -86,7 +87,7 @@ export async function createCourse(
 
 export async function patchCourse(
   url: string,
-  request: UpdateCourseRequestDto
+  request: UpdateCourseRequestDto,
 ): Promise<void> {
   await axiosClient.patch(url, request);
 }
@@ -100,13 +101,15 @@ export interface FetchAllCoursesResult {
   links: import("@/types/LinkDto").LinkDto[];
 }
 
-export async function fetchAllCourses(url?: string): Promise<FetchAllCoursesResult> {
+export async function fetchAllCourses(
+  url?: string,
+): Promise<FetchAllCoursesResult> {
   const endpoint = url || "/courses";
   const response = await axiosClient.get<
     CourseSummaryDto[] | PagedResponse<CourseSummaryDto>
   >(endpoint);
   const data = response.data;
-  
+
   // Handle both legacy array format and new PagedResponse format
   if (Array.isArray(data)) {
     return {
@@ -114,7 +117,7 @@ export async function fetchAllCourses(url?: string): Promise<FetchAllCoursesResu
       links: [],
     };
   }
-  
+
   return {
     courses: data.items.map(mapCourseSummaryToModel),
     links: data.links,
@@ -134,18 +137,18 @@ export interface GenerateUploadUrlResponse {
 
 export async function generateImageUploadUrl(
   uploadUrl: string,
-  request: GenerateUploadUrlRequest
+  request: GenerateUploadUrlRequest,
 ): Promise<GenerateUploadUrlResponse> {
   const response = await axiosClient.post<GenerateUploadUrlResponse>(
     uploadUrl,
-    request
+    request,
   );
   return response.data;
 }
 
 export async function uploadImageToStorage(
   uploadUrl: string,
-  file: File
+  file: File,
 ): Promise<void> {
   // Use a raw axios instance for binary upload to avoid default JSON headers
   await axios.put(uploadUrl, file, {

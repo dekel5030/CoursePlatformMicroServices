@@ -15,6 +15,7 @@ export interface CourseModel {
   isPublished: boolean;
   price: Money;
   lessons?: LessonModel[];
+  lessonCount?: number;
   updatedAtUtc?: string;
   links?: LinkDto[];
 }

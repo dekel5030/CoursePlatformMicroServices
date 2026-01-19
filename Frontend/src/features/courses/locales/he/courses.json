@@ -11,8 +11,8 @@
   "card": {
     "published": "פורסם",
     "draft": "טיוטה",
-    "lessonsCount": "שיעור {{count}}",
-    "lessonsCount_plural": "{{count}} שיעורים"
+    "lessonsCount_one": "שיעור {{count}}",
+    "lessonsCount_other": "{{count}} שיעורים"
   },
   "detail": {
     "instructor": "מדריך",
