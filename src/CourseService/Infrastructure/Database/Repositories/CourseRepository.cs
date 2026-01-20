@@ -17,6 +17,7 @@ public class CourseRepository : RepositoryBase<Course, CourseId>, ICourseReposit
     {
         return DbContext.Courses
             .Include(course => course.Lessons)
+            .Include(course => course.Instructor)
             .FirstOrDefaultAsync(course => course.Id == id, cancellationToken);
     }
 }

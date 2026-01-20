@@ -17,7 +17,7 @@ internal sealed class CanPublishCourseRule : ICourseActionRule
         var resourceId = ResourceId.Create(course.Id.ToString());
         Guid userId = userContext.Id!.Value;
 
-        bool isOwner = course.InstructorId?.Value == userId;
+        bool isOwner = course.InstructorId.Value == userId;
         bool hasPermission = userContext.HasPermission(ActionType.Update, ResourceType.Course, resourceId);
 
         if (isOwner || hasPermission)

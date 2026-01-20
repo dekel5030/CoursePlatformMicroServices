@@ -22,8 +22,8 @@ public static class MediatorExtentions
     }
 
     private static IServiceCollection AddRequestHandlers(
-        this IServiceCollection services, 
-        Assembly assembly, 
+        this IServiceCollection services,
+        Assembly assembly,
         string serviceName)
     {
         var handlerTypes = assembly.GetTypes()
@@ -50,7 +50,7 @@ public static class MediatorExtentions
     }
 
     private static IServiceCollection AddEventHandlers(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         Assembly assembly,
         string serviceName)
     {

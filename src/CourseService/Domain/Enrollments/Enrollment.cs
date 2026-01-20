@@ -13,9 +13,9 @@ public class Enrollment
     public DateTimeOffset ExpiresAtUtc { get; private set; }
     public EnrollmentStatus Status { get; private set; }
 
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     private Enrollment() { }
-    #pragma warning restore CS8618
+#pragma warning restore CS8618
 
     internal static Result<Enrollment> Create(
         CourseId courseId,

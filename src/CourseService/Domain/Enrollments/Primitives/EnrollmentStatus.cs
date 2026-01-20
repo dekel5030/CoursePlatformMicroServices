@@ -1,4 +1,4 @@
-﻿namespace Courses.Domain.Enrollments;
+﻿namespace Courses.Domain.Enrollments.Primitives;
 
 public enum EnrollmentStatus
 {

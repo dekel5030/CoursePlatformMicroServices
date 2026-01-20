@@ -13,7 +13,7 @@ internal sealed class CanReadLessonRule : ILessonActionRule
         var resourceId = ResourceId.Create(course.Id.ToString());
         Guid userId = userContext.Id!.Value;
 
-        bool isOwner = course.InstructorId?.Value == userId;
+        bool isOwner = course.InstructorId.Value == userId;
         bool hasPermission = userContext.HasPermission(ActionType.Read, ResourceType.Course, resourceId);
 
         if (isOwner || hasPermission)
