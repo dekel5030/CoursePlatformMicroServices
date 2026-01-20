@@ -2,6 +2,7 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Actions.Abstract;
 using Courses.Application.Lessons.Dtos;
+using Courses.Application.Shared.Extensions;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
@@ -28,29 +29,18 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
         GetLessonByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        Lesson? lesson = await _dbContext.Lessons
-            .Include(l => l.Course)
-            .FirstOrDefaultAsync(l =>
-                l.Id == request.LessonId &&
-                l.CourseId == request.CourseId,
-                cancellationToken);
+        LessonDetailsDto? lesson = await _dbContext.Lessons
+            .Where(lesson => lesson.Id == request.LessonId)
+            .Select(ProjectionMappings.ToLessonDetails)
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (lesson is null)
         {
             return Result.Failure<LessonDetailsDto>(LessonErrors.NotFound);
         }
 
-        LessonDetailsDto response = new(
-            lesson.CourseId,
-            lesson.Id,
-            lesson.Title,
-            lesson.Description,
-            lesson.Index,
-            lesson.Duration,
-            lesson.Access == LessonAccess.Public,
-            lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
-            lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value);
 
-        return Result.Success(response);
+        lesson.EnrichWithUrls(_urlResolver);
+        return Result.Success(lesson);
     }
 }

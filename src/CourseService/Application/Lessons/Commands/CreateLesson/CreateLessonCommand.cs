@@ -5,7 +5,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Lessons.Commands.CreateLesson;
 
-public record CreateLessonCommand(
+public sealed record CreateLessonCommand(
     CourseId CourseId,
     Title? Title,
-    Description? Description) : ICommand<LessonSummaryDto>;
+    Description? Description) : ICommand<CreateLessonResponse>;

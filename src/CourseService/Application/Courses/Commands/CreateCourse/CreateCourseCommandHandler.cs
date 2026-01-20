@@ -2,6 +2,7 @@
 using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Actions.Abstract;
 using Courses.Application.Courses.Dtos;
+using Courses.Application.Shared.Extensions;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
@@ -11,7 +12,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Commands.CreateCourse;
 
-internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand, CourseSummaryDto>
+internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand, CreateCourseResponse>
 {
     private readonly ICourseRepository _courseRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -30,7 +31,7 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
         _userContext = userContext;
     }
 
-    public async Task<Result<CourseSummaryDto>> Handle(
+    public async Task<Result<CreateCourseResponse>> Handle(
         CreateCourseCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -38,7 +39,7 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
 
         if (instructorId.Value == Guid.Empty)
         {
-            return Result.Failure<CourseSummaryDto>(CourseErrors.Unauthorized);
+            return Result.Failure<CreateCourseResponse>(CourseErrors.Unauthorized);
         }
 
         Result<Course> courseResult = Course.CreateCourse(
@@ -49,7 +50,7 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
 
         if (courseResult.IsFailure)
         {
-            return Result.Failure<CourseSummaryDto>(courseResult.Error);
+            return Result.Failure<CreateCourseResponse>(courseResult.Error);
         }
 
         Course course = courseResult.Value;
@@ -57,17 +58,6 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
         await _courseRepository.AddAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var responseDto = new CourseSummaryDto(
-            course.Id,
-            course.Title,
-            course.Instructor?.FullName,
-            course.Price.Amount,
-            course.Price.Currency,
-            null,
-            course.LessonCount,
-            course.EnrollmentCount
-        );
-
-        return Result.Success(responseDto);
+        return Result.Success(new CreateCourseResponse(course.Id, course.Title));
     }
 }
