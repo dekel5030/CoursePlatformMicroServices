@@ -6,27 +6,22 @@ namespace Courses.Domain.Courses;
 
 public static class CoursePolicies
 {
-    public static Result CanModify(bool isDeleted)
+    public static Result CanModify(CourseStatus status)
     {
-        return !isDeleted
+        return status != CourseStatus.Deleted
             ? Result.Success()
             : Result.Failure(CourseErrors.CannotModifyDeleted);
     }
 
-    public static Result CanDelete(bool isDeleted)
+    public static Result CanDelete(CourseStatus status)
     {
-        return !isDeleted
+        return status == CourseStatus.Deleted
             ? Result.Success()
             : Result.Failure(CourseErrors.NotFound);
     }
 
-    public static Result CanEnroll(bool isDeleted, CourseStatus status)
+    public static Result CanEnroll(CourseStatus status)
     {
-        if (isDeleted)
-        {
-            return Result.Failure(CourseErrors.NotFound);
-        }
-
         if (status != CourseStatus.Published)
         {
             return Result.Failure(CourseErrors.CourseNotPublished);
@@ -35,9 +30,9 @@ public static class CoursePolicies
         return Result.Success();
     }
 
-    public static Result CanPublish(bool isDeleted, CourseStatus status, int lessonCount)
+    public static Result CanPublish(CourseStatus status, int lessonCount)
     {
-        if (isDeleted)
+        if (status == CourseStatus.Deleted)
         {
             return Result.Failure(CourseErrors.NotFound);
         }

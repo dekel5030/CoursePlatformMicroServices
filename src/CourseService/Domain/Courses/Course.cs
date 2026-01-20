@@ -24,7 +24,6 @@ public class Course : Entity<CourseId>
     public CourseStatus Status { get; private set; }
     public int EnrollmentCount { get; private set; }
     public int LessonCount { get; private set; }
-    public bool IsDeleted { get; private set; }
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
     public Money Price { get; private set; } = Money.Zero();
@@ -57,10 +56,10 @@ public class Course : Entity<CourseId>
         return Result.Success(newCourse);
     }
 
-    public Result CanModify => CoursePolicies.CanModify(IsDeleted);
-    public Result CanDelete => CoursePolicies.CanDelete(IsDeleted);
-    public Result CanEnroll => CoursePolicies.CanEnroll(IsDeleted, Status);
-    public Result CanPublish => CoursePolicies.CanPublish(IsDeleted, Status, LessonCount);
+    public Result CanModify => CoursePolicies.CanModify(Status);
+    public Result CanDelete => CoursePolicies.CanDelete(Status);
+    public Result CanEnroll => CoursePolicies.CanEnroll(Status);
+    public Result CanPublish => CoursePolicies.CanPublish(Status, LessonCount);
 
     public Result Publish(TimeProvider timeProvider)
     {
@@ -240,7 +239,7 @@ public class Course : Entity<CourseId>
             return CanDelete;
         }
 
-        IsDeleted = true;
+        Status = CourseStatus.Deleted;
         Raise(new CourseDeleted(this));
         return Result.Success();
     }

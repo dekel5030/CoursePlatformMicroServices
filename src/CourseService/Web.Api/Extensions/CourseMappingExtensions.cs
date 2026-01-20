@@ -1,8 +1,11 @@
 using Courses.Api.Contracts.Courses;
 using Courses.Api.Contracts.Shared;
 using Courses.Api.Infrastructure.LinkProvider;
+using Courses.Application.Actions;
+using Courses.Application.Actions.Abstract;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
+using Courses.Domain.Courses.Primitives;
 
 namespace Courses.Api.Extensions;
 
@@ -10,8 +13,11 @@ internal static class CourseMappingExtensions
 {
     public static CourseSummaryResponse ToApiContract(
         this CourseSummaryDto dto,
-        LinkProvider linkProvider)
+        LinkProvider linkProvider,
+        ICourseActionProvider actionProvider)
     {
+        var courseContext = new CoursePolicyContext(dto.Id, dto.InstructorId, dto.Status, dto.IsDeleted, dto.LessonsCount);
+
         return new CourseSummaryResponse(
             dto.Id.Value,
             dto.Title.Value,
@@ -21,7 +27,7 @@ internal static class CourseMappingExtensions
             dto.ThumbnailUrl?.ToString(),
             dto.LessonsCount,
             dto.EnrollmentCount,
-            linkProvider.CreateCourseLinks(dto.Id, dto.AllowedActions));
+            linkProvider.CreateCourseLinks(dto.Id, dto.a));
     }
 
     public static CourseDetailsResponse ToApiContract(this CourseDetailsDto dto, LinkProvider linkProvider)
