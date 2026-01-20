@@ -15,7 +15,7 @@ public static class CoursePolicies
 
     public static Result CanDelete(CourseStatus status)
     {
-        return status == CourseStatus.Deleted
+        return status != CourseStatus.Deleted
             ? Result.Success()
             : Result.Failure(CourseErrors.NotFound);
     }

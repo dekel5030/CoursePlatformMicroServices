@@ -17,6 +17,8 @@ internal sealed class CreateCourse : IEndpoint
         string? Title,
         string? Description);
 
+    internal sealed record CreateResponse(Guid CourseId, string Title);
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("courses", async (
@@ -30,17 +32,17 @@ internal sealed class CreateCourse : IEndpoint
 
             var command = new CreateCourseCommand(title, description);
 
-            Result<CourseSummaryDto> result = await mediator.Send(command, cancellationToken);
+            Result<CreateCourseResponse> result = await mediator.Send(command, cancellationToken);
 
             return result.Match(
                 course => Results.CreatedAtRoute(
                     nameof(GetCourseById),
                     new { id = course.Id.Value },
-                    course.ToApiContract(linkProvider)
+                    new CreateResponse(course.Id.Value, course.Title.Value)
                 ),
                 CustomResults.Problem);
         })
-        .WithMetadata<CourseSummaryResponse>(
+        .WithMetadata<CreateResponse>(
             nameof(CreateCourse),
             tag: Tags.Courses,
             summary: "Creates a new course.",

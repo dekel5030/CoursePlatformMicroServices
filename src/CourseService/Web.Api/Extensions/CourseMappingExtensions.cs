@@ -11,39 +11,53 @@ namespace Courses.Api.Extensions;
 
 internal static class CourseMappingExtensions
 {
-    public static CourseSummaryResponse ToApiContract(
-        this CourseSummaryDto dto,
-        LinkProvider linkProvider,
-        ICourseActionProvider actionProvider)
+    public static CourseSummaryResponse ToApiContract(this CourseSummaryDto dto, LinkProvider linkProvider)
     {
-        var courseContext = new CoursePolicyContext(dto.Id, dto.InstructorId, dto.Status, dto.IsDeleted, dto.LessonsCount);
+        var courseContext = new CoursePolicyContext(
+            dto.Id,
+            dto.Instructor.Id,
+            dto.Status,
+            dto.LessonsCount);
 
         return new CourseSummaryResponse(
             dto.Id.Value,
             dto.Title.Value,
-            dto.InstructorName,
-            dto.Price,
-            dto.Currency,
-            dto.ThumbnailUrl?.ToString(),
+            dto.Instructor.FullName,
+            dto.Instructor.Id.Value,
+            dto.Instructor.AvatarUrl,
+            dto.Price.Amount,
+            dto.Price.Currency,
+            dto.ThumbnailUrl,
             dto.LessonsCount,
             dto.EnrollmentCount,
-            linkProvider.CreateCourseLinks(dto.Id, dto.a));
+            dto.UpdatedAtUtc,
+            linkProvider.CreateCourseLinks(courseContext));
     }
 
     public static CourseDetailsResponse ToApiContract(this CourseDetailsDto dto, LinkProvider linkProvider)
     {
+        var courseContext = new CoursePolicyContext(
+            dto.Id,
+            dto.Instructor.Id,
+            dto.Status,
+            dto.LessonsCount);
+
         return new CourseDetailsResponse(
             dto.Id.Value,
             dto.Title.Value,
             dto.Description.Value,
-            dto.InstructorName,
-            dto.Price,
-            dto.Currency,
+            dto.Instructor.FullName,
+            dto.Instructor.Id.Value,
+            dto.Instructor.AvatarUrl,
+            dto.Status.ToString(),
+            dto.Price.Amount,
+            dto.Price.Currency,
             dto.EnrollmentCount,
+            dto.LessonsCount,
             dto.UpdatedAtUtc,
-            dto.ImageUrls.Select(url => url.ToString()).ToList(),
-            dto.Lessons.Select(lesson => lesson.ToApiContract(dto.Id, linkProvider)).ToList(),
-            linkProvider.CreateCourseLinks(dto.Id, dto.AllowedActions));
+            dto.ImageUrls,
+            dto.Lessons.Select(lesson => lesson.ToApiContract(courseContext, linkProvider)).ToList(),
+            linkProvider.CreateCourseLinks(courseContext));
     }
 
     public static PagedResponse<CourseSummaryResponse> ToApiContract(

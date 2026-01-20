@@ -1,5 +1,6 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
+using Courses.Application.Actions;
 using Courses.Application.Actions.Abstract;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Shared.Extensions;
@@ -29,9 +30,9 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
         GetLessonByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        LessonDetailsDto? lesson = await _dbContext.Lessons
+        Lesson? lesson = await _dbContext.Lessons
             .Where(lesson => lesson.Id == request.LessonId)
-            .Select(ProjectionMappings.ToLessonDetails)
+            .Include(lesson => lesson.Course)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (lesson is null)
@@ -39,8 +40,31 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
             return Result.Failure<LessonDetailsDto>(LessonErrors.NotFound);
         }
 
+        var courseContext = new CoursePolicyContext(
+            lesson.CourseId,
+            lesson.Course.InstructorId,
+            lesson.Course.Status,
+            lesson.Course.LessonCount);
 
-        lesson.EnrichWithUrls(_urlResolver);
-        return Result.Success(lesson);
+        var response = new LessonDetailsDto
+        (
+            CourseContext: courseContext,
+            CourseId: lesson.CourseId,
+            LessonId: lesson.Id,
+            Title: lesson.Title,
+            Description: lesson.Description,
+            Index: lesson.Index,
+            Duration: lesson.Duration,
+            ThumbnailUrl: lesson.ThumbnailImageUrl is not null
+                ? _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value
+                : null,
+            Access: lesson.Access,
+            Status: lesson.Status,
+            VideoUrl: lesson.VideoUrl is not null
+                ? _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value
+                : null
+        );
+
+        return Result.Success(response);
     }
 }

@@ -10,7 +10,8 @@ internal sealed record LessonDetailsResponse(
     string Description,
     int Index,
     TimeSpan? Duration,
-    bool IsPreview,
     string? ThumbnailUrl,
+    string LessonAccess,
+    string LessonStatus,
     string? VideoUrl,
     IReadOnlyCollection<LinkDto> Links) : ILinksResponse;

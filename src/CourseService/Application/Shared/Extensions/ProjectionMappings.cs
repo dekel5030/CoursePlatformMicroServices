@@ -27,8 +27,8 @@ public static class ProjectionMappings
             course.Images.Select(i => i.Path).ToList(),
             course.Lessons
                 .AsQueryable()
-                .Select(ToLessonSummary)
                 .OrderBy(l => l.Index)
+                .Select(ToLessonSummary)
                 .ToList()
         );
 
@@ -43,7 +43,7 @@ public static class ProjectionMappings
             ),
             course.Status,
             course.Price,
-            course.Images.Select(i => i.Path).LastOrDefault(),
+            course.Images.Select(i => i.Path).FirstOrDefault(),
             course.Lessons.Count,
             course.EnrollmentCount,
             course.UpdatedAtUtc
@@ -61,17 +61,17 @@ public static class ProjectionMappings
             lesson.Access
         );
 
-    public static Expression<Func<Lesson, LessonDetailsDto>> ToLessonDetails =>
-        lesson => new LessonDetailsDto(
-            lesson.CourseId,
-            lesson.Id,
-            lesson.Title,
-            lesson.Description,
-            lesson.Index,
-            lesson.Duration,
-            lesson.ThumbnailImageUrl != null ? lesson.ThumbnailImageUrl.Path : null,
-            lesson.Access,
-            lesson.Status,
-            lesson.VideoUrl != null ? lesson.VideoUrl.Path : null
-        );
+    //public static Expression<Func<Lesson, LessonDetailsDto>> ToLessonDetails =>
+    //    lesson => new LessonDetailsDto(
+    //        lesson.CourseId,
+    //        lesson.Id,
+    //        lesson.Title,
+    //        lesson.Description,
+    //        lesson.Index,
+    //        lesson.Duration,
+    //        lesson.ThumbnailImageUrl != null ? lesson.ThumbnailImageUrl.Path : null,
+    //        lesson.Access,
+    //        lesson.Status,
+    //        lesson.VideoUrl != null ? lesson.VideoUrl.Path : null
+    //    );
 }

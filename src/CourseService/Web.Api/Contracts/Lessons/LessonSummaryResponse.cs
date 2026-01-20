@@ -1,14 +1,15 @@
 using Courses.Api.Contracts.Shared;
 using Courses.Api.Infrastructure.LinkProvider;
+using Courses.Domain.Lessons.Primitives;
 
 namespace Courses.Api.Contracts.Lessons;
 
 internal sealed record LessonSummaryResponse(
     Guid LessonId,
     string Title,
-    string Description,
     int Index,
     TimeSpan? Duration,
-    bool IsPreview,
     string? ThumbnailUrl,
+    string LessonStatus,
+    string LessonAccess,
     IReadOnlyCollection<LinkDto> Links) : ILinksResponse;
