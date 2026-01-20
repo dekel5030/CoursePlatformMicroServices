@@ -6,5 +6,5 @@ namespace Courses.Application.Actions.Policies.Courses;
 
 public interface ICourseActionRule
 {
-    IEnumerable<CourseAction> Evaluate(Course course, IUserContext userContext);
+    IEnumerable<CourseAction> Evaluate(CoursePolicyContext context, IUserContext userContext);
 }

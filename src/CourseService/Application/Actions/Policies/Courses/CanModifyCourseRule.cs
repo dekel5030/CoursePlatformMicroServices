@@ -1,5 +1,6 @@
 ﻿using Courses.Application.Actions.Primitives;
 using Courses.Domain.Courses;
+using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Auth.AuthTypes;
 
@@ -7,14 +8,15 @@ namespace Courses.Application.Actions.Policies.Courses;
 
 internal sealed class CanModifyCourseRule : ICourseActionRule
 {
-    public IEnumerable<CourseAction> Evaluate(Course course, IUserContext userContext)
+    public IEnumerable<CourseAction> Evaluate(CoursePolicyContext course, IUserContext userContext)
     {
-        if (!course.CanModify.IsSuccess)
+        Result canModifyResult = CoursePolicies.CanModify(course.IsDeleted);
+        if (canModifyResult.IsFailure)
         {
             yield break;
         }
 
-        var resourceId = ResourceId.Create(course.Id.ToString());
+        var resourceId = ResourceId.Create(course.CourseId.ToString());
         Guid userId = userContext.Id!.Value;
 
         bool isOwner = course.InstructorId.Value == userId;

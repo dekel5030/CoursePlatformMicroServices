@@ -6,7 +6,9 @@ namespace Courses.Application.Actions.Abstract;
 
 public interface ICourseActionProvider
 {
-    IReadOnlyCollection<CourseAction> GetAllowedActions(Course course);
-    IReadOnlyCollection<LessonAction> GetAllowedActions(Course course, Lesson lesson);
+    IReadOnlyCollection<CourseAction> GetAllowedActions(CoursePolicyContext context);
+    IReadOnlyCollection<LessonAction> GetAllowedActions(
+        CoursePolicyContext courseContext,
+        LessonPolicyContext lessonContext);
     IReadOnlyCollection<CourseCollectionAction> GetAllowedCollectionActions();
 }

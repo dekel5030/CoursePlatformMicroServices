@@ -1,5 +1,6 @@
 ﻿using Courses.Application.Actions.Primitives;
 using Courses.Domain.Courses;
+using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Auth.AuthTypes;
 
@@ -7,14 +8,16 @@ namespace Courses.Application.Actions.Policies.Courses;
 
 internal sealed class CanDeleteCourseRule : ICourseActionRule
 {
-    public IEnumerable<CourseAction> Evaluate(Course course, IUserContext userContext)
+    public IEnumerable<CourseAction> Evaluate(CoursePolicyContext course, IUserContext userContext)
     {
-        if (!course.CanDelete.IsSuccess)
+        Result canDeleteResult = CoursePolicies.CanDelete(course.IsDeleted);
+
+        if (canDeleteResult.IsFailure)
         {
             yield break;
         }
 
-        var resourceId = ResourceId.Create(course.Id.ToString());
+        var resourceId = ResourceId.Create(course.CourseId.ToString());
         Guid userId = userContext.Id!.Value;
 
         bool isOwner = course.InstructorId.Value == userId;
