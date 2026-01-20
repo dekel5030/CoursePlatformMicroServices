@@ -9,10 +9,9 @@ public record LessonSummaryDto(
     CourseId CourseId,
     LessonId LessonId,
     Title Title,
-    Description Description,
     int Index,
-    TimeSpan? Duration,
-    bool IsPreview,
+    TimeSpan Duration,
     string? ThumbnailUrl,
-    IReadOnlyCollection<LessonAction>? AllowedActions = null
+    LessonStatus Status,
+    LessonAccess Access
 );

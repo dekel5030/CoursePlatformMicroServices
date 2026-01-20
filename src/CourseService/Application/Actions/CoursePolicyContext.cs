@@ -6,6 +6,5 @@ public record CoursePolicyContext(
     CourseId CourseId,
     UserId InstructorId,
     CourseStatus Status,
-    bool IsDeleted,
     int LessonCount
 );

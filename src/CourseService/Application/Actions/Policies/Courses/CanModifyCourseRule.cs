@@ -10,7 +10,7 @@ internal sealed class CanModifyCourseRule : ICourseActionRule
 {
     public IEnumerable<CourseAction> Evaluate(CoursePolicyContext context, IUserContext userContext)
     {
-        Result canModifyResult = CoursePolicies.CanModify(context.IsDeleted);
+        Result canModifyResult = CoursePolicies.CanModify(context.Status);
         if (canModifyResult.IsFailure)
         {
             yield break;

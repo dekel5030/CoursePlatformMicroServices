@@ -10,7 +10,7 @@ internal sealed class CanPublishCourseRule : ICourseActionRule
 {
     public IEnumerable<CourseAction> Evaluate(CoursePolicyContext context, IUserContext userContext)
     {
-        Result canPublishResult = CoursePolicies.CanPublish(context.IsDeleted, context.Status, context.LessonCount);
+        Result canPublishResult = CoursePolicies.CanPublish(context.Status, context.LessonCount);
         if (canPublishResult.IsFailure)
         {
             yield break;

@@ -11,8 +11,9 @@ public record LessonDetailsDto(
     Title Title,
     Description Description,
     int Index,
-    TimeSpan? Duration,
-    bool IsPreview,
+    TimeSpan Duration,
     string? ThumbnailUrl,
+    LessonAccess Access,
+    LessonStatus Status,
     string? VideoUrl
 );

@@ -14,7 +14,7 @@ internal sealed class CanUpdateLessonRule : ILessonActionRule
         LessonPolicyContext lessonContext,
         IUserContext userContext)
     {
-        Result courseModifyResult = CoursePolicies.CanModify(courseContext.IsDeleted);
+        Result courseModifyResult = CoursePolicies.CanModify(courseContext.Status);
         if (courseModifyResult.IsFailure)
         {
             yield break;

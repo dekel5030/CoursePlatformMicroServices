@@ -10,7 +10,7 @@ internal sealed class CanDeleteCourseRule : ICourseActionRule
 {
     public IEnumerable<CourseAction> Evaluate(CoursePolicyContext context, IUserContext userContext)
     {
-        Result canDeleteResult = CoursePolicies.CanDelete(context.IsDeleted);
+        Result canDeleteResult = CoursePolicies.CanDelete(context.Status);
 
         if (canDeleteResult.IsFailure)
         {

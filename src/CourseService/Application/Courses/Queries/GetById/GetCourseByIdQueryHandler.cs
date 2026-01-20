@@ -2,8 +2,7 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Actions.Abstract;
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Lessons.Dtos;
-using Courses.Domain.Courses;
+using Courses.Application.Shared.Extensions;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Lessons.Primitives;
 using Kernel;
@@ -29,10 +28,9 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
         GetCourseByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        Course? course = await _dbContext.Courses
-            .Include(c => c.Lessons)
-            .Include(c => c.Instructor)
+        CourseDetailsDto? course = await _dbContext.Courses
             .Where(c => c.Id == request.Id)
+            .Select(ProjectionMappings.ToCourseDetails)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (course is null)
@@ -40,29 +38,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             return Result.Failure<CourseDetailsDto>(CourseErrors.NotFound);
         }
 
-        CourseDetailsDto response = new(
-            course.Id,
-            course.Title,
-            course.Description,
-            course.Instructor?.FullName ?? "Unknown Instructor",
-            course.Price.Amount,
-            course.Price.Currency,
-            course.EnrollmentCount,
-            course.UpdatedAtUtc,
-            course.Images.Select(image => _urlResolver.Resolve(StorageCategory.Public, image.Path).Value).Reverse().ToList(),
-            Lessons: course.Lessons
-                .Select(lesson => new LessonSummaryDto(
-                    course.Id,
-                    lesson.Id,
-                    lesson.Title,
-                    lesson.Description,
-                    lesson.Index,
-                    lesson.Duration,
-                    lesson.Access == LessonAccess.Public,
-                    lesson.ThumbnailImageUrl == null ? null
-                        : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value))
-                .ToList()
-        );
+        CourseDetailsDto response = course.EnrichWithUrls(_urlResolver);
 
         return Result.Success(response);
     }

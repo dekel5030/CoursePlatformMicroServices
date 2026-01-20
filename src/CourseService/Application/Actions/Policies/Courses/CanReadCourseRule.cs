@@ -22,7 +22,7 @@ internal sealed class CanReadCourseRule : ICourseActionRule
             yield break;
         }
 
-        if (!context.IsDeleted && context.Status == CourseStatus.Published)
+        if (context.Status == CourseStatus.Published)
         {
             yield return CourseAction.Read;
         }

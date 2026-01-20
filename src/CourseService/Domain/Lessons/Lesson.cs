@@ -23,7 +23,7 @@ public class Lesson : Entity<LessonId>
 
     public ImageUrl? ThumbnailImageUrl { get; private set; }
     public VideoUrl? VideoUrl { get; private set; }
-    public TimeSpan? Duration { get; private set; }
+    public TimeSpan Duration { get; private set; }
 
     private Lesson() { }
 
