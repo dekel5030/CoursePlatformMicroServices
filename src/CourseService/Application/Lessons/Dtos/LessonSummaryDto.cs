@@ -14,5 +14,5 @@ public record LessonSummaryDto(
     TimeSpan? Duration,
     bool IsPreview,
     string? ThumbnailUrl,
-    IReadOnlyCollection<LessonAction> AllowedActions
+    IReadOnlyCollection<LessonAction>? AllowedActions = null
 );

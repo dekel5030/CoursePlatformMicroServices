@@ -14,6 +14,5 @@ public record LessonDetailsDto(
     TimeSpan? Duration,
     bool IsPreview,
     string? ThumbnailUrl,
-    string? VideoUrl,
-    IReadOnlyCollection<LessonAction> AllowedActions
+    string? VideoUrl
 );

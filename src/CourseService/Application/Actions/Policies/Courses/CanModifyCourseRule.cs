@@ -8,18 +8,18 @@ namespace Courses.Application.Actions.Policies.Courses;
 
 internal sealed class CanModifyCourseRule : ICourseActionRule
 {
-    public IEnumerable<CourseAction> Evaluate(CoursePolicyContext course, IUserContext userContext)
+    public IEnumerable<CourseAction> Evaluate(CoursePolicyContext context, IUserContext userContext)
     {
-        Result canModifyResult = CoursePolicies.CanModify(course.IsDeleted);
+        Result canModifyResult = CoursePolicies.CanModify(context.IsDeleted);
         if (canModifyResult.IsFailure)
         {
             yield break;
         }
 
-        var resourceId = ResourceId.Create(course.CourseId.ToString());
+        var resourceId = ResourceId.Create(context.CourseId.ToString());
         Guid userId = userContext.Id!.Value;
 
-        bool isOwner = course.InstructorId.Value == userId;
+        bool isOwner = context.InstructorId.Value == userId;
         bool hasPermission = userContext.HasPermission(ActionType.Update, ResourceType.Course, resourceId);
 
         if (isOwner || hasPermission)

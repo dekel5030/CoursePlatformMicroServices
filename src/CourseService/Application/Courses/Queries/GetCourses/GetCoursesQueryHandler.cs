@@ -12,19 +12,14 @@ namespace Courses.Application.Courses.Queries.GetCourses;
 internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, CourseCollectionDto>
 {
     private readonly IReadDbContext _dbContext;
-#pragma warning disable S4487 // Unread "private" fields should be removed
     private readonly IStorageUrlResolver _urlResolver;
-#pragma warning restore S4487 // Unread "private" fields should be removed
-    private readonly ICourseActionProvider _actionProvider;
 
     public GetCoursesQueryHandler(
         IReadDbContext dbContext,
-        IStorageUrlResolver urlResolver,
-        ICourseActionProvider courseActionProvider)
+        IStorageUrlResolver urlResolver)
     {
         _dbContext = dbContext;
         _urlResolver = urlResolver;
-        _actionProvider = courseActionProvider;
     }
 
     public async Task<Result<CourseCollectionDto>> Handle(
@@ -54,16 +49,14 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
                 course.Price.Currency,
                 course.Images.Count <= 0 ? null : _urlResolver.Resolve(StorageCategory.Public, course.Images[^1].Path).Value,
                 course.LessonCount,
-                course.EnrollmentCount,
-                _actionProvider.GetAllowedActions(course)))
+                course.EnrollmentCount))
             .ToList();
 
         var response = new CourseCollectionDto(
             courseDtos,
             pageNumber,
             pageSize,
-            totalItems,
-            _actionProvider.GetAllowedCollectionActions());
+            totalItems);
 
         return Result.Success(response);
     }

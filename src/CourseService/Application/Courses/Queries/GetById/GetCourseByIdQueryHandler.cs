@@ -15,19 +15,14 @@ namespace Courses.Application.Courses.Queries.GetById;
 internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CourseDetailsDto>
 {
     private readonly IReadDbContext _dbContext;
-#pragma warning disable S4487 // Unread "private" fields should be removed
     private readonly IStorageUrlResolver _urlResolver;
-#pragma warning restore S4487 // Unread "private" fields should be removed
-    private readonly ICourseActionProvider _courseActionProvider;
 
     public GetCourseByIdQueryHandler(
         IReadDbContext dbContext,
-        IStorageUrlResolver urlResolver,
-        ICourseActionProvider courseActionProvider)
+        IStorageUrlResolver urlResolver)
     {
         _dbContext = dbContext;
         _urlResolver = urlResolver;
-        _courseActionProvider = courseActionProvider;
     }
 
     public async Task<Result<CourseDetailsDto>> Handle(
@@ -55,7 +50,6 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             course.EnrollmentCount,
             course.UpdatedAtUtc,
             course.Images.Select(image => _urlResolver.Resolve(StorageCategory.Public, image.Path).Value).Reverse().ToList(),
-            AllowedActions: _courseActionProvider.GetAllowedActions(course),
             Lessons: course.Lessons
                 .Select(lesson => new LessonSummaryDto(
                     course.Id,
@@ -66,8 +60,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
                     lesson.Duration,
                     lesson.Access == LessonAccess.Public,
                     lesson.ThumbnailImageUrl == null ? null
-                        : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
-                    _courseActionProvider.GetAllowedActions(course, lesson)))
+                        : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value))
                 .ToList()
         );
 

@@ -16,20 +16,17 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
     private readonly ICourseRepository _courseRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly TimeProvider _timeProvider;
-    private readonly ICourseActionProvider _actionProvider;
     private readonly IUserContext _userContext;
 
     public CreateCourseCommandHandler(
         ICourseRepository courseRepository,
         TimeProvider timeProvider,
         IUnitOfWork unitOfWork,
-        ICourseActionProvider courseActionProvider,
         IUserContext userContext)
     {
         _courseRepository = courseRepository;
         _timeProvider = timeProvider;
         _unitOfWork = unitOfWork;
-        _actionProvider = courseActionProvider;
         _userContext = userContext;
     }
 
@@ -68,8 +65,7 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
             course.Price.Currency,
             null,
             course.LessonCount,
-            course.EnrollmentCount,
-            _actionProvider.GetAllowedActions(course)
+            course.EnrollmentCount
         );
 
         return Result.Success(responseDto);

@@ -16,5 +16,5 @@ public record CourseDetailsDto(
     DateTimeOffset UpdatedAtUtc,
     IReadOnlyList<string> ImageUrls,
     IReadOnlyList<LessonSummaryDto> Lessons,
-    IReadOnlyCollection<CourseAction> AllowedActions
+    IReadOnlyCollection<CourseAction>? AllowedActions = null
 );

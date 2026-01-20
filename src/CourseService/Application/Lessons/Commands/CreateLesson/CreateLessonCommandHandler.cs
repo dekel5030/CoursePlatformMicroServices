@@ -17,23 +17,18 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
     private readonly ICourseRepository _courseRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly TimeProvider _timeProvider;
-#pragma warning disable S4487 // Unread "private" fields should be removed
     private readonly IStorageUrlResolver _urlResolver;
-#pragma warning restore S4487 // Unread "private" fields should be removed
-    private readonly ICourseActionProvider _actionProvider;
 
     public CreateLessonCommandHandler(
         ICourseRepository courseRepository,
         TimeProvider timeProvider,
         IStorageUrlResolver urlResolver,
-        IUnitOfWork unitOfWork,
-        ICourseActionProvider actionProvider)
+        IUnitOfWork unitOfWork)
     {
         _courseRepository = courseRepository;
         _timeProvider = timeProvider;
         _urlResolver = urlResolver;
         _unitOfWork = unitOfWork;
-        _actionProvider = actionProvider;
     }
 
     public async Task<Result<LessonSummaryDto>> Handle(
@@ -66,8 +61,7 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
             lesson.Index,
             lesson.Duration,
             lesson.Access == LessonAccess.Public,
-            lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
-            _actionProvider.GetAllowedActions(course, lesson));
+            lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value);
 
         return Result.Success(response);
     }

@@ -12,6 +12,5 @@ public record CourseSummaryDto(
     string Currency,
     string? ThumbnailUrl,
     int LessonsCount,
-    int EnrollmentCount,
-    IReadOnlyCollection<CourseAction> AllowedActions
+    int EnrollmentCount
 );

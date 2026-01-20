@@ -14,19 +14,14 @@ namespace Courses.Application.Lessons.Queries.GetById;
 public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, LessonDetailsDto>
 {
     private readonly IReadDbContext _dbContext;
-#pragma warning disable S4487 // Unread "private" fields should be removed
     private readonly IStorageUrlResolver _urlResolver;
-#pragma warning restore S4487 // Unread "private" fields should be removed
-    private readonly ICourseActionProvider _actionProvider;
 
     public GetLessonByIdQueryHandler(
         IReadDbContext dbContext,
-        IStorageUrlResolver urlResolver,
-        ICourseActionProvider actionProvider)
+        IStorageUrlResolver urlResolver)
     {
         _dbContext = dbContext;
         _urlResolver = urlResolver;
-        _actionProvider = actionProvider;
     }
 
     public async Task<Result<LessonDetailsDto>> Handle(
@@ -54,8 +49,7 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
             lesson.Duration,
             lesson.Access == LessonAccess.Public,
             lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
-            lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value,
-            _actionProvider.GetAllowedActions(lesson.Course, lesson));
+            lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value);
 
         return Result.Success(response);
     }
