@@ -21,7 +21,7 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
             .HasConversion(id => id.Value, v => new CourseId(v));
 
         builder.Property(e => e.StudentId)
-            .HasConversion(id => id.Value, v => new StudentId(v));
+            .HasConversion(id => id.Value, v => new UserId(v));
 
         builder.HasIndex(e => new { e.CourseId, e.StudentId });
 
