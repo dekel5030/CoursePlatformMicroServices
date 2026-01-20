@@ -28,7 +28,7 @@ public sealed class CourseActionProvider : ICourseActionProvider
         _lessonRules = lessonRules;
     }
 
-    public IReadOnlyCollection<CourseAction> GetAllowedActions(Course course)
+    public IReadOnlyCollection<CourseAction> GetAllowedActions(CoursePolicyContext context)
     {
         if (_userContext.Id is null)
         {
@@ -39,7 +39,7 @@ public sealed class CourseActionProvider : ICourseActionProvider
 
         foreach (ICourseActionRule rule in _courseRules)
         {
-            foreach (CourseAction action in rule.Evaluate(course, _userContext))
+            foreach (CourseAction action in rule.Evaluate(context, _userContext))
             {
                 actions.Add(action);
             }
@@ -48,7 +48,9 @@ public sealed class CourseActionProvider : ICourseActionProvider
         return actions;
     }
 
-    public IReadOnlyCollection<LessonAction> GetAllowedActions(Course course, Lesson lesson)
+    public IReadOnlyCollection<LessonAction> GetAllowedActions(
+        CoursePolicyContext courseContext,
+        LessonPolicyContext lessonContext)
     {
         if (_userContext.Id is null)
         {
@@ -59,7 +61,7 @@ public sealed class CourseActionProvider : ICourseActionProvider
 
         foreach (ILessonActionRule rule in _lessonRules)
         {
-            foreach (LessonAction action in rule.Evaluate(course, lesson, _userContext))
+            foreach (LessonAction action in rule.Evaluate(courseContext ,lessonContext, _userContext))
             {
                 actions.Add(action);
             }

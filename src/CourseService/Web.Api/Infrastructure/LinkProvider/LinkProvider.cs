@@ -1,5 +1,7 @@
 using Courses.Api.Endpoints.Courses;
 using Courses.Api.Endpoints.Lessons;
+using Courses.Application.Actions;
+using Courses.Application.Actions.Abstract;
 using Courses.Application.Actions.Primitives;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
@@ -11,12 +13,17 @@ namespace Courses.Api.Infrastructure.LinkProvider;
 internal sealed class LinkProvider
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ICourseActionProvider _courseActionProvider;
     private readonly LinkGenerator _linkGenerator;
 
-    public LinkProvider(IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator)
+    public LinkProvider(
+        IHttpContextAccessor httpContextAccessor, 
+        LinkGenerator linkGenerator, ICourseActionProvider 
+        courseActionProvider)
     {
         _httpContextAccessor = httpContextAccessor;
         _linkGenerator = linkGenerator;
+        _courseActionProvider = courseActionProvider;
     }
 
     public LinkDto Create(string endpointName, string rel, string method, object? values = null)
@@ -37,11 +44,11 @@ internal sealed class LinkProvider
         };
     }
 
-    public List<LinkDto> CreateCourseLinks(CourseId id, IReadOnlyCollection<CourseAction> allowedActions)
+    public List<LinkDto> CreateCourseLinks(CoursePolicyContext courseContext)
     {
-        var allowedActionsSet = allowedActions.ToHashSet();
+        var allowedActionsSet = _courseActionProvider.GetAllowedActions(courseContext).ToHashSet();
         var links = new List<LinkDto>();
-        string idStr = id.Value.ToString();
+        string idStr = courseContext.CourseId.ToString();
 
         links.Add(Create(nameof(GetCourseById), "self", HttpMethods.Get, new { id = idStr }));
 
@@ -62,21 +69,23 @@ internal sealed class LinkProvider
 
         if (allowedActionsSet.TryGetValue(CourseAction.UploadImageUrl, out _))
         {
-            links.Add(Create(nameof(GenerateCourseImageUploadUrl), "generate-image-upload-url", HttpMethods.Post, new { id = idStr }));
+            links.Add(Create(
+                nameof(GenerateCourseImageUploadUrl), 
+                "generate-image-upload-url", 
+                HttpMethods.Post, 
+                new { id = idStr }));
         }
 
         return links;
     }
 
-    public List<LinkDto> CreateLessonLinks(
-        CourseId courseId,
-        LessonId lessonId,
-        IReadOnlyCollection<LessonAction> allowedActions)
+    public List<LinkDto> CreateLessonLinks(CoursePolicyContext courseContext, LessonPolicyContext lessonContext)
     {
-        var allowedActionsSet = allowedActions.ToHashSet();
+        var allowedActionsSet = _courseActionProvider.GetAllowedActions(courseContext, lessonContext).ToHashSet();
         var links = new List<LinkDto>();
-        string courseIdStr = courseId.Value.ToString();
-        string lessonIdStr = lessonId.Value.ToString();
+        string courseIdStr = courseContext.CourseId.ToString();
+        string lessonIdStr = lessonContext.LessonId.ToString();
+
         links.Add(Create(nameof(GetLessonById), "self", HttpMethods.Get, new { courseId = courseIdStr, lessonId = lessonIdStr }));
 
         if (allowedActionsSet.TryGetValue(LessonAction.Update, out _))
@@ -107,7 +116,7 @@ internal sealed class LinkProvider
         PagedQueryDto originalQuery)
     {
         List<LinkDto> links = CreatePagedLinks(courseCollection, originalQuery);
-        var allowedActionsSet = courseCollection.AllowedActions.ToHashSet();
+        var allowedActionsSet = _courseActionProvider.GetAllowedCollectionActions().ToHashSet();
 
         if (allowedActionsSet.TryGetValue(CourseCollectionAction.CreateCourse, out _))
         {

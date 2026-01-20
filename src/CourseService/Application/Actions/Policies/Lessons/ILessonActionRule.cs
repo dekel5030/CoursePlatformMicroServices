@@ -7,5 +7,8 @@ namespace Courses.Application.Actions.Policies.Lessons;
 
 public interface ILessonActionRule
 {
-    IEnumerable<LessonAction> Evaluate(Course course, Lesson lesson, IUserContext userContext);
+    IEnumerable<LessonAction> Evaluate(
+        CoursePolicyContext courseContext,
+        LessonPolicyContext lessonContext,
+        IUserContext userContext);
 }

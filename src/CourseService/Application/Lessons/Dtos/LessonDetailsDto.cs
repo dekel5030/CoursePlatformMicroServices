@@ -1,3 +1,4 @@
+using Courses.Application.Actions;
 using Courses.Application.Actions.Primitives;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
@@ -6,14 +7,15 @@ using Courses.Domain.Shared.Primitives;
 namespace Courses.Application.Lessons.Dtos;
 
 public record LessonDetailsDto(
+    CoursePolicyContext CourseContext,
     CourseId CourseId,
     LessonId LessonId,
     Title Title,
     Description Description,
     int Index,
-    TimeSpan? Duration,
-    bool IsPreview,
+    TimeSpan Duration,
     string? ThumbnailUrl,
-    string? VideoUrl,
-    IReadOnlyCollection<LessonAction> AllowedActions
+    LessonAccess Access,
+    LessonStatus Status,
+    string? VideoUrl
 );

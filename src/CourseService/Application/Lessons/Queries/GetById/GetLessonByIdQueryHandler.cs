@@ -1,7 +1,9 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
+using Courses.Application.Actions;
 using Courses.Application.Actions.Abstract;
 using Courses.Application.Lessons.Dtos;
+using Courses.Application.Shared.Extensions;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
@@ -14,19 +16,14 @@ namespace Courses.Application.Lessons.Queries.GetById;
 public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, LessonDetailsDto>
 {
     private readonly IReadDbContext _dbContext;
-#pragma warning disable S4487 // Unread "private" fields should be removed
     private readonly IStorageUrlResolver _urlResolver;
-#pragma warning restore S4487 // Unread "private" fields should be removed
-    private readonly ICourseActionProvider _actionProvider;
 
     public GetLessonByIdQueryHandler(
         IReadDbContext dbContext,
-        IStorageUrlResolver urlResolver,
-        ICourseActionProvider actionProvider)
+        IStorageUrlResolver urlResolver)
     {
         _dbContext = dbContext;
         _urlResolver = urlResolver;
-        _actionProvider = actionProvider;
     }
 
     public async Task<Result<LessonDetailsDto>> Handle(
@@ -34,28 +31,39 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
         CancellationToken cancellationToken = default)
     {
         Lesson? lesson = await _dbContext.Lessons
-            .Include(l => l.Course)
-            .FirstOrDefaultAsync(l =>
-                l.Id == request.LessonId &&
-                l.CourseId == request.CourseId,
-                cancellationToken);
+            .Where(lesson => lesson.Id == request.LessonId)
+            .Include(lesson => lesson.Course)
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (lesson is null)
         {
             return Result.Failure<LessonDetailsDto>(LessonErrors.NotFound);
         }
 
-        LessonDetailsDto response = new(
+        var courseContext = new CoursePolicyContext(
             lesson.CourseId,
-            lesson.Id,
-            lesson.Title,
-            lesson.Description,
-            lesson.Index,
-            lesson.Duration,
-            lesson.Access == LessonAccess.Public,
-            lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
-            lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value,
-            _actionProvider.GetAllowedActions(lesson.Course, lesson));
+            lesson.Course.InstructorId,
+            lesson.Course.Status,
+            lesson.Course.LessonCount);
+
+        var response = new LessonDetailsDto
+        (
+            CourseContext: courseContext,
+            CourseId: lesson.CourseId,
+            LessonId: lesson.Id,
+            Title: lesson.Title,
+            Description: lesson.Description,
+            Index: lesson.Index,
+            Duration: lesson.Duration,
+            ThumbnailUrl: lesson.ThumbnailImageUrl is not null
+                ? _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value
+                : null,
+            Access: lesson.Access,
+            Status: lesson.Status,
+            VideoUrl: lesson.VideoUrl is not null
+                ? _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value
+                : null
+        );
 
         return Result.Success(response);
     }

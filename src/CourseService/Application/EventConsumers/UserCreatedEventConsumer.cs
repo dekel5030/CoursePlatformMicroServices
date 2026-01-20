@@ -43,13 +43,13 @@ internal sealed class UserCreatedEventConsumer : IEventConsumer<UserCreated>
         _logger.LogInformation("Creating new user with ID {UserId}", userId);
 
         user = new User
-        {
-            Id = userId,
-            Email = message.Email,
-            FirstName = message.FirstName,
-            LastName = message.LastName,
-            AvatarUrl = message.AvatarUrl
-        };
+        (
+            id: userId,
+            firstName: message.FirstName,
+            lastName: message.LastName,
+            email: message.Email,
+            avatarUrl: message.AvatarUrl
+        );
 
         await _userRepo.AddAsync(user, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

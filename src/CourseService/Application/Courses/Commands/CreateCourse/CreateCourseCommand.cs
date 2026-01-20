@@ -4,6 +4,6 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Commands.CreateCourse;
 
-public record CreateCourseCommand(
+public sealed record CreateCourseCommand(
     Title? Title,
-    Description? Description) : ICommand<CourseSummaryDto>;
+    Description? Description) : ICommand<CreateCourseResponse>;

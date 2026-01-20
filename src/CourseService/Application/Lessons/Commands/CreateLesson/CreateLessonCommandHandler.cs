@@ -12,31 +12,23 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Lessons.Commands.CreateLesson;
 
-public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, LessonSummaryDto>
+public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, CreateLessonResponse>
 {
     private readonly ICourseRepository _courseRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly TimeProvider _timeProvider;
-#pragma warning disable S4487 // Unread "private" fields should be removed
-    private readonly IStorageUrlResolver _urlResolver;
-#pragma warning restore S4487 // Unread "private" fields should be removed
-    private readonly ICourseActionProvider _actionProvider;
 
     public CreateLessonCommandHandler(
         ICourseRepository courseRepository,
         TimeProvider timeProvider,
-        IStorageUrlResolver urlResolver,
-        IUnitOfWork unitOfWork,
-        ICourseActionProvider actionProvider)
+        IUnitOfWork unitOfWork)
     {
         _courseRepository = courseRepository;
         _timeProvider = timeProvider;
-        _urlResolver = urlResolver;
         _unitOfWork = unitOfWork;
-        _actionProvider = actionProvider;
     }
 
-    public async Task<Result<LessonSummaryDto>> Handle(
+    public async Task<Result<CreateLessonResponse>> Handle(
         CreateLessonCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -44,31 +36,23 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, L
 
         if (course is null)
         {
-            return Result.Failure<LessonSummaryDto>(CourseErrors.NotFound);
+            return Result.Failure<CreateLessonResponse>(CourseErrors.NotFound);
         }
 
         Result<Lesson> result = course.AddLesson(request.Title, request.Description, _timeProvider);
 
         if (result.IsFailure)
         {
-            return Result.Failure<LessonSummaryDto>(result.Error);
+            return Result.Failure<CreateLessonResponse>(result.Error);
         }
 
         Lesson lesson = result.Value;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        LessonSummaryDto response = new(
+        return Result.Success(new CreateLessonResponse(
             lesson.CourseId,
             lesson.Id,
-            lesson.Title,
-            lesson.Description,
-            lesson.Index,
-            lesson.Duration,
-            lesson.Access == LessonAccess.Public,
-            lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
-            _actionProvider.GetAllowedActions(course, lesson));
-
-        return Result.Success(response);
+            lesson.Title));
     }
 }

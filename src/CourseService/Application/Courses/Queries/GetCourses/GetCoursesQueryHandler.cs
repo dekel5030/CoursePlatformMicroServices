@@ -2,6 +2,7 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Actions.Abstract;
 using Courses.Application.Courses.Dtos;
+using Courses.Application.Shared.Extensions;
 using Courses.Domain.Courses;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -12,19 +13,14 @@ namespace Courses.Application.Courses.Queries.GetCourses;
 internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, CourseCollectionDto>
 {
     private readonly IReadDbContext _dbContext;
-#pragma warning disable S4487 // Unread "private" fields should be removed
     private readonly IStorageUrlResolver _urlResolver;
-#pragma warning restore S4487 // Unread "private" fields should be removed
-    private readonly ICourseActionProvider _actionProvider;
 
     public GetCoursesQueryHandler(
         IReadDbContext dbContext,
-        IStorageUrlResolver urlResolver,
-        ICourseActionProvider courseActionProvider)
+        IStorageUrlResolver urlResolver)
     {
         _dbContext = dbContext;
         _urlResolver = urlResolver;
-        _actionProvider = courseActionProvider;
     }
 
     public async Task<Result<CourseCollectionDto>> Handle(
@@ -38,32 +34,20 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
 
         int totalItems = await baseQuery.CountAsync(cancellationToken);
 
-        List<Course> courses = await _dbContext.Courses
-            .Include(course => course.Instructor)
+        List<CourseSummaryDto> courses = await _dbContext.Courses
             .OrderByDescending(c => c.UpdatedAtUtc)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
+            .Select(ProjectionMappings.ToCourseSummary)
             .ToListAsync(cancellationToken);
 
-        var courseDtos = courses
-            .Select(course => new CourseSummaryDto(
-                course.Id,
-                course.Title,
-                course.Instructor?.FullName ?? "Unknown Instructor",
-                course.Price.Amount,
-                course.Price.Currency,
-                course.Images.Count <= 0 ? null : _urlResolver.Resolve(StorageCategory.Public, course.Images[^1].Path).Value,
-                course.LessonCount,
-                course.EnrollmentCount,
-                _actionProvider.GetAllowedActions(course)))
-            .ToList();
+        courses = courses.Select(course => course.EnrichWithUrls(_urlResolver)).ToList();
 
         var response = new CourseCollectionDto(
-            courseDtos,
+            courses,
             pageNumber,
             pageSize,
-            totalItems,
-            _actionProvider.GetAllowedCollectionActions());
+            totalItems);
 
         return Result.Success(response);
     }

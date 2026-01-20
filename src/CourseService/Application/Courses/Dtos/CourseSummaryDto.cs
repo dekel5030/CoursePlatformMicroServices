@@ -1,17 +1,19 @@
 ﻿using Courses.Application.Actions.Primitives;
+using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
+using Kernel;
 
 namespace Courses.Application.Courses.Dtos;
 
 public record CourseSummaryDto(
     CourseId Id,
     Title Title,
-    string? InstructorName,
-    decimal Price,
-    string Currency,
+    InstructorDto Instructor,
+    CourseStatus Status,
+    Money Price,
     string? ThumbnailUrl,
     int LessonsCount,
     int EnrollmentCount,
-    IReadOnlyCollection<CourseAction> AllowedActions
+    DateTimeOffset UpdatedAtUtc
 );

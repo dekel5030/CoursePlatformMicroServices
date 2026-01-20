@@ -3,5 +3,6 @@
 public enum CourseStatus
 {
     Draft,
-    Published
+    Published,
+    Deleted
 }

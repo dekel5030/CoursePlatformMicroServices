@@ -24,7 +24,6 @@ public class Course : Entity<CourseId>
     public CourseStatus Status { get; private set; }
     public int EnrollmentCount { get; private set; }
     public int LessonCount { get; private set; }
-    public bool IsDeleted { get; private set; }
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
     public Money Price { get; private set; } = Money.Zero();
@@ -57,60 +56,16 @@ public class Course : Entity<CourseId>
         return Result.Success(newCourse);
     }
 
-    public Result CanBeModified => !IsDeleted
-        ? Result.Success()
-        : Result.Failure(CourseErrors.CannotModifyDeleted);
-
-    public Result CanBeDeleted => !IsDeleted
-        ? Result.Success()
-        : Result.Failure(CourseErrors.NotFound);
-
-    public Result CanEnroll
-    {
-        get
-        {
-            if (IsDeleted)
-            {
-                return Result.Failure(CourseErrors.NotFound);
-            }
-
-            if (Status != CourseStatus.Published)
-            {
-                return Result.Failure(CourseErrors.CourseNotPublished);
-            }
-
-            return Result.Success();
-        }
-    }
-
-    public Result CanBePublished
-    {
-        get
-        {
-            if (IsDeleted)
-            {
-                return Result.Failure(CourseErrors.NotFound);
-            }
-
-            if (Status == CourseStatus.Published)
-            {
-                return Result.Failure(CourseErrors.AlreadyPublished);
-            }
-
-            if (LessonCount == 0)
-            {
-                return Result.Failure(CourseErrors.CourseWithoutLessons);
-            }
-
-            return Result.Success();
-        }
-    }
+    public Result CanModify => CoursePolicies.CanModify(Status);
+    public Result CanDelete => CoursePolicies.CanDelete(Status);
+    public Result CanEnroll => CoursePolicies.CanEnroll(Status);
+    public Result CanPublish => CoursePolicies.CanPublish(Status, LessonCount);
 
     public Result Publish(TimeProvider timeProvider)
     {
-        if (CanBePublished.IsFailure)
+        if (CanPublish.IsFailure)
         {
-            return CanBePublished;
+            return CanPublish;
         }
 
         Status = CourseStatus.Published;
@@ -168,9 +123,9 @@ public class Course : Entity<CourseId>
 
     public Result UpdateDescription(Description description, TimeProvider timeProvider)
     {
-        if (CanBeModified.IsFailure)
+        if (CanModify.IsFailure)
         {
-            return CanBeModified;
+            return CanModify;
         }
 
         Description = description;
@@ -181,9 +136,9 @@ public class Course : Entity<CourseId>
 
     public Result UpdateTitle(Title title, TimeProvider timeProvider)
     {
-        if (CanBeModified.IsFailure)
+        if (CanModify.IsFailure)
         {
-            return CanBeModified;
+            return CanModify;
         }
 
         Title = title;
@@ -245,8 +200,13 @@ public class Course : Entity<CourseId>
         LessonAccess? access,
         TimeProvider timeProvider)
     {
-        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
+        Result policyResult = CanModify;
+        if (policyResult.IsFailure)
+        {
+            return policyResult;
+        }
 
+        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
         if (lesson is null)
         {
             return Result.Failure(LessonErrors.NotFound);
@@ -254,29 +214,17 @@ public class Course : Entity<CourseId>
 
         if (title.HasValue)
         {
-            Result titleResult = lesson.SetTitle(title.Value);
-            if (titleResult.IsFailure)
-            {
-                return titleResult;
-            }
+            lesson.SetTitle(title.Value);
         }
 
         if (description.HasValue)
         {
-            Result descriptionResult = lesson.SetDescription(description.Value);
-            if (descriptionResult.IsFailure)
-            {
-                return descriptionResult;
-            }
+            lesson.SetDescription(description.Value);
         }
 
         if (access.HasValue)
         {
-            Result accessResult = lesson.SetAccess(access.Value);
-            if (accessResult.IsFailure)
-            {
-                return accessResult;
-            }
+            lesson.SetAccess(access.Value);
         }
 
         UpdatedAtUtc = timeProvider.GetUtcNow();
@@ -286,12 +234,12 @@ public class Course : Entity<CourseId>
 
     public Result Delete()
     {
-        if (CanBeDeleted.IsFailure)
+        if (CanDelete.IsFailure)
         {
-            return CanBeDeleted;
+            return CanDelete;
         }
 
-        IsDeleted = true;
+        Status = CourseStatus.Deleted;
         Raise(new CourseDeleted(this));
         return Result.Success();
     }
