@@ -13,7 +13,7 @@ public class EnrollmentManager
         _timeProvider = timeProvider;
     }
 
-    public Result<Enrollment> EnrollStudent(
+    public Result<Enrollment> EnrollUser(
         Course course,
         UserId studentId,
         TimeSpan validFor)

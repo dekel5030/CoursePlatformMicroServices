@@ -1,12 +1,12 @@
 ﻿using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments.Primitives;
-using Kernel;
+using Courses.Domain.Shared;
 
 namespace Courses.Domain.Enrollments;
 
-public class Enrollment
+public class Enrollment : Entity<EnrollmentId>
 {
-    public EnrollmentId Id { get; private set; } = EnrollmentId.CreateNew();
+    public override EnrollmentId Id { get; protected set; } = EnrollmentId.CreateNew();
     public CourseId CourseId { get; private set; }
     public UserId StudentId { get; private set; }
     public DateTimeOffset EnrolledAtUtc { get; private set; }
