@@ -1,6 +1,6 @@
 ﻿namespace Courses.Domain.Courses.Primitives;
 
-public record UserId(Guid Value)
+public record struct UserId(Guid Value)
 {
     public static bool TryParse(string value, out UserId userId)
     {

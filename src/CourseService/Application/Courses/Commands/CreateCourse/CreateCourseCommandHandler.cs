@@ -63,7 +63,7 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
         var responseDto = new CourseSummaryDto(
             course.Id,
             course.Title,
-            course.InstructorId?.ToString(),
+            course.Instructor?.FullName,
             course.Price.Amount,
             course.Price.Currency,
             null,

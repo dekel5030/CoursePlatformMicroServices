@@ -7,4 +7,3 @@ public interface ICourseRepository : IRepository<Course, CourseId>
 {
     Task AddAsync(Course entity, CancellationToken cancellationToken = default);
 }
-

@@ -2,6 +2,7 @@
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Enrollments.Primitives;
+using Courses.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -21,14 +22,28 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
             .HasConversion(id => id.Value, v => new CourseId(v));
 
         builder.Property(e => e.StudentId)
-            .HasConversion(id => id.Value, v => new StudentId(v));
+            .HasConversion(id => id.Value, v => new UserId(v));
 
-        builder.HasIndex(e => new { e.CourseId, e.StudentId });
+        builder.Property(e => e.Status)
+            .HasConversion<string>();
+
+        string statusColumnName = builder.Property(e => e.Status).Metadata.GetColumnName();
+        string activeValue = EnrollmentStatus.Active.ToString();
+
+        builder.HasIndex(e => new { e.CourseId, e.StudentId })
+            .IsUnique()
+            .HasFilter($"\"{statusColumnName}\" = '{activeValue}'");
 
         builder.HasOne<Course>()
             .WithMany()
             .HasForeignKey(e => e.CourseId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(e => e.StudentId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

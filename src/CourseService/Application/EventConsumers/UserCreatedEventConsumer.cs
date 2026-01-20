@@ -26,7 +26,7 @@ internal sealed class UserCreatedEventConsumer : IEventConsumer<UserCreated>
 
     public async Task HandleAsync(UserCreated message, CancellationToken cancellationToken = default)
     {
-        if (!UserId.TryParse(message.UserId, out UserId? userId))
+        if (!UserId.TryParse(message.UserId, out UserId userId))
         {
             _logger.LogWarning("Received UserCreated event with invalid UserId: {UserId}", message.UserId);
             return;

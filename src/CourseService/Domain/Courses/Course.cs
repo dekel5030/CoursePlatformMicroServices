@@ -1,7 +1,6 @@
 ﻿using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
@@ -16,6 +15,7 @@ public class Course : Entity<CourseId>
 {
     private readonly List<Lesson> _lessons = new();
     private readonly List<ImageUrl> _images = new();
+
     public override CourseId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
@@ -199,22 +199,6 @@ public class Course : Entity<CourseId>
         return Result.Success();
     }
 
-    public Result<Enrollment> CreateEnrollment(
-        StudentId studentId,
-        TimeProvider timeProvider,
-        TimeSpan validFor)
-    {
-        if (CanEnroll.IsFailure)
-        {
-            return Result.Failure<Enrollment>(CanEnroll.Error);
-        }
-
-        var enrollment = Enrollment.Create(Id, studentId, timeProvider, validFor);
-        EnrollmentCount++;
-
-        return Result.Success(enrollment);
-    }
-
     public Result<Lesson> AddLesson(
         Title? title,
         Description? description,
@@ -309,6 +293,17 @@ public class Course : Entity<CourseId>
 
         IsDeleted = true;
         Raise(new CourseDeleted(this));
+        return Result.Success();
+    }
+
+    internal Result Enroll()
+    {
+        if (CanEnroll.IsFailure)
+        {
+            return CanEnroll;
+        }
+
+        EnrollmentCount++;
         return Result.Success();
     }
 }
