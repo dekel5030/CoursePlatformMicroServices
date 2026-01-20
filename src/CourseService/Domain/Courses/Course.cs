@@ -57,60 +57,16 @@ public class Course : Entity<CourseId>
         return Result.Success(newCourse);
     }
 
-    public Result CanBeModified => !IsDeleted
-        ? Result.Success()
-        : Result.Failure(CourseErrors.CannotModifyDeleted);
-
-    public Result CanBeDeleted => !IsDeleted
-        ? Result.Success()
-        : Result.Failure(CourseErrors.NotFound);
-
-    public Result CanEnroll
-    {
-        get
-        {
-            if (IsDeleted)
-            {
-                return Result.Failure(CourseErrors.NotFound);
-            }
-
-            if (Status != CourseStatus.Published)
-            {
-                return Result.Failure(CourseErrors.CourseNotPublished);
-            }
-
-            return Result.Success();
-        }
-    }
-
-    public Result CanBePublished
-    {
-        get
-        {
-            if (IsDeleted)
-            {
-                return Result.Failure(CourseErrors.NotFound);
-            }
-
-            if (Status == CourseStatus.Published)
-            {
-                return Result.Failure(CourseErrors.AlreadyPublished);
-            }
-
-            if (LessonCount == 0)
-            {
-                return Result.Failure(CourseErrors.CourseWithoutLessons);
-            }
-
-            return Result.Success();
-        }
-    }
+    public Result CanModify => CoursePolicies.CanModify(IsDeleted);
+    public Result CanDelete => CoursePolicies.CanDelete(IsDeleted);
+    public Result CanEnroll => CoursePolicies.CanEnroll(IsDeleted, Status);
+    public Result CanPublish => CoursePolicies.CanPublish(IsDeleted, Status, LessonCount);
 
     public Result Publish(TimeProvider timeProvider)
     {
-        if (CanBePublished.IsFailure)
+        if (CanPublish.IsFailure)
         {
-            return CanBePublished;
+            return CanPublish;
         }
 
         Status = CourseStatus.Published;
@@ -168,9 +124,9 @@ public class Course : Entity<CourseId>
 
     public Result UpdateDescription(Description description, TimeProvider timeProvider)
     {
-        if (CanBeModified.IsFailure)
+        if (CanModify.IsFailure)
         {
-            return CanBeModified;
+            return CanModify;
         }
 
         Description = description;
@@ -181,9 +137,9 @@ public class Course : Entity<CourseId>
 
     public Result UpdateTitle(Title title, TimeProvider timeProvider)
     {
-        if (CanBeModified.IsFailure)
+        if (CanModify.IsFailure)
         {
-            return CanBeModified;
+            return CanModify;
         }
 
         Title = title;
@@ -286,9 +242,9 @@ public class Course : Entity<CourseId>
 
     public Result Delete()
     {
-        if (CanBeDeleted.IsFailure)
+        if (CanDelete.IsFailure)
         {
-            return CanBeDeleted;
+            return CanDelete;
         }
 
         IsDeleted = true;

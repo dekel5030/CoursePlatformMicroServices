@@ -9,7 +9,7 @@ internal sealed class CanDeleteCourseRule : ICourseActionRule
 {
     public IEnumerable<CourseAction> Evaluate(Course course, IUserContext userContext)
     {
-        if (!course.CanBeDeleted.IsSuccess)
+        if (!course.CanDelete.IsSuccess)
         {
             yield break;
         }

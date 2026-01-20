@@ -9,7 +9,7 @@ internal sealed class CanModifyCourseRule : ICourseActionRule
 {
     public IEnumerable<CourseAction> Evaluate(Course course, IUserContext userContext)
     {
-        if (!course.CanBeModified.IsSuccess)
+        if (!course.CanModify.IsSuccess)
         {
             yield break;
         }

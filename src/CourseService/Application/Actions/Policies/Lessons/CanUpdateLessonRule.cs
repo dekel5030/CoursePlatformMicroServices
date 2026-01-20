@@ -10,7 +10,7 @@ internal sealed class CanUpdateLessonRule : ILessonActionRule
 {
     public IEnumerable<LessonAction> Evaluate(Course course, Lesson lesson, IUserContext userContext)
     {
-        if (!course.CanBeModified.IsSuccess)
+        if (!course.CanModify.IsSuccess)
         {
             yield break;
         }

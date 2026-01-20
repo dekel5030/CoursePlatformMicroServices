@@ -9,7 +9,7 @@ internal sealed class CanPublishCourseRule : ICourseActionRule
 {
     public IEnumerable<CourseAction> Evaluate(Course course, IUserContext userContext)
     {
-        if (!course.CanBePublished.IsSuccess)
+        if (!course.CanPublish.IsSuccess)
         {
             yield break;
         }
