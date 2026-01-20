@@ -11,6 +11,7 @@ public class Enrollment
     public UserId StudentId { get; private set; }
     public DateTimeOffset EnrolledAtUtc { get; private set; }
     public DateTimeOffset ExpiresAtUtc { get; private set; }
+    public EnrollmentStatus Status { get; private set; }
 
     #pragma warning disable CS8618
     private Enrollment() { }
@@ -30,7 +31,8 @@ public class Enrollment
             CourseId = courseId,
             StudentId = studentId,
             EnrolledAtUtc = now,
-            ExpiresAtUtc = now.Add(duration)
+            ExpiresAtUtc = now.Add(duration),
+            Status = EnrollmentStatus.Active
         };
 
         return Result.Success(enrollment);

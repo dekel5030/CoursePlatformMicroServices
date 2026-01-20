@@ -306,5 +306,4 @@ public class Course : Entity<CourseId>
         EnrollmentCount++;
         return Result.Success();
     }
-
 }

@@ -1,8 +1,8 @@
-﻿using Courses.Domain.Courses.Enrollments;
+﻿using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 
-namespace Courses.Domain.Courses;
+namespace Courses.Domain.Enrollments;
 
 public class EnrollmentManager
 {
