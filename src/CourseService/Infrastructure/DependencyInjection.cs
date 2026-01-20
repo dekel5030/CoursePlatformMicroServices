@@ -1,4 +1,5 @@
 ﻿using CoursePlatform.ServiceDefaults.Auth;
+using Courses.Domain.Enrollments;
 using Courses.Infrastructure.Database;
 using Courses.Infrastructure.MassTransit;
 using Courses.Infrastructure.Storage;
@@ -41,6 +42,7 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddStorage();
+        services.AddScoped<EnrollmentManager>();
         return services;
     }
 

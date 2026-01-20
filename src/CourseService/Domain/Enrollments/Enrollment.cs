@@ -1,6 +1,7 @@
 ﻿using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments.Primitives;
 using Courses.Domain.Shared;
+using Kernel;
 
 namespace Courses.Domain.Enrollments;
 
