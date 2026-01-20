@@ -50,6 +50,7 @@ internal static class DatabaseExtensions
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<IFeaturedCoursesRepository, FeaturedCoursesRepository>();
+        services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 
         return services;
     }
