@@ -201,8 +201,13 @@ public class Course : Entity<CourseId>
         LessonAccess? access,
         TimeProvider timeProvider)
     {
-        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
+        Result policyResult = CanModify;
+        if (policyResult.IsFailure)
+        {
+            return policyResult;
+        }
 
+        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
         if (lesson is null)
         {
             return Result.Failure(LessonErrors.NotFound);
@@ -210,29 +215,17 @@ public class Course : Entity<CourseId>
 
         if (title.HasValue)
         {
-            Result titleResult = lesson.SetTitle(title.Value);
-            if (titleResult.IsFailure)
-            {
-                return titleResult;
-            }
+            lesson.SetTitle(title.Value);
         }
 
         if (description.HasValue)
         {
-            Result descriptionResult = lesson.SetDescription(description.Value);
-            if (descriptionResult.IsFailure)
-            {
-                return descriptionResult;
-            }
+            lesson.SetDescription(description.Value);
         }
 
         if (access.HasValue)
         {
-            Result accessResult = lesson.SetAccess(access.Value);
-            if (accessResult.IsFailure)
-            {
-                return accessResult;
-            }
+            lesson.SetAccess(access.Value);
         }
 
         UpdatedAtUtc = timeProvider.GetUtcNow();
