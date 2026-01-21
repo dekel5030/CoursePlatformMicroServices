@@ -13,6 +13,8 @@ public sealed record Language
         Code = code;
     }
 
+    public static Language Parse(string code) => new(code);
+
     public static readonly Language English = new("en");
     public static readonly Language Hebrew = new("he");
 }

@@ -1,4 +1,5 @@
-﻿using Courses.Domain.Courses.Events;
+﻿using Courses.Domain.Categories;
+using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
@@ -16,21 +17,21 @@ public class Course : Entity<CourseId>
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
     public CourseStatus Status { get; private set; } = CourseStatus.Draft;
-    public Money Price { get; private set; } = Money.Zero();
     public DifficultyLevel Difficulty { get; private set; } = DifficultyLevel.Beginner;
-    public CourseCategory Category { get; private set; } = CourseCategory.Unkown;
+    public Money Price { get; private set; } = Money.Zero();
     public Language Language { get; private set; } = Language.Hebrew;
     public Slug Slug { get; private set; }
 
     public UserId InstructorId { get; private set; }
-    public User? Instructor { get; private set; }
-    
+    public CategoryId CategoryId { get; private set; }
+
     public int EnrollmentCount { get; private set; }
     public int LessonCount { get; private set; }
     public int Views { get; private set; }
     public TimeSpan TotalDuration { get; private set; } = TimeSpan.Zero;
 
     public IReadOnlyCollection<Tag> Tags => _tags;
+    public IReadOnlyCollection<ImageUrl> Images => _images;
     public DateTimeOffset UpdatedAtUtc { get; private set; }
 
 
@@ -44,22 +45,24 @@ public class Course : Entity<CourseId>
     #pragma warning restore CS8618 
     #pragma warning restore S1133 
 
-    private Course(CourseId id, UserId instructorId, Slug slug)
+    private Course(CourseId id, UserId instructorId, CategoryId categoryId, Slug slug)
     {
         Id = id;
         InstructorId = instructorId;
+        CategoryId = categoryId;
         Slug = slug;
     }
 
     public static Result<Course> CreateCourse(
         UserId instructorId,
+        CategoryId categoryId,
         Title? title = null,
         Description? description = null,
         Money? price = null)
     {
         var courseId = CourseId.CreateNew();
         var slug = new Slug(courseId.ToString());
-        var newCourse = new Course(courseId, instructorId, slug)
+        var newCourse = new Course(courseId, instructorId, categoryId, slug)
         {
             Title = title ?? Title.Empty,
             Description = description ?? Description.Empty,
@@ -138,7 +141,7 @@ public class Course : Entity<CourseId>
 
     public Result UpdateMetadata(
         DifficultyLevel? difficulty = null,
-        CourseCategory? category = null,
+        CategoryId? categoryId = null,
         Language? language = null,
         ICollection<Tag>? tags = null,
         Slug? slug = null)
@@ -153,9 +156,9 @@ public class Course : Entity<CourseId>
             Difficulty = difficulty.Value;
         }
 
-        if (category is not null && category != Category)
+        if (categoryId is not null && categoryId != CategoryId)
         {
-            Category = category;
+            CategoryId = categoryId;
         }
 
         if (language is not null && language != Language)

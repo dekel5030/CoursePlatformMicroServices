@@ -1,6 +1,6 @@
 ﻿namespace Courses.Domain.Courses.Primitives;
 
-public readonly record struct Tag
+public sealed record Tag
 {
     public string Value { get; }
 
