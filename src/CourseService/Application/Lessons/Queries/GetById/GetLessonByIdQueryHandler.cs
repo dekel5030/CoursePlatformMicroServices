@@ -2,6 +2,8 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Actions;
 using Courses.Application.Lessons.Dtos;
+using Courses.Application.Lessons.Primitives;
+using Courses.Application.Shared.Dtos;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Kernel;
@@ -29,7 +31,8 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
     {
         Lesson? lesson = await _dbContext.Lessons
             .Where(lesson => lesson.Id == request.LessonId)
-            .Include(lesson => lesson.Course)
+            .Include(lesson => lesson.Module)
+                .ThenInclude(module => module.Course)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (lesson is null)
@@ -37,16 +40,24 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
             return Result.Failure<LessonDetailsDto>(LessonErrors.NotFound);
         }
 
+        if (lesson.Module is null || lesson.Module.Course is null)
+        {
+            return Result.Failure<LessonDetailsDto>(
+                Error.NotFound("Module.NotFound", "The module or course for this lesson was not found."));
+        }
+
+        var course = lesson.Module.Course;
         var courseContext = new CoursePolicyContext(
-            lesson.CourseId,
-            lesson.Course.InstructorId,
-            lesson.Course.Status,
-            lesson.Course.LessonCount);
+            course.Id,
+            course.InstructorId,
+            course.Status,
+            course.LessonCount);
 
         var response = new LessonDetailsDto
         (
             CourseContext: courseContext,
-            CourseId: lesson.CourseId,
+            CourseId: course.Id,
+            ModuleId: lesson.ModuleId,
             LessonId: lesson.Id,
             Title: lesson.Title,
             Description: lesson.Description,
@@ -56,7 +67,9 @@ public class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQuery, Lesso
                 ? _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value
                 : null,
             Access: lesson.Access,
-            Status: lesson.Status,
+            Status: course.Status == Domain.Courses.Primitives.CourseStatus.Published 
+                ? LessonStatus.Published 
+                : LessonStatus.Draft,
             VideoUrl: lesson.VideoUrl is not null
                 ? _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value
                 : null

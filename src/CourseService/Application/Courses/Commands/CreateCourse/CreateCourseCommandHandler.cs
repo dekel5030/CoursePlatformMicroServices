@@ -1,5 +1,6 @@
 ﻿using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
+using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
@@ -12,18 +13,18 @@ namespace Courses.Application.Courses.Commands.CreateCourse;
 internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand, CreateCourseResponse>
 {
     private readonly ICourseRepository _courseRepository;
+    private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly TimeProvider _timeProvider;
     private readonly IUserContext _userContext;
 
     public CreateCourseCommandHandler(
         ICourseRepository courseRepository,
-        TimeProvider timeProvider,
+        ICategoryRepository categoryRepository,
         IUnitOfWork unitOfWork,
         IUserContext userContext)
     {
         _courseRepository = courseRepository;
-        _timeProvider = timeProvider;
+        _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
         _userContext = userContext;
     }
@@ -39,9 +40,16 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
             return Result.Failure<CreateCourseResponse>(CourseErrors.Unauthorized);
         }
 
+        Category? category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken);
+        if (category is null)
+        {
+            return Result.Failure<CreateCourseResponse>(
+                Error.NotFound("Category.NotFound", "The specified category was not found."));
+        }
+
         Result<Course> courseResult = Course.CreateCourse(
-            _timeProvider,
             instructorId,
+            request.CategoryId,
             request.Title,
             request.Description);
 

@@ -1,10 +1,9 @@
 ﻿using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Shared.Dtos;
-using Courses.Domain.Courses;
-using Courses.Domain.Courses.Errors;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
+using Courses.Domain.Module;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -15,28 +14,29 @@ internal sealed class GenerateLessonVideoUploadUrlCommandHandler
     : ICommandHandler<GenerateLessonVideoUploadUrlCommand, GenerateUploadUrlDto>
 {
     private readonly IObjectStorageService _storageService;
-    private readonly ICourseRepository _courseRepository;
+    private readonly IModuleRepository _moduleRepository;
 
     public GenerateLessonVideoUploadUrlCommandHandler(
         IObjectStorageService storageService,
-        ICourseRepository courseRepository)
+        IModuleRepository moduleRepository)
     {
         _storageService = storageService;
-        _courseRepository = courseRepository;
+        _moduleRepository = moduleRepository;
     }
 
     public async Task<Result<GenerateUploadUrlDto>> Handle(
         GenerateLessonVideoUploadUrlCommand request,
         CancellationToken cancellationToken = default)
     {
-        Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
+        Module? module = await _moduleRepository.GetByIdAsync(request.ModuleId, cancellationToken);
 
-        if (course is null)
+        if (module is null)
         {
-            return Result<GenerateUploadUrlDto>.Failure(CourseErrors.NotFound);
+            return Result<GenerateUploadUrlDto>.Failure(
+                Error.NotFound("Module.NotFound", "The specified module was not found."));
         }
 
-        Lesson? lesson = course.Lessons.FirstOrDefault(l => l.Id == request.LessonId);
+        Lesson? lesson = module.Lessons.FirstOrDefault(l => l.Id == request.LessonId);
 
         if (lesson is null)
         {

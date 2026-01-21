@@ -1,4 +1,5 @@
-﻿using Courses.Domain.Categories;
+﻿using Courses.Application.Abstractions.Repositories;
+using Courses.Domain.Categories;
 
 namespace Courses.Infrastructure.Database.Repositories;
 

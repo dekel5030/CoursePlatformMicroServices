@@ -1,7 +1,6 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
-using Courses.Domain.Courses;
-using Courses.Domain.Courses.Errors;
+using Courses.Domain.Module;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -9,37 +8,34 @@ namespace Courses.Application.Lessons.Commands.PatchLesson;
 
 internal sealed class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
 {
-    private readonly ICourseRepository _courseRepository;
+    private readonly IModuleRepository _moduleRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly TimeProvider _timeProvider;
 
     public PatchLessonCommandHandler(
-        ICourseRepository courseRepository,
-        IUnitOfWork unitOfwORK,
-        TimeProvider timeProvider)
+        IModuleRepository moduleRepository,
+        IUnitOfWork unitOfWork)
     {
-        _courseRepository = courseRepository;
-        _unitOfWork = unitOfwORK;
-        _timeProvider = timeProvider;
+        _moduleRepository = moduleRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result> Handle(
         PatchLessonCommand request,
         CancellationToken cancellationToken = default)
     {
-        Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
+        Module? module = await _moduleRepository.GetByIdAsync(request.ModuleId, cancellationToken);
 
-        if (course is null)
+        if (module is null)
         {
-            return Result.Failure(CourseErrors.NotFound);
+            return Result.Failure(Error.NotFound("Module.NotFound", "The specified module was not found."));
         }
 
-        Result updateResult = course.UpdateLesson(
+        Result updateResult = module.UpdateLesson(
             request.LessonId,
             request.Title,
             request.Description,
             request.Access,
-            _timeProvider);
+            null);
 
         if (updateResult.IsFailure)
         {

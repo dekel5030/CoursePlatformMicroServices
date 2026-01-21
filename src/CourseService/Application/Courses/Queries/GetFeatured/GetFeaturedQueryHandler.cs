@@ -1,7 +1,7 @@
 using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Shared.Extensions;
+using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -27,10 +27,25 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, CourseCol
     {
         IReadOnlyList<Course> courses = await _featuredCoursesProvider.GetFeaturedCourse();
 
-        var courseDtos = courses
-            .AsQueryable()
-            .Select(ProjectionMappings.ToCourseSummary)
-            .ToList();
+        var courseIds = courses.Select(c => c.Id).ToList();
+        // Note: This query assumes modules are already loaded or we need to query them separately
+        // For now, using LessonCount from course domain
+        var courseDtos = courses.Select(course =>
+            new CourseSummaryDto(
+                course.Id,
+                course.Title,
+                new Application.Shared.Dtos.InstructorDto(
+                    course.InstructorId,
+                    "Unknown", // Instructor may not be loaded
+                    null
+                ),
+                course.Status,
+                course.Price,
+                course.Images.Select(i => i.Path).FirstOrDefault(),
+                course.LessonCount,
+                course.EnrollmentCount,
+                course.UpdatedAtUtc
+            )).ToList();
 
         var response = new CourseCollectionDto
         (

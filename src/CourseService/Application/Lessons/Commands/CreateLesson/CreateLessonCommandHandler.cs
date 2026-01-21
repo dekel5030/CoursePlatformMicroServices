@@ -1,8 +1,10 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
-using Courses.Domain.Courses;
-using Courses.Domain.Courses.Errors;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
+using Courses.Domain.Lessons.Errors;
+using Courses.Domain.Module;
+using Courses.Domain.Module.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -10,17 +12,14 @@ namespace Courses.Application.Lessons.Commands.CreateLesson;
 
 public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, CreateLessonResponse>
 {
-    private readonly ICourseRepository _courseRepository;
+    private readonly IModuleRepository _moduleRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly TimeProvider _timeProvider;
 
     public CreateLessonCommandHandler(
-        ICourseRepository courseRepository,
-        TimeProvider timeProvider,
+        IModuleRepository moduleRepository,
         IUnitOfWork unitOfWork)
     {
-        _courseRepository = courseRepository;
-        _timeProvider = timeProvider;
+        _moduleRepository = moduleRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -28,26 +27,27 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, C
         CreateLessonCommand request,
         CancellationToken cancellationToken = default)
     {
-        Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
+        Module? module = await _moduleRepository.GetByIdAsync(request.ModuleId, cancellationToken);
 
-        if (course is null)
+        if (module is null)
         {
-            return Result.Failure<CreateLessonResponse>(CourseErrors.NotFound);
+            return Result.Failure<CreateLessonResponse>(Error.NotFound("Module.NotFound", "The specified module was not found."));
         }
 
-        Result<Lesson> result = course.AddLesson(request.Title, request.Description, _timeProvider);
+        Result result = module.AddLesson(request.Title, request.Description);
 
         if (result.IsFailure)
         {
             return Result.Failure<CreateLessonResponse>(result.Error);
         }
 
-        Lesson lesson = result.Value;
-
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+        // Get the last lesson that was added
+        Lesson lesson = module.Lessons.Last();
+
         return Result.Success(new CreateLessonResponse(
-            lesson.CourseId,
+            module.CourseId,
             lesson.Id,
             lesson.Title));
     }

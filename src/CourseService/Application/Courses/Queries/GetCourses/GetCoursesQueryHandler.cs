@@ -1,7 +1,7 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Shared.Extensions;
+using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -33,12 +33,44 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
 
         int totalItems = await baseQuery.CountAsync(cancellationToken);
 
-        List<CourseSummaryDto> courses = await _dbContext.Courses
+        List<Course> coursesData = await _dbContext.Courses
+            .Include(c => c.Instructor)
             .OrderByDescending(c => c.UpdatedAtUtc)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .Select(ProjectionMappings.ToCourseSummary)
             .ToListAsync(cancellationToken);
+
+        var courseIds = coursesData.Select(c => c.Id).ToList();
+        var modules = await _dbContext.Modules
+            .Where(m => courseIds.Contains(m.CourseId))
+            .Include(m => m.Lessons)
+            .ToListAsync(cancellationToken);
+
+        var modulesByCourse = modules
+            .GroupBy(m => m.CourseId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        List<CourseSummaryDto> courses = coursesData.Select(course =>
+        {
+            var courseModules = modulesByCourse.GetValueOrDefault(course.Id, new List<Domain.Module.Module>());
+            var lessonCount = courseModules.SelectMany(m => m.Lessons).Count();
+
+            return new CourseSummaryDto(
+                course.Id,
+                course.Title,
+                new InstructorDto(
+                    course.InstructorId,
+                    $"{course.Instructor!.FirstName} {course.Instructor.LastName}",
+                    course.Instructor.AvatarUrl
+                ),
+                course.Status,
+                course.Price,
+                course.Images.Select(i => i.Path).FirstOrDefault(),
+                lessonCount,
+                course.EnrollmentCount,
+                course.UpdatedAtUtc
+            );
+        }).ToList();
 
         courses = courses.Select(course => course.EnrichWithUrls(_urlResolver)).ToList();
 

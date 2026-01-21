@@ -10,13 +10,13 @@ namespace Courses.Application.Courses.Commands.PatchCourse;
 
 internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
 {
-    private readonly TimeProvider _timeProvider;
     private readonly ICourseRepository _courseRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public PatchCourseCommandHandler(TimeProvider timeProvider, ICourseRepository courseRepository, IUnitOfWork unitOfWork)
+    public PatchCourseCommandHandler(
+        ICourseRepository courseRepository, 
+        IUnitOfWork unitOfWork)
     {
-        _timeProvider = timeProvider;
         _courseRepository = courseRepository;
         _unitOfWork = unitOfWork;
     }
@@ -32,46 +32,7 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
             return Result.Failure(CourseErrors.NotFound);
         }
 
-        if (request.Title.HasValue)
-        {
-            Result titleResult = course.UpdateTitle(request.Title.Value, _timeProvider);
-            if (titleResult.IsFailure)
-            {
-                return titleResult;
-            }
-        }
-
-        if (request.Description.HasValue)
-        {
-            Result descriptionResult = course.UpdateDescription(request.Description.Value, _timeProvider);
-            if (descriptionResult.IsFailure)
-            {
-                return descriptionResult;
-            }
-        }
-
-        if (request.InstructorId.HasValue)
-        {
-            Result instructorResult = course.AssignInstructor(new UserId(request.InstructorId.Value), _timeProvider);
-            if (instructorResult.IsFailure)
-            {
-                return instructorResult;
-            }
-        }
-
-        if (request.PriceAmount.HasValue != request.PriceCurrency is not null)
-        {
-            return Result.Failure(CourseErrors.InvalidPrice);
-        }
-
-        if (request.PriceAmount.HasValue && request.PriceCurrency is not null)
-        {
-            Result priceResult = course.SetPrice(new Money(request.PriceAmount.Value, request.PriceCurrency), _timeProvider);
-            if (priceResult.IsFailure)
-            {
-                return priceResult;
-            }
-        }
+        course.UpdateDetails(request.Title, request.Description, request.Price);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
