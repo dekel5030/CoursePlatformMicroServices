@@ -1,12 +1,8 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
-using Courses.Application.Abstractions.Storage;
-using Courses.Application.Actions.Abstract;
-using Courses.Application.Lessons.Dtos;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Lessons;
-using Courses.Domain.Lessons.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

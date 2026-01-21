@@ -1,12 +1,9 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Actions;
-using Courses.Application.Actions.Abstract;
 using Courses.Application.Lessons.Dtos;
-using Courses.Application.Shared.Extensions;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
-using Courses.Domain.Lessons.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;

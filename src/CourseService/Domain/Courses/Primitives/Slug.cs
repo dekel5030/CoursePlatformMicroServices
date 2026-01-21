@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Kernel;
 
-namespace Courses.Domain.Courses;
+namespace Courses.Domain.Courses.Primitives;
 
 public readonly record struct Slug
 {
@@ -17,9 +17,9 @@ public readonly record struct Slug
         {
             return Result.Failure<Slug>(Error.Validation("Slug.Cannot.BeEmpty", "Slug cannot be empty."));
         }
-        
+
         string str = rawSlug.ToLowerInvariant();
-        
+
         str = Regex.Replace(str, @"[^\p{L}0-9\s-]", "");
         str = Regex.Replace(str, @"[\s-]+", " ").Trim();
         str = Regex.Replace(str, @"\s", "-");

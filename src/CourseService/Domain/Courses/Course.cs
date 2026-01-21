@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using Courses.Domain.Courses.Errors;
-using Courses.Domain.Courses.Events;
+﻿using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
@@ -42,9 +39,9 @@ public class Course : Entity<CourseId>
     public IReadOnlyCollection<Tag> Tags => _tags;
 
 
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     private Course() { }
-    #pragma warning restore CS8618
+#pragma warning restore CS8618
 
     public static Result<Course> CreateCourse(
         UserId instructorId,
@@ -192,7 +189,7 @@ public class Course : Entity<CourseId>
 
     public Result RemoveImage(ImageUrl imageUrl)
     {
-        _images.Remove(imageUrl)
+        _images.Remove(imageUrl);
         return Result.Success();
     }
 

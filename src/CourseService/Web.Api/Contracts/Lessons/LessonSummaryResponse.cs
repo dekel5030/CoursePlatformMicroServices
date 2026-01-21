@@ -1,6 +1,5 @@
 using Courses.Api.Contracts.Shared;
 using Courses.Api.Infrastructure.LinkProvider;
-using Courses.Domain.Lessons.Primitives;
 
 namespace Courses.Api.Contracts.Lessons;
 

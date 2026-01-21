@@ -2,10 +2,8 @@ using Courses.Api.Contracts.Courses;
 using Courses.Api.Contracts.Shared;
 using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Actions;
-using Courses.Application.Actions.Abstract;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
-using Courses.Domain.Courses.Primitives;
 
 namespace Courses.Api.Extensions;
 

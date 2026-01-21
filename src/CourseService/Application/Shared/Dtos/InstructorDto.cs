@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Courses.Domain.Courses.Primitives;
+﻿using Courses.Domain.Courses.Primitives;
 
 namespace Courses.Application.Shared.Dtos;
 

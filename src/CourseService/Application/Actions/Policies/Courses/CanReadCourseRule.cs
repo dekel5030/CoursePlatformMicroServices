@@ -1,5 +1,4 @@
 ﻿using Courses.Application.Actions.Primitives;
-using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Kernel.Auth.Abstractions;
 using Kernel.Auth.AuthTypes;

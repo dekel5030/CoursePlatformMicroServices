@@ -5,8 +5,6 @@ using Courses.Application.Actions.Abstract;
 using Courses.Application.Actions.Primitives;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
-using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
 
 namespace Courses.Api.Infrastructure.LinkProvider;
 
@@ -17,8 +15,8 @@ internal sealed class LinkProvider
     private readonly LinkGenerator _linkGenerator;
 
     public LinkProvider(
-        IHttpContextAccessor httpContextAccessor, 
-        LinkGenerator linkGenerator, ICourseActionProvider 
+        IHttpContextAccessor httpContextAccessor,
+        LinkGenerator linkGenerator, ICourseActionProvider
         courseActionProvider)
     {
         _httpContextAccessor = httpContextAccessor;
@@ -70,9 +68,9 @@ internal sealed class LinkProvider
         if (allowedActionsSet.TryGetValue(CourseAction.UploadImageUrl, out _))
         {
             links.Add(Create(
-                nameof(GenerateCourseImageUploadUrl), 
-                "generate-image-upload-url", 
-                HttpMethods.Post, 
+                nameof(GenerateCourseImageUploadUrl),
+                "generate-image-upload-url",
+                HttpMethods.Post,
                 new { id = idStr }));
         }
 

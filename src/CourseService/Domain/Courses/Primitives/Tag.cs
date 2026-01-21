@@ -1,4 +1,4 @@
-﻿namespace Courses.Domain.Courses;
+﻿namespace Courses.Domain.Courses.Primitives;
 
 public readonly record struct Tag
 {

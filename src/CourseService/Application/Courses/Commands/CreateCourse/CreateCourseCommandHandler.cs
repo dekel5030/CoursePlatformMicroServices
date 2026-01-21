@@ -1,8 +1,5 @@
 ﻿using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
-using Courses.Application.Actions.Abstract;
-using Courses.Application.Courses.Dtos;
-using Courses.Application.Shared.Extensions;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;

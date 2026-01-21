@@ -1,5 +1,4 @@
-﻿using Courses.Application.Actions.Primitives;
-using Courses.Application.Shared.Dtos;
+﻿using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;

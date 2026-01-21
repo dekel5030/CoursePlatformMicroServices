@@ -3,8 +3,6 @@ using Courses.Application.Actions.Policies.CourseCollection;
 using Courses.Application.Actions.Policies.Courses;
 using Courses.Application.Actions.Policies.Lessons;
 using Courses.Application.Actions.Primitives;
-using Courses.Domain.Courses;
-using Courses.Domain.Lessons;
 using Kernel.Auth.Abstractions;
 
 namespace Courses.Application.Actions;
@@ -61,7 +59,7 @@ public sealed class CourseActionProvider : ICourseActionProvider
 
         foreach (ILessonActionRule rule in _lessonRules)
         {
-            foreach (LessonAction action in rule.Evaluate(courseContext ,lessonContext, _userContext))
+            foreach (LessonAction action in rule.Evaluate(courseContext, lessonContext, _userContext))
             {
                 actions.Add(action);
             }

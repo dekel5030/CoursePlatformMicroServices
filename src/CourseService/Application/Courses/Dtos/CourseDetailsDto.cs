@@ -1,9 +1,7 @@
-﻿using Courses.Application.Actions.Primitives;
-using Courses.Application.Lessons.Dtos;
+﻿using Courses.Application.Lessons.Dtos;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
-using Courses.Domain.Users;
 using Kernel;
 
 namespace Courses.Application.Courses.Dtos;
