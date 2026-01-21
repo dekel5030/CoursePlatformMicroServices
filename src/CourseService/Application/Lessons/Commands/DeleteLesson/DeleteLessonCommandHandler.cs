@@ -28,7 +28,7 @@ public class DeleteLessonCommandHandler : ICommandHandler<DeleteLessonCommand>
             return Result.Failure(CourseErrors.NotFound);
         }
 
-        Result deletionResult = course.DeleteLesson(request.LessonId);
+        Result deletionResult = course.RemoveLesson(request.LessonId);
         if (deletionResult.IsFailure)
         {
             return Result.Failure(deletionResult.Error);
