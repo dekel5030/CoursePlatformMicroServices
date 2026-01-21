@@ -47,7 +47,6 @@ public class Course : Entity<CourseId>
     #pragma warning restore CS8618
 
     public static Result<Course> CreateCourse(
-        TimeProvider timeProvider,
         UserId instructorId,
         Title? title = null,
         Description? description = null,
@@ -61,7 +60,6 @@ public class Course : Entity<CourseId>
             InstructorId = instructorId,
             Status = CourseStatus.Draft,
             Price = price ?? Money.Zero(),
-            UpdatedAtUtc = timeProvider.GetUtcNow()
         };
 
         return Result.Success(newCourse);
@@ -72,7 +70,7 @@ public class Course : Entity<CourseId>
     public Result CanEnroll => CoursePolicies.CanEnroll(Status);
     public Result CanPublish => CoursePolicies.CanPublish(Status, LessonCount);
 
-    public Result Publish(TimeProvider timeProvider)
+    public Result Publish()
     {
         if (CanPublish.IsFailure)
         {
@@ -80,7 +78,6 @@ public class Course : Entity<CourseId>
         }
 
         Status = CourseStatus.Published;
-        UpdatedAtUtc = timeProvider.GetUtcNow();
 
         Raise(new CoursePublished(this));
 
@@ -89,8 +86,7 @@ public class Course : Entity<CourseId>
 
     public Result<Lesson> AddLesson(
         Title? title,
-        Description? description,
-        TimeProvider timeProvider)
+        Description? description)
     {
         int index = _lessons.Count;
 
@@ -105,7 +101,6 @@ public class Course : Entity<CourseId>
 
         _lessons.Add(lesson);
         LessonCount++;
-        UpdatedAtUtc = timeProvider.GetUtcNow();
 
         return Result.Success(lesson);
     }
@@ -130,8 +125,7 @@ public class Course : Entity<CourseId>
         LessonId lessonId,
         Title? title,
         Description? description,
-        LessonAccess? access,
-        TimeProvider timeProvider)
+        LessonAccess? access)
     {
         Result policyResult = CanModify;
         if (policyResult.IsFailure)
@@ -160,8 +154,6 @@ public class Course : Entity<CourseId>
             lesson.SetAccess(access.Value);
         }
 
-        UpdatedAtUtc = timeProvider.GetUtcNow();
-
         return Result.Success();
     }
 
@@ -186,7 +178,7 @@ public class Course : Entity<CourseId>
         return Result.Success();
     }
 
-    public Result AddImage(ImageUrl imageUrl, TimeProvider timeProvider)
+    public Result AddImage(ImageUrl imageUrl)
     {
         if (_images.Contains(imageUrl))
         {
@@ -194,18 +186,13 @@ public class Course : Entity<CourseId>
         }
 
         _images.Add(imageUrl);
-        UpdatedAtUtc = timeProvider.GetUtcNow();
 
         return Result.Success();
     }
 
-    public Result RemoveImage(ImageUrl imageUrl, TimeProvider timeProvider)
+    public Result RemoveImage(ImageUrl imageUrl)
     {
-        if (_images.Remove(imageUrl))
-        {
-            UpdatedAtUtc = timeProvider.GetUtcNow();
-        }
-
+        _images.Remove(imageUrl)
         return Result.Success();
     }
 
