@@ -46,7 +46,7 @@ public class Module : Entity<ModuleId>
     {
         int index = _lessons.Count;
 
-        Result<Lesson> lessonResult = Lesson.Create(title, description, index);
+        Result<Lesson> lessonResult = Lesson.Create(Id, title, description, index);
         if (lessonResult.IsFailure)
         {
             return Result.Failure(lessonResult.Error);

@@ -14,6 +14,7 @@ public sealed record Attachment(string Name, string Url, long SizeBytes);
 public class Lesson : Entity<LessonId>
 {
     public override LessonId Id { get; protected set; }
+    public ModuleId ModuleId { get; private set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
     public LessonAccess Access { get; private set; } = LessonAccess.Private;
@@ -35,20 +36,22 @@ public class Lesson : Entity<LessonId>
     #pragma warning restore CS8618 
     #pragma warning restore S1133 
 
-    private Lesson(LessonId id, Slug slug)
+    private Lesson(ModuleId moduleId, LessonId id, Slug slug)
     {
+        ModuleId = moduleId;
         Id = id;
         Slug = slug;
     }
 
     internal static Result<Lesson> Create(
-            Title? title,
-            Description? description,
-            int index = 0)
+        ModuleId moduleId,
+        Title? title,
+        Description? description,
+        int index = 0)
     {
         var lessonId = LessonId.CreateNew();
         var slug = new Slug(lessonId.ToString());
-        var lesson = new Lesson(lessonId, slug)
+        var lesson = new Lesson(moduleId, lessonId, slug)
         {
             Title = title ?? Title.Empty,
             Description = description ?? Description.Empty,
