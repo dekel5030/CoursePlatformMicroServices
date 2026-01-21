@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Kernel;
 
-namespace Courses.Domain.Courses.Primitives;
+namespace Courses.Domain.Shared.Primitives;
 
 public sealed record Slug
 {

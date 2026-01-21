@@ -12,31 +12,32 @@ namespace Courses.Domain.Courses;
 
 public class Course : Entity<CourseId>
 {
-    private readonly List<Lesson> _lessons = new();
-    private readonly List<ImageUrl> _images = new();
-    private readonly HashSet<Tag> _tags = new();
-
     public override CourseId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
-    public UserId InstructorId { get; private set; }
-    public User? Instructor { get; private set; }
     public CourseStatus Status { get; private set; } = CourseStatus.Draft;
-    public int EnrollmentCount { get; private set; }
-    public int LessonCount { get; private set; }
-
-    public DateTimeOffset UpdatedAtUtc { get; private set; }
     public Money Price { get; private set; } = Money.Zero();
-    public IReadOnlyList<Lesson> Lessons => _lessons.AsReadOnly();
-    public IReadOnlyList<ImageUrl> Images => _images.AsReadOnly();
-
     public DifficultyLevel Difficulty { get; private set; } = DifficultyLevel.Beginner;
     public CourseCategory Category { get; private set; } = CourseCategory.Unkown;
     public Language Language { get; private set; } = Language.Hebrew;
+    public Slug Slug { get; private set; }
+
+    public UserId InstructorId { get; private set; }
+    public User? Instructor { get; private set; }
+    
+    public int EnrollmentCount { get; private set; }
+    public int LessonCount { get; private set; }
     public TimeSpan TotalDuration { get; private set; } = TimeSpan.Zero;
 
-    public Slug Slug { get; private set; }
+    public IReadOnlyList<Lesson> Lessons => _lessons.AsReadOnly();
+    public IReadOnlyList<ImageUrl> Images => _images.AsReadOnly();
     public IReadOnlyCollection<Tag> Tags => _tags;
+    public DateTimeOffset UpdatedAtUtc { get; private set; }
+
+
+    private readonly List<Lesson> _lessons = new();
+    private readonly List<ImageUrl> _images = new();
+    private readonly HashSet<Tag> _tags = new();
 
 #pragma warning disable S1133
 #pragma warning disable CS8618 
@@ -97,7 +98,7 @@ public class Course : Entity<CourseId>
     {
         int index = _lessons.Count;
 
-        Result<Lesson> lessonResult = Lesson.Create(title, description, index);
+        Result<Lesson> lessonResult = Lesson.Create(Id ,title, description, index);
 
         if (lessonResult.IsFailure)
         {
@@ -130,9 +131,11 @@ public class Course : Entity<CourseId>
 
     public Result UpdateLesson(
         LessonId lessonId,
-        Title? title,
-        Description? description,
-        LessonAccess? access)
+        Title? title = null,
+        Description? description = null,
+        LessonAccess? access = null,
+        int? index = null,
+        Slug? slug = null)
     {
         Result policyResult = CanModify;
         if (policyResult.IsFailure)
@@ -146,25 +149,16 @@ public class Course : Entity<CourseId>
             return Result.Failure(LessonErrors.NotFound);
         }
 
-        if (title is not null && title != Title)
-        {
-            lesson.SetTitle(title);
-        }
-
-        if (description is not null && description != Description)
-        {
-            lesson.SetDescription(description);
-        }
-
-        if (access is not null && access != lesson.Access)
-        {
-            lesson.SetAccess(access.Value);
-        }
+        lesson.UpdateDetails(title, description, access, index, slug);
 
         return Result.Success();
     }
 
-    public Result UpdateLessonVideo(LessonId lessonId, VideoUrl url, TimeSpan duration)
+    public Result UpdateLessonMedia(
+        LessonId lessonId,
+        VideoUrl? videoUrl = null,
+        ImageUrl? imageUrl = null,
+        TimeSpan? duration = null)
     {
         Lesson? lesson = _lessons.FirstOrDefault(x => x.Id == lessonId);
         if (lesson is null)
@@ -173,7 +167,7 @@ public class Course : Entity<CourseId>
         }
 
         TimeSpan previousDuration = lesson.Duration;
-        Result updateResult = lesson.UpdateVideoData(url, duration);
+        Result updateResult = lesson.UpdateMedia(imageUrl, videoUrl, duration);
 
         if (updateResult.IsFailure)
         {
