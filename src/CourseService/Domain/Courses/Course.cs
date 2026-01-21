@@ -27,24 +27,22 @@ public class Course : Entity<CourseId>
     
     public int EnrollmentCount { get; private set; }
     public int LessonCount { get; private set; }
+    public int Views { get; private set; }
     public TimeSpan TotalDuration { get; private set; } = TimeSpan.Zero;
 
-    public IReadOnlyList<Lesson> Lessons => _lessons.AsReadOnly();
-    public IReadOnlyList<ImageUrl> Images => _images.AsReadOnly();
     public IReadOnlyCollection<Tag> Tags => _tags;
     public DateTimeOffset UpdatedAtUtc { get; private set; }
 
 
-    private readonly List<Lesson> _lessons = new();
     private readonly List<ImageUrl> _images = new();
     private readonly HashSet<Tag> _tags = new();
 
-#pragma warning disable S1133
-#pragma warning disable CS8618 
+    #pragma warning disable S1133
+    #pragma warning disable CS8618 
     [Obsolete("This constructor is for EF Core only.", error: true)]
     private Course() { }
-#pragma warning restore CS8618 
-#pragma warning restore S1133 
+    #pragma warning restore CS8618 
+    #pragma warning restore S1133 
 
     private Course(CourseId id, UserId instructorId, Slug slug)
     {
@@ -88,93 +86,6 @@ public class Course : Entity<CourseId>
         Status = CourseStatus.Published;
 
         Raise(new CoursePublished(this));
-
-        return Result.Success();
-    }
-
-    public Result<Lesson> AddLesson(
-        Title? title,
-        Description? description)
-    {
-        int index = _lessons.Count;
-
-        Result<Lesson> lessonResult = Lesson.Create(Id ,title, description, index);
-
-        if (lessonResult.IsFailure)
-        {
-            return Result.Failure<Lesson>(lessonResult.Error);
-        }
-
-        Lesson lesson = lessonResult.Value;
-
-        _lessons.Add(lesson);
-        LessonCount++;
-
-        return Result.Success(lesson);
-    }
-
-    public Result RemoveLesson(LessonId lessonId)
-    {
-        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
-
-        if (lesson is null)
-        {
-            return Result.Failure<Course>(LessonErrors.NotFound);
-        }
-
-        _lessons.Remove(lesson);
-        LessonCount--;
-        Raise(new CourseLessonDeleted(this, lesson));
-
-        return Result.Success();
-    }
-
-    public Result UpdateLesson(
-        LessonId lessonId,
-        Title? title = null,
-        Description? description = null,
-        LessonAccess? access = null,
-        int? index = null,
-        Slug? slug = null)
-    {
-        Result policyResult = CanModify;
-        if (policyResult.IsFailure)
-        {
-            return policyResult;
-        }
-
-        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
-        if (lesson is null)
-        {
-            return Result.Failure(LessonErrors.NotFound);
-        }
-
-        lesson.UpdateDetails(title, description, access, index, slug);
-
-        return Result.Success();
-    }
-
-    public Result UpdateLessonMedia(
-        LessonId lessonId,
-        VideoUrl? videoUrl = null,
-        ImageUrl? imageUrl = null,
-        TimeSpan? duration = null)
-    {
-        Lesson? lesson = _lessons.FirstOrDefault(x => x.Id == lessonId);
-        if (lesson is null)
-        {
-            return Result.Failure(LessonErrors.NotFound);
-        }
-
-        TimeSpan previousDuration = lesson.Duration;
-        Result updateResult = lesson.UpdateMedia(imageUrl, videoUrl, duration);
-
-        if (updateResult.IsFailure)
-        {
-            return updateResult;
-        }
-
-        TotalDuration = TotalDuration - previousDuration + lesson.Duration;
 
         return Result.Success();
     }

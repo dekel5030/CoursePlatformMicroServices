@@ -18,11 +18,12 @@ public class EnrollmentManager
         UserId studentId,
         TimeSpan validFor)
     {
+        DateTimeOffset currentTime = _timeProvider.GetUtcNow();
         Result<Enrollment> enrollmentResult = Enrollment.Create(
             course.Id,
             studentId,
-            _timeProvider,
-            validFor);
+            currentTime,
+            currentTime + validFor);
 
         if (enrollmentResult.IsFailure)
         {

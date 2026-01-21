@@ -2,6 +2,7 @@
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Events;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Module.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
@@ -21,45 +22,42 @@ public class Lesson : Entity<LessonId>
     public TimeSpan Duration { get; private set; } = TimeSpan.Zero;
     public Slug Slug { get; private set; }
 
-    public CourseId CourseId { get; private set; }
-    public Course Course { get; private set; } = null!;
     public int Index { get; private set; }
 
     public IReadOnlyList<Attachment> Attachments => _attachments.AsReadOnly();
 
     private readonly List<Attachment> _attachments = new();
 
-#pragma warning disable S1133
-#pragma warning disable CS8618 
+    #pragma warning disable S1133
+    #pragma warning disable CS8618 
     [Obsolete("This constructor is for EF Core only.", error: true)]
     private Lesson() { }
-#pragma warning restore CS8618 
-#pragma warning restore S1133 
+    #pragma warning restore CS8618 
+    #pragma warning restore S1133 
 
-    private Lesson(CourseId courseId, LessonId id, Slug slug)
+    private Lesson(LessonId id, Slug slug)
     {
         Id = id;
-        CourseId = courseId;
         Slug = slug;
     }
 
     internal static Result<Lesson> Create(
-        CourseId courseId,
-        Title? title,
-        Description? description,
-        int index = 0)
+            Title? title,
+            Description? description,
+            int index = 0)
     {
         var lessonId = LessonId.CreateNew();
         var slug = new Slug(lessonId.ToString());
-        var newLesson = new Lesson(courseId, lessonId, slug)
+        var lesson = new Lesson(lessonId, slug)
         {
             Title = title ?? Title.Empty,
             Description = description ?? Description.Empty,
             Index = index,
         };
 
-        return Result.Success(newLesson);
+        return Result.Success(lesson);
     }
+
 
     internal Result UpdateDetails(
         Title? title = null,
