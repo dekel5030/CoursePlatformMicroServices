@@ -13,7 +13,6 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
     {
         builder.ToTable("Lessons");
         builder.HasKey(lesson => lesson.Id);
-        builder.HasIndex(l => new { l.CourseId, l.Index }).IsUnique();
 
         builder.Property(lesson => lesson.Id)
             .HasConversion(
@@ -32,19 +31,6 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
 
         builder.Property(lesson => lesson.Access)
             .HasConversion<string>();
-
-        builder.Property(lesson => lesson.Status)
-            .HasConversion<string>();
-
-        builder.Property(lesson => lesson.CourseId)
-            .HasConversion(
-                id => id.Value,
-                value => new CourseId(value));
-
-        builder.HasOne(lesson => lesson.Course)
-            .WithMany(course => course.Lessons)
-            .HasForeignKey(lesson => lesson.CourseId)
-            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(l => l.ThumbnailImageUrl)
             .HasConversion(
