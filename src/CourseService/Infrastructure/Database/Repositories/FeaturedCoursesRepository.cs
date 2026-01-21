@@ -26,7 +26,6 @@ public class FeaturedCoursesRepository : IFeaturedCoursesRepository
     public async Task<IReadOnlyList<Course>> GetFeaturedCourse()
     {
         List<Course> course = await _dbContext.Courses
-            .Include(c => c.Instructor)
             .Where(course => _featuredCourseIds.Contains(course.Id)).ToListAsync();
 
         return course.AsReadOnly();
