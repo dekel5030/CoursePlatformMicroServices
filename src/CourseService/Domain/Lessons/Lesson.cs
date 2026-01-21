@@ -25,9 +25,6 @@ public class Lesson : Entity<LessonId>
     public VideoUrl? VideoUrl { get; private set; }
     public TimeSpan Duration { get; private set; }
 
-    public DifficultyLevel Difficulty { get; private set; }
-    public CourseCategory Category { get; private set; }
-    public Language Language { get; private set; }
     public TimeSpan TotalDuration { get; private set; }
 
     private Lesson() { }

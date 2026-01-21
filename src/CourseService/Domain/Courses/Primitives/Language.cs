@@ -1,6 +1,6 @@
 ﻿namespace Courses.Domain.Courses.Primitives;
 
-public readonly record struct Language
+public sealed record Language
 {
     public string Code { get; }
     private Language(string code)

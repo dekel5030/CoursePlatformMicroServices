@@ -21,7 +21,7 @@ public class Course : Entity<CourseId>
     public Description Description { get; private set; } = Description.Empty;
     public UserId InstructorId { get; private set; }
     public User? Instructor { get; private set; }
-    public CourseStatus Status { get; private set; }
+    public CourseStatus Status { get; private set; } = CourseStatus.Draft;
     public int EnrollmentCount { get; private set; }
     public int LessonCount { get; private set; }
 
@@ -30,18 +30,27 @@ public class Course : Entity<CourseId>
     public IReadOnlyList<Lesson> Lessons => _lessons.AsReadOnly();
     public IReadOnlyList<ImageUrl> Images => _images.AsReadOnly();
 
-    public DifficultyLevel Difficulty { get; private set; }
-    public CourseCategory Category { get; private set; }
-    public Language Language { get; private set; }
-    public TimeSpan TotalDuration { get; private set; }
+    public DifficultyLevel Difficulty { get; private set; } = DifficultyLevel.Beginner;
+    public CourseCategory Category { get; private set; } = CourseCategory.Unkown;
+    public Language Language { get; private set; } = Language.Hebrew;
+    public TimeSpan TotalDuration { get; private set; } = TimeSpan.Zero;
 
     public Slug Slug { get; private set; }
     public IReadOnlyCollection<Tag> Tags => _tags;
 
-
-#pragma warning disable CS8618
+#pragma warning disable S1133
+#pragma warning disable CS8618 
+    [Obsolete("This constructor is for EF Core only.", error: true)]
     private Course() { }
-#pragma warning restore CS8618
+#pragma warning restore CS8618 
+#pragma warning restore S1133 
+
+    private Course(CourseId id, UserId instructorId, Slug slug)
+    {
+        Id = id;
+        InstructorId = instructorId;
+        Slug = slug;
+    }
 
     public static Result<Course> CreateCourse(
         UserId instructorId,
@@ -49,9 +58,10 @@ public class Course : Entity<CourseId>
         Description? description = null,
         Money? price = null)
     {
-        var newCourse = new Course
+        var courseId = CourseId.CreateNew();
+        var slug = new Slug(courseId.ToString());
+        var newCourse = new Course(courseId, instructorId, slug)
         {
-            Id = CourseId.CreateNew(),
             Title = title ?? Title.Empty,
             Description = description ?? Description.Empty,
             InstructorId = instructorId,
@@ -136,17 +146,17 @@ public class Course : Entity<CourseId>
             return Result.Failure(LessonErrors.NotFound);
         }
 
-        if (title.HasValue)
+        if (title is not null && title != Title)
         {
-            lesson.SetTitle(title.Value);
+            lesson.SetTitle(title);
         }
 
-        if (description.HasValue)
+        if (description is not null && description != Description)
         {
-            lesson.SetDescription(description.Value);
+            lesson.SetDescription(description);
         }
 
-        if (access.HasValue)
+        if (access is not null && access != lesson.Access)
         {
             lesson.SetAccess(access.Value);
         }
@@ -203,14 +213,14 @@ public class Course : Entity<CourseId>
             return CanModify;
         }
 
-        if (title.HasValue && title.Value != Title)
+        if (title is not null && title != Title)
         {
-            Title = title.Value;
+            Title = title;
         }
 
-        if (description.HasValue && description.Value != Description)
+        if (description is not null && description != Description)
         {
-            Description = description.Value;
+            Description = description;
         }
 
         if (price is not null && price != Price)
@@ -233,24 +243,24 @@ public class Course : Entity<CourseId>
             return CanModify;
         }
 
-        if (difficulty.HasValue && difficulty.Value != Difficulty)
+        if (difficulty is not null && difficulty != Difficulty)
         {
             Difficulty = difficulty.Value;
         }
 
-        if (category.HasValue && category.Value != Category)
+        if (category is not null && category != Category)
         {
-            Category = category.Value;
+            Category = category;
         }
 
-        if (language.HasValue && language.Value != Language)
+        if (language is not null && language != Language)
         {
-            Language = language.Value;
+            Language = language;
         }
 
-        if (slug.HasValue && slug.Value != Slug)
+        if (slug is not null && slug != Slug)
         {
-            Slug = slug.Value;
+            Slug = slug;
         }
 
         if (tags is not null)
