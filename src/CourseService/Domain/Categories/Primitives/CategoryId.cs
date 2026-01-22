@@ -1,4 +1,4 @@
-﻿namespace Courses.Domain.Categories;
+﻿namespace Courses.Domain.Categories.Primitives;
 
 public sealed record CategoryId(Guid Value)
 {

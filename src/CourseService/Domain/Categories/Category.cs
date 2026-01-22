@@ -1,4 +1,5 @@
-﻿using Courses.Domain.Shared;
+﻿using Courses.Domain.Categories.Primitives;
+using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 

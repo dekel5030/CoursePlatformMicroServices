@@ -1,5 +1,6 @@
 ﻿using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Categories;
+using Courses.Domain.Categories.Primitives;
 
 namespace Courses.Infrastructure.Database.Repositories;
 

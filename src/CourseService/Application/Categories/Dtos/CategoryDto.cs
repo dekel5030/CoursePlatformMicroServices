@@ -1,4 +1,4 @@
-using Courses.Domain.Categories;
+using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Shared.Primitives;
 
 namespace Courses.Application.Categories.Dtos;

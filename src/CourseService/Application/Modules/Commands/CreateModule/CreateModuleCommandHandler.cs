@@ -1,3 +1,4 @@
+using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
@@ -34,7 +35,9 @@ internal sealed class CreateModuleCommandHandler : ICommandHandler<CreateModuleC
             return Result.Failure<CreateModuleResponse>(CourseErrors.NotFound);
         }
 
-        var existingModules = await _moduleRepository.GetAllByCourseIdAsync(request.CourseId, cancellationToken);
+        IReadOnlyList<Module> existingModules = await _moduleRepository
+            .GetAllByCourseIdAsync(request.CourseId, cancellationToken);
+        
         int nextIndex = existingModules.Count;
 
         Result<Module> moduleResult = Module.Create(request.CourseId, nextIndex, request.Title);

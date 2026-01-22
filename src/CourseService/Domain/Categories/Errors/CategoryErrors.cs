@@ -1,6 +1,6 @@
 ﻿using Kernel;
 
-namespace Courses.Application.Categories.Errors;
+namespace Courses.Domain.Categories.Errors;
 
 internal static class CategoryErrors
 {
