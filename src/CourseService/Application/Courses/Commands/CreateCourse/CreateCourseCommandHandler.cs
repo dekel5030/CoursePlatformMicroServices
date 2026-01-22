@@ -13,18 +13,15 @@ namespace Courses.Application.Courses.Commands.CreateCourse;
 internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseCommand, CreateCourseResponse>
 {
     private readonly ICourseRepository _courseRepository;
-    private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserContext _userContext;
 
     public CreateCourseCommandHandler(
         ICourseRepository courseRepository,
-        ICategoryRepository categoryRepository,
         IUnitOfWork unitOfWork,
         IUserContext userContext)
     {
         _courseRepository = courseRepository;
-        _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
         _userContext = userContext;
     }
