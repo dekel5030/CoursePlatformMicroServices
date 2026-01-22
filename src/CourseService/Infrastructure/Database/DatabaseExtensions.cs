@@ -53,6 +53,7 @@ internal static class DatabaseExtensions
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IModuleRepository, ModulesRepository>();
+        services.AddScoped<ISqlConnectionFactory, SqlConnectionFactory>();
 
         return services;
     }

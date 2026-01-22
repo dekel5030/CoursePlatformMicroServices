@@ -1,7 +1,4 @@
-﻿using Courses.Domain.Courses;
-using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Events;
-using Courses.Domain.Lessons.Primitives;
+﻿using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Module.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
@@ -29,12 +26,12 @@ public class Lesson : Entity<LessonId>
 
     private readonly List<Attachment> _attachments = new();
 
-    #pragma warning disable S1133
-    #pragma warning disable CS8618 
+#pragma warning disable S1133
+#pragma warning disable CS8618
     [Obsolete("This constructor is for EF Core only.", error: true)]
     private Lesson() { }
-    #pragma warning restore CS8618 
-    #pragma warning restore S1133 
+#pragma warning restore CS8618
+#pragma warning restore S1133
 
     private Lesson(ModuleId moduleId, LessonId id, Slug slug)
     {

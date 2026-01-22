@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Kernel;
 
 namespace Courses.Domain.Shared.Primitives;
 

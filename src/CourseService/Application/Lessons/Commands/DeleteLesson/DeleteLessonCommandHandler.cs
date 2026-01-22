@@ -1,5 +1,4 @@
-﻿using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Repositories;
+﻿using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Module;
 using Kernel;
 using Kernel.Messaging.Abstractions;

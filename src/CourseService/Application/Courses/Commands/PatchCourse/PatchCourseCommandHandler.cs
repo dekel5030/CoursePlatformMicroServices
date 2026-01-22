@@ -1,8 +1,6 @@
-using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
-using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -14,7 +12,7 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
     private readonly IUnitOfWork _unitOfWork;
 
     public PatchCourseCommandHandler(
-        ICourseRepository courseRepository, 
+        ICourseRepository courseRepository,
         IUnitOfWork unitOfWork)
     {
         _courseRepository = courseRepository;

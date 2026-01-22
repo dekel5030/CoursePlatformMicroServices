@@ -24,12 +24,12 @@ public class Enrollment : Entity<EnrollmentId>
 
     private readonly HashSet<LessonId> _completedLessons = new();
 
-    #pragma warning disable S1133
-    #pragma warning disable CS8618
+#pragma warning disable S1133
+#pragma warning disable CS8618
     [Obsolete("This constructor is for EF Core only.", error: true)]
     private Enrollment() { }
-    #pragma warning restore CS8618
-    #pragma warning restore S1133
+#pragma warning restore CS8618
+#pragma warning restore S1133
 
     private Enrollment(EnrollmentId id, CourseId courseId, UserId studentId)
     {
@@ -60,7 +60,7 @@ public class Enrollment : Entity<EnrollmentId>
     {
         LastAccessedLessonId = lessonId;
         LastAccessedAt = DateTimeOffset.UtcNow;
-        
+
         if (!_completedLessons.Add(lessonId))
         {
             return;

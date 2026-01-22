@@ -1,4 +1,3 @@
-using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Module;
 using Kernel;

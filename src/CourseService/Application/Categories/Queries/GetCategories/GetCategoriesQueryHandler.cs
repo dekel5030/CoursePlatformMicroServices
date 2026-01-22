@@ -1,29 +1,48 @@
+using System.Data;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Categories.Dtos;
+using Courses.Application.Shared.Dtos;
+using Courses.Domain.Categories;
+using Courses.Domain.Shared.Primitives;
+using Dapper;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Categories.Queries.GetCategories;
 
 internal sealed class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQuery, IReadOnlyList<CategoryDto>>
 {
-    private readonly IReadDbContext _dbContext;
+    private readonly ISqlConnectionFactory _connectionFactory;
 
-    public GetCategoriesQueryHandler(IReadDbContext dbContext)
+    public GetCategoriesQueryHandler(ISqlConnectionFactory connectionFactory)
     {
-        _dbContext = dbContext;
+        _connectionFactory = connectionFactory;
     }
 
     public async Task<Result<IReadOnlyList<CategoryDto>>> Handle(
         GetCategoriesQuery request,
         CancellationToken cancellationToken = default)
     {
-        var categories = await _dbContext.Categories
-            .OrderBy(c => c.Name)
-            .Select(c => new CategoryDto(c.Id, c.Name, c.Slug))
-            .ToListAsync(cancellationToken);
+        using IDbConnection connection = _connectionFactory.CreateConnection();
 
-        return Result.Success<IReadOnlyList<CategoryDto>>(categories);
+        const string sql = @"
+            SELECT 
+                id,
+                name,
+                slug
+            FROM categories
+            ORDER BY name";
+
+        IEnumerable<CategoryRow> categories = await connection.QueryAsync<CategoryRow>(
+            new CommandDefinition(sql, cancellationToken: cancellationToken));
+
+        List<CategoryDto> categoryDtos = categories
+            .Select(c => new CategoryDto(
+                new CategoryId(c.Id),
+                c.Name,
+                new Slug(c.Slug)))
+            .ToList();
+
+        return Result.Success<IReadOnlyList<CategoryDto>>(categoryDtos);
     }
 }

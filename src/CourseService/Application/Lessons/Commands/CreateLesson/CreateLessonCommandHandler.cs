@@ -1,10 +1,6 @@
-using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
-using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
-using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Module;
-using Courses.Domain.Module.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -48,6 +44,7 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, C
 
         return Result.Success(new CreateLessonResponse(
             module.CourseId,
+            module.Id,
             lesson.Id,
             lesson.Title));
     }

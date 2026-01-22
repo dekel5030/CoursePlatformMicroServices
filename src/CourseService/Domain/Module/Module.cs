@@ -1,5 +1,4 @@
-﻿using Courses.Domain.Courses;
-using Courses.Domain.Courses.Primitives;
+﻿using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
@@ -21,12 +20,12 @@ public class Module : Entity<ModuleId>
 
     private readonly List<Lesson> _lessons = new();
 
-    #pragma warning disable S1133
-    #pragma warning disable CS8618
+#pragma warning disable S1133
+#pragma warning disable CS8618
     [Obsolete("This constructor is for EF Core only.", error: true)]
     private Module() { }
-    #pragma warning restore CS8618
-    #pragma warning restore S1133
+#pragma warning restore CS8618
+#pragma warning restore S1133
 
     private Module(CourseId courseId, int index, Title title)
     {
@@ -36,7 +35,7 @@ public class Module : Entity<ModuleId>
         Title = title;
     }
 
-    internal static Result<Module> Create(CourseId courseId, int index, Title? title = null)
+    public static Result<Module> Create(CourseId courseId, int index, Title? title = null)
     {
         var module = new Module(courseId, index, title ?? Title.Empty);
         return Result.Success(module);

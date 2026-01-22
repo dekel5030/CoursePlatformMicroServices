@@ -40,16 +40,8 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
             return Result.Failure<CreateCourseResponse>(CourseErrors.Unauthorized);
         }
 
-        Category? category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken);
-        if (category is null)
-        {
-            return Result.Failure<CreateCourseResponse>(
-                Error.NotFound("Category.NotFound", "The specified category was not found."));
-        }
-
         Result<Course> courseResult = Course.CreateCourse(
             instructorId,
-            request.CategoryId,
             request.Title,
             request.Description);
 

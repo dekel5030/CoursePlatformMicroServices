@@ -1,24 +1,27 @@
+using System.Data;
+using System.Text.Json;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
-using Courses.Domain.Courses;
+using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Shared.Primitives;
+using Dapper;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Queries.GetCourses;
 
 internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, CourseCollectionDto>
 {
-    private readonly IReadDbContext _dbContext;
+    private readonly ISqlConnectionFactory _connectionFactory;
     private readonly IStorageUrlResolver _urlResolver;
 
     public GetCoursesQueryHandler(
-        IReadDbContext dbContext,
+        ISqlConnectionFactory connectionFactory,
         IStorageUrlResolver urlResolver)
     {
-        _dbContext = dbContext;
+        _connectionFactory = connectionFactory;
         _urlResolver = urlResolver;
     }
 
@@ -29,47 +32,94 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
         int pageNumber = Math.Max(1, request.PagedQuery.PageNumber ?? 1);
         int pageSize = Math.Clamp(request.PagedQuery.PageSize ?? 10, 1, 100);
 
-        DbSet<Course> baseQuery = _dbContext.Courses;
+        using IDbConnection connection = _connectionFactory.CreateConnection();
 
-        int totalItems = await baseQuery.CountAsync(cancellationToken);
+        // Count total items
+        const string countSql = "SELECT COUNT(*) FROM courses";
+        int totalItems = await connection.QuerySingleAsync<int>(
+            new CommandDefinition(countSql, cancellationToken: cancellationToken));
 
-        List<Course> coursesData = await _dbContext.Courses
-            .Include(c => c.Instructor)
-            .OrderByDescending(c => c.UpdatedAtUtc)
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
+        // Get paginated courses with instructor info in a single query
+        const string coursesSql = @"
+            SELECT 
+                c.id,
+                c.title,
+                c.status,
+                c.price_amount AS PriceAmount,
+                c.price_currency AS PriceCurrency,
+                c.enrollment_count AS EnrollmentCount,
+                c.lesson_count AS LessonCount,
+                c.updated_at_utc AS UpdatedAtUtc,
+                c.instructor_id AS InstructorId,
+                c.course_images AS CourseImages,
+                u.first_name AS FirstName,
+                u.last_name AS LastName,
+                u.avatar_url AS AvatarUrl
+            FROM courses c
+            LEFT JOIN users u ON c.instructor_id = u.id
+            ORDER BY c.updated_at_utc DESC
+            LIMIT @PageSize OFFSET @Offset";
 
-        var courseIds = coursesData.Select(c => c.Id).ToList();
-        var modules = await _dbContext.Modules
-            .Where(m => courseIds.Contains(m.CourseId))
-            .Include(m => m.Lessons)
-            .ToListAsync(cancellationToken);
+        int offset = (pageNumber - 1) * pageSize;
 
-        var modulesByCourse = modules
-            .GroupBy(m => m.CourseId)
-            .ToDictionary(g => g.Key, g => g.ToList());
+        IEnumerable<CourseSummaryRow> coursesData = await connection.QueryAsync<CourseSummaryRow>(
+            new CommandDefinition(
+                coursesSql,
+                new { PageSize = pageSize, Offset = offset },
+                cancellationToken: cancellationToken));
 
-        List<CourseSummaryDto> courses = coursesData.Select(course =>
+        List<CourseSummaryRow> coursesList = coursesData.ToList();
+
+        if (coursesList.Count == 0)
         {
-            var courseModules = modulesByCourse.GetValueOrDefault(course.Id, new List<Domain.Module.Module>());
-            var lessonCount = courseModules.SelectMany(m => m.Lessons).Count();
+            return Result.Success(new CourseCollectionDto(
+                new List<CourseSummaryDto>(),
+                pageNumber,
+                pageSize,
+                totalItems));
+        }
+
+        // Get lesson counts for all courses in a single query using aggregation
+        List<Guid> courseIds = coursesList.Select(c => c.Id).ToList();
+
+        const string lessonCountsSql = @"
+            SELECT 
+                m.course_id AS CourseId,
+                COUNT(l.id) AS LessonCount
+            FROM modules m
+            LEFT JOIN lessons l ON m.id = l.module_id
+            WHERE m.course_id = ANY(@CourseIds)
+            GROUP BY m.course_id";
+
+        var lessonCounts = await connection.QueryAsync<LessonCountRow>(
+            new CommandDefinition(lessonCountsSql, new { CourseIds = courseIds.ToArray() }, cancellationToken: cancellationToken));
+
+        var lessonCountsByCourse = lessonCounts.ToDictionary(lc => lc.CourseId, lc => lc.LessonCount);
+
+        List<CourseSummaryDto> courses = coursesList.Select(course =>
+        {
+            int lessonCount = lessonCountsByCourse.GetValueOrDefault(course.Id, course.LessonCount);
+
+            string? thumbnailUrl = course.CourseImages != null
+                ? JsonSerializer.Deserialize<List<ImageUrlData>>(course.CourseImages)
+                    ?.FirstOrDefault()?.Path
+                : null;
 
             return new CourseSummaryDto(
-                course.Id,
-                course.Title,
+                new CourseId(course.Id),
+                new Title(course.Title),
                 new InstructorDto(
-                    course.InstructorId,
-                    $"{course.Instructor!.FirstName} {course.Instructor.LastName}",
-                    course.Instructor.AvatarUrl
-                ),
-                course.Status,
-                course.Price,
-                course.Images.Select(i => i.Path).FirstOrDefault(),
+                    new UserId(course.InstructorId),
+                    course.FirstName != null && course.LastName != null
+                        ? $"{course.FirstName} {course.LastName}"
+                        : "Unknown",
+                    course.AvatarUrl),
+                Enum.Parse<CourseStatus>(course.Status, ignoreCase: true),
+                new Money(course.PriceAmount, course.PriceCurrency),
+                thumbnailUrl,
                 lessonCount,
                 course.EnrollmentCount,
-                course.UpdatedAtUtc
-            );
+                course.UpdatedAtUtc);
         }).ToList();
 
         courses = courses.Select(course => course.EnrichWithUrls(_urlResolver)).ToList();
@@ -82,4 +132,25 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
 
         return Result.Success(response);
     }
+
+    private sealed record CourseSummaryRow(
+        Guid Id,
+        string Title,
+        string Status,
+        decimal PriceAmount,
+        string PriceCurrency,
+        int EnrollmentCount,
+        int LessonCount,
+        DateTimeOffset UpdatedAtUtc,
+        Guid InstructorId,
+        string? CourseImages,
+        string? FirstName,
+        string? LastName,
+        string? AvatarUrl
+    );
+
+    private sealed record LessonCountRow(
+        Guid CourseId,
+        int LessonCount
+    );
 }

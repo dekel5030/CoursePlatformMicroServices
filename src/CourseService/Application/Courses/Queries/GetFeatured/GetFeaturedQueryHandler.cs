@@ -1,8 +1,8 @@
 using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses;
+using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -27,7 +27,7 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, CourseCol
     {
         IReadOnlyList<Course> courses = await _featuredCoursesProvider.GetFeaturedCourse();
 
-        var courseIds = courses.Select(c => c.Id).ToList();
+        List<CourseId> courseIds = courses.Select(c => c.Id).ToList();
         // Note: This query assumes modules are already loaded or we need to query them separately
         // For now, using LessonCount from course domain
         var courseDtos = courses.Select(course =>

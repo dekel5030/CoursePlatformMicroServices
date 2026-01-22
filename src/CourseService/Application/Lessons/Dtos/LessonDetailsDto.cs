@@ -1,5 +1,4 @@
 using Courses.Application.Actions;
-using Courses.Application.Lessons.Primitives;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Module.Primitives;
@@ -18,6 +17,5 @@ public record LessonDetailsDto(
     TimeSpan Duration,
     string? ThumbnailUrl,
     LessonAccess Access,
-    LessonStatus Status,
     string? VideoUrl
 );

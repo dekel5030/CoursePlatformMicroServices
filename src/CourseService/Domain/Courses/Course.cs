@@ -1,12 +1,8 @@
 ﻿using Courses.Domain.Categories;
 using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons;
-using Courses.Domain.Lessons.Errors;
-using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
-using Courses.Domain.Users;
 using Kernel;
 
 namespace Courses.Domain.Courses;
@@ -23,7 +19,7 @@ public class Course : Entity<CourseId>
     public Slug Slug { get; private set; }
 
     public UserId InstructorId { get; private set; }
-    public CategoryId CategoryId { get; private set; }
+    public CategoryId CategoryId { get; private set; } = new CategoryId(Guid.Empty);
 
     public int EnrollmentCount { get; private set; }
     public int LessonCount { get; private set; }
@@ -38,31 +34,29 @@ public class Course : Entity<CourseId>
     private readonly List<ImageUrl> _images = new();
     private readonly HashSet<Tag> _tags = new();
 
-    #pragma warning disable S1133
-    #pragma warning disable CS8618 
+#pragma warning disable S1133
+#pragma warning disable CS8618
     [Obsolete("This constructor is for EF Core only.", error: true)]
     private Course() { }
-    #pragma warning restore CS8618 
-    #pragma warning restore S1133 
+#pragma warning restore CS8618
+#pragma warning restore S1133
 
-    private Course(CourseId id, UserId instructorId, CategoryId categoryId, Slug slug)
+    private Course(CourseId id, UserId instructorId, Slug slug)
     {
         Id = id;
         InstructorId = instructorId;
-        CategoryId = categoryId;
         Slug = slug;
     }
 
     public static Result<Course> CreateCourse(
         UserId instructorId,
-        CategoryId categoryId,
         Title? title = null,
         Description? description = null,
         Money? price = null)
     {
         var courseId = CourseId.CreateNew();
         var slug = new Slug(courseId.ToString());
-        var newCourse = new Course(courseId, instructorId, categoryId, slug)
+        var newCourse = new Course(courseId, instructorId, slug)
         {
             Title = title ?? Title.Empty,
             Description = description ?? Description.Empty,
