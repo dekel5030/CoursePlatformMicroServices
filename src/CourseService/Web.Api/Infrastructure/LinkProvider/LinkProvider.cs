@@ -1,10 +1,15 @@
 using Courses.Api.Endpoints.Courses;
 using Courses.Api.Endpoints.Lessons;
+using Courses.Api.Endpoints.Modules;
+using Courses.Api.Endpoints.Categories;
 using Courses.Application.Actions;
 using Courses.Application.Actions.Abstract;
 using Courses.Application.Actions.Primitives;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
+using Courses.Domain.Categories.Primitives;
+using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Module.Primitives;
 
 namespace Courses.Api.Infrastructure.LinkProvider;
 
@@ -163,5 +168,42 @@ internal sealed class LinkProvider
         }
 
         return links;
+    }
+
+    public List<LinkDto> CreateModuleLinks(CourseId courseId, ModuleId _)
+    {
+        var links = new List<LinkDto>();
+        string courseIdStr = courseId.ToString();
+
+        links.Add(Create(nameof(GetModulesByCourseId), "self", HttpMethods.Get, new { courseId = courseIdStr }));
+
+        return links;
+    }
+
+    public List<LinkDto> CreateModuleCollectionLinks(CourseId courseId)
+    {
+        var links = new List<LinkDto>();
+        string courseIdStr = courseId.ToString();
+
+        links.Add(Create(nameof(GetModulesByCourseId), "self", HttpMethods.Get, new { courseId = courseIdStr }));
+        links.Add(Create(nameof(CreateModule), "create", HttpMethods.Post, new { courseId = courseIdStr }));
+
+        return links;
+    }
+
+    public List<LinkDto> CreateCategoryLinks(CategoryId _)
+    {
+        return
+        [
+            Create(nameof(GetCategories), "self", HttpMethods.Get)
+        ];
+    }
+
+    public List<LinkDto> CreateCategoryCollectionLinks()
+    {
+        return
+        [
+            Create(nameof(GetCategories), "self", HttpMethods.Get)
+        ];
     }
 }

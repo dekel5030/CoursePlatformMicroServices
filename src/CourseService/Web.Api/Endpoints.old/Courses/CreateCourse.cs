@@ -1,4 +1,4 @@
-using CoursePlatform.ServiceDefaults.CustomResults;
+﻿using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
@@ -13,6 +13,7 @@ namespace Courses.Api.Endpoints.Courses;
 internal sealed class CreateCourse : IEndpoint
 {
     internal sealed record CreateCourseRequest(
+        Guid CategoryId,
         string? Title,
         string? Description);
 
@@ -28,8 +29,9 @@ internal sealed class CreateCourse : IEndpoint
         {
             Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
             Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
+            CategoryId categoryId = new(request.CategoryId);
 
-            var command = new CreateCourseCommand(title, description);
+            var command = new CreateCourseCommand(categoryId, title, description);
 
             Result<CreateCourseResponse> result = await mediator.Send(command, cancellationToken);
 

@@ -1,3 +1,4 @@
+﻿
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;

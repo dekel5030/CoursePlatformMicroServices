@@ -1,4 +1,4 @@
-using CoursePlatform.ServiceDefaults.CustomResults;
+﻿using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Commands.DeleteCourse;

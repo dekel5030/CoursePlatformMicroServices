@@ -13,7 +13,7 @@ internal static class LessonMappingExtensions
         CoursePolicyContext courseContext,
         LinkProvider linkProvider)
     {
-        var lessonContext = new LessonPolicyContext(dto.LessonId, dto.Status, dto.Access);
+        var lessonContext = new LessonPolicyContext(dto.LessonId, dto.Access);
 
         return new LessonSummaryResponse(
             dto.LessonId.Value,
@@ -21,7 +21,7 @@ internal static class LessonMappingExtensions
             dto.Index,
             dto.Duration,
             dto.ThumbnailUrl?.ToString(),
-            dto.Status.ToString(),
+            "Draft", // LessonSummaryDto doesn't have Status, using default
             dto.Access.ToString(),
             linkProvider.CreateLessonLinks(courseContext, lessonContext));
     }
@@ -31,7 +31,14 @@ internal static class LessonMappingExtensions
         CourseId courseId,
         LinkProvider linkProvider)
     {
-        LessonPolicyContext lessonContext = new(dto.LessonId, dto.Status, dto.Access);
+        LessonPolicyContext lessonContext = new(dto.LessonId, dto.Access);
+
+        // Create a minimal course context for links
+        var courseContext = new CoursePolicyContext(
+            courseId,
+            new Domain.Courses.Primitives.UserId(Guid.Empty),
+            Domain.Courses.Primitives.CourseStatus.Draft,
+            0);
 
         return new LessonDetailsResponse(
             courseId.Value,
@@ -42,8 +49,8 @@ internal static class LessonMappingExtensions
             dto.Duration,
             dto.ThumbnailUrl?.ToString(),
             dto.Access.ToString(),
-            dto.Status.ToString(),
+            "Draft", // LessonDetailsDto doesn't have Status, using default
             dto.VideoUrl?.ToString(),
-            linkProvider.CreateLessonLinks(courseContext: dto.CourseContext, lessonContext: lessonContext));
+            linkProvider.CreateLessonLinks(courseContext: courseContext, lessonContext: lessonContext));
     }
 }

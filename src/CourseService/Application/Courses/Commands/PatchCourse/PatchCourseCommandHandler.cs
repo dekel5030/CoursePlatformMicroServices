@@ -1,7 +1,7 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
-using Courses.Application.Categories.Errors;
 using Courses.Domain.Categories;
+using Courses.Domain.Categories.Errors;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;

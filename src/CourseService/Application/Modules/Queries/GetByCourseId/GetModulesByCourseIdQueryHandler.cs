@@ -1,7 +1,6 @@
 using System.Data;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Lessons.Dtos;
-using Courses.Application.Lessons.Primitives;
 using Courses.Application.Modules.Dtos;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;

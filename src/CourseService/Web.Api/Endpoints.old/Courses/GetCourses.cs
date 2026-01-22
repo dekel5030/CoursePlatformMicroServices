@@ -1,4 +1,4 @@
-using CoursePlatform.ServiceDefaults.CustomResults;
+﻿using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Contracts.Courses;
 using Courses.Api.Contracts.Shared;

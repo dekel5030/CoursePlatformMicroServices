@@ -1,8 +1,5 @@
-using Courses.Application.Lessons.Primitives;
-
 namespace Courses.Application.Shared.Dtos;
 
-// Shared row types for Dapper queries across the application layer
 
 public sealed record CourseRow(
     Guid Id,

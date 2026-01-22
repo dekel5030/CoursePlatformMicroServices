@@ -1,6 +1,5 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Endpoints.Modules;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Lessons.Commands.CreateLesson;
@@ -15,7 +14,7 @@ internal sealed class CreateLesson : IEndpoint
 {
     internal sealed record CreateLessonRequest(string? Title, string? Description);
 
-    private sealed record CreateResponse(Guid ModuleId, Guid CourseId, string Title);
+    private sealed record CreateResponse(Guid LessonId, string Title);
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -38,9 +37,9 @@ internal sealed class CreateLesson : IEndpoint
 
             return result.Match(
                 lessonDto => Results.CreatedAtRoute(
-                    nameof(GetModulesByCourseId),
-                    new { courseId = lessonDto.CourseId.Value },
-                    new CreateResponse(lessonDto.ModuleId.Value, lessonDto.CourseId.Value, "Lesson")
+                    nameof(GetLessonById),
+                    new { moduleId = lessonDto.ModuleId.Value, lessonId = lessonDto.LessonId.Value },
+                    new CreateResponse(lessonDto.LessonId.Value, lessonDto.Title.Value)
                 ),
                 CustomResults.Problem);
         })

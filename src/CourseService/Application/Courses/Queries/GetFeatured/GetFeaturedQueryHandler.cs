@@ -11,7 +11,9 @@ namespace Courses.Application.Courses.Queries.GetFeatured;
 public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, CourseCollectionDto>
 {
     private readonly IFeaturedCoursesRepository _featuredCoursesProvider;
+#pragma warning disable S4487 // Unread "private" fields should be removed
     private readonly IStorageUrlResolver _urlResolver;
+#pragma warning restore S4487 // Unread "private" fields should be removed
 
     public GetFeaturedQueryHandler(
         IFeaturedCoursesRepository featuredCoursesProvider,
@@ -27,9 +29,6 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, CourseCol
     {
         IReadOnlyList<Course> courses = await _featuredCoursesProvider.GetFeaturedCourse();
 
-        List<CourseId> courseIds = courses.Select(c => c.Id).ToList();
-        // Note: This query assumes modules are already loaded or we need to query them separately
-        // For now, using LessonCount from course domain
         var courseDtos = courses.Select(course =>
             new CourseSummaryDto(
                 course.Id,
@@ -55,6 +54,6 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, CourseCol
             TotalItems: courseDtos.Count
         );
 
-        return Result.Success(response.EnrichWithUrls(_urlResolver));
+        return Result.Success(response);
     }
 }

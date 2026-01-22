@@ -12,4 +12,11 @@
     <ProjectReference Include="..\Infrastructure\Courses.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Endpoints.old\**" />
+    <Content Remove="Endpoints.old\**" />
+    <EmbeddedResource Remove="Endpoints.old\**" />
+    <None Remove="Endpoints.old\**" />
+  </ItemGroup>
+
 </Project>

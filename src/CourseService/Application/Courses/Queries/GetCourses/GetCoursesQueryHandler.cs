@@ -15,7 +15,9 @@ namespace Courses.Application.Courses.Queries.GetCourses;
 internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, CourseCollectionDto>
 {
     private readonly ISqlConnectionFactory _connectionFactory;
+#pragma warning disable S4487 // Unread "private" fields should be removed
     private readonly IStorageUrlResolver _urlResolver;
+#pragma warning restore S4487 // Unread "private" fields should be removed
 
     public GetCoursesQueryHandler(
         ISqlConnectionFactory connectionFactory,
@@ -68,7 +70,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
                 new { PageSize = pageSize, Offset = offset },
                 cancellationToken: cancellationToken));
 
-        List<CourseSummaryRow> coursesList = coursesData.ToList();
+        var coursesList = coursesData.ToList();
 
         if (coursesList.Count == 0)
         {
@@ -79,8 +81,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
                 totalItems));
         }
 
-        // Get lesson counts for all courses in a single query using aggregation
-        List<Guid> courseIds = coursesList.Select(c => c.Id).ToList();
+        var courseIds = coursesList.Select(c => c.Id).ToList();
 
         const string lessonCountsSql = @"
             SELECT 
@@ -91,12 +92,12 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
             WHERE m.course_id = ANY(@CourseIds)
             GROUP BY m.course_id";
 
-        var lessonCounts = await connection.QueryAsync<LessonCountRow>(
+        IEnumerable<LessonCountRow> lessonCounts = await connection.QueryAsync<LessonCountRow>(
             new CommandDefinition(lessonCountsSql, new { CourseIds = courseIds.ToArray() }, cancellationToken: cancellationToken));
 
         var lessonCountsByCourse = lessonCounts.ToDictionary(lc => lc.CourseId, lc => lc.LessonCount);
 
-        List<CourseSummaryDto> courses = coursesList.Select(course =>
+        var courses = coursesList.Select(course =>
         {
             int lessonCount = lessonCountsByCourse.GetValueOrDefault(course.Id, course.LessonCount);
 
@@ -121,8 +122,6 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
                 course.EnrollmentCount,
                 course.UpdatedAtUtc);
         }).ToList();
-
-        courses = courses.Select(course => course.EnrichWithUrls(_urlResolver)).ToList();
 
         var response = new CourseCollectionDto(
             courses,

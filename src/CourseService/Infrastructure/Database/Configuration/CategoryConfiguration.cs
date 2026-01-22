@@ -1,4 +1,5 @@
 ﻿using Courses.Domain.Categories;
+using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

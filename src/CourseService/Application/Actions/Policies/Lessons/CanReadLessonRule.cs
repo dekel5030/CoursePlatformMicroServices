@@ -25,8 +25,7 @@ internal sealed class CanReadLessonRule : ILessonActionRule
             yield break;
         }
 
-        if (courseContext.Status != CourseStatus.Published
-            || lessonContext.Status != LessonStatus.Published)
+        if (courseContext.Status != CourseStatus.Published)
         {
             yield break;
         }
