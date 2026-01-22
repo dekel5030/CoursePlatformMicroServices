@@ -16,8 +16,8 @@ internal sealed class EnrollUserCommandHandler : ICommandHandler<EnrollUserComma
     private readonly IUnitOfWork _unitOfWork;
 
     public EnrollUserCommandHandler(
-        ICourseRepository courseRepository, 
-        IEnrollmentRepository enrollmentRepository, 
+        ICourseRepository courseRepository,
+        IEnrollmentRepository enrollmentRepository,
         EnrollmentManager enrollmentManager,
         IUnitOfWork unitOfWork)
     {
@@ -28,11 +28,11 @@ internal sealed class EnrollUserCommandHandler : ICommandHandler<EnrollUserComma
     }
 
     public async Task<Result> Handle(
-        EnrollUserCommand request, 
+        EnrollUserCommand request,
         CancellationToken cancellationToken = default)
     {
         Course? course = await _courseRepository.GetByIdAsync(request.CourseId, cancellationToken);
-        
+
         if (course == null)
         {
             return Result.Failure(CourseErrors.NotFound);

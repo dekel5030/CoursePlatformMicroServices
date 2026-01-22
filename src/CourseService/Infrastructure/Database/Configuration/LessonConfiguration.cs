@@ -13,7 +13,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
     {
         builder.ToTable("Lessons");
         builder.HasKey(lesson => lesson.Id);
-        builder.HasIndex(l => new { l.CourseId, l.Index }).IsUnique();
+        //builder.HasIndex(l => new { l.ModuleId, l.Index }).IsUnique();
 
         builder.Property(lesson => lesson.Id)
             .HasConversion(
@@ -23,28 +23,19 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
         builder.Property(lesson => lesson.Title)
             .HasConversion(
                 title => title.Value,
-                value => new Title(value));
+                value => new Title(value))
+            .HasMaxLength(200);
 
         builder.Property(lesson => lesson.Description)
             .HasConversion(
                 description => description.Value,
-                value => new Description(value));
+                value => new Description(value))
+            .HasMaxLength(2000);
 
-        builder.Property(lesson => lesson.Access)
-            .HasConversion<string>();
-
-        builder.Property(lesson => lesson.Status)
-            .HasConversion<string>();
-
-        builder.Property(lesson => lesson.CourseId)
+        builder.Property(lesson => lesson.Slug)
             .HasConversion(
-                id => id.Value,
-                value => new CourseId(value));
-
-        builder.HasOne(lesson => lesson.Course)
-            .WithMany(course => course.Lessons)
-            .HasForeignKey(lesson => lesson.CourseId)
-            .OnDelete(DeleteBehavior.Cascade);
+                slug => slug.Value,
+                value => new Slug(value));
 
         builder.Property(l => l.ThumbnailImageUrl)
             .HasConversion(
@@ -55,5 +46,13 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
             .HasConversion(
                 url => url != null ? url.Path : null,
                 value => value != null ? new VideoUrl(value) : null);
+
+        builder.Property(lesson => lesson.Access)
+            .HasConversion<string>();
+
+        builder.OwnsMany(l => l.Attachments, attachmentBuilder =>
+        {
+            attachmentBuilder.ToJson("attachments");
+        });
     }
 }

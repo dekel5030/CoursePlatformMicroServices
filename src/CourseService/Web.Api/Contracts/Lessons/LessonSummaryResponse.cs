@@ -1,6 +1,5 @@
 using Courses.Api.Contracts.Shared;
-using Courses.Api.Infrastructure.LinkProvider;
-using Courses.Domain.Lessons.Primitives;
+using Courses.Application.Abstractions.Hateoas;
 
 namespace Courses.Api.Contracts.Lessons;
 
@@ -10,6 +9,5 @@ internal sealed record LessonSummaryResponse(
     int Index,
     TimeSpan? Duration,
     string? ThumbnailUrl,
-    string LessonStatus,
     string LessonAccess,
     IReadOnlyCollection<LinkDto> Links) : ILinksResponse;

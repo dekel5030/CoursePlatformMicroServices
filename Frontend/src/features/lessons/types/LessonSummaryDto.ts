@@ -5,13 +5,14 @@ import type { LinkDto } from "@/types/LinkDto";
  * Used for network layer communication
  */
 export interface LessonSummaryDto {
-  courseId: string;
+  courseId?: string;
   lessonId: string;
   title: string;
-  description: string;
+  description?: string;
   index: number;
   duration: string | null;
-  isPreview: boolean;
+  isPreview?: boolean;
   thumbnailUrl: string | null;
+  access?: string;
   links: LinkDto[];
 }

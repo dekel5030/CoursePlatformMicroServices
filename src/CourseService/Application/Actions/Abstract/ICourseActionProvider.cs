@@ -1,6 +1,4 @@
 ﻿using Courses.Application.Actions.Primitives;
-using Courses.Domain.Courses;
-using Courses.Domain.Lessons;
 
 namespace Courses.Application.Actions.Abstract;
 

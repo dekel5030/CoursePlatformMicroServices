@@ -17,16 +17,15 @@ public class FeaturedCoursesRepository : IFeaturedCoursesRepository
 
     private static readonly List<CourseId> _featuredCourseIds = new()
     {
-        new CourseId(Guid.Parse("019a6842-b9a5-714a-b257-d164982cbc19")),
-        new CourseId(Guid.Parse("019a6842-95e4-76bd-ac68-7884af14ae5f")),
-        new CourseId(Guid.Parse("019a778e-4e98-7e5a-8e86-c2fc7b756f70")),
-        new CourseId(Guid.Parse("019a778e-ea05-7b08-9308-f381eae6b750")),
+        new CourseId(Guid.Parse("019be5ba-c9af-783c-b3f2-201a56e759d0")),
+        new CourseId(Guid.Parse("019be5ba-9e07-7919-9998-c247772474c6")),
+        new CourseId(Guid.Parse("019be5ba-5eac-78f8-97d1-7008fe4ae739")),
+        new CourseId(Guid.Parse("019be5b9-7a87-72b6-86f8-9079d093cc37")),
     };
 
     public async Task<IReadOnlyList<Course>> GetFeaturedCourse()
     {
         List<Course> course = await _dbContext.Courses
-            .Include(c => c.Instructor)
             .Where(course => _featuredCourseIds.Contains(course.Id)).ToListAsync();
 
         return course.AsReadOnly();

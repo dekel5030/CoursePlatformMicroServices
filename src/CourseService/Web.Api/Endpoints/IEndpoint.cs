@@ -1,4 +1,4 @@
-﻿namespace Courses.Api.Endpoints;
+namespace Courses.Api.Endpoints;
 
 internal interface IEndpoint
 {

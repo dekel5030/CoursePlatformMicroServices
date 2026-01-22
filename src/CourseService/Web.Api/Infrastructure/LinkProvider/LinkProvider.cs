@@ -1,24 +1,28 @@
 using Courses.Api.Endpoints.Courses;
 using Courses.Api.Endpoints.Lessons;
+using Courses.Api.Endpoints.Modules;
+using Courses.Api.Endpoints.Categories;
 using Courses.Application.Actions;
 using Courses.Application.Actions.Abstract;
 using Courses.Application.Actions.Primitives;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
+using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Module.Primitives;
+using Courses.Application.Abstractions.Hateoas;
 
 namespace Courses.Api.Infrastructure.LinkProvider;
 
-internal sealed class LinkProvider
+internal sealed class LinkProvider : IHateoasLinkProvider
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ICourseActionProvider _courseActionProvider;
     private readonly LinkGenerator _linkGenerator;
 
     public LinkProvider(
-        IHttpContextAccessor httpContextAccessor, 
-        LinkGenerator linkGenerator, ICourseActionProvider 
+        IHttpContextAccessor httpContextAccessor,
+        LinkGenerator linkGenerator, ICourseActionProvider
         courseActionProvider)
     {
         _httpContextAccessor = httpContextAccessor;
@@ -62,50 +66,47 @@ internal sealed class LinkProvider
             links.Add(Create(nameof(DeleteCourse), "delete", HttpMethods.Delete, new { id = idStr }));
         }
 
-        if (allowedActionsSet.TryGetValue(CourseAction.CreateLesson, out _))
-        {
-            links.Add(Create(nameof(CreateLesson), "create-lesson", HttpMethods.Post, new { courseId = idStr }));
-        }
-
         if (allowedActionsSet.TryGetValue(CourseAction.UploadImageUrl, out _))
         {
             links.Add(Create(
-                nameof(GenerateCourseImageUploadUrl), 
-                "generate-image-upload-url", 
-                HttpMethods.Post, 
+                nameof(GenerateCourseImageUploadUrl),
+                "generate-image-upload-url",
+                HttpMethods.Post,
                 new { id = idStr }));
         }
 
         return links;
     }
 
-    public List<LinkDto> CreateLessonLinks(CoursePolicyContext courseContext, LessonPolicyContext lessonContext)
+    public List<LinkDto> CreateLessonLinks(CoursePolicyContext courseContext, LessonPolicyContext lessonContext, ModuleId moduleIdParam)
     {
         var allowedActionsSet = _courseActionProvider.GetAllowedActions(courseContext, lessonContext).ToHashSet();
         var links = new List<LinkDto>();
+#pragma warning disable S1481 // Unused local variables should be removed
         string courseIdStr = courseContext.CourseId.ToString();
+#pragma warning restore S1481 // Unused local variables should be removed
         string lessonIdStr = lessonContext.LessonId.ToString();
 
-        links.Add(Create(nameof(GetLessonById), "self", HttpMethods.Get, new { courseId = courseIdStr, lessonId = lessonIdStr }));
+        links.Add(Create(nameof(GetLessonById), "self", HttpMethods.Get, new { moduleId = moduleIdParam, lessonId = lessonIdStr }));
 
         if (allowedActionsSet.TryGetValue(LessonAction.Update, out _))
         {
-            links.Add(Create(nameof(PatchLesson), "partial-update", HttpMethods.Patch, new { courseId = courseIdStr, lessonId = lessonIdStr }));
+            links.Add(Create(nameof(PatchLesson), "partial-update", HttpMethods.Patch, new { moduleId = moduleIdParam, lessonId = lessonIdStr }));
         }
 
         if (allowedActionsSet.TryGetValue(LessonAction.Delete, out _))
         {
-            links.Add(Create(nameof(DeleteLesson), "delete", HttpMethods.Delete, new { courseId = courseIdStr, lessonId = lessonIdStr }));
+            links.Add(Create(nameof(DeleteLesson), "delete", HttpMethods.Delete, new { moduleId = moduleIdParam, lessonId = lessonIdStr }));
         }
 
         if (allowedActionsSet.TryGetValue(LessonAction.Create, out _))
         {
-            links.Add(Create(nameof(CreateLesson), "create", HttpMethods.Post, new { courseId = courseIdStr }));
+            links.Add(Create(nameof(CreateLesson), "create", HttpMethods.Post, new { moduleId = moduleIdParam }));
         }
 
         if (allowedActionsSet.TryGetValue(LessonAction.UploadVideoUrl, out _))
         {
-            links.Add(Create(nameof(GenerateLessonVideoUploadUrl), "generate-video-upload-url", HttpMethods.Post, new { courseIdRaw = courseIdStr, lessonIdRaw = lessonIdStr }));
+            links.Add(Create(nameof(GenerateLessonVideoUploadUrl), "generate-video-upload-url", HttpMethods.Post, new { moduleId = moduleIdParam, lessonId = lessonIdStr }));
         }
 
         return links;
@@ -165,5 +166,45 @@ internal sealed class LinkProvider
         }
 
         return links;
+    }
+
+    public List<LinkDto> CreateModuleLinks(CourseId courseId, ModuleId moduleId)
+    {
+        var links = new List<LinkDto>();
+        string courseIdStr = courseId.ToString();
+        string moduleIdStr = moduleId.ToString();
+
+        links.Add(Create(nameof(GetModulesByCourseId), "self", HttpMethods.Get, new { courseId = courseIdStr }));
+
+        links.Add(Create(nameof(CreateLesson), "create-lesson", HttpMethods.Post, new { moduleId = moduleIdStr }));
+
+        return links;
+    }
+
+    public List<LinkDto> CreateModuleCollectionLinks(CourseId courseId)
+    {
+        var links = new List<LinkDto>();
+        string courseIdStr = courseId.ToString();
+
+        links.Add(Create(nameof(GetModulesByCourseId), "self", HttpMethods.Get, new { courseId = courseIdStr }));
+        links.Add(Create(nameof(CreateModule), "create-module", HttpMethods.Post, new { courseId = courseIdStr }));
+
+        return links;
+    }
+
+    public List<LinkDto> CreateCategoryLinks(CategoryId _)
+    {
+        return
+        [
+            Create(nameof(GetCategories), "self", HttpMethods.Get)
+        ];
+    }
+
+    public List<LinkDto> CreateCategoryCollectionLinks()
+    {
+        return
+        [
+            Create(nameof(GetCategories), "self", HttpMethods.Get)
+        ];
     }
 }

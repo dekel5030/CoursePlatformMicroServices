@@ -1,56 +1,68 @@
-﻿using Courses.Domain.Courses.Errors;
+﻿using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons;
-using Courses.Domain.Lessons.Errors;
-using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
-using Courses.Domain.Users;
 using Kernel;
 
 namespace Courses.Domain.Courses;
 
 public class Course : Entity<CourseId>
 {
-    private readonly List<Lesson> _lessons = new();
-    private readonly List<ImageUrl> _images = new();
-
     public override CourseId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
+    public CourseStatus Status { get; private set; } = CourseStatus.Draft;
+    public DifficultyLevel Difficulty { get; private set; } = DifficultyLevel.Beginner;
+    public Money Price { get; private set; } = Money.Zero();
+    public Language Language { get; private set; } = Language.Hebrew;
+    public Slug Slug { get; private set; }
+
     public UserId InstructorId { get; private set; }
-    public User? Instructor { get; private set; }
-    public CourseStatus Status { get; private set; }
+    public CategoryId CategoryId { get; private set; } = new CategoryId(Guid.Empty);
+
     public int EnrollmentCount { get; private set; }
     public int LessonCount { get; private set; }
+    public int Views { get; private set; }
+    public TimeSpan Duration { get; private set; } = TimeSpan.Zero;
 
+    public IReadOnlyCollection<Tag> Tags => _tags;
+    public IReadOnlyCollection<ImageUrl> Images => _images;
     public DateTimeOffset UpdatedAtUtc { get; private set; }
-    public Money Price { get; private set; } = Money.Zero();
-    public IReadOnlyList<Lesson> Lessons => _lessons.AsReadOnly();
-    public IReadOnlyList<ImageUrl> Images => _images.AsReadOnly();
 
 
+    private readonly List<ImageUrl> _images = new();
+    private readonly HashSet<Tag> _tags = new();
+
+#pragma warning disable S1133
 #pragma warning disable CS8618
+    [Obsolete("This constructor is for EF Core only.", error: true)]
     private Course() { }
 #pragma warning restore CS8618
+#pragma warning restore S1133
+
+    private Course(CourseId id, UserId instructorId, Slug slug)
+    {
+        Id = id;
+        InstructorId = instructorId;
+        Slug = slug;
+    }
 
     public static Result<Course> CreateCourse(
-        TimeProvider timeProvider,
         UserId instructorId,
         Title? title = null,
         Description? description = null,
         Money? price = null)
     {
-        var newCourse = new Course
+        var courseId = CourseId.CreateNew();
+        var slug = new Slug(courseId.ToString());
+        var newCourse = new Course(courseId, instructorId, slug)
         {
-            Id = CourseId.CreateNew(),
             Title = title ?? Title.Empty,
             Description = description ?? Description.Empty,
             InstructorId = instructorId,
             Status = CourseStatus.Draft,
             Price = price ?? Money.Zero(),
-            UpdatedAtUtc = timeProvider.GetUtcNow()
         };
 
         return Result.Success(newCourse);
@@ -61,7 +73,7 @@ public class Course : Entity<CourseId>
     public Result CanEnroll => CoursePolicies.CanEnroll(Status);
     public Result CanPublish => CoursePolicies.CanPublish(Status, LessonCount);
 
-    public Result Publish(TimeProvider timeProvider)
+    public Result Publish()
     {
         if (CanPublish.IsFailure)
         {
@@ -69,36 +81,13 @@ public class Course : Entity<CourseId>
         }
 
         Status = CourseStatus.Published;
-        UpdatedAtUtc = timeProvider.GetUtcNow();
 
         Raise(new CoursePublished(this));
 
         return Result.Success();
     }
 
-    public Result RemoveLesson(Lesson lesson, TimeProvider timeProvider)
-    {
-        if (_lessons.Remove(lesson))
-        {
-            UpdatedAtUtc = timeProvider.GetUtcNow();
-            LessonCount--;
-        }
-
-        return Result.Success();
-    }
-
-    public Result SetPrice(Money price, TimeProvider timeProvider)
-    {
-        if (price.Amount < 0)
-        {
-            return Result.Failure<Course>(CourseErrors.InvalidPrice);
-        }
-        Price = price;
-        UpdatedAtUtc = timeProvider.GetUtcNow();
-        return Result.Success();
-    }
-
-    public Result AddImage(ImageUrl imageUrl, TimeProvider timeProvider)
+    public Result AddImage(ImageUrl imageUrl)
     {
         if (_images.Contains(imageUrl))
         {
@@ -106,128 +95,84 @@ public class Course : Entity<CourseId>
         }
 
         _images.Add(imageUrl);
-        UpdatedAtUtc = timeProvider.GetUtcNow();
 
         return Result.Success();
     }
 
-    public Result RemoveImage(ImageUrl imageUrl, TimeProvider timeProvider)
+    public Result RemoveImage(ImageUrl imageUrl)
     {
-        if (_images.Remove(imageUrl))
-        {
-            UpdatedAtUtc = timeProvider.GetUtcNow();
-        }
-
+        _images.Remove(imageUrl);
         return Result.Success();
     }
 
-    public Result UpdateDescription(Description description, TimeProvider timeProvider)
+    public Result UpdateDetails(
+        Title? title = null,
+        Description? description = null,
+        Money? price = null)
     {
         if (CanModify.IsFailure)
         {
             return CanModify;
         }
 
-        Description = description;
-        UpdatedAtUtc = timeProvider.GetUtcNow();
+        if (title is not null && title != Title)
+        {
+            Title = title;
+        }
+
+        if (description is not null && description != Description)
+        {
+            Description = description;
+        }
+
+        if (price is not null && price != Price)
+        {
+            Price = price;
+        }
 
         return Result.Success();
     }
 
-    public Result UpdateTitle(Title title, TimeProvider timeProvider)
+    public Result UpdateMetadata(
+        DifficultyLevel? difficulty = null,
+        CategoryId? categoryId = null,
+        Language? language = null,
+        ICollection<Tag>? tags = null,
+        Slug? slug = null)
     {
         if (CanModify.IsFailure)
         {
             return CanModify;
         }
 
-        Title = title;
-        UpdatedAtUtc = timeProvider.GetUtcNow();
-        return Result.Success();
-    }
-
-    public Result AssignInstructor(UserId instructorId, TimeProvider timeProvider)
-    {
-        InstructorId = instructorId;
-        UpdatedAtUtc = timeProvider.GetUtcNow();
-
-        return Result.Success();
-    }
-
-    public Result<Lesson> AddLesson(
-        Title? title,
-        Description? description,
-        TimeProvider timeProvider)
-    {
-        int index = _lessons.Count;
-
-        Result<Lesson> lessonResult = Lesson.Create(title, description, index);
-
-        if (lessonResult.IsFailure)
+        if (difficulty is not null && difficulty != Difficulty)
         {
-            return Result.Failure<Lesson>(lessonResult.Error);
+            Difficulty = difficulty.Value;
         }
 
-        Lesson lesson = lessonResult.Value;
-
-        _lessons.Add(lesson);
-        LessonCount++;
-        UpdatedAtUtc = timeProvider.GetUtcNow();
-
-        return Result.Success(lesson);
-    }
-
-    public Result DeleteLesson(LessonId lessonId)
-    {
-        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
-
-        if (lesson is null)
+        if (categoryId is not null && categoryId != CategoryId)
         {
-            return Result.Failure<Course>(LessonErrors.NotFound);
+            CategoryId = categoryId;
         }
 
-        _lessons.Remove(lesson);
-        LessonCount = _lessons.Count;
-        Raise(new CourseLessonDeleted(this, lesson));
-
-        return Result.Success();
-    }
-
-    public Result UpdateLesson(
-        LessonId lessonId,
-        Title? title,
-        Description? description,
-        LessonAccess? access,
-        TimeProvider timeProvider)
-    {
-        Result policyResult = CanModify;
-        if (policyResult.IsFailure)
+        if (language is not null && language != Language)
         {
-            return policyResult;
+            Language = language;
         }
 
-        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
-        if (lesson is null)
+        if (slug is not null && slug != Slug)
         {
-            return Result.Failure(LessonErrors.NotFound);
+            Slug = slug;
         }
 
-        if (title.HasValue)
+        if (tags is not null)
         {
-            lesson.SetTitle(title.Value);
+            _tags.Clear();
+            foreach (Tag tag in tags)
+            {
+                _tags.Add(tag);
+            }
         }
-
-        if (description.HasValue)
-        {
-            lesson.SetDescription(description.Value);
-        }
-
-        if (access.HasValue)
-        {
-            lesson.SetAccess(access.Value);
-        }
-
-        UpdatedAtUtc = timeProvider.GetUtcNow();
 
         return Result.Success();
     }

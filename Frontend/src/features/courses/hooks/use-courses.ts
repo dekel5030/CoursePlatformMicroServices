@@ -6,7 +6,9 @@ import {
   patchCourse,
   deleteCourse,
   fetchAllCourses,
+  createModule,
   type FetchAllCoursesResult,
+  type CreateModuleRequest,
 } from "../api";
 import type {
   CourseModel,
@@ -14,6 +16,7 @@ import type {
   UpdateCourseRequestDto,
 } from "../types";
 import { API_ENDPOINTS } from "@/axios/config";
+import { toast } from "sonner";
 
 export const coursesQueryKeys = {
   all: ["courses"] as const,
@@ -59,8 +62,13 @@ export function usePatchCourse(id: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ url, request }: { url: string; request: UpdateCourseRequestDto }) => 
-      patchCourse(url, request),
+    mutationFn: ({
+      url,
+      request,
+    }: {
+      url: string;
+      request: UpdateCourseRequestDto;
+    }) => patchCourse(url, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.featured() });
@@ -78,6 +86,29 @@ export function useDeleteCourse() {
     mutationFn: (url: string) => deleteCourse(url),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.all });
+    },
+  });
+}
+
+export function useCreateModule(courseId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      url,
+      request,
+    }: {
+      url: string;
+      request?: CreateModuleRequest;
+    }) => createModule(url, request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.detail(courseId),
+      });
+      toast.success("Module created successfully");
+    },
+    onError: () => {
+      toast.error("Failed to create module");
     },
   });
 }

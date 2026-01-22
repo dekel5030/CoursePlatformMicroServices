@@ -4,23 +4,42 @@ import type {
   CourseSummaryDto,
   CreateCourseRequestDto,
   UpdateCourseRequestDto,
+  ModuleDto,
+  ModuleModel,
 } from "../types";
 import { axiosClient } from "@/axios/axiosClient";
 import axios from "axios";
 import type { LessonSummaryDto, LessonModel } from "@/features/lessons/types";
 import type { PagedResponse } from "@/types/LinkDto";
 
-function mapLessonSummaryToModel(dto: LessonSummaryDto): LessonModel {
+function mapLessonSummaryToModel(
+  dto: LessonSummaryDto,
+  courseId?: string,
+): LessonModel {
   return {
-    courseId: dto.courseId,
+    courseId: dto.courseId || courseId || "",
     lessonId: dto.lessonId,
     title: dto.title,
-    description: dto.description,
+    description: dto.description || "",
     videoUrl: null,
     thumbnailImage: dto.thumbnailUrl,
-    isPreview: dto.isPreview,
+    isPreview: dto.isPreview || dto.access === "Public",
     order: dto.index,
     duration: dto.duration,
+    links: dto.links,
+  };
+}
+
+function mapModuleToModel(dto: ModuleDto, courseId: string): ModuleModel {
+  return {
+    id: dto.id,
+    title: dto.title,
+    order: dto.index,
+    lessonCount: dto.lessonCount,
+    duration: dto.duration,
+    lessons: dto.lessons.map((lesson) =>
+      mapLessonSummaryToModel(lesson, courseId),
+    ),
     links: dto.links,
   };
 }
@@ -32,13 +51,20 @@ function mapCourseDetailsToModel(dto: CourseDetailsDto): CourseModel {
     description: dto.description,
     imageUrl: dto.imageUrls?.[0] || null,
     instructorName: dto.instructorName,
-    isPublished: true,
+    instructorAvatarUrl: dto.instructorAvatarUrl,
+    isPublished: dto.status === 1,
     price: {
-      amount: dto.price,
-      currency: dto.currency,
+      amount: dto.price.amount,
+      currency: dto.price.currency,
     },
-    lessons: dto.lessons.map(mapLessonSummaryToModel),
+    modules:
+      dto.modules?.map((module) => mapModuleToModel(module, dto.id)) || [],
+    lessonCount: dto.lessonsCount,
+    enrollmentCount: dto.enrollmentCount,
+    totalDuration: dto.totalDuration,
     updatedAtUtc: dto.updatedAtUtc,
+    categoryName: dto.categoryName,
+    tags: dto.tags,
     links: dto.links,
   };
 }
@@ -50,6 +76,7 @@ function mapCourseSummaryToModel(dto: CourseSummaryDto): CourseModel {
     description: "",
     imageUrl: dto.thumbnailUrl,
     instructorName: dto.instructorName,
+    instructorAvatarUrl: null,
     isPublished: true,
     price: {
       amount: dto.price,
@@ -156,4 +183,22 @@ export async function uploadImageToStorage(
       "Content-Type": file.type,
     },
   });
+}
+
+export interface CreateModuleRequest {
+  title?: string;
+}
+
+export interface CreateModuleResponse {
+  moduleId: string;
+  courseId: string;
+  title: string;
+}
+
+export async function createModule(
+  url: string,
+  request: CreateModuleRequest = {},
+): Promise<CreateModuleResponse> {
+  const response = await axiosClient.post<CreateModuleResponse>(url, request);
+  return response.data;
 }

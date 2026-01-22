@@ -1,7 +1,5 @@
 ﻿using Courses.Application.Actions.Primitives;
-using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Primitives;
 using Kernel.Auth.Abstractions;
 using Kernel.Auth.AuthTypes;
@@ -27,8 +25,7 @@ internal sealed class CanReadLessonRule : ILessonActionRule
             yield break;
         }
 
-        if (courseContext.Status != CourseStatus.Published
-            || lessonContext.Status != LessonStatus.Published)
+        if (courseContext.Status != CourseStatus.Published)
         {
             yield break;
         }

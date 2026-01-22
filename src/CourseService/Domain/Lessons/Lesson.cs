@@ -1,86 +1,119 @@
-﻿using Courses.Domain.Courses;
-using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Events;
-using Courses.Domain.Lessons.Primitives;
+﻿using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Module.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 
 namespace Courses.Domain.Lessons;
 
+public sealed record Attachment(string Name, string Url, long SizeBytes);
+
 public class Lesson : Entity<LessonId>
 {
-    public override LessonId Id { get; protected set; } = LessonId.CreateNew();
+    public override LessonId Id { get; protected set; }
+    public ModuleId ModuleId { get; private set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
     public LessonAccess Access { get; private set; } = LessonAccess.Private;
-    public LessonStatus Status { get; private set; } = LessonStatus.Draft;
-
-    public CourseId CourseId { get; private set; }
-    public Course Course { get; private set; } = null!;
+    public ImageUrl? ThumbnailImageUrl { get; private set; }
+    public VideoUrl? VideoUrl { get; private set; }
+    public TimeSpan Duration { get; private set; } = TimeSpan.Zero;
+    public Slug Slug { get; private set; }
 
     public int Index { get; private set; }
 
-    public ImageUrl? ThumbnailImageUrl { get; private set; }
-    public VideoUrl? VideoUrl { get; private set; }
-    public TimeSpan Duration { get; private set; }
+    public IReadOnlyList<Attachment> Attachments => _attachments.AsReadOnly();
 
+    private readonly List<Attachment> _attachments = new();
+
+#pragma warning disable S1133
+#pragma warning disable CS8618
+    [Obsolete("This constructor is for EF Core only.", error: true)]
     private Lesson() { }
+#pragma warning restore CS8618
+#pragma warning restore S1133
+
+    private Lesson(ModuleId moduleId, LessonId id, Slug slug)
+    {
+        ModuleId = moduleId;
+        Id = id;
+        Slug = slug;
+    }
 
     internal static Result<Lesson> Create(
+        ModuleId moduleId,
         Title? title,
         Description? description,
         int index = 0)
     {
-        var newLesson = new Lesson()
+        var lessonId = LessonId.CreateNew();
+        var slug = new Slug(lessonId.ToString());
+        var lesson = new Lesson(moduleId, lessonId, slug)
         {
             Title = title ?? Title.Empty,
             Description = description ?? Description.Empty,
             Index = index,
         };
 
-        return Result.Success(newLesson);
+        return Result.Success(lesson);
     }
 
-    public Result UpdateVideoData(VideoUrl videoUrl, TimeSpan duration)
-    {
-        VideoUrl = videoUrl;
-        Duration = duration;
 
-        Raise(new LessonVideoDataUpdatedDomainEvent(this));
+    internal Result UpdateDetails(
+        Title? title = null,
+        Description? description = null,
+        LessonAccess? access = null,
+        int? index = null,
+        Slug? slug = null)
+    {
+        if (title is not null && title != Title)
+        {
+            Title = title;
+        }
+
+        if (description is not null && description != Description)
+        {
+            Description = description;
+        }
+
+        if (access is not null && access != Access)
+        {
+            Access = access.Value;
+        }
+
+        if (index is not null && index != Index)
+        {
+            Index = index.Value;
+        }
+
+        if (slug is not null && slug != Slug)
+        {
+            Slug = slug;
+        }
 
         return Result.Success();
     }
 
-    public Result SetThumbnailImage(ImageUrl url)
+    internal Result UpdateMedia(
+        ImageUrl? thumbnailImageUrl = null,
+        VideoUrl? videoUrl = null,
+        TimeSpan? duration = null)
     {
-        ThumbnailImageUrl = url;
+        if (thumbnailImageUrl is not null && thumbnailImageUrl != ThumbnailImageUrl)
+        {
+            ThumbnailImageUrl = thumbnailImageUrl;
+        }
 
-        return Result.Success();
-    }
+        if (videoUrl is not null && videoUrl != VideoUrl)
+        {
+            VideoUrl = videoUrl;
+        }
 
-    public Result SetDescription(Description description)
-    {
-        Description = description;
-        return Result.Success();
-    }
+        if (duration is not null && duration != Duration)
+        {
+            Duration = duration.Value;
+        }
 
-    public Result SetTitle(Title title)
-    {
-        Title = title;
-
-        return Result.Success();
-    }
-
-    public Result SetAccess(LessonAccess access)
-    {
-        Access = access;
-        return Result.Success();
-    }
-
-    internal Result SetIndex(int index)
-    {
-        Index = index;
         return Result.Success();
     }
 }

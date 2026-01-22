@@ -1,11 +1,10 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Contracts.Lessons;
+using Courses.Api.Endpoints.Modules;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Lessons.Commands.CreateLesson;
-using Courses.Application.Lessons.Dtos;
-using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Module.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -16,22 +15,22 @@ internal sealed class CreateLesson : IEndpoint
 {
     internal sealed record CreateLessonRequest(string? Title, string? Description);
 
-    private sealed record CreateResponse(Guid LessonId, string Title);
+    private sealed record CreateResponse(Guid ModuleId, Guid CourseId, string Title);
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("courses/{courseid:Guid}/lessons", async (
-            Guid courseid,
+        app.MapPost("modules/{moduleId:Guid}/lessons", async (
+            Guid moduleId,
             CreateLessonRequest request,
             IMediator mediator,
             LinkProvider linkProvider) =>
         {
             Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
             Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
-            var courseIdObj = new CourseId(courseid);
+            var moduleIdObj = new ModuleId(moduleId);
 
             var command = new CreateLessonCommand(
-                courseIdObj,
+                moduleIdObj,
                 title,
                 description);
 
@@ -39,9 +38,9 @@ internal sealed class CreateLesson : IEndpoint
 
             return result.Match(
                 lessonDto => Results.CreatedAtRoute(
-                    nameof(GetLessonById),
-                    new { courseId = courseid, lessonId = lessonDto.LessonId.Value },
-                    new CreateResponse(lessonDto.LessonId.Value, lessonDto.Title.Value)
+                    nameof(GetModulesByCourseId),
+                    new { courseId = lessonDto.CourseId.Value },
+                    new CreateResponse(lessonDto.ModuleId.Value, lessonDto.CourseId.Value, "Lesson")
                 ),
                 CustomResults.Problem);
         })

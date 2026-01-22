@@ -1,11 +1,10 @@
-using Courses.Application.Lessons.Dtos;
-using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Module.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Lessons.Commands.CreateLesson;
 
 public sealed record CreateLessonCommand(
-    CourseId CourseId,
+    ModuleId ModuleId,
     Title? Title,
     Description? Description) : ICommand<CreateLessonResponse>;

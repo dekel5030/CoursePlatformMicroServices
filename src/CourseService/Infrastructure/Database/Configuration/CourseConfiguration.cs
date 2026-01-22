@@ -1,6 +1,9 @@
-﻿using Courses.Domain.Courses;
+﻿using Courses.Domain.Categories;
+using Courses.Domain.Categories.Primitives;
+using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
+using Courses.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,46 +23,67 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
                 value => new CourseId(value));
 
         builder.Property(course => course.Title)
-            .HasConversion(
-                title => title.Value,
-                value => new Title(value));
+                    .HasConversion(
+                        title => title.Value,
+                        value => new Title(value))
+                    .HasMaxLength(200);
 
         builder.Property(course => course.Description)
             .HasConversion(
                 description => description.Value,
-                value => new Description(value));
+                value => new Description(value))
+            .HasMaxLength(2000);
+
+        builder.Property(course => course.Status)
+            .HasConversion<string>()
+            .HasMaxLength(50);
+
+        builder.Property(course => course.Difficulty)
+            .HasConversion<string>()
+            .HasMaxLength(50);
+
+        builder.OwnsOne(course => course.Price, price =>
+        {
+            price.Property(p => p.Amount).HasColumnName("PriceAmount").IsRequired();
+            price.Property(p => p.Currency).HasColumnName("PriceCurrency").HasMaxLength(3).IsRequired();
+        });
+
+        builder.Property(course => course.Language)
+            .HasConversion(language => language.Code, code => Language.Parse(code))
+            .HasMaxLength(10);
+
+        builder.Property(course => course.Slug)
+            .HasConversion(
+                slug => slug.Value,
+                value => new Slug(value))
+            .HasMaxLength(200);
+
+        builder.HasIndex(course => course.Slug).IsUnique();
 
         builder.Property(course => course.InstructorId)
             .HasConversion(
                 id => id.Value,
                 value => new UserId(value));
 
-        builder.HasOne(course => course.Instructor)
+        builder.Property(course => course.CategoryId)
+            .HasConversion(id => id.Value, value => new CategoryId(value));
+
+        builder.HasOne<Category>()
             .WithMany()
-            .HasForeignKey(course => course.InstructorId)
+            .HasForeignKey(c => c.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(course => course.Status)
-            .HasConversion<string>();
-
-        builder.HasMany(course => course.Lessons)
-            .WithOne()
-            .HasForeignKey(lesson => lesson.CourseId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.Navigation(course => course.Lessons)
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.OwnsMany(course => course.Images, images =>
+        builder.OwnsMany(course => course.Images, imageBuilder =>
         {
-            images.ToJson("course_images");
+            imageBuilder.ToJson("course_images");
         });
 
-        builder.OwnsOne(course => course.Price, price =>
+        builder.OwnsMany(course => course.Tags, tagBuilder =>
         {
-            price.Property(p => p.Amount).HasColumnName("price_amount").IsRequired();
-            price.Property(p => p.Currency).HasColumnName("price_currency").IsRequired();
+            tagBuilder.ToJson("course_tags");
         });
+
+        builder.HasQueryFilter(course => course.Status != CourseStatus.Deleted);
 
         builder.Ignore(course => course.DomainEvents);
     }

@@ -1,4 +1,4 @@
-import type { LessonSummaryDto } from "@/features/lessons/types/LessonSummaryDto";
+import type { ModuleDto } from "./ModuleDto";
 import type { LinkDto } from "@/types/LinkDto";
 
 /**
@@ -9,12 +9,23 @@ export interface CourseDetailsDto {
   id: string;
   title: string;
   description: string;
-  instructorName: string | null;
-  price: number;
-  currency: string;
+  instructorId: string;
+  instructorName: string;
+  instructorAvatarUrl: string | null;
+  status: number;
+  price: {
+    amount: number;
+    currency: string;
+  };
   enrollmentCount: number;
+  lessonsCount: number;
+  totalDuration: string;
   updatedAtUtc: string;
   imageUrls: string[];
-  lessons: LessonSummaryDto[];
+  tags: string[];
+  categoryId: string;
+  categoryName: string;
+  categorySlug: string;
+  modules: ModuleDto[];
   links: LinkDto[];
 }

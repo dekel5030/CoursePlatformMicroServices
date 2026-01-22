@@ -68,8 +68,8 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
             return;
         }
 
-        var videoUrl = new VideoUrl(message.FileKey);
-        lesson.UpdateVideoData(videoUrl, TimeSpan.FromMinutes(8));
+        //var videoUrl = new VideoUrl(message.FileKey);
+        //lesson.UpdateMedia(videoUrl: videoUrl, duration: TimeSpan.FromMinutes(8));
 
         await _writeDbContext.SaveChangesAsync(cancellationToken);
 
@@ -98,7 +98,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
         }
 
         var imageUrl = new ImageUrl(message.FileKey);
-        course.AddImage(imageUrl, TimeProvider.System);
+        course.AddImage(imageUrl);
 
         await _writeDbContext.SaveChangesAsync(cancellationToken);
 
@@ -126,8 +126,8 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
             return;
         }
 
-        var imageUrl = new ImageUrl(message.FileKey);
-        lesson.SetThumbnailImage(imageUrl);
+        //var imageUrl = new ImageUrl(message.FileKey);
+        //lesson.UpdateMedia(thumbnailImageUrl: imageUrl);
 
         await _writeDbContext.SaveChangesAsync(cancellationToken);
 

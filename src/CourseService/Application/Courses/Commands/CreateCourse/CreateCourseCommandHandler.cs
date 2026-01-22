@@ -1,8 +1,6 @@
 ﻿using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
-using Courses.Application.Actions.Abstract;
-using Courses.Application.Courses.Dtos;
-using Courses.Application.Shared.Extensions;
+using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
@@ -16,17 +14,14 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
 {
     private readonly ICourseRepository _courseRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly TimeProvider _timeProvider;
     private readonly IUserContext _userContext;
 
     public CreateCourseCommandHandler(
         ICourseRepository courseRepository,
-        TimeProvider timeProvider,
         IUnitOfWork unitOfWork,
         IUserContext userContext)
     {
         _courseRepository = courseRepository;
-        _timeProvider = timeProvider;
         _unitOfWork = unitOfWork;
         _userContext = userContext;
     }
@@ -43,7 +38,6 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
         }
 
         Result<Course> courseResult = Course.CreateCourse(
-            _timeProvider,
             instructorId,
             request.Title,
             request.Description);

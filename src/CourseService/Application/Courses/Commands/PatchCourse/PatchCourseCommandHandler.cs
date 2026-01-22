@@ -1,8 +1,11 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
+using Courses.Domain.Categories;
+using Courses.Domain.Categories.Errors;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -10,14 +13,17 @@ namespace Courses.Application.Courses.Commands.PatchCourse;
 
 internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCommand>
 {
-    private readonly TimeProvider _timeProvider;
     private readonly ICourseRepository _courseRepository;
+    private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public PatchCourseCommandHandler(TimeProvider timeProvider, ICourseRepository courseRepository, IUnitOfWork unitOfWork)
+    public PatchCourseCommandHandler(
+        ICourseRepository courseRepository,
+        ICategoryRepository categoryRepository,
+        IUnitOfWork unitOfWork)
     {
-        _timeProvider = timeProvider;
         _courseRepository = courseRepository;
+        _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -32,46 +38,23 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
             return Result.Failure(CourseErrors.NotFound);
         }
 
-        if (request.Title.HasValue)
+        course.UpdateDetails(request.Title, request.Description, request.Price);
+
+        if (request.CategoryId != null)
         {
-            Result titleResult = course.UpdateTitle(request.Title.Value, _timeProvider);
-            if (titleResult.IsFailure)
+            Category? category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken);
+
+            if (category is null)
             {
-                return titleResult;
+                return Result.Failure(CategoryErrors.NotFound);
             }
         }
+        
+        var tags = request.Tags?.Select(Tag.Create).ToList();
 
-        if (request.Description.HasValue)
-        {
-            Result descriptionResult = course.UpdateDescription(request.Description.Value, _timeProvider);
-            if (descriptionResult.IsFailure)
-            {
-                return descriptionResult;
-            }
-        }
+        Slug? slug = request.Slug == null ? null : new Slug(request.Slug);
 
-        if (request.InstructorId.HasValue)
-        {
-            Result instructorResult = course.AssignInstructor(new UserId(request.InstructorId.Value), _timeProvider);
-            if (instructorResult.IsFailure)
-            {
-                return instructorResult;
-            }
-        }
-
-        if (request.PriceAmount.HasValue != request.PriceCurrency is not null)
-        {
-            return Result.Failure(CourseErrors.InvalidPrice);
-        }
-
-        if (request.PriceAmount.HasValue && request.PriceCurrency is not null)
-        {
-            Result priceResult = course.SetPrice(new Money(request.PriceAmount.Value, request.PriceCurrency), _timeProvider);
-            if (priceResult.IsFailure)
-            {
-                return priceResult;
-            }
-        }
+        course.UpdateMetadata(request.Difficulty, request.CategoryId, request.Language, tags, slug);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
