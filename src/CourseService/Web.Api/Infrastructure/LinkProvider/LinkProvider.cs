@@ -82,10 +82,12 @@ internal sealed class LinkProvider : IHateoasLinkProvider
     {
         var allowedActionsSet = _courseActionProvider.GetAllowedActions(courseContext, lessonContext).ToHashSet();
         var links = new List<LinkDto>();
+#pragma warning disable S1481 // Unused local variables should be removed
         string courseIdStr = courseContext.CourseId.ToString();
+#pragma warning restore S1481 // Unused local variables should be removed
         string lessonIdStr = lessonContext.LessonId.ToString();
 
-        links.Add(Create(nameof(GetLessonById), "self", HttpMethods.Get, new { courseId = courseIdStr, lessonId = lessonIdStr }));
+        links.Add(Create(nameof(GetLessonById), "self", HttpMethods.Get, new { moduleId = moduleIdParam, lessonId = lessonIdStr }));
 
         if (allowedActionsSet.TryGetValue(LessonAction.Update, out _))
         {
@@ -185,7 +187,7 @@ internal sealed class LinkProvider : IHateoasLinkProvider
         string courseIdStr = courseId.ToString();
 
         links.Add(Create(nameof(GetModulesByCourseId), "self", HttpMethods.Get, new { courseId = courseIdStr }));
-        links.Add(Create(nameof(CreateModule), "create", HttpMethods.Post, new { courseId = courseIdStr }));
+        links.Add(Create(nameof(CreateModule), "create-module", HttpMethods.Post, new { courseId = courseIdStr }));
 
         return links;
     }

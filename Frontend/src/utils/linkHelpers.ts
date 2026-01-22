@@ -37,6 +37,7 @@ export const CourseRels = {
   PARTIAL_UPDATE: "partial-update",
   DELETE: "delete",
   CREATE: "create",
+  CREATE_MODULE: "create-module",
   CREATE_LESSON: "create-lesson",
   GENERATE_IMAGE_UPLOAD_URL: "generate-image-upload-url",
   NEXT_PAGE: "next-page",

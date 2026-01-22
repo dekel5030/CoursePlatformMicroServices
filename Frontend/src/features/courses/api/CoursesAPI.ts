@@ -184,3 +184,21 @@ export async function uploadImageToStorage(
     },
   });
 }
+
+export interface CreateModuleRequest {
+  title?: string;
+}
+
+export interface CreateModuleResponse {
+  moduleId: string;
+  courseId: string;
+  title: string;
+}
+
+export async function createModule(
+  url: string,
+  request: CreateModuleRequest = {},
+): Promise<CreateModuleResponse> {
+  const response = await axiosClient.post<CreateModuleResponse>(url, request);
+  return response.data;
+}

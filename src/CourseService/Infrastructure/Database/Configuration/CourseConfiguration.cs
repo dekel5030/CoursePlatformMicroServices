@@ -83,6 +83,8 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             tagBuilder.ToJson("course_tags");
         });
 
+        builder.HasQueryFilter(course => course.Status != CourseStatus.Deleted);
+
         builder.Ignore(course => course.DomainEvents);
     }
 }

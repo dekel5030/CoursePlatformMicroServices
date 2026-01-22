@@ -2,11 +2,10 @@ using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Contracts.Lessons;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Lessons.Queries.GetById;
-using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Module.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -16,21 +15,20 @@ internal sealed class GetLessonById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("courses/{courseId:Guid}/lessons/{lessonId:Guid}", async (
-            Guid courseId,
+        app.MapGet("modules/{moduleId:Guid}/lessons/{lessonId:Guid}", async (
+            Guid moduleId,
             Guid lessonId,
             IMediator mediator,
-            LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
-            var courseIdObj = new CourseId(courseId);
+            var moduleIdObj = new ModuleId(moduleId);
             var lessonIdObj = new LessonId(lessonId);
-            var query = new GetLessonByIdQuery(courseIdObj, lessonIdObj);
+            var query = new GetLessonByIdQuery(moduleIdObj, lessonIdObj);
 
-            Result<LessonDetailsDto> result = await mediator.Send(query, cancellationToken);
+            Result<LessonDetailsPageDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
-                dto => Results.Ok(dto.ToApiContract(courseIdObj, linkProvider)),
+                dto => Results.Ok(dto.ToApiContract()),
                 CustomResults.Problem);
         })
         .WithMetadata<LessonDetailsResponse>(

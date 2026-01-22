@@ -20,12 +20,16 @@ export const lessonsQueryKeys = {
     [...lessonsQueryKeys.all(courseId), lessonId] as const,
 } as const;
 
-export function useLesson(courseId: string, lessonId: string | undefined) {
+export function useLesson(
+  courseId: string,
+  lessonId: string | undefined,
+  url?: string,
+) {
   return useQuery<LessonModel, Error>({
     queryKey: lessonId
       ? lessonsQueryKeys.detail(courseId, lessonId)
       : ["courses", courseId, "lessons", "undefined"],
-    queryFn: () => fetchLessonById(courseId, lessonId!),
+    queryFn: () => fetchLessonById(courseId, lessonId!, url),
     enabled: !!courseId && !!lessonId,
   });
 }
@@ -34,8 +38,13 @@ export function useCreateLesson(courseId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ url, request }: { url: string; request: CreateLessonRequestDto }) =>
-      createLesson(url, request),
+    mutationFn: ({
+      url,
+      request,
+    }: {
+      url: string;
+      request: CreateLessonRequestDto;
+    }) => createLesson(url, request),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: lessonsQueryKeys.all(courseId),
@@ -51,8 +60,13 @@ export function usePatchLesson(courseId: string, lessonId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ url, request }: { url: string; request: UpdateLessonRequestDto }) =>
-      patchLesson(url, request),
+    mutationFn: ({
+      url,
+      request,
+    }: {
+      url: string;
+      request: UpdateLessonRequestDto;
+    }) => patchLesson(url, request),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: lessonsQueryKeys.detail(courseId, lessonId),

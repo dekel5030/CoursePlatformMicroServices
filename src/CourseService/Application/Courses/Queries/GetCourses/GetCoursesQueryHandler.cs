@@ -60,7 +60,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
                 instructor,
                 course.Status,
                 course.Price,
-                course.Images.Select(i => i.Path).FirstOrDefault(),
+                _urlResolver.Resolve(StorageCategory.Public, course.Images.Select(i => i.Path).FirstOrDefault() ?? "").Value,
                 course.LessonCount,
                 course.EnrollmentCount,
                 course.UpdatedAtUtc);

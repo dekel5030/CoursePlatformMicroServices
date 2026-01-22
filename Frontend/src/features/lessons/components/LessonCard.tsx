@@ -56,7 +56,10 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
   };
 
   const handleLessonClick = () => {
-    navigate(`/courses/${courseId}/lessons/${lesson.lessonId}`);
+    const selfLink = getLink(lesson.links, LessonRels.SELF);
+    navigate(`/courses/${courseId}/lessons/${lesson.lessonId}`, {
+      state: { lessonSelfLink: selfLink?.href },
+    });
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -82,9 +85,12 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
       console.error("No update link found for this lesson");
       return;
     }
-    
+
     try {
-      await patchLesson.mutateAsync({ url: updateLink.href, request: { title: newTitle } });
+      await patchLesson.mutateAsync({
+        url: updateLink.href,
+        request: { title: newTitle },
+      });
       toast.success(t("lessons:actions.titleUpdated"));
     } catch (error) {
       toast.error(t("lessons:actions.titleUpdateFailed"));
@@ -97,9 +103,12 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
       console.error("No update link found for this lesson");
       return;
     }
-    
+
     try {
-      await patchLesson.mutateAsync({ url: updateLink.href, request: { description: newDescription } });
+      await patchLesson.mutateAsync({
+        url: updateLink.href,
+        request: { description: newDescription },
+      });
       toast.success(t("lessons:actions.descriptionUpdated"));
     } catch (error) {
       toast.error(t("lessons:actions.descriptionUpdateFailed"));

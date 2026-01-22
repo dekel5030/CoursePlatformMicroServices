@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useLesson, usePatchLesson } from "@/features/lessons";
 import { useCourse } from "@/features/courses";
 import {
@@ -23,8 +23,15 @@ export default function LessonPage() {
     courseId: string;
     lessonId: string;
   }>();
+  const location = useLocation();
+  const lessonSelfLink = (location.state as { lessonSelfLink?: string })
+    ?.lessonSelfLink;
 
-  const { data: lesson, isLoading, error } = useLesson(courseId!, lessonId);
+  const {
+    data: lesson,
+    isLoading,
+    error,
+  } = useLesson(courseId!, lessonId, lessonSelfLink);
   const { data: course } = useCourse(courseId!);
 
   const patchLesson = usePatchLesson(courseId!, lessonId!);
@@ -37,9 +44,12 @@ export default function LessonPage() {
       console.error("No update link found for this lesson");
       return;
     }
-    
+
     try {
-      await patchLesson.mutateAsync({ url: updateLink.href, request: { title: newTitle } });
+      await patchLesson.mutateAsync({
+        url: updateLink.href,
+        request: { title: newTitle },
+      });
       toast.success(t("lessons:actions.titleUpdated"));
     } catch (error) {
       toast.error(t("lessons:actions.titleUpdateFailed"));
@@ -53,9 +63,12 @@ export default function LessonPage() {
       console.error("No update link found for this lesson");
       return;
     }
-    
+
     try {
-      await patchLesson.mutateAsync({ url: updateLink.href, request: { description: newDescription } });
+      await patchLesson.mutateAsync({
+        url: updateLink.href,
+        request: { description: newDescription },
+      });
       toast.success(t("lessons:actions.descriptionUpdated"));
     } catch (error) {
       toast.error(t("lessons:actions.descriptionUpdateFailed"));

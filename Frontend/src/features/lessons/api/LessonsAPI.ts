@@ -24,28 +24,27 @@ function mapToLessonModel(dto: LessonDetailsDto): LessonModel {
 
 export async function fetchLessonById(
   courseId: string,
-  lessonId: string
+  lessonId: string,
+  url?: string,
 ): Promise<LessonModel> {
-  const response = await axiosClient.get<LessonDetailsDto>(
-    `/courses/${courseId}/lessons/${lessonId}`
-  );
+  // Use the provided HATEOAS self link if available
+  // Otherwise fall back to the constructed course-based URL
+  const endpoint = url || `/courses/${courseId}/lessons/${lessonId}`;
+  const response = await axiosClient.get<LessonDetailsDto>(endpoint);
   return mapToLessonModel(response.data);
 }
 
 export async function createLesson(
   url: string,
-  request: CreateLessonRequestDto
+  request: CreateLessonRequestDto,
 ): Promise<LessonModel> {
-  const response = await axiosClient.post<LessonDetailsDto>(
-    url,
-    request
-  );
+  const response = await axiosClient.post<LessonDetailsDto>(url, request);
   return mapToLessonModel(response.data);
 }
 
 export async function patchLesson(
   url: string,
-  request: UpdateLessonRequestDto
+  request: UpdateLessonRequestDto,
 ): Promise<void> {
   await axiosClient.patch(url, request);
 }
@@ -67,18 +66,18 @@ export interface GenerateVideoUploadUrlResponse {
 
 export async function generateVideoUploadUrl(
   uploadUrl: string,
-  request: GenerateVideoUploadUrlRequest
+  request: GenerateVideoUploadUrlRequest,
 ): Promise<GenerateVideoUploadUrlResponse> {
   const response = await axiosClient.post<GenerateVideoUploadUrlResponse>(
     uploadUrl,
-    request
+    request,
   );
   return response.data;
 }
 
 export async function uploadVideoToStorage(
   uploadUrl: string,
-  file: File
+  file: File,
 ): Promise<void> {
   // Use a raw axios instance for binary upload to avoid default JSON headers
   await axios.put(uploadUrl, file, {
