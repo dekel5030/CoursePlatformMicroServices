@@ -2,10 +2,7 @@ using System.Data;
 using System.Text.Json;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Lessons.Dtos;
-using Courses.Application.Modules.Dtos;
 using Courses.Application.Shared.Dtos;
 using SharedDtos = Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Errors;
@@ -16,11 +13,13 @@ using Courses.Domain.Shared.Primitives;
 using Dapper;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Courses.Domain.Categories;
-using Microsoft.EntityFrameworkCore;
 using Courses.Domain.Courses;
+using Microsoft.EntityFrameworkCore;
 using Courses.Domain.Module;
 using Courses.Domain.Users;
+using Courses.Domain.Categories;
+using Courses.Application.Abstractions.Hateoas;
+using Courses.Application.Actions;
 
 namespace Courses.Application.Courses.Queries.GetById;
 
@@ -28,13 +27,16 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
 {
     private readonly IReadDbContext _readDbContext;
     private readonly IStorageUrlResolver _urlResolver;
+    private readonly IHateoasLinkProvider _hateoasProvider;
 
     public GetCourseByIdQueryHandler(
         IStorageUrlResolver urlResolver,
-        IReadDbContext readDbContext)
+        IReadDbContext readDbContext,
+        IHateoasLinkProvider hateoasProvider)
     {
         _urlResolver = urlResolver;
         _readDbContext = readDbContext;
+        _hateoasProvider = hateoasProvider;
     }
 
     public async Task<Result<CoursePageDto>> Handle(
@@ -59,49 +61,50 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             .Where(m => m.CourseId == request.Id)
             .ToListAsync(cancellationToken);
 
-        CategoryDto categoryDto = await _readDbContext.Categories
-            .Where(category => category.Id == course.CategoryId)
-            .Select(category => new CategoryDto(category.Id, category.Name, category.Slug))
+        Category category = await _readDbContext.Categories
+            .Where(c => c.Id == course.CategoryId)
             .FirstAsync(cancellationToken);
-
-        var instructorDto = new InstructorDto(
-            instructor.Id,
-            instructor.FullName,
-            instructor.AvatarUrl);
 
         var images = course.Images
             .Select(image => _urlResolver.Resolve(StorageCategory.Public, image.Path).Value)
             .ToList();
 
-        var tags = course.Tags.Select(tag => new TagDto(tag.Value)).ToList();
+        var tags = course.Tags.Select(tag => tag.Value).ToList();
 
-        var lessonDtos = modules
-            .SelectMany(module => module.Lessons)
-            .Select(lesson => new LessonSummaryDto(
-                lesson.ModuleId,
-                lesson.Id,
-                lesson.Title,
-                lesson.Index,
-                lesson.Duration,
-                _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl?.Path ?? "").Value,
-                lesson.Access))
-            .ToList();
+        var courseContext = new CoursePolicyContext(course.Id, instructor.Id, course.Status, course.LessonCount);
 
-        var moduleDtos = modules.Select(module => new ModuleDetailsDto(
-            module.Id,
-            module.Title,
-            module.Index,
-            module.LessonCount,
-            module.Duration,
-            lessonDtos)
-
-        ).ToList();
+        var moduleDtos = modules.Select(module =>
+        {
+            return new ModuleDto(
+                Id: module.Id.Value,
+                Title: module.Title.Value,
+                Index: module.Index,
+                LessonCount: module.LessonCount,
+                Duration: module.Duration,
+                Links: _hateoasProvider.CreateModuleLinks(course.Id, module.Id),
+                Lessons: module.Lessons.Select(lesson =>
+                {
+                    return new ModuleLessonDto(
+                        LessonId: lesson.Id.Value,
+                        Title: lesson.Title.Value,
+                        Index: lesson.Index,
+                        Duration: lesson.Duration,
+                        ThumbnailUrl: lesson.ThumbnailImageUrl == null ? null :
+                            _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
+                        Access: lesson.Access.ToString(),
+                        Links: _hateoasProvider.CreateLessonLinks(courseContext, new LessonPolicyContext(lesson.Id, lesson.Access), module.Id)
+                    );
+                }).ToList()
+            );
+        }).ToList();
 
         var response = new CoursePageDto(
-            course.Id,
-            course.Title,
-            course.Description,
-            instructorDto,
+            course.Id.Value,
+            course.Title.Value,
+            course.Description.Value,
+            instructor.Id.Value,
+            instructor.FullName,
+            instructor.AvatarUrl,
             course.Status,
             course.Price,
             course.EnrollmentCount,
@@ -110,8 +113,11 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             course.UpdatedAtUtc,
             images,
             tags,
-            categoryDto,
-            moduleDtos);
+            category.Id.Value,
+            category.Name,
+            category.Slug.Value,
+            moduleDtos,
+            _hateoasProvider.CreateCourseLinks(courseContext));
 
         return Result<CoursePageDto>.Success(response);
     }

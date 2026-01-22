@@ -13,6 +13,7 @@ internal static class GatewayConfiguration
             
             // Lessons Route
             CreateRoute("lessons-route", "courseservice", "/api/lessons/{**catch-all}", "/api"),
+            CreateRoute("modules-route", "courseservice", "/api/modules/{**catch-all}", "/api"),
             
             // Auth Routes (דוגמה לשימוש חוזר)
             CreateRoute("auth-route", "authservice", "/api/auth/{**catch-all}", "/api"),

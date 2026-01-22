@@ -1,6 +1,6 @@
-namespace Courses.Api.Infrastructure.LinkProvider;
+namespace Courses.Application.Abstractions.Hateoas;
 
-internal sealed record LinkDto
+public sealed record LinkDto
 {
     public required string Href { get; init; }
     public required string Rel { get; init; }

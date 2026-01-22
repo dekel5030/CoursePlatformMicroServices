@@ -1,5 +1,6 @@
 import type { Money } from "./money";
 import type { LessonModel } from "@/features/lessons/types/LessonModel";
+import type { ModuleModel } from "./ModuleModel";
 import type { LinkDto } from "@/types/LinkDto";
 
 /**
@@ -12,10 +13,16 @@ export interface CourseModel {
   description: string;
   imageUrl: string | null;
   instructorName: string | null;
+  instructorAvatarUrl: string | null;
   isPublished: boolean;
   price: Money;
   lessons?: LessonModel[];
+  modules?: ModuleModel[];
   lessonCount?: number;
+  enrollmentCount?: number;
+  totalDuration?: string;
   updatedAtUtc?: string;
+  categoryName?: string;
+  tags?: string[];
   links?: LinkDto[];
 }

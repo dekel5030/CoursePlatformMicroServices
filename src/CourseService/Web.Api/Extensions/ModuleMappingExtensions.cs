@@ -52,12 +52,8 @@ internal static class ModuleMappingExtensions
         CourseId courseId,
         LinkProvider linkProvider)
     {
-        // Create a minimal lesson context - LessonSummaryDto doesn't have Status
-        // We'll use a default status for the policy context
         var lessonContext = new LessonPolicyContext(dto.LessonId, dto.Access);
         
-        // Create a minimal course context for links
-        // We don't have all course info, so use defaults
         var courseContext = new CoursePolicyContext(
             courseId,
             new Domain.Courses.Primitives.UserId(Guid.Empty),
@@ -70,8 +66,7 @@ internal static class ModuleMappingExtensions
             dto.Index,
             dto.Duration,
             dto.ThumbnailUrl?.ToString(),
-            "Draft", // Default since LessonSummaryDto doesn't have Status
             dto.Access.ToString(),
-            linkProvider.CreateLessonLinks(courseContext, lessonContext));
+            linkProvider.CreateLessonLinks(courseContext, lessonContext, new Domain.Module.Primitives.ModuleId(Guid.NewGuid())));
     }
 }

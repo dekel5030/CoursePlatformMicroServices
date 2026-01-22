@@ -1,6 +1,6 @@
 using Courses.Api.Contracts.Lessons;
 using Courses.Api.Contracts.Shared;
-using Courses.Api.Infrastructure.LinkProvider;
+using Courses.Application.Abstractions.Hateoas;
 
 namespace Courses.Api.Contracts.Courses;
 

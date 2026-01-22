@@ -21,6 +21,11 @@
     "previous": "קודם",
     "next": "הבא"
   },
+  "time": {
+    "hour": "ש",
+    "minute": "ד",
+    "second": "ש"
+  },
   "breadcrumbs": {
     "home": "בית",
     "courses": "קורסים",

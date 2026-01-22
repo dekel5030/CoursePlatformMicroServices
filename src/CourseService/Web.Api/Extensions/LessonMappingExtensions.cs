@@ -21,9 +21,8 @@ internal static class LessonMappingExtensions
             dto.Index,
             dto.Duration,
             dto.ThumbnailUrl?.ToString(),
-            "Draft", // LessonSummaryDto doesn't have Status, using default
             dto.Access.ToString(),
-            linkProvider.CreateLessonLinks(courseContext, lessonContext));
+            linkProvider.CreateLessonLinks(courseContext, lessonContext, new Domain.Module.Primitives.ModuleId(Guid.NewGuid())));
     }
 
     public static LessonDetailsResponse ToApiContract(
@@ -51,6 +50,6 @@ internal static class LessonMappingExtensions
             dto.Access.ToString(),
             "Draft", // LessonDetailsDto doesn't have Status, using default
             dto.VideoUrl?.ToString(),
-            linkProvider.CreateLessonLinks(courseContext: courseContext, lessonContext: lessonContext));
+            linkProvider.CreateLessonLinks(courseContext: courseContext, lessonContext: lessonContext, new Domain.Module.Primitives.ModuleId(Guid.NewGuid())));
     }
 }

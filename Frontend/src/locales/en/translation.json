@@ -21,6 +21,11 @@
     "previous": "Previous",
     "next": "Next"
   },
+  "time": {
+    "hour": "h",
+    "minute": "m",
+    "second": "s"
+  },
   "breadcrumbs": {
     "home": "Home",
     "courses": "Courses",

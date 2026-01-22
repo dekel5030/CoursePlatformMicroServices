@@ -23,10 +23,17 @@ const ALLOWED_VIDEO_TYPES = [
 
 const ALLOWED_VIDEO_EXTENSIONS = ALLOWED_VIDEO_TYPES.join(",");
 
-export function LessonVideoUpload({ courseId, lessonId, links }: LessonVideoUploadProps) {
+export function LessonVideoUpload({
+  courseId,
+  lessonId,
+  links,
+}: LessonVideoUploadProps) {
   const { t } = useTranslation(["lessons"]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadVideo, isUploading, reset } = useLessonVideoUpload(courseId, lessonId);
+  const { uploadVideo, isUploading, reset } = useLessonVideoUpload(
+    courseId,
+    lessonId,
+  );
 
   // Check if user has permission to upload video
   const uploadLink = getLink(links, LessonRels.GENERATE_VIDEO_UPLOAD_URL);
@@ -47,7 +54,7 @@ export function LessonVideoUpload({ courseId, lessonId, links }: LessonVideoUplo
   };
 
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;

@@ -1,17 +1,37 @@
-using Courses.Application.Categories.Dtos;
-using Courses.Application.Modules.Dtos;
-using Courses.Application.Shared.Dtos;
+using Courses.Application.Abstractions.Hateoas;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 
 namespace Courses.Application.Courses.Dtos;
 
+public record ModuleLessonDto(
+    Guid LessonId,
+    string Title,
+    int Index,
+    TimeSpan Duration,
+    string? ThumbnailUrl,
+    string Access,
+    IReadOnlyList<LinkDto> Links
+);
+
+public record ModuleDto(
+    Guid Id,
+    string Title,
+    int Index,
+    int LessonCount,
+    TimeSpan Duration,
+    IReadOnlyList<ModuleLessonDto> Lessons,
+    IReadOnlyList<LinkDto> Links
+);
+
 public record CoursePageDto(
-    CourseId Id,
-    Title Title,
-    Description Description,
-    InstructorDto Instructor,
+    Guid Id,
+    string Title,
+    string Description,
+    Guid InstructorId,
+    string InstructorName,
+    string? InstructorAvatarUrl,
     CourseStatus Status,
     Money Price,
     int EnrollmentCount,
@@ -19,7 +39,10 @@ public record CoursePageDto(
     TimeSpan TotalDuration,
     DateTimeOffset UpdatedAtUtc,
     IReadOnlyList<string> ImageUrls,
-    IReadOnlyList<TagDto> Tags,
-    CategoryDto Category,
-    IReadOnlyList<ModuleDetailsDto> Modules
+    IReadOnlyList<string> Tags,
+    Guid CategoryId,
+    string CategoryName,
+    string CategorySlug,
+    IReadOnlyList<ModuleDto> Modules,
+    IReadOnlyList<LinkDto> Links
 );

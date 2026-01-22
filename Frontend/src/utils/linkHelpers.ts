@@ -10,7 +10,7 @@ export function hasLink(links: LinkDto[] | undefined, rel: string): boolean {
   if (!links || links.length === 0) {
     return false;
   }
-  return links.some(link => link.rel === rel);
+  return links.some((link) => link.rel === rel);
 }
 
 /**
@@ -19,11 +19,14 @@ export function hasLink(links: LinkDto[] | undefined, rel: string): boolean {
  * @param rel - The relation name to find
  * @returns The link if found, undefined otherwise
  */
-export function getLink(links: LinkDto[] | undefined, rel: string): LinkDto | undefined {
+export function getLink(
+  links: LinkDto[] | undefined,
+  rel: string,
+): LinkDto | undefined {
   if (!links || links.length === 0) {
     return undefined;
   }
-  return links.find(link => link.rel === rel);
+  return links.find((link) => link.rel === rel);
 }
 
 /**
@@ -48,4 +51,14 @@ export const LessonRels = {
   PARTIAL_UPDATE: "partial-update",
   DELETE: "delete",
   GENERATE_VIDEO_UPLOAD_URL: "generate-video-upload-url",
+} as const;
+
+/**
+ * Relation names used in the API for module operations
+ */
+export const ModuleRels = {
+  SELF: "self",
+  CREATE_LESSON: "create-lesson",
+  PARTIAL_UPDATE: "partial-update",
+  DELETE: "delete",
 } as const;

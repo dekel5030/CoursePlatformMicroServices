@@ -26,7 +26,7 @@ internal sealed class GetCourseById : IEndpoint
             Result<CoursePageDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
-                dto => Results.Ok(dto.ToApiContract(linkProvider)),
+                dto => Results.Ok(dto),//.ToApiContract(linkProvider)),
                 CustomResults.Problem);
         })
         .WithMetadata<CourseDetailsResponse>(
