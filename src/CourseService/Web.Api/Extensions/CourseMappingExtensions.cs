@@ -82,7 +82,6 @@ internal static class CourseMappingExtensions
             dto.Status,
             dto.LessonsCount);
 
-        // Flatten modules to get lessons
         var lessons = dto.Modules
             .SelectMany(module => module.Lessons)
             .Select(lesson => lesson.ToApiContract(courseContext, linkProvider))

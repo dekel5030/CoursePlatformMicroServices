@@ -13,7 +13,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
     {
         builder.ToTable("Lessons");
         builder.HasKey(lesson => lesson.Id);
-        builder.HasIndex(l => new { l.ModuleId, l.Index }).IsUnique();
+        //builder.HasIndex(l => new { l.ModuleId, l.Index }).IsUnique();
 
         builder.Property(lesson => lesson.Id)
             .HasConversion(
@@ -36,8 +36,6 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
             .HasConversion(
                 slug => slug.Value,
                 value => new Slug(value));
-
-        builder.HasIndex(lesson => lesson.Slug).IsUnique();
 
         builder.Property(l => l.ThumbnailImageUrl)
             .HasConversion(

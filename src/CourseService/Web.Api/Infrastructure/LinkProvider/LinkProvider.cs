@@ -67,7 +67,7 @@ internal sealed class LinkProvider
 
         if (allowedActionsSet.TryGetValue(CourseAction.CreateLesson, out _))
         {
-            links.Add(Create(nameof(CreateLesson), "create-lesson", HttpMethods.Post, new { courseId = idStr }));
+            links.Add(Create(nameof(CreateLesson), "create-lesson", HttpMethods.Post, new { moduleId = idStr }));
         }
 
         if (allowedActionsSet.TryGetValue(CourseAction.UploadImageUrl, out _))
