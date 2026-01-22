@@ -7,42 +7,33 @@ using Courses.Domain.Shared.Primitives;
 using Dapper;
 using Kernel;
 using Kernel.Messaging.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Categories.Queries.GetCategories;
 
-internal sealed class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQuery, IReadOnlyList<CategoryDto>>
+internal sealed class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQuery, CategoryCollectionDto>
 {
-    private readonly ISqlConnectionFactory _connectionFactory;
+    private readonly IReadDbContext _readDbContext;
 
-    public GetCategoriesQueryHandler(ISqlConnectionFactory connectionFactory)
+    public GetCategoriesQueryHandler(IReadDbContext readDbContext)
     {
-        _connectionFactory = connectionFactory;
+        _readDbContext = readDbContext;
     }
 
-    public async Task<Result<IReadOnlyList<CategoryDto>>> Handle(
+    public async Task<Result<CategoryCollectionDto>> Handle(
         GetCategoriesQuery request,
         CancellationToken cancellationToken = default)
     {
-        using IDbConnection connection = _connectionFactory.CreateConnection();
+        int categoryCount = await _readDbContext.Categories.CountAsync(cancellationToken);
 
-        const string sql = @"
-            SELECT 
-                id,
-                name,
-                slug
-            FROM categories
-            ORDER BY name";
+        List<Category> categories = await _readDbContext.Categories.ToListAsync(cancellationToken);
 
-        IEnumerable<CategoryRow> categories = await connection.QueryAsync<CategoryRow>(
-            new CommandDefinition(sql, cancellationToken: cancellationToken));
-
-        List<CategoryDto> categoryDtos = categories
-            .Select(c => new CategoryDto(
-                new CategoryId(c.Id),
-                c.Name,
-                new Slug(c.Slug)))
+        var categoryDtos = categories
+            .Select(c => new CategoryDto(c.Id, c.Name, c.Slug))
             .ToList();
 
-        return Result.Success<IReadOnlyList<CategoryDto>>(categoryDtos);
+        var response = new CategoryCollectionDto(categoryDtos, 1, categoryCount, categoryCount);
+
+        return Result<CategoryCollectionDto>.Success(response);
     }
 }
