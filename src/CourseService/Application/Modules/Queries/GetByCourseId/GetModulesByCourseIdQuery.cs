@@ -4,4 +4,4 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Modules.Queries.GetByCourseId;
 
-public sealed record GetModulesByCourseIdQuery(CourseId CourseId) : IQuery<IReadOnlyList<ModuleDetailsDto>>;
+public sealed record GetModulesByCourseIdQuery(CourseId CourseId) : IQuery<ModuleCollectionDto>;

@@ -6,121 +6,53 @@ using Courses.Application.Modules.Dtos;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Module;
 using Courses.Domain.Module.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Dapper;
 using Kernel;
 using Kernel.Messaging.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Modules.Queries.GetByCourseId;
 
-internal sealed class GetModulesByCourseIdQueryHandler : IQueryHandler<GetModulesByCourseIdQuery, IReadOnlyList<ModuleDetailsDto>>
+internal sealed class GetModulesByCourseIdQueryHandler
+    : IQueryHandler<GetModulesByCourseIdQuery, ModuleCollectionDto>
 {
-    private readonly ISqlConnectionFactory _connectionFactory;
+    private readonly IReadDbContext _readDbContext;
 
-    public GetModulesByCourseIdQueryHandler(ISqlConnectionFactory connectionFactory)
+    public GetModulesByCourseIdQueryHandler(IReadDbContext readDbContext)
     {
-        _connectionFactory = connectionFactory;
+        _readDbContext = readDbContext;
     }
 
-    public async Task<Result<IReadOnlyList<ModuleDetailsDto>>> Handle(
+    public async Task<Result<ModuleCollectionDto>> Handle(
         GetModulesByCourseIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        using IDbConnection connection = _connectionFactory.CreateConnection();
+        List<Module> modules = await _readDbContext.Modules
+            .Include(module => module.Lessons)
+            .Where(module => module.CourseId == request.CourseId)
+            .ToListAsync(cancellationToken);
 
-        // Get course status in a single query with modules
-        const string courseStatusSql = @"
-            SELECT status, lesson_count
-            FROM courses
-            WHERE id = @CourseId";
-
-        var courseStatusRow = await connection.QueryFirstOrDefaultAsync<CourseStatusRow>(
-            new CommandDefinition(courseStatusSql, new { CourseId = request.CourseId.Value }, cancellationToken: cancellationToken));
-
-        if (courseStatusRow is null)
-        {
-            return Result.Failure<IReadOnlyList<ModuleDetailsDto>>(
-                Error.NotFound("Course.NotFound", "The specified course was not found."));
-        }
-
-        bool isPublished = Enum.Parse<CourseStatus>(courseStatusRow.Status, ignoreCase: true) == CourseStatus.Published;
-
-        // Get all modules for the course
-        const string modulesSql = @"
-            SELECT 
-                id,
-                title,
-                index,
-                course_id AS CourseId
-            FROM modules
-            WHERE course_id = @CourseId
-            ORDER BY index";
-
-        IEnumerable<Courses.Application.Shared.Dtos.ModuleRow> modules = await connection.QueryAsync<Courses.Application.Shared.Dtos.ModuleRow>(
-            new CommandDefinition(modulesSql, new { CourseId = request.CourseId.Value }, cancellationToken: cancellationToken));
-
-        List<ModuleRow> modulesList = modules.ToList();
-
-        if (modulesList.Count == 0)
-        {
-            return Result.Success<IReadOnlyList<ModuleDetailsDto>>(new List<ModuleDetailsDto>());
-        }
-
-        // Get all lessons for all modules in a single query
-        List<Guid> moduleIds = modulesList.Select(m => m.Id).ToList();
-
-        const string lessonsSql = @"
-            SELECT 
-                id,
-                module_id AS ModuleId,
-                title,
-                index,
-                duration,
-                thumbnail_image_url AS ThumbnailImageUrl,
-                access
-            FROM lessons
-            WHERE module_id = ANY(@ModuleIds)
-            ORDER BY module_id, index";
-
-        IEnumerable<Courses.Application.Shared.Dtos.LessonRow> lessons = await connection.QueryAsync<Courses.Application.Shared.Dtos.LessonRow>(
-            new CommandDefinition(lessonsSql, new { ModuleIds = moduleIds.ToArray() }, cancellationToken: cancellationToken));
-
-        var lessonsByModuleId = lessons.GroupBy(l => l.ModuleId).ToDictionary(g => g.Key, g => g.ToList());
-
-        List<ModuleDetailsDto> moduleDtos = modulesList.Select(module =>
-        {
-            List<Courses.Application.Shared.Dtos.LessonRow> moduleLessons = lessonsByModuleId.GetValueOrDefault(module.Id, new List<Courses.Application.Shared.Dtos.LessonRow>());
-
-            List<LessonSummaryDto> lessonDtos = moduleLessons
-                .OrderBy(l => l.Index)
+        var moduleDetailsDtos = modules.Select(module => new ModuleDetailsDto(
+            module.Id,
+            module.Title,
+            module.Index,
+            module.Lessons.Count,
+            module.Duration,
+            module.Lessons
+                .OrderBy(lesson => lesson.Index)
                 .Select(lesson => new LessonSummaryDto(
-                    new CourseId(module.CourseId),
-                    new ModuleId(module.Id),
-                    new LessonId(lesson.Id),
-                    new Title(lesson.Title ?? string.Empty),
+                    module.Id,
+                    lesson.Id,
+                    lesson.Title,
                     lesson.Index,
                     lesson.Duration,
-                    lesson.ThumbnailImageUrl,
-                    Enum.Parse<LessonAccess>(lesson.Access, ignoreCase: true)))
-                .ToList();
+                    lesson.ThumbnailImageUrl?.Path,
+                    lesson.Access)).ToList())).ToList();
 
-            TimeSpan totalDuration = TimeSpan.FromTicks(moduleLessons.Sum(l => l.Duration.Ticks));
-
-            return new ModuleDetailsDto(
-                new ModuleId(module.Id),
-                new Title(module.Title),
-                module.Index,
-                moduleLessons.Count,
-                totalDuration,
-                lessonDtos);
-        }).ToList();
-
-        return Result.Success<IReadOnlyList<ModuleDetailsDto>>(moduleDtos);
+        ModuleCollectionDto moduleCollectionDto = new(moduleDetailsDtos, 1, 1 , 1);
+        return Result.Success(moduleCollectionDto);
     }
-
-    private sealed record CourseStatusRow(
-        string Status,
-        int LessonCount
-    );
 }
