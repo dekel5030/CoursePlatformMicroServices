@@ -1,5 +1,7 @@
+using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Module;
+using Courses.Domain.Module.Errors;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -26,7 +28,7 @@ internal sealed class PatchLessonCommandHandler : ICommandHandler<PatchLessonCom
 
         if (module is null)
         {
-            return Result.Failure(Error.NotFound("Module.NotFound", "The specified module was not found."));
+            return Result.Failure(ModuleErrors.NotFound);
         }
 
         Result updateResult = module.UpdateLesson(
