@@ -40,13 +40,7 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, C
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Get the last lesson that was added
-        Lesson lesson = module.Lessons.Last();
 
-        return Result.Success(new CreateLessonResponse(
-            module.CourseId,
-            module.Id,
-            lesson.Id,
-            lesson.Title));
+        return Result.Success(new CreateLessonResponse(module.CourseId, module.Id));
     }
 }
