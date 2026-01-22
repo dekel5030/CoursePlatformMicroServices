@@ -1,5 +1,7 @@
-﻿using Courses.Application.Abstractions.Repositories;
+﻿using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Module;
+using Courses.Domain.Module.Errors;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -23,7 +25,7 @@ public class DeleteLessonCommandHandler : ICommandHandler<DeleteLessonCommand>
         Module? module = await _moduleRepository.GetByIdAsync(request.ModuleId, cancellationToken);
         if (module is null)
         {
-            return Result.Failure(Error.NotFound("Module.NotFound", "The specified module was not found."));
+            return Result.Failure(ModuleErrors.NotFound);
         }
 
         Result deletionResult = module.RemoveLesson(request.LessonId);
