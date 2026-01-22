@@ -7,8 +7,6 @@ using Courses.Domain.Shared.Primitives;
 namespace Courses.Application.Lessons.Dtos;
 
 public record LessonDetailsDto(
-    CoursePolicyContext CourseContext,
-    CourseId CourseId,
     ModuleId ModuleId,
     LessonId LessonId,
     Title Title,
