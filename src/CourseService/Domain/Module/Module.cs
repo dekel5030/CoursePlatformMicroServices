@@ -15,6 +15,7 @@ public class Module : Entity<ModuleId>
     public Title Title { get; private set; } = Title.Empty;
     public int Index { get; private set; }
     public TimeSpan Duration { get; private set; } = TimeSpan.Zero;
+    public int LessonCount { get; private set; }
 
     public CourseId CourseId { get; private set; }
     public IReadOnlyList<Lesson> Lessons => _lessons.AsReadOnly();

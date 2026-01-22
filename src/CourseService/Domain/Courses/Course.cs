@@ -24,7 +24,7 @@ public class Course : Entity<CourseId>
     public int EnrollmentCount { get; private set; }
     public int LessonCount { get; private set; }
     public int Views { get; private set; }
-    public TimeSpan TotalDuration { get; private set; } = TimeSpan.Zero;
+    public TimeSpan Duration { get; private set; } = TimeSpan.Zero;
 
     public IReadOnlyCollection<Tag> Tags => _tags;
     public IReadOnlyCollection<ImageUrl> Images => _images;
