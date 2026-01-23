@@ -52,6 +52,6 @@ internal sealed class CreateModuleCommandHandler : ICommandHandler<CreateModuleC
         await _moduleRepository.AddAsync(module, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(new CreateModuleResponse(module.Id, module.CourseId, module.Title));
+        return Result.Success(new CreateModuleResponse(module.Id.Value, module.CourseId.Value, module.Title.Value));
     }
 }

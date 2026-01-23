@@ -3,4 +3,4 @@ using Courses.Domain.Shared.Primitives;
 
 namespace Courses.Application.Courses.Commands.CreateCourse;
 
-public sealed record CreateCourseResponse(CourseId Id, Title Title);
+public sealed record CreateCourseResponse(Guid Id, string Title);

@@ -40,6 +40,6 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, C
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
 
-        return Result.Success(new CreateLessonResponse(module.CourseId, module.Id));
+        return Result.Success(new CreateLessonResponse(module.CourseId.Value, module.Id.Value));
     }
 }

@@ -35,8 +35,8 @@ internal sealed class CreateCourse : IEndpoint
             return result.Match(
                 course => Results.CreatedAtRoute(
                     nameof(GetCourseById),
-                    new { id = course.Id.Value },
-                    new CreateResponse(course.Id.Value, course.Title.Value)
+                    new { id = course.Id },
+                    new CreateResponse(course.Id, course.Title)
                 ),
                 CustomResults.Problem);
         })

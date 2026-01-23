@@ -26,7 +26,7 @@ internal sealed class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQue
         List<Category> categories = await _readDbContext.Categories.ToListAsync(cancellationToken);
 
         var categoryDtos = categories
-            .Select(c => new CategoryDto(c.Id, c.Name, c.Slug))
+            .Select(c => new CategoryDto(c.Id.Value, c.Name, c.Slug.Value))
             .ToList();
 
         var response = new CategoryCollectionDto(categoryDtos, 1, categoryCount, categoryCount);

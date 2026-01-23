@@ -51,6 +51,6 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
         await _courseRepository.AddAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(new CreateCourseResponse(course.Id, course.Title));
+        return Result.Success(new CreateCourseResponse(course.Id.Value, course.Title.Value));
     }
 }

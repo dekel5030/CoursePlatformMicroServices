@@ -1,15 +1,14 @@
 ﻿using Courses.Application.Lessons.Dtos;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Shared.Primitives;
 using Kernel;
 
 namespace Courses.Application.Courses.Dtos;
 
 public record CourseDetailsDto(
-    CourseId Id,
-    Title Title,
-    Description Description,
+    Guid Id,
+    string Title,
+    string Description,
     InstructorDto Instructor,
     CourseStatus Status,
     Money Price,

@@ -38,7 +38,7 @@ internal sealed class CreateLesson : IEndpoint
             return result.Match(
                 lessonDto => Results.CreatedAtRoute(
                     nameof(GetModulesByCourseId),
-                    new { courseId = lessonDto.CourseId.Value },
+                    new { courseId = lessonDto.CourseId },
                     result.Value
                 ),
                 CustomResults.Problem);

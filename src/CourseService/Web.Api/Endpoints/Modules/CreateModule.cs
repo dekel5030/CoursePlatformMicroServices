@@ -34,8 +34,8 @@ internal sealed class CreateModule : IEndpoint
             return result.Match(
                 module => Results.CreatedAtRoute(
                     nameof(GetModulesByCourseId),
-                    new { courseId = module.CourseId.Value },
-                    new CreateResponse(module.ModuleId.Value, module.CourseId.Value, module.Title.Value)
+                    new { courseId = module.CourseId },
+                    new CreateResponse(module.ModuleId, module.CourseId, module.Title)
                 ),
                 CustomResults.Problem);
         })

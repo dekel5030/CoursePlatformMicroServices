@@ -3,4 +3,4 @@ using Courses.Domain.Module.Primitives;
 
 namespace Courses.Application.Lessons.Commands.CreateLesson;
 
-public sealed record CreateLessonResponse(CourseId CourseId, ModuleId ModuleId);
+public sealed record CreateLessonResponse(Guid CourseId, Guid ModuleId);

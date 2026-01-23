@@ -41,7 +41,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
             .Where(u => courses.Select(c => c.InstructorId).Contains(u.Id))
             .ToDictionaryAsync(u => u.Id, u =>
                 new InstructorDto(
-                    u.Id,
+                    u.Id.Value,
                     u.FullName,
                     _urlResolver.Resolve(StorageCategory.Public, u.AvatarUrl ?? "").Value)
             , cancellationToken);
@@ -49,11 +49,11 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
         var courseDtos = courses.Select(course =>
         {
             InstructorDto instructor = instructorDtos.GetValueOrDefault(course.InstructorId)
-                         ?? new InstructorDto(course.InstructorId, "Unknown", null);
+                         ?? new InstructorDto(course.InstructorId.Value, "Unknown", null);
 
             return new CourseSummaryDto(
-                course.Id,
-                course.Title,
+                course.Id.Value,
+                course.Title.Value,
                 instructor,
                 course.Status,
                 course.Price,

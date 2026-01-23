@@ -3,7 +3,7 @@
 namespace Courses.Application.Shared.Dtos;
 
 public record InstructorDto(
-    UserId Id,
+    Guid Id,
     string FullName,
     string? AvatarUrl
 );
