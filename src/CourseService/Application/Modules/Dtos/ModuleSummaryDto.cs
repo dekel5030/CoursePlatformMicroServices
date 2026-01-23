@@ -1,11 +1,11 @@
-using Courses.Domain.Module.Primitives;
+using System;
 using Courses.Domain.Shared.Primitives;
 
 namespace Courses.Application.Modules.Dtos;
 
 public record ModuleSummaryDto(
-    ModuleId Id,
-    Title Title,
+    Guid Id,
+    string Title,
     int Index,
     int LessonCount
 );

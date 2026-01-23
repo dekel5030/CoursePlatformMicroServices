@@ -62,12 +62,12 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
         }
 
         var lessonDetailsPageDto = new LessonDetailsPageDto(
-            lesson.Id,
-            lesson.ModuleId,
-            course.Id,
+            lesson.Id.Value,
+            lesson.ModuleId.Value,
+            course.Id.Value,
             course.Title.Value,
-            lesson.Title,
-            lesson.Description,
+            lesson.Title.Value,
+            lesson.Description.Value,
             lesson.Index,
             lesson.Duration,
             _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl?.Path ?? "").Value,

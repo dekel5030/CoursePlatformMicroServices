@@ -5,10 +5,10 @@ using Courses.Domain.Shared.Primitives;
 namespace Courses.Application.Lessons.Dtos;
 
 public record LessonDetailsDto(
-    ModuleId ModuleId,
-    LessonId LessonId,
-    Title Title,
-    Description Description,
+    Guid ModuleId,
+    Guid LessonId,
+    string Title,
+    string Description,
     int Index,
     TimeSpan Duration,
     string? ThumbnailUrl,
