@@ -1,5 +1,4 @@
-﻿using Courses.Application.Actions;
-using Courses.Application.Courses.Dtos;
+﻿using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses.Primitives;

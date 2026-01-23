@@ -1,4 +1,4 @@
-﻿namespace Courses.Application.Actions.Primitives;
+﻿namespace Courses.Application.Actions.CourseCollection;
 
 public sealed record CourseCollectionAction
 {

@@ -37,7 +37,7 @@ internal sealed class CreateModuleCommandHandler : ICommandHandler<CreateModuleC
 
         IReadOnlyList<Module> existingModules = await _moduleRepository
             .GetAllByCourseIdAsync(request.CourseId, cancellationToken);
-        
+
         int nextIndex = existingModules.Count;
 
         Result<Module> moduleResult = Module.Create(request.CourseId, nextIndex, request.Title);

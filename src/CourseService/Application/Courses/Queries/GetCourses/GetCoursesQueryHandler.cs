@@ -1,13 +1,10 @@
 using System.Data;
-using System.Text.Json;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Shared.Primitives;
-using Dapper;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -42,12 +39,12 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
 
         Dictionary<UserId, InstructorDto> instructorDtos = await _dbContext.Users
             .Where(u => courses.Select(c => c.InstructorId).Contains(u.Id))
-            .ToDictionaryAsync(u => u.Id, u => 
+            .ToDictionaryAsync(u => u.Id, u =>
                 new InstructorDto(
-                    u.Id, 
-                    u.FullName, 
-                    _urlResolver.Resolve(StorageCategory.Public ,u.AvatarUrl ?? "").Value)
-            ,cancellationToken);
+                    u.Id,
+                    u.FullName,
+                    _urlResolver.Resolve(StorageCategory.Public, u.AvatarUrl ?? "").Value)
+            , cancellationToken);
 
         var courseDtos = courses.Select(course =>
         {
@@ -74,7 +71,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
             PageSize: pageSize,
             TotalItems: courseCount
         );
-        
+
         return Result.Success(response);
     }
 }

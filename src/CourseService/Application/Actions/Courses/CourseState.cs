@@ -1,8 +1,8 @@
 ﻿using Courses.Domain.Courses.Primitives;
 
-namespace Courses.Application.Actions;
+namespace Courses.Application.Actions.Courses;
 
-public record CoursePolicyContext(
+public record CourseState(
     CourseId CourseId,
     UserId InstructorId,
     CourseStatus Status,

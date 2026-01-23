@@ -1,5 +1,4 @@
-﻿using Courses.Domain.Categories;
-using Courses.Domain.Shared.Primitives;
+﻿using Courses.Domain.Shared.Primitives;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Courses.Commands.CreateCourse;

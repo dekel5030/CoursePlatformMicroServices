@@ -49,7 +49,7 @@ internal sealed class PatchCourseCommandHandler : ICommandHandler<PatchCourseCom
                 return Result.Failure(CategoryErrors.NotFound);
             }
         }
-        
+
         var tags = request.Tags?.Select(Tag.Create).ToList();
 
         Slug? slug = request.Slug == null ? null : new Slug(request.Slug);

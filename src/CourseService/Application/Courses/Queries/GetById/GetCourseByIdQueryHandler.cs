@@ -1,25 +1,15 @@
 using System.Data;
-using System.Text.Json;
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Hateoas;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Courses.Dtos;
-using Courses.Application.Shared.Dtos;
-using SharedDtos = Courses.Application.Shared.Dtos;
-using Courses.Domain.Courses.Errors;
-using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Module.Primitives;
-using Courses.Domain.Shared.Primitives;
-using Dapper;
-using Kernel;
-using Kernel.Messaging.Abstractions;
+using Courses.Domain.Categories;
 using Courses.Domain.Courses;
-using Microsoft.EntityFrameworkCore;
+using Courses.Domain.Courses.Errors;
 using Courses.Domain.Module;
 using Courses.Domain.Users;
-using Courses.Domain.Categories;
-using Courses.Application.Abstractions.Hateoas;
-using Courses.Application.Actions;
+using Kernel;
+using Kernel.Messaging.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Queries.GetById;
 

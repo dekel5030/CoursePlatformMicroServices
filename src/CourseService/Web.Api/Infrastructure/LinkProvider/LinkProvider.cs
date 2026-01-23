@@ -3,7 +3,6 @@ using Courses.Api.Endpoints.Lessons;
 using Courses.Api.Endpoints.Modules;
 using Courses.Api.Endpoints.Categories;
 using Courses.Application.Actions;
-using Courses.Application.Actions.Abstract;
 using Courses.Application.Actions.Primitives;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
@@ -11,6 +10,8 @@ using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Module.Primitives;
 using Courses.Application.Abstractions.Hateoas;
+using Courses.Application.Actions.Courses;
+using Courses.Application.Actions.CourseCollection;
 
 namespace Courses.Api.Infrastructure.LinkProvider;
 

@@ -1,12 +1,11 @@
-﻿using Courses.Application.Actions.Primitives;
-using Kernel.Auth.Abstractions;
+﻿using Kernel.Auth.Abstractions;
 using Kernel.Auth.AuthTypes;
 
-namespace Courses.Application.Actions.Policies.CourseCollection;
+namespace Courses.Application.Actions.CourseCollection.Policies;
 
 internal sealed class CanCreateCourseRule : ICourseCollectionActionRule
 {
-    public IEnumerable<CourseCollectionAction> Evaluate(IUserContext userContext)
+    public IEnumerable<CourseCollectionAction> Evaluate(Empty state, IUserContext userContext)
     {
         if (userContext.HasPermission(ActionType.Create, ResourceType.Course, ResourceId.Wildcard))
         {

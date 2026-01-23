@@ -2,13 +2,7 @@ using System.Data;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
-using Courses.Application.Shared.Dtos;
-using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Module;
-using Courses.Domain.Module.Primitives;
-using Courses.Domain.Shared.Primitives;
-using Dapper;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -51,7 +45,7 @@ internal sealed class GetModulesByCourseIdQueryHandler
                     lesson.ThumbnailImageUrl?.Path,
                     lesson.Access)).ToList())).ToList();
 
-        ModuleCollectionDto moduleCollectionDto = new(moduleDetailsDtos, 1, 1 , 1);
+        ModuleCollectionDto moduleCollectionDto = new(moduleDetailsDtos, 1, 1, 1);
         return Result.Success(moduleCollectionDto);
     }
 }
