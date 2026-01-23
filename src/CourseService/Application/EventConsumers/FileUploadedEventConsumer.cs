@@ -4,6 +4,7 @@ using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Module;
 using Courses.Domain.Shared.Primitives;
 using Kernel.EventBus;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ namespace Courses.Application.EventConsumers;
 
 internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEvent>
 {
-    private readonly IWriteDbContext _writeDbContext;
+    private readonly IWriteDbContext _dbContext;
     private readonly ILogger<FileUploadedEventConsumer> _logger;
     private const string CourseServiceName = "courseservice";
     private const string LessonImage = "lessonimage";
@@ -22,7 +23,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 
     public FileUploadedEventConsumer(IWriteDbContext writeDbContext, ILogger<FileUploadedEventConsumer> logger)
     {
-        _writeDbContext = writeDbContext;
+        _dbContext = writeDbContext;
         _logger = logger;
     }
 
@@ -59,7 +60,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 
         var lessonId = new LessonId(guidId);
 
-        Lesson? lesson = await _writeDbContext.Lessons
+        Lesson? lesson = await _dbContext.Lessons
             .FirstOrDefaultAsync(c => c.Id == lessonId, cancellationToken);
 
         if (lesson is null)
@@ -68,10 +69,10 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
             return;
         }
 
-        //var videoUrl = new VideoUrl(message.FileKey);
-        //lesson.UpdateMedia(videoUrl: videoUrl, duration: TimeSpan.FromMinutes(8));
+        var videoUrl = new VideoUrl(message.FileKey);
+        Module module = await _dbContext.Modules.FirstAsync(module => module.Id == lesson.ModuleId, cancellationToken: cancellationToken);
 
-        await _writeDbContext.SaveChangesAsync(cancellationToken);
+        module.UpdateLessonMedia(lessonId, videoUrl: videoUrl);
 
         _logger.LogInformation("Updated image for lesson {LessonId}", lessonId);
     }
@@ -88,7 +89,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 
         var courseId = new CourseId(guidId);
 
-        Course? course = await _writeDbContext.Courses
+        Course? course = await _dbContext.Courses
             .FirstOrDefaultAsync(c => c.Id == courseId, cancellationToken);
 
         if (course is null)
@@ -100,7 +101,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
         var imageUrl = new ImageUrl(message.FileKey);
         course.AddImage(imageUrl);
 
-        await _writeDbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Updated image for course {CourseId}", courseId);
     }
@@ -117,7 +118,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 
         var lessonId = new LessonId(guidId);
 
-        Lesson? lesson = await _writeDbContext.Lessons
+        Lesson? lesson = await _dbContext.Lessons
             .FirstOrDefaultAsync(c => c.Id == lessonId, cancellationToken);
 
         if (lesson is null)
@@ -129,7 +130,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
         //var imageUrl = new ImageUrl(message.FileKey);
         //lesson.UpdateMedia(thumbnailImageUrl: imageUrl);
 
-        await _writeDbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Updated image for lesson {LessonId}", lessonId);
     }

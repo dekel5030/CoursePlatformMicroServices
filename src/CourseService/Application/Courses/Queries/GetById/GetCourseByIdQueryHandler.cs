@@ -81,10 +81,10 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
                 Index: module.Index,
                 LessonCount: module.LessonCount,
                 Duration: module.Duration,
-                Links: _hateoasProvider.CreateModuleLinks(course.Id, module.Id),
+                Links: _hateoasProvider.CreateModuleCollectionLinks(course.Id),
                 Lessons: module.Lessons.Select(lesson =>
                 {
-                    return new ModuleLessonDto(
+                    return new LessonDto(
                         LessonId: lesson.Id.Value,
                         Title: lesson.Title.Value,
                         Index: lesson.Index,

@@ -1,6 +1,6 @@
 ﻿namespace Courses.Application.Shared.Dtos;
 
-public record CollectionDto<T>(
+public record PaginatedCollectionDto<T>(
     IReadOnlyCollection<T> Items,
     int PageNumber,
     int PageSize,

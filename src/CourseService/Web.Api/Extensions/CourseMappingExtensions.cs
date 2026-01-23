@@ -4,6 +4,7 @@ using Courses.Api.Contracts.Shared;
 using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Actions;
 using Courses.Application.Courses.Dtos;
+using Courses.Application.Courses.Queries.GetById;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
@@ -112,7 +113,7 @@ internal static class CourseMappingExtensions
     }
 
     private static LessonSummaryResponse ToApiContract(
-        this ModuleLessonDto lesson,
+        this LessonDto lesson,
         CoursePolicyContext courseContext,
         LinkProvider linkProvider,
         ModuleId moduleId)

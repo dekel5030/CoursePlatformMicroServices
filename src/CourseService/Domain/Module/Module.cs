@@ -59,10 +59,11 @@ public class Module : Entity<ModuleId>
 
     public Result UpdateLesson(
         LessonId lessonId,
-        Title? title,
-        Description? description,
-        LessonAccess? access,
-        int? index)
+        Title? title = null,
+        Description? description = null,
+        LessonAccess? access = null,
+        int? index = null,
+        Slug? slug = null)
     {
         Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
         if (lesson is null)
@@ -70,7 +71,24 @@ public class Module : Entity<ModuleId>
             return Result.Failure(LessonErrors.NotFound);
         }
 
-        lesson.UpdateDetails(title, description, access, index);
+        lesson.UpdateDetails(title, description, access, index, slug);
+        return Result.Success();
+    }
+
+
+    public Result UpdateLessonMedia(
+        LessonId lessonId,
+        ImageUrl? thumbnailImageUrl = null,
+        VideoUrl? videoUrl = null,
+        TimeSpan? duration = null)
+    {
+        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
+        if (lesson is null)
+        {
+            return Result.Failure(LessonErrors.NotFound);
+        }
+        lesson.UpdateMedia(thumbnailImageUrl, videoUrl, duration);
+
         return Result.Success();
     }
 

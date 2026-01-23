@@ -1,29 +1,10 @@
 using Courses.Application.Abstractions.Hateoas;
+using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 
-namespace Courses.Application.Courses.Dtos;
-
-public record ModuleLessonDto(
-    Guid LessonId,
-    string Title,
-    int Index,
-    TimeSpan Duration,
-    string? ThumbnailUrl,
-    string Access,
-    IReadOnlyList<LinkDto> Links
-);
-
-public record ModuleDto(
-    Guid Id,
-    string Title,
-    int Index,
-    int LessonCount,
-    TimeSpan Duration,
-    IReadOnlyList<ModuleLessonDto> Lessons,
-    IReadOnlyList<LinkDto> Links
-);
+namespace Courses.Application.Courses.Queries.GetById;
 
 public record CoursePageDto(
     Guid Id,

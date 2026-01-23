@@ -7,7 +7,7 @@ public sealed record CourseCollectionDto(
     int PageNumber,
     int PageSize,
     int TotalItems
-) : CollectionDto<CourseSummaryDto>(
+) : PaginatedCollectionDto<CourseSummaryDto>(
     Items,
     PageNumber,
     PageSize,

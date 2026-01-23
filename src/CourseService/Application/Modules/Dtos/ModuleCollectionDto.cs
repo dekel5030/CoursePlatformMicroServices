@@ -7,4 +7,4 @@ public sealed record ModuleCollectionDto(
     int PageNumber,
     int PageSize,
     int TotalItems)
-    : CollectionDto<ModuleDetailsDto>(Items, PageNumber, PageSize, TotalItems);
+    : PaginatedCollectionDto<ModuleDetailsDto>(Items, PageNumber, PageSize, TotalItems);
