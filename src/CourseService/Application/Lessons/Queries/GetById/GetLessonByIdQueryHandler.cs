@@ -1,6 +1,6 @@
 using System.Data;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.LinkProvider;
+using Courses.Application.Abstractions.Links;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Dtos;
 using Courses.Domain.Courses;
@@ -18,13 +18,16 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
 {
     private readonly IReadDbContext _dbContext;
     private readonly IStorageUrlResolver _urlResolver;
+    private readonly ILessonLinkFactory _lessonLinkFactory;
 
     public GetLessonByIdQueryHandler(
         IStorageUrlResolver urlResolver,
-        IReadDbContext dbContext)
+        IReadDbContext dbContext,
+        ILessonLinkFactory lessonLinkFactory)
     {
         _urlResolver = urlResolver;
         _dbContext = dbContext;
+        _lessonLinkFactory = lessonLinkFactory;
     }
 
     public async Task<Result<LessonDetailsPageDto>> Handle(
@@ -58,10 +61,6 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
         }
 
-        //User instructor = await _dbContext.Users
-        //    .Where(u => u.Id == course.InstructorId)
-        //    .FirstAsync(cancellationToken);
-
         var lessonDetailsPageDto = new LessonDetailsPageDto(
             lesson.Id,
             lesson.ModuleId,
@@ -74,7 +73,7 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl?.Path ?? "").Value,
             lesson.Access.ToString(),
             _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl?.Path ?? "").Value,
-            new List<LinkDto>());
+            _lessonLinkFactory.CreateLinks(lesson).ToList());
 
         return Result.Success(lessonDetailsPageDto);
     }

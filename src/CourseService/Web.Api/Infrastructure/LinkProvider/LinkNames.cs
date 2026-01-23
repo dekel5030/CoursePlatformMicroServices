@@ -24,4 +24,9 @@ internal static class LinkNames
     {
         public const string CreateLesson = "create-lesson";
     }
+
+    internal static class Lessons
+    {
+        public const string UploadVideoUrl = "upload-video-url";
+    }
 }

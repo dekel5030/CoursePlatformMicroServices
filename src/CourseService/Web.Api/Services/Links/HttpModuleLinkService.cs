@@ -1,14 +1,16 @@
-﻿using Courses.Application.Abstractions.LinkProvider;
-using Microsoft.AspNetCore.Routing;
+using Courses.Api.Endpoints.Lessons;
+using Courses.Api.Infrastructure.LinkProvider;
+using Courses.Application.Abstractions.Links;
+using Courses.Application.Abstractions.LinkProvider;
 
-namespace Courses.Api.Infrastructure.LinkProvider.Abstractions;
+namespace Courses.Api.Services.Links;
 
-internal abstract class LinkProviderBase
+internal sealed class HttpModuleLinkService : IModuleLinkService
 {
     private readonly LinkGenerator _linkGenerator;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    protected LinkProviderBase(
+    public HttpModuleLinkService(
         LinkGenerator linkGenerator,
         IHttpContextAccessor httpContextAccessor)
     {
@@ -16,7 +18,16 @@ internal abstract class LinkProviderBase
         _httpContextAccessor = httpContextAccessor;
     }
 
-    protected LinkDto CreateLink(string endpointName, string rel, string method, object? values = null)
+    public LinkDto GetCreateLessonLink(Guid moduleId)
+    {
+        return CreateLink(
+            nameof(CreateLesson),
+            LinkNames.Modules.CreateLesson,
+            HttpMethods.Post,
+            new { moduleId });
+    }
+
+    private LinkDto CreateLink(string endpointName, string rel, string method, object? values = null)
     {
         HttpContext httpContext = _httpContextAccessor.HttpContext
             ?? throw new InvalidOperationException("HTTP context is not available.");

@@ -1,8 +1,9 @@
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Endpoints;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure.LinkProvider;
+using Courses.Api.Services.Links;
 using Courses.Application;
+using Courses.Application.Abstractions.Links;
 using Courses.Infrastructure;
 using Courses.Infrastructure.Extensions;
 
@@ -20,7 +21,13 @@ builder.AddDefaultOpenApi();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
-builder.Services.AddLinkProvider();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICourseLinkService, HttpCourseLinkService>();
+builder.Services.AddScoped<IModuleLinkService, HttpModuleLinkService>();
+builder.Services.AddScoped<ILessonLinkService, HttpLessonLinkService>();
+builder.Services.AddScoped<ICourseLinkFactory, CourseLinkFactory>();
+builder.Services.AddScoped<IModuleLinkFactory, ModuleLinkFactory>();
+builder.Services.AddScoped<ILessonLinkFactory, LessonLinkFactory>();
 
 WebApplication app = builder.Build();
 

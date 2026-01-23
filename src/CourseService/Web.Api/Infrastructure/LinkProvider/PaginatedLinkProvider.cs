@@ -1,20 +1,21 @@
 ﻿using CoursePlatform.ServiceDefaults.Dtos;
 using Courses.Api.Endpoints.Courses;
-using Courses.Api.Infrastructure.LinkProvider.Abstractions;
 using Courses.Application.Abstractions.LinkProvider;
 using Courses.Application.Shared.Dtos;
 
 namespace Courses.Api.Infrastructure.LinkProvider;
 
 internal sealed class PaginatedLinkProvider<TItem>
-    : LinkProviderBase,
-      ICollectionLinkProvider<PagnitatedResponse<TItem>, PagedQueryDto>
 {
+    private readonly LinkGenerator _linkGenerator;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
     public PaginatedLinkProvider(
         LinkGenerator linkGenerator,
         IHttpContextAccessor httpContextAccessor)
-        : base(linkGenerator, httpContextAccessor)
     {
+        _linkGenerator = linkGenerator;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public IReadOnlyCollection<LinkDto> CreateLinks(PagnitatedResponse<TItem> collection, PagedQueryDto query)
@@ -49,5 +50,20 @@ internal sealed class PaginatedLinkProvider<TItem>
         }
 
         return links;
+    }
+
+    private LinkDto CreateLink(string endpointName, string rel, string method, object? values = null)
+    {
+        HttpContext httpContext = _httpContextAccessor.HttpContext
+            ?? throw new InvalidOperationException("HTTP context is not available.");
+
+        string? href = _linkGenerator.GetUriByName(httpContext, endpointName, values);
+
+        return new LinkDto
+        {
+            Href = href ?? throw new InvalidOperationException($"Could not generate URL for endpoint '{endpointName}'.kind."),
+            Rel = rel,
+            Method = method
+        };
     }
 }
