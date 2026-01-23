@@ -10,4 +10,5 @@ public sealed record CourseAction
     public static readonly CourseAction Delete = new("Delete");
     public static readonly CourseAction Read = new("Read");
     public static readonly CourseAction UploadImageUrl = new("UploadImage");
+    public static readonly CourseAction CreateModule = new("CreateModule");
 }

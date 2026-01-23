@@ -1,4 +1,4 @@
-﻿using Courses.Application.Actions.Abstract;
+﻿using Courses.Application.Actions.Abstractions;
 using Courses.Application.Actions.CourseCollection.Policies;
 using Kernel.Auth.Abstractions;
 

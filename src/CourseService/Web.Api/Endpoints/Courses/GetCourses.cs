@@ -1,7 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Contracts.Courses;
-using Courses.Api.Contracts.Shared;
+using Courses.Api.Endpoints.Contracts.Courses;
+using Courses.Api.Endpoints.Contracts.Shared;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Courses.Dtos;
@@ -19,7 +19,6 @@ internal sealed class GetCourses : IEndpoint
         app.MapGet("courses", async (
             [AsParameters] PagedQueryDto pagedQuery,
             IMediator mediator,
-            LinkProvider linksProvider,
             HttpContext context,
             CancellationToken cancellationToken) =>
         {
@@ -27,7 +26,7 @@ internal sealed class GetCourses : IEndpoint
             Result<CourseCollectionDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
-                dto => Results.Ok(dto.ToApiContract(linksProvider, pagedQuery)),
+                dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
         .WithMetadata<PagedResponse<CourseSummaryResponse>>(

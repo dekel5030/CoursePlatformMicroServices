@@ -1,4 +1,4 @@
-using Courses.Application.Abstractions.Hateoas;
+using Courses.Application.Abstractions.LinkProvider;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Module.Primitives;

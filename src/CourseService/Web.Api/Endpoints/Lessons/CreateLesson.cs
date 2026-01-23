@@ -22,8 +22,7 @@ internal sealed class CreateLesson : IEndpoint
         app.MapPost("modules/{moduleId:Guid}/lessons", async (
             Guid moduleId,
             CreateLessonRequest request,
-            IMediator mediator,
-            LinkProvider linkProvider) =>
+            IMediator mediator) =>
         {
             Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
             Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
@@ -40,11 +39,11 @@ internal sealed class CreateLesson : IEndpoint
                 lessonDto => Results.CreatedAtRoute(
                     nameof(GetModulesByCourseId),
                     new { courseId = lessonDto.CourseId.Value },
-                    new CreateResponse(lessonDto.ModuleId.Value, lessonDto.CourseId.Value, "Lesson")
+                    result.Value
                 ),
                 CustomResults.Problem);
         })
-        .WithMetadata<CreateResponse>(
+        .WithMetadata<CreateLessonResponse>(
             nameof(CreateLesson),
             Tags.Lessons,
             "Create a lesson",

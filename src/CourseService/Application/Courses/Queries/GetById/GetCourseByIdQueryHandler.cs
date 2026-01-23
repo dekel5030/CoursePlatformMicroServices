@@ -1,7 +1,11 @@
 using System.Data;
+using System.Linq;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Hateoas;
+using Courses.Application.Abstractions.LinkProvider;
 using Courses.Application.Abstractions.Storage;
+using Courses.Application.Actions.Courses;
+using Courses.Application.Actions.Lessons;
+using Courses.Application.Actions.Modules;
 using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
@@ -17,16 +21,22 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
 {
     private readonly IReadDbContext _readDbContext;
     private readonly IStorageUrlResolver _urlResolver;
-    private readonly IHateoasLinkProvider _hateoasProvider;
+    private readonly ICourseLinkProvider _courseLinkProvider;
+    private readonly IModuleLinkProvider _moduleLinkProvider;
+    private readonly ILessonLinkProvider _lessonLinkProvider;
 
     public GetCourseByIdQueryHandler(
         IStorageUrlResolver urlResolver,
         IReadDbContext readDbContext,
-        IHateoasLinkProvider hateoasProvider)
+        ICourseLinkProvider courseLinkProvider,
+        IModuleLinkProvider moduleLinkProvider,
+        ILessonLinkProvider lessonLinkProvider)
     {
         _urlResolver = urlResolver;
         _readDbContext = readDbContext;
-        _hateoasProvider = hateoasProvider;
+        _courseLinkProvider = courseLinkProvider;
+        _moduleLinkProvider = moduleLinkProvider;
+        _lessonLinkProvider = lessonLinkProvider;
     }
 
     public async Task<Result<CoursePageDto>> Handle(
@@ -61,7 +71,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
 
         var tags = course.Tags.Select(tag => tag.Value).ToList();
 
-        var courseContext = new CoursePolicyContext(course.Id, instructor.Id, course.Status, course.LessonCount);
+        var courseState = new CourseState(course.Id, instructor.Id, course.Status, course.LessonCount);
 
         var moduleDtos = modules.Select(module =>
         {
@@ -71,7 +81,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
                 Index: module.Index,
                 LessonCount: module.LessonCount,
                 Duration: module.Duration,
-                Links: _hateoasProvider.CreateModuleCollectionLinks(course.Id),
+                Links: _moduleLinkProvider.CreateLinks(new ModuleState(module.CourseId, module.Id)).ToList(),
                 Lessons: module.Lessons.Select(lesson =>
                 {
                     return new LessonDto(
@@ -82,7 +92,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
                         ThumbnailUrl: lesson.ThumbnailImageUrl == null ? null :
                             _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
                         Access: lesson.Access.ToString(),
-                        Links: _hateoasProvider.CreateLessonLinks(courseContext, new LessonPolicyContext(lesson.Id, lesson.Access), module.Id)
+                        Links: _lessonLinkProvider.CreateLinks(new LessonState(lesson.Id)).ToList()
                     );
                 }).ToList()
             );
@@ -107,7 +117,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             category.Name,
             category.Slug.Value,
             moduleDtos,
-            _hateoasProvider.CreateCourseLinks(courseContext));
+            _courseLinkProvider.CreateLinks(courseState).ToList());
 
         return Result<CoursePageDto>.Success(response);
     }

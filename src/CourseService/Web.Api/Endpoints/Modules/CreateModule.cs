@@ -22,7 +22,6 @@ internal sealed class CreateModule : IEndpoint
             Guid courseId,
             CreateModuleRequest request,
             IMediator mediator,
-            LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
             Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);

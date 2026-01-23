@@ -28,7 +28,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
         GetCoursesQuery request,
         CancellationToken cancellationToken = default)
     {
-        int pageNumber = Math.Max(1, request.PagedQuery.PageNumber ?? 1);
+        int pageNumber = Math.Max(1, request.PagedQuery.Page ?? 1);
         int pageSize = Math.Clamp(request.PagedQuery.PageSize ?? 10, 1, 100);
 
         int courseCount = await _dbContext.Courses.CountAsync(cancellationToken);

@@ -1,4 +1,4 @@
-using Courses.Application.Abstractions.Hateoas;
+using Courses.Application.Abstractions.LinkProvider;
 
 namespace Courses.Application.Courses.Queries.GetById;
 

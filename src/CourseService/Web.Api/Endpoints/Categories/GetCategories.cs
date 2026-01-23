@@ -1,7 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Contracts.Categories;
-using Courses.Api.Contracts.Shared;
+using Courses.Api.Endpoints.Contracts.Categories;
+using Courses.Api.Endpoints.Contracts.Shared;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Categories.Dtos;
@@ -17,17 +17,16 @@ internal sealed class GetCategories : IEndpoint
     {
         app.MapGet("categories", async (
             IMediator mediator,
-            LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
             var query = new GetCategoriesQuery();
             Result<CategoryCollectionDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
-                dto => Results.Ok(dto.ToApiContract(linkProvider)),
+                dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
-        .WithMetadata<PagedResponse<CategoryResponse>>(
+        .WithMetadata<CategoryCollectionDto>(
             nameof(GetCategories),
             tag: Tags.Categories,
             summary: "Gets all categories.");

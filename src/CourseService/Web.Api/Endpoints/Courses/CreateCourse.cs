@@ -23,7 +23,6 @@ internal sealed class CreateCourse : IEndpoint
         app.MapPost("courses", async (
             CreateCourseRequest request,
             IMediator mediator,
-            LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
             Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);

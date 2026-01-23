@@ -1,6 +1,5 @@
-﻿using Courses.Application.Actions.Abstract;
+﻿using Courses.Application.Actions.Abstractions;
 using Courses.Application.Actions.CourseCollection;
-using Courses.Application.Actions.Modules.Policies;
 
 namespace Courses.Application.Actions.Modules;
 

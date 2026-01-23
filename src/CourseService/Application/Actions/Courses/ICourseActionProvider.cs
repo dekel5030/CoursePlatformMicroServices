@@ -1,4 +1,4 @@
-﻿using Courses.Application.Actions.Abstract;
+﻿using Courses.Application.Actions.Abstractions;
 
 namespace Courses.Application.Actions.Courses;
 

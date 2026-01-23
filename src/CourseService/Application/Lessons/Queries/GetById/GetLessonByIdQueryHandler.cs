@@ -1,6 +1,6 @@
 using System.Data;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Hateoas;
+using Courses.Application.Abstractions.LinkProvider;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Dtos;
 using Courses.Domain.Courses;
@@ -18,16 +18,13 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
 {
     private readonly IReadDbContext _dbContext;
     private readonly IStorageUrlResolver _urlResolver;
-    private readonly IHateoasLinkProvider _hateoasProvider;
 
     public GetLessonByIdQueryHandler(
         IStorageUrlResolver urlResolver,
-        IReadDbContext dbContext,
-        IHateoasLinkProvider hateoasProvider)
+        IReadDbContext dbContext)
     {
         _urlResolver = urlResolver;
         _dbContext = dbContext;
-        _hateoasProvider = hateoasProvider;
     }
 
     public async Task<Result<LessonDetailsPageDto>> Handle(
@@ -61,16 +58,9 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
         }
 
-        User instructor = await _dbContext.Users
-            .Where(u => u.Id == course.InstructorId)
-            .FirstAsync(cancellationToken);
-
-        // Create policy contexts for link generation
-        var courseContext = new CoursePolicyContext(course.Id, instructor.Id, course.Status, course.LessonCount);
-        var lessonContext = new LessonPolicyContext(lesson.Id, lesson.Access);
-
-        // Generate links
-        IReadOnlyCollection<LinkDto> links = _hateoasProvider.CreateLessonLinks(courseContext, lessonContext, lesson.ModuleId);
+        //User instructor = await _dbContext.Users
+        //    .Where(u => u.Id == course.InstructorId)
+        //    .FirstAsync(cancellationToken);
 
         var lessonDetailsPageDto = new LessonDetailsPageDto(
             lesson.Id,
@@ -84,7 +74,7 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl?.Path ?? "").Value,
             lesson.Access.ToString(),
             _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl?.Path ?? "").Value,
-            links);
+            new List<LinkDto>());
 
         return Result.Success(lessonDetailsPageDto);
     }

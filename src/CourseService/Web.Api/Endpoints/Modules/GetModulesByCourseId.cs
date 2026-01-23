@@ -1,7 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Contracts.Modules;
-using Courses.Api.Contracts.Shared;
+using Courses.Api.Endpoints.Contracts.Modules;
+using Courses.Api.Endpoints.Contracts.Shared;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Modules.Dtos;
@@ -19,20 +19,17 @@ internal sealed class GetModulesByCourseId : IEndpoint
         app.MapGet("courses/{courseId:Guid}/modules", async (
             Guid courseId,
             IMediator mediator,
-            LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
             var query = new GetModulesByCourseIdQuery(new CourseId(courseId));
 
             Result<ModuleCollectionDto> result = await mediator.Send(query, cancellationToken);
 
-            var courseIdObj = new CourseId(courseId);
-
             return result.Match(
-                dto => Results.Ok(dto.ToApiContract(courseIdObj, linkProvider)),
+                dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
-        .WithMetadata<PagedResponse<ModuleDetailsResponse>>(
+        .WithMetadata<ModuleCollectionDto>(
             nameof(GetModulesByCourseId),
             tag: Tags.Modules,
             summary: "Gets all modules for a course by course ID.");
