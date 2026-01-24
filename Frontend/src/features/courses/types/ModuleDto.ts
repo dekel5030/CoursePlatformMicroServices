@@ -9,7 +9,7 @@ export interface ModuleLessonDto {
   index: number;
   duration: string;
   thumbnailUrl: string | null;
-  access: string;
+  access: string; // "Private" or "Public"
   links: LinkDto[];
 }
 

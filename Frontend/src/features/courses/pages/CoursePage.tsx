@@ -1,7 +1,15 @@
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCourse, usePatchCourse } from "@/features/courses";
-import { Card, CardHeader, CardTitle, CardContent, Skeleton, BreadcrumbNav, InlineEditableTextarea } from "@/components";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Skeleton,
+  BreadcrumbNav,
+  InlineEditableTextarea,
+} from "@/components";
 import { motion } from "framer-motion";
 import { CourseHeader } from "../components/CourseHeader";
 import { CourseLessonsSection } from "../components/CourseLessonsSection";
@@ -12,11 +20,11 @@ export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
   const { data: course, isLoading, error } = useCourse(id);
   const patchCourse = usePatchCourse(id!);
-  const { t, i18n } = useTranslation(['courses', 'translation']);
-  
+  const { t, i18n } = useTranslation(["courses", "translation"]);
+
   // Determine text alignment based on interface locale
-  const isRTL = i18n.dir() === 'rtl';
-  const textAlignClass = isRTL ? 'text-right' : 'text-left';
+  const isRTL = i18n.dir() === "rtl";
+  const textAlignClass = isRTL ? "text-right" : "text-left";
 
   const handleDescriptionUpdate = async (newDescription: string) => {
     const updateLink = getLink(course?.links, CourseRels.PARTIAL_UPDATE);
@@ -24,12 +32,15 @@ export default function CoursePage() {
       console.error("No update link found for this course");
       return;
     }
-    
+
     try {
-      await patchCourse.mutateAsync({ url: updateLink.href, request: { description: newDescription } });
-      toast.success(t('courses:detail.descriptionUpdated'));
+      await patchCourse.mutateAsync({
+        url: updateLink.href,
+        request: { description: newDescription },
+      });
+      toast.success(t("courses:detail.descriptionUpdated"));
     } catch (error) {
-      toast.error(t('courses:detail.descriptionUpdateFailed'));
+      toast.error(t("courses:detail.descriptionUpdateFailed"));
       throw error;
     }
   };
@@ -87,14 +98,14 @@ export default function CoursePage() {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
-          {t('courses:detail.notFound')}
+          {t("courses:detail.notFound")}
         </div>
       </div>
     );
   }
 
   const contentDir = i18n.dir();
-  
+
   // Check if user can update course based on HATEOAS links
   const canUpdate = hasLink(course.links, CourseRels.PARTIAL_UPDATE);
 
@@ -123,7 +134,7 @@ export default function CoursePage() {
     <div className="space-y-6">
       <BreadcrumbNav items={breadcrumbItems} />
       <motion.div
-        className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"
+        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"
         variants={container}
         initial="hidden"
         animate="show"
@@ -132,12 +143,14 @@ export default function CoursePage() {
           <CourseHeader course={course} />
         </motion.div>
 
-        {/* Always show description section to allow adding description if empty */}
-        {id && (
+        {/* Course Description */}
+        {(course.description || canUpdate) && id && (
           <motion.div variants={item}>
             <Card>
-              <CardHeader>
-                <CardTitle className={textAlignClass}>{t('courses:detail.about')}</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className={textAlignClass}>
+                  {t("courses:detail.about")}
+                </CardTitle>
               </CardHeader>
               <CardContent className={textAlignClass}>
                 {canUpdate ? (
@@ -145,26 +158,24 @@ export default function CoursePage() {
                     value={course.description || ""}
                     onSave={handleDescriptionUpdate}
                     displayClassName={`text-muted-foreground ${textAlignClass}`}
-                    placeholder={t('courses:detail.enterDescription')}
-                    rows={5}
+                    placeholder={t("courses:detail.enterDescription")}
+                    rows={4}
                     maxLength={2000}
                   />
-                ) : (
-                  course.description ? (
-                    <p className={`text-muted-foreground ${textAlignClass}`} dir="auto">
-                      {course.description}
-                    </p>
-                  ) : (
-                    <p className={`text-muted-foreground italic ${textAlignClass}`}>
-                      {t('courses:detail.noDescription')}
-                    </p>
-                  )
-                )}
+                ) : course.description ? (
+                  <p
+                    className={`text-muted-foreground leading-relaxed ${textAlignClass}`}
+                    dir="auto"
+                  >
+                    {course.description}
+                  </p>
+                ) : null}
               </CardContent>
             </Card>
           </motion.div>
         )}
 
+        {/* Course Content - Modules & Lessons */}
         <motion.div variants={item}>
           <CourseLessonsSection course={course} contentDir={contentDir} />
         </motion.div>

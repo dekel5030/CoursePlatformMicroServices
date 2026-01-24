@@ -13,17 +13,22 @@ import type { LessonSummaryDto, LessonModel } from "@/features/lessons/types";
 import type { PagedResponse } from "@/types/LinkDto";
 
 function mapLessonSummaryToModel(
-  dto: LessonSummaryDto,
+  dto: LessonSummaryDto | import("../types").ModuleLessonDto,
   courseId?: string,
 ): LessonModel {
+  // Handle both LessonSummaryDto and ModuleLessonDto
+  const access =
+    "access" in dto ? dto.access : dto.isPreview ? "Public" : "Private";
+
   return {
-    courseId: dto.courseId || courseId || "",
+    courseId:
+      "courseId" in dto ? dto.courseId || courseId || "" : courseId || "",
     lessonId: dto.lessonId,
     title: dto.title,
-    description: dto.description || "",
+    description: "description" in dto ? dto.description || "" : "",
     videoUrl: null,
     thumbnailImage: dto.thumbnailUrl,
-    isPreview: dto.isPreview || dto.access === "Public",
+    isPreview: access === "Public",
     order: dto.index,
     duration: dto.duration,
     links: dto.links,
@@ -52,7 +57,7 @@ function mapCourseDetailsToModel(dto: CourseDetailsDto): CourseModel {
     imageUrl: dto.imageUrls?.[0] || null,
     instructorName: dto.instructorName,
     instructorAvatarUrl: dto.instructorAvatarUrl,
-    isPublished: dto.status === 1,
+    isPublished: dto.status === "Published",
     price: {
       amount: dto.price.amount,
       currency: dto.price.currency,
@@ -64,6 +69,7 @@ function mapCourseDetailsToModel(dto: CourseDetailsDto): CourseModel {
     totalDuration: dto.totalDuration,
     updatedAtUtc: dto.updatedAtUtc,
     categoryName: dto.categoryName,
+    categoryId: dto.categoryId,
     tags: dto.tags,
     links: dto.links,
   };

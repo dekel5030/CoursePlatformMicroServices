@@ -2,7 +2,7 @@ import type { ModuleDto } from "./ModuleDto";
 import type { LinkDto } from "@/types/LinkDto";
 
 /**
- * Backend DTO: Matches CourseDetailsDto from CourseService
+ * Backend DTO: Matches CoursePageDto from CourseService
  * Used for network layer communication
  */
 export interface CourseDetailsDto {
@@ -12,7 +12,7 @@ export interface CourseDetailsDto {
   instructorId: string;
   instructorName: string;
   instructorAvatarUrl: string | null;
-  status: number;
+  status: "Draft" | "Published" | "Deleted";
   price: {
     amount: number;
     currency: string;

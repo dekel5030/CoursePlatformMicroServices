@@ -91,7 +91,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
                         Duration: lesson.Duration,
                         ThumbnailUrl: lesson.ThumbnailImageUrl == null ? null :
                             _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
-                        Access: lesson.Access.ToString(),
+                        Access: lesson.Access,
                         Links: _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState).ToList()
                     );
                 }).ToList()

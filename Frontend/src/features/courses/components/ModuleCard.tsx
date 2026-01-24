@@ -47,31 +47,31 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
 
   return (
     <>
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden border-l-4 border-l-primary/20">
         <CardHeader
-          className="cursor-pointer hover:bg-accent/50 transition-colors p-4"
+          className="cursor-pointer hover:bg-accent/30 transition-colors py-3 px-4"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <div className="flex items-center justify-between gap-4">
             <div className={`flex items-center gap-3 flex-1 ${textAlignClass}`}>
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary font-semibold text-sm">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
                 {index + 1}
               </div>
               <div className="flex-1 min-w-0">
                 <h3
-                  className={`font-semibold text-lg ${textAlignClass}`}
+                  className={`font-semibold ${textAlignClass}`}
                   dir="auto"
                 >
                   {module.title}
                 </h3>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                <div className={`flex items-center gap-3 text-xs text-muted-foreground mt-0.5 ${isRTL ? "flex-row-reverse" : ""}`}>
                   <span>
                     {module.lessonCount} {t("courses:detail.lessons")}
                   </span>
                   {durationText && (
                     <>
                       <span>•</span>
-                      <div className="flex items-center gap-1">
+                      <div className={`flex items-center gap-1 ${isRTL ? "flex-row-reverse" : ""}`}>
                         <Clock className="h-3 w-3" />
                         <span>{durationText}</span>
                       </div>
@@ -86,21 +86,21 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="gap-2"
+                  className="gap-1.5 h-8"
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsAddLessonOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
-                  {t("courses:detail.addLesson")}
+                  <Plus className="h-3.5 w-3.5" />
+                  <span className="text-xs">{t("courses:detail.addLesson")}</span>
                 </Button>
               )}
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                 {isExpanded ? (
-                  <ChevronUp className="h-5 w-5" />
+                  <ChevronUp className="h-4 w-4" />
                 ) : (
-                  <ChevronDown className="h-5 w-5" />
+                  <ChevronDown className="h-4 w-4" />
                 )}
               </Button>
             </div>
@@ -108,7 +108,7 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
         </CardHeader>
 
         {isExpanded && (
-          <CardContent className="p-4 pt-0 space-y-2">
+          <CardContent className="px-4 pb-3 pt-0 space-y-1">
             {sortedLessons.length > 0 ? (
               sortedLessons.map((lesson, lessonIndex) => (
                 <LessonCard
@@ -120,7 +120,7 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
               ))
             ) : (
               <p
-                className={`text-muted-foreground text-sm py-4 ${textAlignClass}`}
+                className={`text-muted-foreground text-sm py-3 ${textAlignClass}`}
               >
                 {t("courses:detail.noLessons")}
               </p>
