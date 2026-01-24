@@ -1,8 +1,6 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Endpoints.Contracts.Courses;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Courses.Queries.GetById;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
@@ -27,7 +25,7 @@ internal sealed class GetCourseById : IEndpoint
                 dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
-        .WithMetadata<CourseDetailsResponse>(
+        .WithMetadata<CoursePageDto>(
             nameof(GetCourseById),
             tag: Tags.Courses,
             summary: "Gets a course by its ID.");

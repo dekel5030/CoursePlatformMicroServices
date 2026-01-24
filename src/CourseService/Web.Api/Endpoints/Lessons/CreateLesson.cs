@@ -2,7 +2,6 @@ using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Endpoints.Modules;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Lessons.Commands.CreateLesson;
 using Courses.Domain.Module.Primitives;
 using Courses.Domain.Shared.Primitives;

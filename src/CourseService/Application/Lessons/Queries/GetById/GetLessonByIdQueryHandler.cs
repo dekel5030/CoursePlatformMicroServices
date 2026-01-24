@@ -1,13 +1,12 @@
 using System.Data;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Links;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Dtos;
+using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Domain.Courses;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Module;
-using Courses.Domain.Users;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;

@@ -1,8 +1,7 @@
 using System.Data;
-using System.Linq;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Links;
 using Courses.Application.Abstractions.Storage;
+using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;

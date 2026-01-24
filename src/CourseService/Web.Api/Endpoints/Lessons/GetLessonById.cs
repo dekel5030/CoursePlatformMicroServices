@@ -1,6 +1,5 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Endpoints.Contracts.Lessons;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Lessons.Queries.GetById;

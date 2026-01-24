@@ -1,9 +1,6 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Endpoints.Contracts.Modules;
-using Courses.Api.Endpoints.Contracts.Shared;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Modules.Dtos;
 using Courses.Application.Modules.Queries.GetByCourseId;
 using Courses.Domain.Courses.Primitives;

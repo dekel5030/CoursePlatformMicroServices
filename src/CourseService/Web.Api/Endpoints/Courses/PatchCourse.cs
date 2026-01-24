@@ -39,8 +39,8 @@ internal sealed class PatchCourse : IEndpoint
             DifficultyLevel? difficulty = !string.IsNullOrWhiteSpace(request.Difficulty) && Enum.TryParse<DifficultyLevel>(request.Difficulty, out DifficultyLevel diff)
                 ? diff
                 : null;
-            CategoryId? categoryId = request.CategoryId.HasValue 
-                ? new CategoryId(request.CategoryId.Value) 
+            CategoryId? categoryId = request.CategoryId.HasValue
+                ? new CategoryId(request.CategoryId.Value)
                 : null;
             Language? language = !string.IsNullOrWhiteSpace(request.Language)
                 ? Language.Parse(request.Language)

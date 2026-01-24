@@ -1,6 +1,6 @@
 ﻿using CoursePlatform.ServiceDefaults.Dtos;
 using Courses.Api.Endpoints.Courses;
-using Courses.Application.Abstractions.LinkProvider;
+using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Shared.Dtos;
 
 namespace Courses.Api.Infrastructure.LinkProvider;

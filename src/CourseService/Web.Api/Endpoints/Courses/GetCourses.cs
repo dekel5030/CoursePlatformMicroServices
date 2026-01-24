@@ -1,9 +1,6 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Endpoints.Contracts.Courses;
-using Courses.Api.Endpoints.Contracts.Shared;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetCourses;
 using Courses.Application.Shared.Dtos;
@@ -29,7 +26,7 @@ internal sealed class GetCourses : IEndpoint
                 dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
-        .WithMetadata<PagedResponse<CourseSummaryResponse>>(
+        .WithMetadata<CourseCollectionDto>(
             nameof(GetCourses),
             tag: Tags.Courses,
             summary: "Gets a paginated list of courses.");
