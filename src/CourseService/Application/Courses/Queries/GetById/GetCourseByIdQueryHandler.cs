@@ -8,19 +8,9 @@ using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Module;
 using Courses.Domain.Users;
-using Courses.Domain.Module.Primitives;
-using Courses.Domain.Shared.Primitives;
-using Dapper;
 using Kernel;
-using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
-using Courses.Domain.Courses;
 using Microsoft.EntityFrameworkCore;
-using Courses.Domain.Module;
-using Courses.Domain.Users;
-using Courses.Domain.Categories;
-using Courses.Application.Abstractions.Hateoas;
-using Courses.Application.Actions;
 
 namespace Courses.Application.Courses.Queries.GetById;
 

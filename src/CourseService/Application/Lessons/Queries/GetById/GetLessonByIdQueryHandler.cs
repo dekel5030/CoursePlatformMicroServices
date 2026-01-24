@@ -1,6 +1,5 @@
 using System.Data;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Hateoas;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Services.Actions.States;
@@ -10,7 +9,6 @@ using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Module;
 using Kernel;
-using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -79,7 +77,7 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl?.Path ?? "").Value,
             lesson.Access.ToString(),
             _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl?.Path ?? "").Value,
-            _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState).ToList());
+            _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState));
 
         return Result.Success(lessonDetailsPageDto);
     }
