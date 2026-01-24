@@ -1,4 +1,5 @@
-﻿using Courses.Domain.Courses;
+﻿using System.Text.Json;
+using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Enrollments.Primitives;

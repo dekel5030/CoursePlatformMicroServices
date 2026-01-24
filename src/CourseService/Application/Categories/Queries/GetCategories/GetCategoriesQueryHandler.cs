@@ -1,7 +1,10 @@
 using System.Data;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Categories.Dtos;
+using Courses.Application.Shared.Dtos;
 using Courses.Domain.Categories;
+using Courses.Domain.Shared.Primitives;
+using Dapper;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;

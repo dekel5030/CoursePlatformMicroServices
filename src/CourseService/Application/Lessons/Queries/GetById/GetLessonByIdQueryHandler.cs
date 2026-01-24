@@ -1,5 +1,6 @@
 using System.Data;
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Hateoas;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Services.Actions.States;

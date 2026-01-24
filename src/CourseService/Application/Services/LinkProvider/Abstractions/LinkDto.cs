@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/CourseService/Application/Services/LinkProvider/Abstractions/LinkDto.cs
 namespace Courses.Application.Services.LinkProvider.Abstractions;
+========
+namespace Courses.Application.Abstractions.Hateoas;
+>>>>>>>> origin/main:src/CourseService/Application/Abstractions/Hateoas/LinkDto.cs
 
 public sealed record LinkDto
 {

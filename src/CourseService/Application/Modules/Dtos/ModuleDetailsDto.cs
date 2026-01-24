@@ -1,4 +1,6 @@
 using Courses.Application.Lessons.Dtos;
+using Courses.Domain.Module.Primitives;
+using Courses.Domain.Shared.Primitives;
 
 namespace Courses.Application.Modules.Dtos;
 

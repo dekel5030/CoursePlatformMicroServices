@@ -89,6 +89,7 @@ public class Module : Entity<ModuleId>
         }
         lesson.UpdateMedia(thumbnailImageUrl, videoUrl, duration);
 
+        lesson.UpdateDetails(title, description, access, index);
         return Result.Success();
     }
 
