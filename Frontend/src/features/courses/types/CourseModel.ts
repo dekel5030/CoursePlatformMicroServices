@@ -23,6 +23,7 @@ export interface CourseModel {
   totalDuration?: string;
   updatedAtUtc?: string;
   categoryName?: string;
+  categoryId?: string;
   tags?: string[];
   links?: LinkDto[];
 }

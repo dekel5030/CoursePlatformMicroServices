@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
@@ -11,7 +12,7 @@ public record CoursePageDto(
     Guid InstructorId,
     string InstructorName,
     string? InstructorAvatarUrl,
-    CourseStatus Status,
+    [property: JsonConverter(typeof(JsonStringEnumConverter))] CourseStatus Status,
     Money Price,
     int EnrollmentCount,
     int LessonsCount,

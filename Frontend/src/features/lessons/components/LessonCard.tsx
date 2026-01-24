@@ -10,7 +10,7 @@ import {
   InlineEditableText,
 } from "@/components";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import { Clock, Trash2 } from "lucide-react";
+import { Clock, Trash2, Play, Lock } from "lucide-react";
 import { usePatchLesson, useDeleteLesson } from "../hooks/use-lessons";
 import { toast } from "sonner";
 import { hasLink, LessonRels, getLink } from "@/utils/linkHelpers";
@@ -40,7 +40,7 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
   const deleteLink = getLink(lesson.links, LessonRels.DELETE);
 
   const formatDuration = (duration: string | null | undefined) => {
-    if (!duration) return null;
+    if (!duration || duration === "00:00:00") return null;
 
     const parts = duration.split(":");
     if (parts.length >= 2) {
@@ -48,11 +48,13 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
       const minutes = parseInt(parts[1]);
 
       if (hours > 0) {
-        return `${hours}h ${minutes}m`;
+        return `${hours}${t("translation:time.hour")} ${minutes}${t("translation:time.minute")}`;
       }
-      return `${minutes}m`;
+      if (minutes > 0) {
+        return `${minutes}${t("translation:time.minute")}`;
+      }
     }
-    return duration;
+    return null;
   };
 
   const handleLessonClick = () => {
@@ -98,28 +100,12 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
     }
   };
 
-  const handleDescriptionUpdate = async (newDescription: string) => {
-    if (!updateLink) {
-      console.error("No update link found for this lesson");
-      return;
-    }
-
-    try {
-      await patchLesson.mutateAsync({
-        url: updateLink.href,
-        request: { description: newDescription },
-      });
-      toast.success(t("lessons:actions.descriptionUpdated"));
-    } catch (error) {
-      toast.error(t("lessons:actions.descriptionUpdateFailed"));
-      throw error;
-    }
-  };
+  const durationText = formatDuration(lesson.duration);
 
   return (
     <>
       <Card
-        className="cursor-pointer hover:shadow-md transition-shadow"
+        className="cursor-pointer hover:bg-accent/50 transition-colors border-l-2 hover:border-l-primary"
         onClick={handleLessonClick}
         role="button"
         tabIndex={0}
@@ -133,84 +119,72 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
           }
         }}
       >
-        <CardContent className="p-4">
-          <div className="flex items-start gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
-              {index + 1}
+        <CardContent className="py-2.5 px-4">
+          <div className="flex items-center gap-3">
+            {/* Play Button */}
+            <div className="shrink-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 hover:bg-primary/20 transition-colors">
+                {lesson.isPreview ? (
+                  <Play className="h-4 w-4 text-primary fill-primary" />
+                ) : (
+                  <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                )}
+              </div>
             </div>
 
-            <div className={`flex-1 space-y-1 min-w-0 ${textAlignClass}`}>
-              <div className="flex items-center gap-2 flex-wrap">
+            {/* Lesson Info */}
+            <div className={`flex-1 min-w-0 ${textAlignClass}`}>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground font-medium">
+                  {index + 1}.
+                </span>
                 {canUpdate ? (
                   <div className="flex-1" onClick={(e) => e.stopPropagation()}>
                     <InlineEditableText
                       value={lesson.title}
                       onSave={handleTitleUpdate}
-                      displayClassName={`font-semibold text-base ${textAlignClass}`}
-                      inputClassName={`font-semibold text-base ${textAlignClass}`}
+                      displayClassName={`font-medium text-sm ${textAlignClass}`}
+                      inputClassName={`font-medium text-sm ${textAlignClass}`}
                       placeholder={t("lessons:actions.enterTitle")}
                       maxLength={200}
                     />
                   </div>
                 ) : (
                   <h3
-                    className={`font-semibold text-base line-clamp-1 ${textAlignClass}`}
+                    className={`font-medium text-sm line-clamp-1 flex-1 ${textAlignClass}`}
                     dir="auto"
                   >
                     {lesson.title}
                   </h3>
                 )}
-                {lesson.isPreview && (
-                  <Badge variant="secondary" className="text-xs">
-                    {t("lessons:card.preview")}
-                  </Badge>
-                )}
               </div>
-
-              {lesson.description !== null &&
-                lesson.description !== undefined &&
-                (canUpdate ? (
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <InlineEditableText
-                      value={lesson.description || ""}
-                      onSave={handleDescriptionUpdate}
-                      displayClassName={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`}
-                      inputClassName={`text-sm ${textAlignClass}`}
-                      placeholder={t("lessons:actions.enterDescription")}
-                      maxLength={500}
-                    />
-                  </div>
-                ) : lesson.description ? (
-                  <p
-                    className={`text-sm text-muted-foreground line-clamp-2 ${textAlignClass}`}
-                    dir="auto"
-                  >
-                    {lesson.description}
-                  </p>
-                ) : null)}
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
-              {lesson.duration && (
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  <span>{formatDuration(lesson.duration)}</span>
+            {/* Badges & Actions */}
+            <div className={`flex items-center gap-2 shrink-0 ${isRTL ? "flex-row-reverse" : ""}`}>
+              {lesson.isPreview && (
+                <Badge variant="secondary" className="text-xs h-5">
+                  {t("lessons:card.preview")}
+                </Badge>
+              )}
+              {durationText && (
+                <div className={`flex items-center gap-1 text-xs text-muted-foreground ${isRTL ? "flex-row-reverse" : ""}`}>
+                  <Clock className="h-3 w-3" />
+                  <span>{durationText}</span>
                 </div>
               )}
-              <div className="flex gap-1">
-                {canDelete && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 hover:text-destructive"
-                    onClick={handleDeleteClick}
-                    title={t("common.delete")}
-                    disabled={deleteLesson.isPending}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
+              {canDelete && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 hover:text-destructive hover:bg-destructive/10"
+                  onClick={handleDeleteClick}
+                  title={t("common.delete")}
+                  disabled={deleteLesson.isPending}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
