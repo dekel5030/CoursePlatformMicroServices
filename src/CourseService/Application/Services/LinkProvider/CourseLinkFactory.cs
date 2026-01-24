@@ -1,53 +1,44 @@
-using Courses.Application.Services.Actions.Courses;
+using Courses.Application.Services.Actions;
+using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
-using Courses.Application.Services.LinkProvider.Abstractions.Links;
-using Courses.Domain.Courses;
+using Courses.Application.Services.LinkProvider.Abstractions.LinkProvider;
 
 namespace Courses.Application.Services.LinkProvider;
 
 internal sealed class CourseLinkFactory : ICourseLinkFactory
 {
-    private readonly ICourseActionProvider _courseActionProvider;
+    private readonly CourseGovernancePolicy _policy;
     private readonly ICourseLinkProvider _courseLinkService;
 
     public CourseLinkFactory(
-        ICourseActionProvider courseActionProvider,
+        CourseGovernancePolicy policy,
         ICourseLinkProvider courseLinkService)
     {
-        _courseActionProvider = courseActionProvider;
+        _policy = policy;
         _courseLinkService = courseLinkService;
     }
 
-    public IReadOnlyList<LinkDto> CreateLinks(Course course)
+    public IReadOnlyList<LinkDto> CreateLinks(CourseState state)
     {
-        var courseState = new CourseState(course.Id, course.InstructorId, course.Status, course.LessonCount);
-        var allowedActions = _courseActionProvider.GetAllowedActions(courseState).ToHashSet();
         var links = new List<LinkDto>();
+        Guid courseId = state.Id.Value;
 
-        if (allowedActions.Contains(CourseAction.Read))
+        if (_policy.CanReadCourse(state))
         {
-            links.Add(_courseLinkService.GetSelfLink(course.Id.Value));
+            links.Add(_courseLinkService.GetSelfLink(courseId));
         }
 
-        if (allowedActions.Contains(CourseAction.Update))
+        if (_policy.CanEditCourseContent(state))
         {
-            links.Add(_courseLinkService.GetUpdateLink(course.Id.Value));
+            links.Add(_courseLinkService.GetUpdateLink(courseId));
+            links.Add(_courseLinkService.GetUploadImageUrlLink(courseId));
+            links.Add(_courseLinkService.GetCreateModuleLink(courseId));
         }
 
-        if (allowedActions.Contains(CourseAction.Delete))
+        if (_policy.CanDeleteCourse(state))
         {
-            links.Add(_courseLinkService.GetDeleteLink(course.Id.Value));
-        }
-
-        if (allowedActions.Contains(CourseAction.UploadImageUrl))
-        {
-            links.Add(_courseLinkService.GetUploadImageUrlLink(course.Id.Value));
-        }
-
-        if (allowedActions.Contains(CourseAction.CreateModule))
-        {
-            links.Add(_courseLinkService.GetCreateModuleLink(course.Id.Value));
+            links.Add(_courseLinkService.GetDeleteLink(courseId));
         }
 
         return links.AsReadOnly();

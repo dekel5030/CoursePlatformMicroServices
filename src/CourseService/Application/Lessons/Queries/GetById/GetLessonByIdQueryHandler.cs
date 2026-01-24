@@ -2,12 +2,14 @@ using System.Data;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Dtos;
+using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Domain.Courses;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Module;
 using Kernel;
+using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -60,6 +62,10 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
         }
 
+        var courseState = new CourseState(course.Id, course.InstructorId, course.Status, course.LessonCount);
+        var moduleState = new ModuleState(module.Id);
+        var lessonState = new LessonState(lesson.Id, lesson.Access);
+
         var lessonDetailsPageDto = new LessonDetailsPageDto(
             lesson.Id.Value,
             lesson.ModuleId.Value,
@@ -72,7 +78,7 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl?.Path ?? "").Value,
             lesson.Access.ToString(),
             _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl?.Path ?? "").Value,
-            _lessonLinkFactory.CreateLinks(lesson).ToList());
+            _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState).ToList());
 
         return Result.Success(lessonDetailsPageDto);
     }

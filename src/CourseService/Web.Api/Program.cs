@@ -3,7 +3,7 @@ using Courses.Api.Endpoints;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application;
-using Courses.Application.Services.LinkProvider.Abstractions.Links;
+using Courses.Application.Services.LinkProvider.Abstractions.LinkProvider;
 using Courses.Infrastructure;
 using Courses.Infrastructure.Extensions;
 

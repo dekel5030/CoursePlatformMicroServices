@@ -1,33 +1,31 @@
-using Courses.Application.Services.Actions.Modules;
+using Courses.Application.Services.Actions;
+using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
-using Courses.Application.Services.LinkProvider.Abstractions.Links;
-using Courses.Domain.Module;
+using Courses.Application.Services.LinkProvider.Abstractions.LinkProvider;
 
 namespace Courses.Application.Services.LinkProvider;
 
 internal sealed class ModuleLinkFactory : IModuleLinkFactory
 {
-    private readonly IModuleActionProvider _moduleActionProvider;
+    private readonly CourseGovernancePolicy _policy;
     private readonly IModuleLinkProvider _moduleLinkService;
 
     public ModuleLinkFactory(
-        IModuleActionProvider moduleActionProvider,
+        CourseGovernancePolicy policy,
         IModuleLinkProvider moduleLinkService)
     {
-        _moduleActionProvider = moduleActionProvider;
+        _policy = policy;
         _moduleLinkService = moduleLinkService;
     }
 
-    public IReadOnlyList<LinkDto> CreateLinks(Module module)
+    public IReadOnlyList<LinkDto> CreateLinks(CourseState courseState, ModuleState moduleState)
     {
-        var moduleState = new ModuleState(module.CourseId, module.Id);
-        var allowedActions = _moduleActionProvider.GetAllowedActions(moduleState).ToHashSet();
         var links = new List<LinkDto>();
 
-        if (allowedActions.Contains(ModuleAction.CreateLesson))
+        if (_policy.CanEditModule(courseState))
         {
-            links.Add(_moduleLinkService.GetCreateLessonLink(module.Id.Value));
+            links.Add(_moduleLinkService.GetCreateLessonLink(moduleState.Id.Value));
         }
 
         return links.AsReadOnly();

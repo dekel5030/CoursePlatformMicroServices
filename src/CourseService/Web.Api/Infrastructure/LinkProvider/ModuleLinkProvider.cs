@@ -1,6 +1,6 @@
 using Courses.Api.Endpoints.Lessons;
 using Courses.Application.Services.LinkProvider.Abstractions;
-using Courses.Application.Services.LinkProvider.Abstractions.Links;
+using Courses.Application.Services.LinkProvider.Abstractions.LinkProvider;
 
 namespace Courses.Api.Infrastructure.LinkProvider;
 

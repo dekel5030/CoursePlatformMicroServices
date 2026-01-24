@@ -1,6 +1,7 @@
 using System.Data;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
+using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Domain.Categories;
 using Courses.Domain.Courses;
@@ -8,6 +9,7 @@ using Courses.Domain.Courses.Errors;
 using Courses.Domain.Module;
 using Courses.Domain.Users;
 using Kernel;
+using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -66,18 +68,23 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             .ToList();
 
         var tags = course.Tags.Select(tag => tag.Value).ToList();
+        var courseState = new CourseState(course.Id, course.InstructorId, course.Status, course.LessonCount);
 
         var moduleDtos = modules.Select(module =>
         {
+            var moduleState = new ModuleState(module.Id);
+
             return new ModuleDto(
                 Id: module.Id.Value,
                 Title: module.Title.Value,
                 Index: module.Index,
-                LessonCount: module.LessonCount,
                 Duration: module.Duration,
-                Links: _moduleLinkFactory.CreateLinks(module).ToList(),
+                Links: _moduleLinkFactory.CreateLinks(courseState, moduleState),
+                LessonCount: module.Lessons.Count,
                 Lessons: module.Lessons.Select(lesson =>
                 {
+                    var lessonState = new LessonState(lesson.Id, lesson.Access);
+
                     return new LessonDto(
                         LessonId: lesson.Id.Value,
                         Title: lesson.Title.Value,
@@ -86,7 +93,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
                         ThumbnailUrl: lesson.ThumbnailImageUrl == null ? null :
                             _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
                         Access: lesson.Access.ToString(),
-                        Links: _lessonLinkFactory.CreateLinks(lesson).ToList()
+                        Links: _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState).ToList()
                     );
                 }).ToList()
             );
@@ -111,7 +118,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             category.Name,
             category.Slug.Value,
             moduleDtos,
-            _courseLinkFactory.CreateLinks(course).ToList());
+            _courseLinkFactory.CreateLinks(courseState).ToList());
 
         return Result<CoursePageDto>.Success(response);
     }

@@ -1,48 +1,44 @@
-using Courses.Application.Services.Actions.Lessons;
+using Courses.Application.Services.Actions;
+using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
-using Courses.Application.Services.LinkProvider.Abstractions.Links;
-using Courses.Domain.Lessons;
+using Courses.Application.Services.LinkProvider.Abstractions.LinkProvider;
 
 namespace Courses.Application.Services.LinkProvider;
 
 internal sealed class LessonLinkFactory : ILessonLinkFactory
 {
-    private readonly ILessonActionProvider _lessonActionProvider;
+    private readonly CourseGovernancePolicy _policy;
     private readonly ILessonLinkProvider _lessonLinkService;
 
     public LessonLinkFactory(
-        ILessonActionProvider lessonActionProvider,
+        CourseGovernancePolicy policy,
         ILessonLinkProvider lessonLinkService)
     {
-        _lessonActionProvider = lessonActionProvider;
+        _policy = policy;
         _lessonLinkService = lessonLinkService;
     }
 
-    public IReadOnlyList<LinkDto> CreateLinks(Lesson lesson)
+    public IReadOnlyList<LinkDto> CreateLinks(
+        CourseState courseState,
+        ModuleState moduleState,
+        LessonState lessonState,
+        EnrollmentState? enrollmentState = null)
     {
-        var lessonState = new LessonState(lesson.Id);
-        var allowedActions = _lessonActionProvider.GetAllowedActions(lessonState).ToHashSet();
         var links = new List<LinkDto>();
+        Guid moduleId = moduleState.Id.Value;
+        Guid lessonId = lessonState.Id.Value;
 
-        if (allowedActions.Contains(LessonAction.Read))
+        if (_policy.CanReadLesson(courseState, lessonState, enrollmentState))
         {
-            links.Add(_lessonLinkService.GetSelfLink(lesson.ModuleId.Value, lesson.Id.Value));
+            links.Add(_lessonLinkService.GetSelfLink(moduleId, lessonId));
         }
 
-        if (allowedActions.Contains(LessonAction.Update))
+        if (_policy.CanEditLesson(courseState))
         {
-            links.Add(_lessonLinkService.GetUpdateLink(lesson.ModuleId.Value, lesson.Id.Value));
-        }
-
-        if (allowedActions.Contains(LessonAction.Delete))
-        {
-            links.Add(_lessonLinkService.GetDeleteLink(lesson.ModuleId.Value, lesson.Id.Value));
-        }
-
-        if (allowedActions.Contains(LessonAction.UploadVideoUrl))
-        {
-            links.Add(_lessonLinkService.GetUploadVideoUrlLink(lesson.ModuleId.Value, lesson.Id.Value));
+            links.Add(_lessonLinkService.GetUpdateLink(moduleId, lessonId));
+            links.Add(_lessonLinkService.GetDeleteLink(moduleId, lessonId));
+            links.Add(_lessonLinkService.GetUploadVideoUrlLink(moduleId, lessonId));
         }
 
         return links.AsReadOnly();

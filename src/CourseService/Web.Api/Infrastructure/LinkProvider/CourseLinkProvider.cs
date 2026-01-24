@@ -1,7 +1,7 @@
 using Courses.Api.Endpoints.Courses;
 using Courses.Api.Endpoints.Modules;
 using Courses.Application.Services.LinkProvider.Abstractions;
-using Courses.Application.Services.LinkProvider.Abstractions.Links;
+using Courses.Application.Services.LinkProvider.Abstractions.LinkProvider;
 
 namespace Courses.Api.Infrastructure.LinkProvider;
 

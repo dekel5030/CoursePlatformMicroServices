@@ -1,8 +1,8 @@
-using Courses.Domain.Courses;
+﻿using Courses.Application.Services.Actions.States;
 
 namespace Courses.Application.Services.LinkProvider.Abstractions.Factories;
 
-public interface ICourseLinkFactory
+internal interface ICourseLinkFactory
 {
-    IReadOnlyList<LinkDto> CreateLinks(Course course);
+    IReadOnlyList<LinkDto> CreateLinks(CourseState state);
 }

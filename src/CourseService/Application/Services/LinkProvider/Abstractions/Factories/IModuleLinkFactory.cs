@@ -1,8 +1,8 @@
-using Courses.Domain.Module;
+﻿using Courses.Application.Services.Actions.States;
 
 namespace Courses.Application.Services.LinkProvider.Abstractions.Factories;
 
-public interface IModuleLinkFactory
+internal interface IModuleLinkFactory
 {
-    IReadOnlyList<LinkDto> CreateLinks(Module module);
+    IReadOnlyList<LinkDto> CreateLinks(CourseState courseState, ModuleState moduleState);
 }

@@ -1,4 +1,4 @@
-namespace Courses.Application.Services.LinkProvider.Abstractions.Links;
+namespace Courses.Application.Services.LinkProvider.Abstractions.LinkProvider;
 
 public interface IModuleLinkProvider
 {

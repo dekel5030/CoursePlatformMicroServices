@@ -1,9 +1,9 @@
 ﻿using Courses.Domain.Courses.Primitives;
 
-namespace Courses.Application.Services.Actions.Courses;
+namespace Courses.Application.Services.Actions.States;
 
 public record CourseState(
-    CourseId CourseId,
+    CourseId Id,
     UserId InstructorId,
     CourseStatus Status,
     int LessonCount
