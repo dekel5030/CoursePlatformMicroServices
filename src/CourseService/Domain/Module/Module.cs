@@ -88,8 +88,6 @@ public class Module : Entity<ModuleId>
             return Result.Failure(LessonErrors.NotFound);
         }
         lesson.UpdateMedia(thumbnailImageUrl, videoUrl, duration);
-
-        lesson.UpdateDetails(title, description, access, index);
         return Result.Success();
     }
 

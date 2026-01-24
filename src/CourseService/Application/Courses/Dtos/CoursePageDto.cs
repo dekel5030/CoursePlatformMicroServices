@@ -1,4 +1,4 @@
-using Courses.Application.Abstractions.Hateoas;
+using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
