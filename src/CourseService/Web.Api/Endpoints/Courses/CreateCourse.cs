@@ -1,9 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Courses.Commands.CreateCourse;
-using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -23,7 +21,6 @@ internal sealed class CreateCourse : IEndpoint
         app.MapPost("courses", async (
             CreateCourseRequest request,
             IMediator mediator,
-            LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
             Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
@@ -36,8 +33,8 @@ internal sealed class CreateCourse : IEndpoint
             return result.Match(
                 course => Results.CreatedAtRoute(
                     nameof(GetCourseById),
-                    new { id = course.Id.Value },
-                    new CreateResponse(course.Id.Value, course.Title.Value)
+                    new { id = course.Id },
+                    new CreateResponse(course.Id, course.Title)
                 ),
                 CustomResults.Problem);
         })

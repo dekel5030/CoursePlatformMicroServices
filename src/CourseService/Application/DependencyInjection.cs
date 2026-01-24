@@ -1,5 +1,6 @@
 ﻿using CoursePlatform.ServiceDefaults.Messaging;
-using Courses.Application.Actions;
+using Courses.Application.Services.Actions;
+using Courses.Application.Services.LinkProvider;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,8 @@ public static class DependencyInjection
         services.AddMediator<AssemblyMarker>();
 
         services.AddActionProvider();
+
+        services.AddLinkFactories();
 
         return services;
     }

@@ -1,9 +1,6 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Contracts.Courses;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure.LinkProvider;
-using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetById;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
@@ -18,7 +15,6 @@ internal sealed class GetCourseById : IEndpoint
         app.MapGet("courses/{id:Guid}", async (
             Guid id,
             IMediator mediator,
-            LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
             var query = new GetCourseByIdQuery(new CourseId(id));
@@ -26,10 +22,10 @@ internal sealed class GetCourseById : IEndpoint
             Result<CoursePageDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
-                dto => Results.Ok(dto),//.ToApiContract(linkProvider)),
+                dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
-        .WithMetadata<CourseDetailsResponse>(
+        .WithMetadata<CoursePageDto>(
             nameof(GetCourseById),
             tag: Tags.Courses,
             summary: "Gets a course by its ID.");

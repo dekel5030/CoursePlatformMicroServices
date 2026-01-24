@@ -35,23 +35,23 @@ internal sealed class GetModulesByCourseIdQueryHandler
             .ToListAsync(cancellationToken);
 
         var moduleDetailsDtos = modules.Select(module => new ModuleDetailsDto(
-            module.Id,
-            module.Title,
+            module.Id.Value,
+            module.Title.Value,
             module.Index,
             module.Lessons.Count,
             module.Duration,
             module.Lessons
                 .OrderBy(lesson => lesson.Index)
                 .Select(lesson => new LessonSummaryDto(
-                    module.Id,
-                    lesson.Id,
-                    lesson.Title,
+                    module.Id.Value,
+                    lesson.Id.Value,
+                    lesson.Title.Value,
                     lesson.Index,
                     lesson.Duration,
                     lesson.ThumbnailImageUrl?.Path,
                     lesson.Access)).ToList())).ToList();
 
-        ModuleCollectionDto moduleCollectionDto = new(moduleDetailsDtos, 1, 1 , 1);
+        ModuleCollectionDto moduleCollectionDto = new(moduleDetailsDtos, 1, 1, 1);
         return Result.Success(moduleCollectionDto);
     }
 }

@@ -6,4 +6,4 @@ public record CategoryCollectionDto(
     IReadOnlyCollection<CategoryDto> Items,
     int PageNumber,
     int PageSize,
-    int TotalItems) : CollectionDto<CategoryDto>(Items, PageNumber, PageSize, TotalItems);
+    int TotalItems) : PaginatedCollectionDto<CategoryDto>(Items, PageNumber, PageSize, TotalItems);

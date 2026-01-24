@@ -4,4 +4,4 @@ using Courses.Domain.Shared.Primitives;
 
 namespace Courses.Application.Modules.Commands.CreateModule;
 
-public sealed record CreateModuleResponse(ModuleId ModuleId, CourseId CourseId, Title Title);
+public sealed record CreateModuleResponse(Guid ModuleId, Guid CourseId, string Title);

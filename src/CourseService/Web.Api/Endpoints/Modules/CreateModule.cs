@@ -1,7 +1,6 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
-using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application.Modules.Commands.CreateModule;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
@@ -22,7 +21,6 @@ internal sealed class CreateModule : IEndpoint
             Guid courseId,
             CreateModuleRequest request,
             IMediator mediator,
-            LinkProvider linkProvider,
             CancellationToken cancellationToken) =>
         {
             Title? title = string.IsNullOrWhiteSpace(request.Title) ? null : new Title(request.Title);
@@ -35,8 +33,8 @@ internal sealed class CreateModule : IEndpoint
             return result.Match(
                 module => Results.CreatedAtRoute(
                     nameof(GetModulesByCourseId),
-                    new { courseId = module.CourseId.Value },
-                    new CreateResponse(module.ModuleId.Value, module.CourseId.Value, module.Title.Value)
+                    new { courseId = module.CourseId },
+                    new CreateResponse(module.ModuleId, module.CourseId, module.Title)
                 ),
                 CustomResults.Problem);
         })

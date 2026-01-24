@@ -2,18 +2,15 @@ using System.Data;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Hateoas;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Actions;
 using Courses.Application.Lessons.Dtos;
+using Courses.Application.Services.Actions.States;
+using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Domain.Courses;
-using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
-using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Module;
-using Courses.Domain.Module.Primitives;
-using Courses.Domain.Users;
-using Dapper;
 using Kernel;
+using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,16 +20,16 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
 {
     private readonly IReadDbContext _dbContext;
     private readonly IStorageUrlResolver _urlResolver;
-    private readonly IHateoasLinkProvider _hateoasProvider;
+    private readonly ILessonLinkFactory _lessonLinkFactory;
 
     public GetLessonByIdQueryHandler(
         IStorageUrlResolver urlResolver,
         IReadDbContext dbContext,
-        IHateoasLinkProvider hateoasProvider)
+        ILessonLinkFactory lessonLinkFactory)
     {
         _urlResolver = urlResolver;
         _dbContext = dbContext;
-        _hateoasProvider = hateoasProvider;
+        _lessonLinkFactory = lessonLinkFactory;
     }
 
     public async Task<Result<LessonDetailsPageDto>> Handle(
@@ -66,30 +63,23 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
         }
 
-        User instructor = await _dbContext.Users
-            .Where(u => u.Id == course.InstructorId)
-            .FirstAsync(cancellationToken);
-
-        // Create policy contexts for link generation
-        var courseContext = new CoursePolicyContext(course.Id, instructor.Id, course.Status, course.LessonCount);
-        var lessonContext = new LessonPolicyContext(lesson.Id, lesson.Access);
-
-        // Generate links
-        IReadOnlyCollection<LinkDto> links = _hateoasProvider.CreateLessonLinks(courseContext, lessonContext, lesson.ModuleId);
+        var courseState = new CourseState(course.Id, course.InstructorId, course.Status, course.LessonCount);
+        var moduleState = new ModuleState(module.Id);
+        var lessonState = new LessonState(lesson.Id, lesson.Access);
 
         var lessonDetailsPageDto = new LessonDetailsPageDto(
-            lesson.Id,
-            lesson.ModuleId,
-            course.Id,
+            lesson.Id.Value,
+            lesson.ModuleId.Value,
+            course.Id.Value,
             course.Title.Value,
-            lesson.Title,
-            lesson.Description,
+            lesson.Title.Value,
+            lesson.Description.Value,
             lesson.Index,
             lesson.Duration,
             _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl?.Path ?? "").Value,
             lesson.Access.ToString(),
             _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl?.Path ?? "").Value,
-            links);
+            _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState).ToList());
 
         return Result.Success(lessonDetailsPageDto);
     }

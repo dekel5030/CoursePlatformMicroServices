@@ -1,18 +1,14 @@
-using Courses.Application.Abstractions.Hateoas;
-using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Module.Primitives;
-using Courses.Domain.Shared.Primitives;
+using Courses.Application.Services.LinkProvider.Abstractions;
 
 namespace Courses.Application.Lessons.Dtos;
 
 public record LessonDetailsPageDto(
-    LessonId LessonId,
-    ModuleId ModuleId,
-    CourseId CourseId,
+    Guid LessonId,
+    Guid ModuleId,
+    Guid CourseId,
     string CourseName,
-    Title Title,
-    Description Description,
+    string Title,
+    string Description,
     int Index,
     TimeSpan Duration,
     string? ThumbnailUrl,

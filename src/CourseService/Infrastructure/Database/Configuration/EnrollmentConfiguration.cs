@@ -4,7 +4,6 @@ using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Enrollments.Primitives;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

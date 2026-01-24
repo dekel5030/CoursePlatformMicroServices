@@ -1,6 +1,5 @@
 ﻿using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
-using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
@@ -52,6 +51,6 @@ internal sealed class CreateCourseCommandHandler : ICommandHandler<CreateCourseC
         await _courseRepository.AddAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(new CreateCourseResponse(course.Id, course.Title));
+        return Result.Success(new CreateCourseResponse(course.Id.Value, course.Title.Value));
     }
 }
