@@ -358,6 +358,8 @@ dotnet_diagnostic.IDE0005.severity = suggestion
 # We prefer collecting event objects over using C# event handlers for better decoupling.
 dotnet_diagnostic.CA1030.severity = none
 
+dotnet_diagnostic.CA1031.severity = none
+
 # CA1040: Avoid empty interfaces
 dotnet_diagnostic.CA1040.severity = none
 

@@ -4,9 +4,13 @@ using CoursePlatform.ServiceDefaults.Endpoints;
 using CoursePlatform.ServiceDefaults.Swagger;
 using StorageService.Masstransit;
 using StorageService.S3;
+using StorageService.Transcription;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+string openAiKey = builder.Configuration["OpenAI:ApiKey"]
+    ?? throw new InvalidOperationException("OpenAI:ApiKey is missing from configuration!");
 
+builder.Services.AddOpenAiTranscriptionService(openAiKey);
 builder.AddServiceDefaults();
 builder.AddDefaultOpenApi();
 builder.Services.AddMassTransitInternal(builder.Configuration);

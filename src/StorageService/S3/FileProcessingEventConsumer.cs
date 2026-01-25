@@ -5,6 +5,7 @@ using Kernel.EventBus;
 using MassTransit;
 using StorageService.Abstractions;
 using StorageService.InternalContracts;
+using StorageService.Transcription;
 
 namespace StorageService.S3;
 
@@ -12,13 +13,19 @@ internal sealed class FileProcessingEventConsumer : IEventConsumer<FileProcessin
 {
     private readonly IEventBus _bus;
     private readonly IStorageProvider _storage;
+    private readonly ITranscriptionService _transcriptionService;
     private readonly ILogger<FileProcessingEventConsumer> _logger;
 
-    public FileProcessingEventConsumer(IEventBus bus, IStorageProvider storage, ILogger<FileProcessingEventConsumer> logger)
+    public FileProcessingEventConsumer(
+        IEventBus bus,
+        IStorageProvider storage,
+        ILogger<FileProcessingEventConsumer> logger,
+        ITranscriptionService transcriptionService)
     {
         _bus = bus;
         _storage = storage;
         _logger = logger;
+        _transcriptionService = transcriptionService;
     }
 
     public async Task HandleAsync(FileProcessingEvent message, CancellationToken cancellationToken = default)
@@ -63,11 +70,42 @@ internal sealed class FileProcessingEventConsumer : IEventConsumer<FileProcessin
 
             await RunFfmpegAsync(tempInputPath, tempOutputDir);
 
+            string? vttKey = null;
+            string audioPath = Path.Combine(tempOutputDir, "audio.mp3");
+
+            if (File.Exists(audioPath))
+            {
+                _logger.LogInformation("Audio extracted. Starting transcription...");
+
+                string? vttContent = await _transcriptionService.TranscribeAsync(audioPath, cancellationToken);
+
+                if (!string.IsNullOrEmpty(vttContent))
+                {
+                    string vttFileName = $"{Path.GetFileNameWithoutExtension(message.FileKey)}.vtt";
+                    string vttLocalPath = Path.Combine(tempOutputDir, vttFileName);
+
+                    await File.WriteAllTextAsync(vttLocalPath, vttContent, cancellationToken);
+
+                    vttKey = $"processed/{Path.GetFileNameWithoutExtension(message.FileKey)}/{vttFileName}";
+
+                    using FileStream vttStream = File.OpenRead(vttLocalPath);
+                    await _storage.UploadObjectAsync(vttStream, vttKey, "text/vtt", vttStream.Length, message.Bucket);
+
+                    _logger.LogInformation("Transcription uploaded to: {Key}", vttKey);
+                }
+            }
+
             string processedBaseKey = $"processed/{Path.GetFileNameWithoutExtension(message.FileKey)}";
 
             var uploadedFiles = new List<string>();
             foreach (string filePath in Directory.GetFiles(tempOutputDir))
             {
+                if (filePath.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase)
+                    || filePath.EndsWith(".vtt", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 string fileName = Path.GetFileName(filePath);
                 string key = $"{processedBaseKey}/{fileName}";
                 string contentType = GetContentType(fileName);
@@ -95,7 +133,8 @@ internal sealed class FileProcessingEventConsumer : IEventConsumer<FileProcessin
                     { "RawVideoKey", message.FileKey },
                     { "AudioKey", $"{processedBaseKey}/audio.mp3" },
                     { "DurationSeconds", durationInSeconds.ToString(CultureInfo.InvariantCulture) },
-                    { "Duration", formattedDuration }
+                    { "Duration", formattedDuration },
+                    { "TranscriptKey", vttKey ?? "" }
                 }
             }, cancellationToken);
 
