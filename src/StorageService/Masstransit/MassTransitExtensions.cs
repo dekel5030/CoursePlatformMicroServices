@@ -1,6 +1,7 @@
 ﻿using Kernel.EventBus;
 using MassTransit;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using StorageService.Endpoints;
 
 namespace StorageService.Masstransit;
 
@@ -15,7 +16,7 @@ internal static class MassTransitExtensions
         services.AddMassTransit(config =>
         {
             config.SetKebabCaseEndpointNameFormatter();
-
+            config.AddConsumer<FileProcessingEventConsumer>();
             config.UsingRabbitMq((context, busConfig) =>
             {
                 string connectionString = configuration.GetConnectionString(SectionName)

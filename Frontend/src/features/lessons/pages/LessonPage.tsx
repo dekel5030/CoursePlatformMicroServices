@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getLink, hasLink, LessonRels } from "@/utils/linkHelpers";
 import { LessonVideoUpload } from "../components/LessonVideoUpload";
+import { HlsVideoPlayer } from "@/components/VideoPlayer";
 
 export default function LessonPage() {
   const { courseId, lessonId } = useParams<{
@@ -171,14 +172,10 @@ export default function LessonPage() {
           <motion.div variants={item}>
             <Card className="overflow-hidden border-0 shadow-lg bg-black">
               <CardContent className="p-0">
-                <video
-                  className="w-full aspect-video"
-                  controls
-                  controlsList="nodownload"
-                  poster={lesson.thumbnailImage || undefined}
-                >
-                  <source src={lesson.videoUrl} type="video/mp4" />
-                </video>
+                <HlsVideoPlayer
+                  src={lesson.videoUrl}
+                  poster={lesson.thumbnailImage ?? undefined}
+                />
               </CardContent>
             </Card>
           </motion.div>
