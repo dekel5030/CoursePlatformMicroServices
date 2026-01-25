@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Courses.Application.Categories.Dtos;
+using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
@@ -34,4 +35,6 @@ public record CourseSummaryDto
 
     [property: JsonConverter(typeof(JsonStringEnumConverter))]
     public required CourseStatus Status { get; init; }
+
+    public required IReadOnlyList<LinkDto> Links { get; init; }
 }

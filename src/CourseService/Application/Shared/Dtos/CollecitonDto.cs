@@ -1,12 +1,13 @@
-﻿namespace Courses.Application.Shared.Dtos;
+﻿using Courses.Application.Services.LinkProvider.Abstractions;
 
-public record PaginatedCollectionDto<T>(
-    IReadOnlyCollection<T> Items,
-    int PageNumber,
-    int PageSize,
-    int TotalItems)
+namespace Courses.Application.Shared.Dtos;
+
+public record PaginatedCollectionDto<T>
 {
-    public bool HasNextPage => TotalItems > PageNumber * PageSize;
-    public bool HasPreviousPage => PageNumber > 1;
+    public required IReadOnlyCollection<T> Items { get; init; }
+    public required int PageNumber { get; init; }
+    public required int PageSize { get; init; }
+    public required int TotalItems { get; init; }
     public int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize);
+    public required IReadOnlyList<LinkDto>? Links { get; init; }
 }

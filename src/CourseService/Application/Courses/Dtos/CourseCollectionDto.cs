@@ -1,15 +1,6 @@
-﻿using Courses.Application.Shared.Dtos;
+﻿using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Shared.Dtos;
 
 namespace Courses.Application.Courses.Dtos;
 
-public sealed record CourseCollectionDto(
-    IReadOnlyCollection<CourseSummaryDto> Items,
-    int PageNumber,
-    int PageSize,
-    int TotalItems
-) : PaginatedCollectionDto<CourseSummaryDto>(
-    Items,
-    PageNumber,
-    PageSize,
-    TotalItems
-);
+public sealed record CourseCollectionDto : PaginatedCollectionDto<CourseSummaryDto>;

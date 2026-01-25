@@ -4,6 +4,9 @@ using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetCourses;
+using Courses.Application.Services.Actions.States;
+using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses;
@@ -12,23 +15,27 @@ using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Trace;
 
 namespace Courses.Application.Courses.Queries.GetFeatured;
 
-public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, CourseCollectionDto>
+internal sealed class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, CourseCollectionDto>
 {
     private readonly IFeaturedCoursesRepository _featuredCoursesRepo;
     private readonly IStorageUrlResolver _urlResolver;
     private readonly IReadDbContext _dbContext;
+    private readonly ICourseLinkFactory _courseLinkFactory;
 
     public GetFeaturedQueryHandler(
         IFeaturedCoursesRepository featuredCoursesProvider,
         IStorageUrlResolver urlResolver,
-        IReadDbContext dbContext)
+        IReadDbContext dbContext,
+        ICourseLinkFactory courseLinkFactory)
     {
         _featuredCoursesRepo = featuredCoursesProvider;
         _urlResolver = urlResolver;
         _dbContext = dbContext;
+        _courseLinkFactory = courseLinkFactory;
     }
 
     public async Task<Result<CourseCollectionDto>> Handle(
@@ -115,17 +122,19 @@ public class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, CourseCol
                 CourseViews = course.Views,
                 UpdatedAtUtc = course.UpdatedAtUtc,
 
-                Status = course.Status
+                Status = course.Status,
+                Links = _courseLinkFactory.CreateLinks(new CourseState(course.Id, course.InstructorId, course.Status, course.LessonCount))
             };
         }).ToList();
 
         var response = new CourseCollectionDto
-        (
-            Items: courseDtos,
-            PageNumber: 1,
-            PageSize: courses.Count,
-            TotalItems: courses.Count
-        );
+        {
+            Items = courseDtos,
+            PageNumber = 1,
+            PageSize = courseDtos.Count,
+            TotalItems = courseDtos.Count,
+            Links = _courseLinkFactory.CreateCollectionLinks(new PagedQueryDto { Page = 1, PageSize = courseDtos.Count}, courseDtos.Count)
+        };
 
         return Result.Success(response);
     }

@@ -3,12 +3,16 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
+using Courses.Application.Services.Actions.States;
+using Courses.Application.Services.LinkProvider;
+using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
+using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,13 +22,16 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
 {
     private readonly IReadDbContext _dbContext;
     private readonly IStorageUrlResolver _urlResolver;
+    private readonly ICourseLinkFactory _courseLinkFactory;
 
     public GetCoursesQueryHandler(
         IStorageUrlResolver urlResolver,
-        IReadDbContext dbContext)
+        IReadDbContext dbContext,
+        ICourseLinkFactory courseLinkFactory)
     {
         _urlResolver = urlResolver;
         _dbContext = dbContext;
+        _courseLinkFactory = courseLinkFactory;
     }
 
     public async Task<Result<CourseCollectionDto>> Handle(
@@ -44,7 +51,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
 
         if (courses.Count == 0)
         {
-            return Result.Success(new CourseCollectionDto([], pageNumber, pageSize, 0));
+            return Result.Success(new CourseCollectionDto { Items = [], Links = [], PageNumber = 1, PageSize = 0, TotalItems = 0 });
         }
 
         var instructorIds = courses.Select(c => c.InstructorId).Distinct().ToList();
@@ -125,17 +132,19 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
                 CourseViews = course.Views,
                 UpdatedAtUtc = course.UpdatedAtUtc,
 
-                Status = course.Status
+                Status = course.Status,
+                Links = _courseLinkFactory.CreateLinks(new CourseState(course.Id, course.InstructorId, course.Status, course.LessonCount))
             };
         }).ToList();
 
         var response = new CourseCollectionDto
-        (
-            Items: courseDtos,
-            PageNumber: pageNumber,
-            PageSize: pageSize,
-            TotalItems: courseCount
-        );
+        {
+            Items = courseDtos,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalItems = courseCount,
+            Links = _courseLinkFactory.CreateCollectionLinks(request.PagedQuery with { Page = pageNumber, PageSize = pageSize }, courseCount)
+        };
 
         return Result.Success(response);
     }
