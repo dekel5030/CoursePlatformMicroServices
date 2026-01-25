@@ -65,19 +65,22 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
         var moduleState = new ModuleState(module.Id);
         var lessonState = new LessonState(lesson.Id, lesson.Access);
 
-        var lessonDetailsPageDto = new LessonDetailsPageDto(
-            lesson.Id.Value,
-            lesson.ModuleId.Value,
-            course.Id.Value,
-            course.Title.Value,
-            lesson.Title.Value,
-            lesson.Description.Value,
-            lesson.Index,
-            lesson.Duration,
-            lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
-            lesson.Access.ToString(),
-            lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value,
-            _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState));
+        var lessonDetailsPageDto = new LessonDetailsPageDto
+        {
+            LessonId = lesson.Id.Value,
+            ModuleId = lesson.ModuleId.Value,
+            CourseId = course.Id.Value,
+            CourseName = course.Title.Value,
+            Title = lesson.Title.Value,
+            Description = lesson.Description.Value,
+            Index = lesson.Index,
+            Duration = lesson.Duration,
+            ThumbnailUrl = lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
+            Access = lesson.Access,
+            VideoUrl = lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value,
+            TranscriptUrl = lesson.Transcript == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.Transcript.Path).Value,
+            Links = _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState)
+        };
 
         return Result.Success(lessonDetailsPageDto);
     }

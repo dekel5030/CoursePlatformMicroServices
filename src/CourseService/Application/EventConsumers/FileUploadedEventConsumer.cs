@@ -53,8 +53,6 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 
     private async Task HandleLessonVideoAsync(FileUploadedEvent message, CancellationToken cancellationToken)
     {
-        
-
         if (!Guid.TryParse(message.ReferenceId, out Guid guidId))
         {
             _logger.LogError("Invalid ReferenceId format: {ReferenceId}", message.ReferenceId);
@@ -88,7 +86,9 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 
         module.UpdateLessonMedia(lessonId, videoUrl: videoUrl, transcriptUrl: transcriptUrl ,duration: duration);
 
-        _logger.LogInformation("Updated image for lesson {LessonId}", lessonId);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Updated video for lesson {LessonId}", lessonId);
+
     }
 
     private async Task HandleCourseImageAsync(
