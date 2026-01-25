@@ -45,7 +45,15 @@ internal sealed class GetModulesByCourseIdQueryHandler
                     lesson.ThumbnailImageUrl?.Path,
                     lesson.Access)).ToList())).ToList();
 
-        ModuleCollectionDto moduleCollectionDto = new(moduleDetailsDtos, 1, 1, 1);
+        var moduleCollectionDto = new ModuleCollectionDto
+        {
+            Items = moduleDetailsDtos,
+            PageNumber = 1,
+            PageSize = 1,
+            TotalItems = 1,
+            Links = null
+        };
+
         return Result.Success(moduleCollectionDto);
     }
 }

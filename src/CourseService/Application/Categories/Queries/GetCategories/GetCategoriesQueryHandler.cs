@@ -29,7 +29,14 @@ internal sealed class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQue
             .Select(c => new CategoryDto(c.Id.Value, c.Name, c.Slug.Value))
             .ToList();
 
-        var response = new CategoryCollectionDto(categoryDtos, 1, categoryCount, categoryCount);
+        var response = new CategoryCollectionDto
+        {
+            Items = categoryDtos,
+            PageNumber = 1,
+            PageSize = categoryDtos.Count,
+            TotalItems = categoryCount,
+            Links = null
+        };
 
         return Result<CategoryCollectionDto>.Success(response);
     }

@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Text.Json.Nodes;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace CoursePlatform.ServiceDefaults.Swagger;
 
@@ -19,6 +21,8 @@ public static class SwaggerExtensions
         {
             options.OperationFilter<ProblemDetailsOperationFilter>(securitySchemeId);
 
+            options.SchemaFilter<EnumSchemaFilter>();
+
             options.CustomSchemaIds(id => id.FullName?.Replace("+", "-", StringComparison.Ordinal));
 
             var scheme = new OpenApiSecurityScheme
@@ -35,5 +39,31 @@ public static class SwaggerExtensions
         });
 
         return builder;
+    }
+}
+
+internal sealed class EnumSchemaFilter : ISchemaFilter
+{
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
+    {
+        if (schema is not OpenApiSchema concreteSchema)
+        {
+            return;
+        }
+
+        if (context.Type != null && context.Type.IsEnum)
+        {
+            concreteSchema.Enum?.Clear();
+
+            concreteSchema.Enum ??= new List<JsonNode>();
+
+            concreteSchema.Type = JsonSchemaType.String;
+            concreteSchema.Format = null;
+
+            foreach (string name in Enum.GetNames(context.Type))
+            {
+                concreteSchema.Enum.Add(JsonValue.Create(name));
+            }
+        }
     }
 }

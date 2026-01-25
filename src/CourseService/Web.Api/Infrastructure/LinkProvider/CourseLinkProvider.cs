@@ -2,6 +2,7 @@ using Courses.Api.Endpoints.Courses;
 using Courses.Api.Endpoints.Modules;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Services.LinkProvider.Abstractions.LinkProvider;
+using Courses.Application.Shared.Dtos;
 
 namespace Courses.Api.Infrastructure.LinkProvider;
 
@@ -16,6 +17,21 @@ internal sealed class CourseLinkProvider : ICourseLinkProvider
     {
         _linkGenerator = linkGenerator;
         _httpContextAccessor = httpContextAccessor;
+    }
+
+    private LinkDto CreateLink(string endpointName, string rel, string method, object? values = null)
+    {
+        HttpContext httpContext = _httpContextAccessor.HttpContext
+            ?? throw new InvalidOperationException("HTTP context is not available.");
+
+        string? href = _linkGenerator.GetUriByName(httpContext, endpointName, values);
+
+        return new LinkDto
+        {
+            Href = href ?? throw new InvalidOperationException($"Could not generate URL for endpoint '{endpointName}'."),
+            Rel = rel,
+            Method = method
+        };
     }
 
     public LinkDto GetSelfLink(Guid courseId)
@@ -51,18 +67,39 @@ internal sealed class CourseLinkProvider : ICourseLinkProvider
             new { courseId });
     }
 
-    private LinkDto CreateLink(string endpointName, string rel, string method, object? values = null)
+    public List<LinkDto> GetPaginationLinks(PagedQueryDto query, int totalCount)
     {
-        HttpContext httpContext = _httpContextAccessor.HttpContext
-            ?? throw new InvalidOperationException("HTTP context is not available.");
-
-        string? href = _linkGenerator.GetUriByName(httpContext, endpointName, values);
-
-        return new LinkDto
+        var links = new List<LinkDto>
         {
-            Href = href ?? throw new InvalidOperationException($"Could not generate URL for endpoint '{endpointName}'."),
-            Rel = rel,
-            Method = method
+            CreateLink(nameof(GetCourses), LinkNames.Self, HttpMethods.Get, query)
         };
+
+        if (query.Page * query.PageSize < totalCount)
+        {
+            links.Add(CreateLink(
+                nameof(GetCourses), 
+                LinkNames.Pagination.NextPage, 
+                HttpMethods.Get, 
+                query with { Page = query.Page + 1 }));
+        }
+
+        if (query.Page > 1)
+        {
+            links.Add(CreateLink(
+                nameof(GetCourses), 
+                LinkNames.Pagination.PreviousPage, 
+                HttpMethods.Get, 
+                query with { Page = query.Page - 1 }));
+        }
+
+        return links;
+    }
+
+    public LinkDto GetCreateCourseLink()
+    {
+        return CreateLink(
+            nameof(CreateCourse),
+            LinkNames.Create,
+            HttpMethods.Post);
     }
 }
