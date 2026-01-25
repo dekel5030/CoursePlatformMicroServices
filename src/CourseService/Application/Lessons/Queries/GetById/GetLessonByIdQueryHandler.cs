@@ -74,9 +74,9 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             lesson.Description.Value,
             lesson.Index,
             lesson.Duration,
-            _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl?.Path ?? "").Value,
+            lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
             lesson.Access.ToString(),
-            _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl?.Path ?? "").Value,
+            lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value,
             _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState));
 
         return Result.Success(lessonDetailsPageDto);
