@@ -117,7 +117,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
                 Category = category,
 
                 Price = course.Price,
-                OriginalPrice = null,
+                OriginalPrice = course.Price,
                 Badges = badges,
 
                 AverageRating = avg,

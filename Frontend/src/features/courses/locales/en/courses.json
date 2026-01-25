@@ -8,11 +8,33 @@
     "noCourses": "No courses found in this category.",
     "errorLoading": "Error loading courses: {{message}}"
   },
+  "difficulty": {
+    "label": "Difficulty:",
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "expert": "Expert"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "deleted": "Deleted"
+  },
   "card": {
     "published": "Published",
     "draft": "Draft",
     "lessonsCount_one": "{{count}} lesson",
-    "lessonsCount_other": "{{count}} lessons"
+    "lessonsCount_other": "{{count}} lessons",
+    "students": "Students",
+    "views": "Views",
+    "rating": "Rating",
+    "reviews_one": "{{count}} review",
+    "reviews_other": "{{count}} reviews",
+    "sale": "Sale",
+    "new": "New",
+    "bestseller": "Bestseller",
+    "hours": "{{count}}h",
+    "minutes": "{{count}}m"
   },
   "detail": {
     "instructor": "Instructor",

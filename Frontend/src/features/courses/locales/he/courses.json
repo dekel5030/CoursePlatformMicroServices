@@ -8,11 +8,33 @@
     "noCourses": "לא נמצאו קורסים בקטגוריה זו.",
     "errorLoading": "שגיאה בטעינת קורסים: {{message}}"
   },
+  "difficulty": {
+    "label": "רמת קושי:",
+    "beginner": "מתחילים",
+    "intermediate": "בינוני",
+    "advanced": "מתקדמים",
+    "expert": "מומחים"
+  },
+  "status": {
+    "draft": "טיוטה",
+    "published": "פורסם",
+    "deleted": "נמחק"
+  },
   "card": {
     "published": "פורסם",
     "draft": "טיוטה",
     "lessonsCount_one": "שיעור {{count}}",
-    "lessonsCount_other": "{{count}} שיעורים"
+    "lessonsCount_other": "{{count}} שיעורים",
+    "students": "תלמידים",
+    "views": "צפיות",
+    "rating": "דירוג",
+    "reviews_one": "ביקורת {{count}}",
+    "reviews_other": "{{count}} ביקורות",
+    "sale": "מבצע",
+    "new": "חדש",
+    "bestseller": "רב מכר",
+    "hours": "{{count}}ש",
+    "minutes": "{{count}}ד"
   },
   "detail": {
     "instructor": "מדריך",

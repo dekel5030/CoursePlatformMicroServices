@@ -76,19 +76,49 @@ function mapCourseDetailsToModel(dto: CourseDetailsDto): CourseModel {
 }
 
 function mapCourseSummaryToModel(dto: CourseSummaryDto): CourseModel {
+  // Convert difficulty from string to enum if needed
+  const getDifficultyEnum = (difficulty: any): number | undefined => {
+    if (typeof difficulty === "number") {
+      return difficulty;
+    }
+    if (typeof difficulty === "string") {
+      const difficultyMap: Record<string, number> = {
+        Beginner: 0,
+        Intermediate: 1,
+        Advanced: 2,
+        Expert: 3,
+      };
+      return difficultyMap[difficulty];
+    }
+    return undefined;
+  };
+
   return {
     id: dto.id,
     title: dto.title,
-    description: "",
+    description: dto.shortDescription || "",
+    shortDescription: dto.shortDescription,
+    slug: dto.slug,
     imageUrl: dto.thumbnailUrl,
-    instructorName: dto.instructorName,
-    instructorAvatarUrl: null,
-    isPublished: true,
-    price: {
-      amount: dto.price,
-      currency: dto.currency,
-    },
+    instructorId: dto.instructor.id,
+    instructorName: dto.instructor.fullName,
+    instructorAvatarUrl: dto.instructor.avatarUrl,
+    isPublished: dto.status === "Published",
+    status: dto.status,
+    price: dto.price,
+    originalPrice: dto.originalPrice,
+    badges: dto.badges,
+    averageRating: dto.averageRating,
+    reviewsCount: dto.reviewsCount,
+    difficulty: getDifficultyEnum(dto.difficulty),
+    courseViews: dto.courseViews,
     lessonCount: dto.lessonsCount,
+    enrollmentCount: dto.enrollmentCount,
+    totalDuration: dto.duration,
+    updatedAtUtc: dto.updatedAtUtc,
+    categoryName: dto.category.name || undefined,
+    categoryId: dto.category.id,
+    categorySlug: dto.category.slug || undefined,
     links: dto.links,
   };
 }
