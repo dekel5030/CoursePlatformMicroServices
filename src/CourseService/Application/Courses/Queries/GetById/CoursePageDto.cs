@@ -12,7 +12,7 @@ public record CoursePageDto(
     Guid InstructorId,
     string InstructorName,
     string? InstructorAvatarUrl,
-    [property: JsonConverter(typeof(JsonStringEnumConverter))] CourseStatus Status,
+    CourseStatus Status,
     Money Price,
     int EnrollmentCount,
     int LessonsCount,

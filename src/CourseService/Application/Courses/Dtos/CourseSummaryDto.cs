@@ -33,7 +33,6 @@ public record CourseSummaryDto
     public required int CourseViews { get; init; }
     public required DateTimeOffset UpdatedAtUtc { get; init; }
 
-    [property: JsonConverter(typeof(JsonStringEnumConverter))]
     public required CourseStatus Status { get; init; }
 
     public required IReadOnlyList<LinkDto> Links { get; init; }

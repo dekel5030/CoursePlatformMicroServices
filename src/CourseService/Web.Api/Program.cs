@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Endpoints;
 using Courses.Api.Extensions;
@@ -6,6 +7,7 @@ using Courses.Application;
 using Courses.Application.Services.LinkProvider.Abstractions.LinkProvider;
 using Courses.Infrastructure;
 using Courses.Infrastructure.Extensions;
+using Microsoft.AspNetCore.Http.Json;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All;
 });
 
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.AddInfrastructureDefaults();
 builder.AddDefaultOpenApi();
