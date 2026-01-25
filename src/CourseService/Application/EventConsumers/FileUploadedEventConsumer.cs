@@ -53,6 +53,8 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 
     private async Task HandleLessonVideoAsync(FileUploadedEvent message, CancellationToken cancellationToken)
     {
+        
+
         if (!Guid.TryParse(message.ReferenceId, out Guid guidId))
         {
             _logger.LogError("Invalid ReferenceId format: {ReferenceId}", message.ReferenceId);
@@ -73,13 +75,18 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
         var videoUrl = new VideoUrl(message.FileKey);
         Module module = await _dbContext.Modules.FirstAsync(module => module.Id == lesson.ModuleId, cancellationToken: cancellationToken);
 
-        double durationSeconds = message.Metadata.GetValueOrDefault("DurationSeconds") is string ds
-                         && double.TryParse(ds, NumberStyles.Any, CultureInfo.InvariantCulture, out double result)
+        double durationSeconds = message.Metadata.GetValueOrDefault("DurationSeconds") is string durationString
+                         && double.TryParse(durationString, NumberStyles.Any, CultureInfo.InvariantCulture, out double result)
                          ? result
                          : 0;
 
         var duration = TimeSpan.FromSeconds(durationSeconds);
-        module.UpdateLessonMedia(lessonId, videoUrl: videoUrl, duration: duration);
+
+        Url? transcriptUrl = message.Metadata.GetValueOrDefault("TranscriptKey") is string transcriptFileKey
+            ? new Url(transcriptFileKey)
+            : null;
+
+        module.UpdateLessonMedia(lessonId, videoUrl: videoUrl, transcriptUrl: transcriptUrl ,duration: duration);
 
         _logger.LogInformation("Updated image for lesson {LessonId}", lessonId);
     }

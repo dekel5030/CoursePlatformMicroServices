@@ -3,7 +3,7 @@ using OpenAI.Audio;
 
 namespace StorageService.Transcription;
 
-internal class OpenAiTranscriptionService : ITranscriptionService
+internal sealed class OpenAiTranscriptionService : ITranscriptionService
 {
     private readonly AudioClient _audioClient;
     private readonly ILogger<OpenAiTranscriptionService> _logger;
