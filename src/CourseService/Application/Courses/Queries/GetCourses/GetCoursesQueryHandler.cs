@@ -89,8 +89,8 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
                 : null;
 
             string descriptionText = course.Description.Value;
-            string shortDescription = descriptionText.Length > 50
-                ? descriptionText[..50] + "..."
+            string shortDescription = descriptionText.Length > 100
+                ? descriptionText[..100] + "..."
                 : descriptionText;
 
             var badges = new List<string>();

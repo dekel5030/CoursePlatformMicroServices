@@ -1,4 +1,5 @@
-﻿using CoursePlatform.Contracts.StorageEvent;
+﻿using System.Globalization;
+using CoursePlatform.Contracts.StorageEvent;
 using Courses.Application.Abstractions.Data;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
@@ -72,7 +73,13 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
         var videoUrl = new VideoUrl(message.FileKey);
         Module module = await _dbContext.Modules.FirstAsync(module => module.Id == lesson.ModuleId, cancellationToken: cancellationToken);
 
-        module.UpdateLessonMedia(lessonId, videoUrl: videoUrl);
+        double durationSeconds = message.Metadata.GetValueOrDefault("DurationSeconds") is string ds
+                         && double.TryParse(ds, NumberStyles.Any, CultureInfo.InvariantCulture, out double result)
+                         ? result
+                         : 0;
+
+        var duration = TimeSpan.FromSeconds(durationSeconds);
+        module.UpdateLessonMedia(lessonId, videoUrl: videoUrl, duration: duration);
 
         _logger.LogInformation("Updated image for lesson {LessonId}", lessonId);
     }

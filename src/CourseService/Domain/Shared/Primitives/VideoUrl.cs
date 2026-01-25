@@ -4,7 +4,7 @@ namespace Courses.Domain.Shared.Primitives;
 
 public sealed record VideoUrl : Url
 {
-    private static readonly string[] _allowedExtensions = [".mp4", ".webm", ".mov"];
+    private static readonly string[] _allowedExtensions = [".mp4", ".webm", ".mov", ".m3u8"];
 
 #pragma warning disable CS8618
     private VideoUrl() : base() { }

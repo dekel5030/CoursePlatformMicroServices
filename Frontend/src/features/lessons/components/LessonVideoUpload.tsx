@@ -36,7 +36,7 @@ export function LessonVideoUpload({
   );
 
   // Check if user has permission to upload video
-  const uploadLink = getLink(links, LessonRels.GENERATE_VIDEO_UPLOAD_URL);
+  const uploadLink = getLink(links, LessonRels.UPLOAD_VIDEO_URL);
 
   // If no permission, don't render the component
   if (!uploadLink) {

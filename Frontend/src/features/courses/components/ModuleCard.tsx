@@ -24,22 +24,10 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
   // Check available actions based on HATEOAS links
   const canCreateLesson = hasLink(module.links, "create-lesson");
 
-  const formatDuration = (duration: string) => {
-    if (!duration || duration === "00:00:00") return null;
-
+  const formatDuration = (duration: string | null | undefined) => {
+    if (!duration) return null;
     const parts = duration.split(":");
-    if (parts.length >= 2) {
-      const hours = parseInt(parts[0]);
-      const minutes = parseInt(parts[1]);
-
-      if (hours > 0) {
-        return `${hours}${t("translation:time.hour")} ${minutes}${t("translation:time.minute")}`;
-      }
-      if (minutes > 0) {
-        return `${minutes}${t("translation:time.minute")}`;
-      }
-    }
-    return null;
+    return `${parseInt(parts[1])}m ${parseInt(parts[2])}s`;
   };
 
   const sortedLessons = [...module.lessons].sort((a, b) => a.order - b.order);
@@ -58,20 +46,21 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
                 {index + 1}
               </div>
               <div className="flex-1 min-w-0">
-                <h3
-                  className={`font-semibold ${textAlignClass}`}
-                  dir="auto"
-                >
+                <h3 className={`font-semibold ${textAlignClass}`} dir="auto">
                   {module.title}
                 </h3>
-                <div className={`flex items-center gap-3 text-xs text-muted-foreground mt-0.5 ${isRTL ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center gap-3 text-xs text-muted-foreground mt-0.5 ${isRTL ? "flex-row-reverse" : ""}`}
+                >
                   <span>
                     {module.lessonCount} {t("courses:detail.lessons")}
                   </span>
                   {durationText && (
                     <>
                       <span>•</span>
-                      <div className={`flex items-center gap-1 ${isRTL ? "flex-row-reverse" : ""}`}>
+                      <div
+                        className={`flex items-center gap-1 ${isRTL ? "flex-row-reverse" : ""}`}
+                      >
                         <Clock className="h-3 w-3" />
                         <span>{durationText}</span>
                       </div>
@@ -93,7 +82,9 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
                   }}
                 >
                   <Plus className="h-3.5 w-3.5" />
-                  <span className="text-xs">{t("courses:detail.addLesson")}</span>
+                  <span className="text-xs">
+                    {t("courses:detail.addLesson")}
+                  </span>
                 </Button>
               )}
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">

@@ -1,9 +1,11 @@
-﻿using CoursePlatform.Contracts.StorageEvent;
+﻿using System.Net.Mime;
 using CoursePlatform.ServiceDefaults.Endpoints;
 using Kernel;
 using Kernel.EventBus;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using StorageService.Abstractions;
+using StorageService.InternalContracts;
 
 namespace StorageService.Endpoints;
 
@@ -41,8 +43,8 @@ internal sealed class Upload : IEndpoint
                 return Results.Problem("Failed to upload file to storage.");
             }
 
-            await bus.PublishAsync(new FileUploadedEvent
-            {
+            await bus.PublishAsync(new FileProcessingEvent
+            { 
                 FileKey = fileResult.Value,
                 Bucket = bucket,
                 ContentType = contentType,
@@ -57,3 +59,4 @@ internal sealed class Upload : IEndpoint
         .WithMetadata(new DisableRequestSizeLimitAttribute());
     }
 }
+

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CoursePlatform.ServiceDefaults;
 using CoursePlatform.ServiceDefaults.Endpoints;
 using CoursePlatform.ServiceDefaults.Swagger;
@@ -22,8 +23,18 @@ builder.Services.AddCors(options =>
     });
 });
 
+
 WebApplication app = builder.Build();
 app.UseCors("AllowAll");
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "http://localhost:5173");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "*");
+    }
+});
 
 if (app.Environment.IsDevelopment())
 {

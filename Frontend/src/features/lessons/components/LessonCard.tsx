@@ -40,21 +40,9 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
   const deleteLink = getLink(lesson.links, LessonRels.DELETE);
 
   const formatDuration = (duration: string | null | undefined) => {
-    if (!duration || duration === "00:00:00") return null;
-
+    if (!duration) return null;
     const parts = duration.split(":");
-    if (parts.length >= 2) {
-      const hours = parseInt(parts[0]);
-      const minutes = parseInt(parts[1]);
-
-      if (hours > 0) {
-        return `${hours}${t("translation:time.hour")} ${minutes}${t("translation:time.minute")}`;
-      }
-      if (minutes > 0) {
-        return `${minutes}${t("translation:time.minute")}`;
-      }
-    }
-    return null;
+    return `${parseInt(parts[1])}m ${parseInt(parts[2])}s`;
   };
 
   const handleLessonClick = () => {
@@ -161,14 +149,18 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
             </div>
 
             {/* Badges & Actions */}
-            <div className={`flex items-center gap-2 shrink-0 ${isRTL ? "flex-row-reverse" : ""}`}>
+            <div
+              className={`flex items-center gap-2 shrink-0 ${isRTL ? "flex-row-reverse" : ""}`}
+            >
               {lesson.isPreview && (
                 <Badge variant="secondary" className="text-xs h-5">
                   {t("lessons:card.preview")}
                 </Badge>
               )}
               {durationText && (
-                <div className={`flex items-center gap-1 text-xs text-muted-foreground ${isRTL ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center gap-1 text-xs text-muted-foreground ${isRTL ? "flex-row-reverse" : ""}`}
+                >
                   <Clock className="h-3 w-3" />
                   <span>{durationText}</span>
                 </div>
