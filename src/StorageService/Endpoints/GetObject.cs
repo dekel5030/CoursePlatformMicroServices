@@ -9,27 +9,13 @@ internal sealed class GetObject : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        string routePattern = "storage/{bucketName}/{*key}";
-
-        app.MapMethods(routePattern, ["OPTIONS"], (HttpResponse response) =>
-        {
-            response.Headers.Append("Access-Control-Allow-Origin", "*");
-            response.Headers.Append("Access-Control-Allow-Methods", "GET, OPTIONS");
-            response.Headers.Append("Access-Control-Allow-Headers", "*");
-            return Results.Ok();
-        });
-
-        app.MapGet(routePattern, async (
+        app.MapGet("storage/{bucketName}/{*key}", async (
             string key,
             string bucketName,
             HttpResponse response,
             HttpRequest request,
             IStorageProvider storage) =>
         {
-            response.Headers.Append("Access-Control-Allow-Origin", "*");
-            response.Headers.Append("Access-Control-Allow-Methods", "GET, OPTIONS");
-            response.Headers.Append("Access-Control-Allow-Headers", "*");
-
             ObjectResponse file = await storage.GetObjectAsync(bucketName, key);
 
             string etag = $"\"{file.ETag}\"";
@@ -41,15 +27,16 @@ internal sealed class GetObject : IEndpoint
             {
                 return Results.StatusCode(StatusCodes.Status304NotModified);
             }
-
             string contentType = GetContentType(key, file.ContentType);
 
             return Results.File(
                 fileStream: file.Content,
                 contentType: contentType,
-                enableRangeProcessing: true
+                enableRangeProcessing: true 
             );
-        });
+
+        })
+        .RequireCors("AllowAll");
     }
 
     private static string GetContentType(string key, string originalContentType)

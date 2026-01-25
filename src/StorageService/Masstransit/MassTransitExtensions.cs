@@ -1,7 +1,7 @@
 ﻿using Kernel.EventBus;
 using MassTransit;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using StorageService.Endpoints;
+using StorageService.S3;
 
 namespace StorageService.Masstransit;
 

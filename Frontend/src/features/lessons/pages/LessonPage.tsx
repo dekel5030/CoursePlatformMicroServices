@@ -131,7 +131,7 @@ export default function LessonPage() {
   const formatDuration = (duration: string | null | undefined) => {
     if (!duration) return null;
     const parts = duration.split(":");
-    return `${parseInt(parts[0])}h ${parseInt(parts[1])}m`;
+    return `${parseInt(parts[1])}m ${parseInt(parts[2])}s`;
   };
 
   const breadcrumbItems = [
