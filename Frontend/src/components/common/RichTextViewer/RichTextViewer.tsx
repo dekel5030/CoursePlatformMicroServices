@@ -1,6 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { cn } from "@/lib/utils";
+import type { Components } from "react-markdown";
 
 interface RichTextViewerProps {
   content: string;
@@ -24,6 +25,40 @@ export function RichTextViewer({ content, className }: RichTextViewerProps) {
     return null;
   }
 
+  // Custom components for better control
+  const components: Components = {
+    p: ({ children, ...props }) => (
+      <p className="my-2 leading-relaxed" {...props}>
+        {children}
+      </p>
+    ),
+    ul: ({ children, ...props }) => (
+      <ul className="my-2 space-y-1 list-disc list-inside" {...props}>
+        {children}
+      </ul>
+    ),
+    ol: ({ children, ...props }) => (
+      <ol className="my-2 space-y-1 list-decimal list-inside" {...props}>
+        {children}
+      </ol>
+    ),
+    li: ({ children, ...props }) => (
+      <li className="my-0.5" {...props}>
+        {children}
+      </li>
+    ),
+    strong: ({ children, ...props }) => (
+      <strong className="font-semibold text-foreground" {...props}>
+        {children}
+      </strong>
+    ),
+    em: ({ children, ...props }) => (
+      <em className="italic" {...props}>
+        {children}
+      </em>
+    ),
+  };
+
   return (
     <div
       className={cn(
@@ -34,19 +69,12 @@ export function RichTextViewer({ content, className }: RichTextViewerProps) {
         "prose-li:my-1",
         "prose-strong:text-foreground prose-strong:font-semibold",
         "dark:prose-invert",
+        "text-muted-foreground",
         className,
       )}
       dir="auto"
     >
-      <ReactMarkdown
-        rehypePlugins={[rehypeRaw]}
-        components={{
-          // Customize rendering of specific elements if needed
-          p: ({ children }) => <p className="my-2">{children}</p>,
-          ul: ({ children }) => <ul className="my-2 space-y-1">{children}</ul>,
-          ol: ({ children }) => <ol className="my-2 space-y-1">{children}</ol>,
-        }}
-      >
+      <ReactMarkdown rehypePlugins={[rehypeRaw]} components={components}>
         {content}
       </ReactMarkdown>
     </div>

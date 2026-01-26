@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Edit2, Check, X } from "lucide-react";
 import { cn } from "@/utils/utils";
+import { RichTextViewer } from "./common/RichTextViewer/RichTextViewer";
 
 interface InlineEditableTextareaProps {
   value: string;
@@ -20,6 +21,7 @@ interface InlineEditableTextareaProps {
   canEdit?: boolean;
   rows?: number;
   maxLength?: number;
+  renderAsMarkdown?: boolean; // New prop to enable Markdown rendering
 }
 
 export interface InlineEditableTextareaHandle {
@@ -40,6 +42,7 @@ export const InlineEditableTextarea = forwardRef<
     canEdit = true,
     rows = 3,
     maxLength,
+    renderAsMarkdown = false, // Default to false for backward compatibility
   },
   ref,
 ) {
@@ -103,19 +106,29 @@ export const InlineEditableTextarea = forwardRef<
   };
 
   if (!canEdit) {
-    return <p className={cn(displayClassName)}>{value || placeholder}</p>;
+    return renderAsMarkdown && value ? (
+      <RichTextViewer content={value} className={displayClassName} />
+    ) : (
+      <p className={cn(displayClassName)}>{value || placeholder}</p>
+    );
   }
 
   if (!isEditing) {
     return (
       <div className={cn("group", className)}>
         <div className="flex items-start justify-between gap-2">
-          <p
-            className={cn("flex-1 whitespace-pre-wrap", displayClassName)}
-            dir="auto"
-          >
-            {value || placeholder}
-          </p>
+          {renderAsMarkdown && value ? (
+            <div className="flex-1">
+              <RichTextViewer content={value} className={displayClassName} />
+            </div>
+          ) : (
+            <p
+              className={cn("flex-1 whitespace-pre-wrap", displayClassName)}
+              dir="auto"
+            >
+              {value || placeholder}
+            </p>
+          )}
           <Button
             variant="ghost"
             size="sm"

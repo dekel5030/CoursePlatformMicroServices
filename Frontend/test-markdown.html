@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Test</title>
+</head>
+<body>
+    <h1>Test if your backend is sending Markdown correctly</h1>
+    
+    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2>What the AI should generate:</h2>
+        <pre style="background: white; padding: 15px; border-radius: 4px;">**Welcome to the course!** In this lesson, you will learn:
+• How to use the &lt;kbd&gt;Ctrl&lt;/kbd&gt; + &lt;kbd&gt;S&lt;/kbd&gt; shortcut.
+• Technical concepts of **Revit** modeling.</pre>
+    </div>
+
+    <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2>Check these in DevTools Console:</h2>
+        <ol>
+            <li>Open your app in the browser</li>
+            <li>Navigate to a lesson page</li>
+            <li>Open DevTools (F12)</li>
+            <li>In Console, type: <code style="background: #333; color: #0f0; padding: 2px 8px; border-radius: 3px;">console.log(lesson.description)</code></li>
+            <li>Check if the description contains <strong>actual asterisks</strong> and <strong>&lt;kbd&gt; tags</strong></li>
+        </ol>
+    </div>
+
+    <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2>Common Issues:</h2>
+        <ul>
+            <li><strong>Issue 1:</strong> Backend is returning plain text without Markdown formatting</li>
+            <li><strong>Issue 2:</strong> Backend is escaping HTML entities (e.g., &amp;lt;kbd&amp;gt; instead of &lt;kbd&gt;)</li>
+            <li><strong>Issue 3:</strong> Frontend is displaying before RichTextViewer is loaded</li>
+        </ul>
+    </div>
+
+    <div style="background: #f8d7da; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2>Quick Browser Test:</h2>
+        <p>Open browser console and paste this to test the component:</p>
+        <pre style="background: #333; color: #0f0; padding: 15px; border-radius: 4px;">// Check if react-markdown is loaded
+import('react-markdown').then(() => console.log('✅ react-markdown loaded')).catch(() => console.log('❌ react-markdown NOT loaded'));
+
+// Check if rehype-raw is loaded
+import('rehype-raw').then(() => console.log('✅ rehype-raw loaded')).catch(() => console.log('❌ rehype-raw NOT loaded'));</pre>
+    </div>
+</body>
+</html>

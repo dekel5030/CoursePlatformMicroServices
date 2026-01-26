@@ -162,6 +162,7 @@ export default function CoursePage() {
                     placeholder={t("courses:detail.enterDescription")}
                     rows={4}
                     maxLength={2000}
+                    renderAsMarkdown={true}
                   />
                 ) : course.description ? (
                   <RichTextViewer content={course.description} />

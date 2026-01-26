@@ -370,6 +370,7 @@ export default function LessonPage() {
                       placeholder={t("lessons:actions.enterDescription")}
                       rows={5}
                       maxLength={2000}
+                      renderAsMarkdown={true}
                     />
                   ) : lesson.description ? (
                     <RichTextViewer content={lesson.description} />
