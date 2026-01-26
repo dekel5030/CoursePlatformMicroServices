@@ -46,9 +46,14 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
                 url => url != null ? url.Path : null,
                 value => value != null ? new VideoUrl(value) : null);
 
-        builder.OwnsMany(lesson => lesson.TranscriptLines, lessonBuilder =>
+        builder.Property(lesson => lesson.Transcript)
+            .HasConversion(
+                url => url != null ? url.Path : null,
+                value => value != null ? new Url(value) : null);
+
+        builder.OwnsMany(lesson => lesson.TranscriptLines, transcriptLinesBuilder =>
         {
-            lessonBuilder.ToJson();
+            transcriptLinesBuilder.ToJson();
         });
 
         builder.Property(lesson => lesson.Access)
