@@ -9,6 +9,7 @@ import {
   Skeleton,
   BreadcrumbNav,
   InlineEditableTextarea,
+  RichTextViewer,
 } from "@/components";
 import { motion } from "framer-motion";
 import { CourseHeader } from "../components/CourseHeader";
@@ -163,12 +164,7 @@ export default function CoursePage() {
                     maxLength={2000}
                   />
                 ) : course.description ? (
-                  <p
-                    className={`text-muted-foreground leading-relaxed ${textAlignClass}`}
-                    dir="auto"
-                  >
-                    {course.description}
-                  </p>
+                  <RichTextViewer content={course.description} />
                 ) : null}
               </CardContent>
             </Card>

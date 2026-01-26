@@ -15,6 +15,7 @@ import {
   InlineEditableText,
   InlineEditableTextarea,
   Button,
+  RichTextViewer,
 } from "@/components";
 import { Clock, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -47,7 +48,6 @@ export default function LessonPage() {
 
   const { t } = useTranslation(["lessons", "translation"]);
 
-  // State for AI-generated suggestions (tracked separately per field)
   const [aiTitle, setAiTitle] = useState<string | null>(null);
   const [aiDescription, setAiDescription] = useState<string | null>(null);
 
@@ -101,13 +101,11 @@ export default function LessonPage() {
     try {
       const result = await generateAi.mutateAsync(aiGenerateLink.href);
 
-      // Store AI suggestions separately
       setAiTitle(result.title);
       setAiDescription(result.description);
 
       toast.success(t("lessons:actions.aiGenerateSuccess"));
     } catch (error: unknown) {
-      // Handle specific error for no transcript
       const axiosError = error as { response?: { data?: { title?: string } } };
       if (axiosError?.response?.data?.title === "Lesson.NoTranscript") {
         toast.error(t("lessons:actions.aiGenerateNoTranscript"));
@@ -374,12 +372,7 @@ export default function LessonPage() {
                       maxLength={2000}
                     />
                   ) : lesson.description ? (
-                    <p
-                      className="text-muted-foreground leading-relaxed"
-                      dir="auto"
-                    >
-                      {lesson.description}
-                    </p>
+                    <RichTextViewer content={lesson.description} />
                   ) : (
                     <p className="text-muted-foreground italic">
                       {t("lessons:actions.noDescription")}

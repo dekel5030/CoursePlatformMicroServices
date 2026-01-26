@@ -188,41 +188,42 @@ internal sealed class FileProcessingEventConsumer : IEventConsumer<FileProcessin
     private static async Task RunFfmpegAsync(string inputPath, string outputDir)
     {
         string arguments =
-                $"-i \"{inputPath}\" " +
+            $"-i \"{inputPath}\" " +
 
-                // 1. פיצול הוידאו ל-3 גדלים (1080, 720, 360)
-                $"-filter_complex \"[0:v]split=3[v1][v2][v3];" +
-                $"[v1]scale=w=1920:h=1080:force_original_aspect_ratio=decrease[v1out];" +
-                $"[v2]scale=w=1280:h=720:force_original_aspect_ratio=decrease[v2out];" +
-                $"[v3]scale=w=640:h=360:force_original_aspect_ratio=decrease[v3out]\" " +
+            // 1. פיצול הוידאו ל-3 גדלים עם הבטחת מספר פיקסלים זוגי
+            $"-filter_complex \"[0:v]split=3[v1][v2][v3];" +
+            // הוספת force_divisible_by=2 מבטיחה שלא נקבל גובה אי-זוגי כמו 661
+            $"[v1]scale=w=1920:h=1080:force_original_aspect_ratio=decrease,scale=w=trunc(iw/2)*2:h=trunc(ih/2)*2[v1out];" +
+            $"[v2]scale=w=1280:h=720:force_original_aspect_ratio=decrease,scale=w=trunc(iw/2)*2:h=trunc(ih/2)*2[v2out];" +
+            $"[v3]scale=w=640:h=360:force_original_aspect_ratio=decrease,scale=w=trunc(iw/2)*2:h=trunc(ih/2)*2[v3out]\" " +
 
-                // 2. הגדרת הזרם הראשון (1080p)
-                $"-map \"[v1out]\" -c:v:0 libx264 -b:v:0 5000k -maxrate:v:0 5350k -bufsize:v:0 7500k " +
+            // 2. הגדרת הזרם הראשון (1080p)
+            $"-map \"[v1out]\" -c:v:0 libx264 -pix_fmt yuv420p -b:v:0 5000k -maxrate:v:0 5350k -bufsize:v:0 7500k " +
 
-                // 3. הגדרת הזרם השני (720p)
-                $"-map \"[v2out]\" -c:v:1 libx264 -b:v:1 2800k -maxrate:v:1 2996k -bufsize:v:1 4200k " +
+            // 3. הגדרת הזרם השני (720p)
+            $"-map \"[v2out]\" -c:v:1 libx264 -pix_fmt yuv420p -b:v:1 2800k -maxrate:v:1 2996k -bufsize:v:1 4200k " +
 
-                // 4. הגדרת הזרם השלישי (360p)
-                $"-map \"[v3out]\" -c:v:2 libx264 -b:v:2 800k -maxrate:v:2 856k -bufsize:v:2 1200k " +
+            // 4. הגדרת הזרם השלישי (360p)
+            $"-map \"[v3out]\" -c:v:2 libx264 -pix_fmt yuv420p -b:v:2 800k -maxrate:v:2 856k -bufsize:v:2 1200k " +
 
-                // 5. יצירת 3 ערוצי אודיו (אחד לכל וידאו)
-                $"-map a:0 -c:a:0 aac -b:a:0 192k " +
-                $"-map a:0 -c:a:1 aac -b:a:1 128k " +
-                $"-map a:0 -c:a:2 aac -b:a:2 96k " +
+            // 5. יצירת 3 ערוצי אודיו
+            $"-map a:0 -c:a:0 aac -b:a:0 192k " +
+            $"-map a:0 -c:a:1 aac -b:a:1 128k " +
+            $"-map a:0 -c:a:2 aac -b:a:2 96k " +
 
-                // 6. הגדרות HLS
-                $"-f hls -hls_time 6 -hls_playlist_type vod -hls_flags independent_segments " +
-                $"-hls_segment_type mpegts " +
+            // 6. הגדרות HLS
+            $"-f hls -hls_time 6 -hls_playlist_type vod -hls_flags independent_segments " +
+            $"-hls_segment_type mpegts " +
 
-                // 7. המיפוי הקריטי! מחבר בין וידאו לאודיו בכל רמה
-                $"-var_stream_map \"v:0,a:0 v:1,a:1 v:2,a:2\" " +
+            // 7. המיפוי הקריטי
+            $"-var_stream_map \"v:0,a:0 v:1,a:1 v:2,a:2\" " +
 
-                $"-master_pl_name master.m3u8 " +
-                $"-hls_segment_filename \"{outputDir}/stream_%v_data%03d.ts\" " +
-                $"\"{outputDir}/stream_%v.m3u8\" " + // פלט ה-HLS
+            $"-master_pl_name master.m3u8 " +
+            $"-hls_segment_filename \"{outputDir}/stream_%v_data%03d.ts\" " +
+            $"\"{outputDir}/stream_%v.m3u8\" " +
 
-                // 8. פלט נפרד ל-MP3 (כמו שעשית במקור, פקודה אחת שמייצרת גם וגם)
-                $"-map a:0 -vn -acodec libmp3lame -q:a 4 \"{outputDir}/audio.mp3\"";
+            // 8. פלט נפרד ל-MP3
+            $"-map a:0 -vn -acodec libmp3lame -q:a 4 \"{outputDir}/audio.mp3\"";
 
         var processStartInfo = new ProcessStartInfo
         {

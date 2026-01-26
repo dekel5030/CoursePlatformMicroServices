@@ -10,7 +10,7 @@ namespace Courses.Infrastructure.Ai;
 public class OpenAiProvider<T> : IAiProvider<T>
 {
     private readonly ChatClient _chatClient;
-    private const int MaxTranscriptLength = 12000;
+    private const int MaxTranscriptLength = 20000;
     private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
     {
         PropertyNameCaseInsensitive = true
