@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
+  <PropertyGroup>
+    <UserSecretsId>ca52925b-3524-442a-9244-35830ffd4e83</UserSecretsId>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Serilog" />
 	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />

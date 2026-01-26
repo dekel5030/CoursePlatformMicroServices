@@ -26,6 +26,7 @@
     <PackageVersion Include="Dapper" Version="2.1.35" />
     <!-- Swashbuckle / OpenAPI -->
     <PackageVersion Include="Npgsql.OpenTelemetry" Version="10.0.1" />
+    <PackageVersion Include="OpenAI" Version="2.8.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />

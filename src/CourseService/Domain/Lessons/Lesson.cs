@@ -17,6 +17,7 @@ public class Lesson : Entity<LessonId>
     public LessonAccess Access { get; private set; } = LessonAccess.Private;
     public ImageUrl? ThumbnailImageUrl { get; private set; }
     public VideoUrl? VideoUrl { get; private set; }
+    public Url? Transcript { get; private set; }
     public TimeSpan Duration { get; private set; } = TimeSpan.Zero;
     public Slug Slug { get; private set; }
 
@@ -58,7 +59,6 @@ public class Lesson : Entity<LessonId>
         return Result.Success(lesson);
     }
 
-
     internal Result UpdateDetails(
         Title? title = null,
         Description? description = null,
@@ -97,6 +97,7 @@ public class Lesson : Entity<LessonId>
     internal Result UpdateMedia(
         ImageUrl? thumbnailImageUrl = null,
         VideoUrl? videoUrl = null,
+        Url? transcriptUrl = null,
         TimeSpan? duration = null)
     {
         if (thumbnailImageUrl is not null && thumbnailImageUrl != ThumbnailImageUrl)
@@ -107,6 +108,11 @@ public class Lesson : Entity<LessonId>
         if (videoUrl is not null && videoUrl != VideoUrl)
         {
             VideoUrl = videoUrl;
+        }
+
+        if (transcriptUrl is not null && transcriptUrl != Transcript)
+        {
+            Transcript = transcriptUrl;
         }
 
         if (duration is not null && duration != Duration)

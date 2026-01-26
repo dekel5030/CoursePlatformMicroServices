@@ -46,6 +46,11 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
                 url => url != null ? url.Path : null,
                 value => value != null ? new VideoUrl(value) : null);
 
+        builder.Property(lesson => lesson.Transcript)
+            .HasConversion(
+                url => url != null ? url.Path : null,
+                value => value != null ? new Url(value) : null);
+
         builder.Property(lesson => lesson.Access)
             .HasConversion<string>();
 
