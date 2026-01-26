@@ -87,3 +87,15 @@ export async function uploadVideoToStorage(
     },
   });
 }
+
+export interface GenerateLessonAiResponse {
+  title: string;
+  description: string;
+}
+
+export async function generateLessonAi(
+  url: string,
+): Promise<GenerateLessonAiResponse> {
+  const response = await axiosClient.post<GenerateLessonAiResponse>(url);
+  return response.data;
+}

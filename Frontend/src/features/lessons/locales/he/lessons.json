@@ -39,7 +39,12 @@
     "deleteSuccess": "השיעור נמחק בהצלחה",
     "deleteFailed": "נכשל במחיקת השיעור",
     "deleteConfirmTitle": "מחק שיעור",
-    "deleteConfirmMessage": "האם אתה בטוח שברצונך למחוק שיעור זה? פעולה זו אינה ניתנת לביטול."
+    "deleteConfirmMessage": "האם אתה בטוח שברצונך למחוק שיעור זה? פעולה זו אינה ניתנת לביטול.",
+    "generateWithAi": "צור עם AI",
+    "generatingWithAi": "מייצר...",
+    "aiGenerateSuccess": "הצעות AI הוחלו! סקור ושמור את השינויים שלך.",
+    "aiGenerateFailed": "נכשל ביצירת תוכן עם AI",
+    "aiGenerateNoTranscript": "לא ניתן לייצר תוכן: אין תמלול זמין לשיעור זה"
   },
   "pages": {
     "lesson": {

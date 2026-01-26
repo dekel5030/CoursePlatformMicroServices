@@ -9,6 +9,7 @@ export {
   useLesson,
   useCreateLesson,
   usePatchLesson,
+  useGenerateLessonAi,
   lessonsQueryKeys,
 } from "./hooks/use-lessons";
 

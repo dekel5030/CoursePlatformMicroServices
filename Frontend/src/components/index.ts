@@ -3,7 +3,9 @@ export * from "./ui";
 
 // Inline Editing Components
 export { InlineEditableText } from "./InlineEditableText";
+export type { InlineEditableTextHandle } from "./InlineEditableText";
 export { InlineEditableTextarea } from "./InlineEditableTextarea";
+export type { InlineEditableTextareaHandle } from "./InlineEditableTextarea";
 
 // Layout Components (re-export specific ones)
 export { default as Layout } from "./layout/Layout/Layout";

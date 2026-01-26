@@ -16,9 +16,9 @@ public class OpenAiProvider<T> : IAiProvider<T>
         PropertyNameCaseInsensitive = true
     };
 
-    public OpenAiProvider(string apiKey)
+    public OpenAiProvider(ChatClient chatClient)
     {
-        _chatClient = new("gpt-4o-mini", apiKey);
+        _chatClient = chatClient;
     }
 
     public async Task<T> SendAsync(string prompt, CancellationToken cancellationToken = default)

@@ -1,4 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Edit2, Check, X } from "lucide-react";
@@ -16,17 +22,27 @@ interface InlineEditableTextareaProps {
   maxLength?: number;
 }
 
-export function InlineEditableTextarea({
-  value,
-  onSave,
-  className,
-  textareaClassName,
-  displayClassName,
-  placeholder = "Enter description...",
-  canEdit = true,
-  rows = 3,
-  maxLength,
-}: InlineEditableTextareaProps) {
+export interface InlineEditableTextareaHandle {
+  enterEditMode: () => void;
+}
+
+export const InlineEditableTextarea = forwardRef<
+  InlineEditableTextareaHandle,
+  InlineEditableTextareaProps
+>(function InlineEditableTextarea(
+  {
+    value,
+    onSave,
+    className,
+    textareaClassName,
+    displayClassName,
+    placeholder = "Enter description...",
+    canEdit = true,
+    rows = 3,
+    maxLength,
+  },
+  ref,
+) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
   const [isSaving, setIsSaving] = useState(false);
@@ -42,6 +58,10 @@ export function InlineEditableTextarea({
       textareaRef.current.select();
     }
   }, [isEditing]);
+
+  useImperativeHandle(ref, () => ({
+    enterEditMode: () => setIsEditing(true),
+  }));
 
   const handleSave = async () => {
     // Don't save if value hasn't changed (exact comparison to preserve whitespace)
@@ -90,7 +110,10 @@ export function InlineEditableTextarea({
     return (
       <div className={cn("group", className)}>
         <div className="flex items-start justify-between gap-2">
-          <p className={cn("flex-1 whitespace-pre-wrap", displayClassName)} dir="auto">
+          <p
+            className={cn("flex-1 whitespace-pre-wrap", displayClassName)}
+            dir="auto"
+          >
             {value || placeholder}
           </p>
           <Button
@@ -156,4 +179,4 @@ export function InlineEditableTextarea({
       </div>
     </div>
   );
-}
+});

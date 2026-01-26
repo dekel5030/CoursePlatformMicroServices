@@ -4,6 +4,7 @@ import {
   createLesson,
   patchLesson,
   deleteLesson,
+  generateLessonAi,
 } from "../api";
 import type {
   LessonModel,
@@ -94,5 +95,11 @@ export function useDeleteLesson(courseId: string) {
       console.error("Failed to delete lesson:", error);
       toast.error("Failed to delete lesson");
     },
+  });
+}
+
+export function useGenerateLessonAi() {
+  return useMutation({
+    mutationFn: (url: string) => generateLessonAi(url),
   });
 }
