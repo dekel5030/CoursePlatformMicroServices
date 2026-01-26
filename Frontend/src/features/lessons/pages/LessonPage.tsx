@@ -17,7 +17,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getLink, hasLink, LessonRels } from "@/utils/linkHelpers";
 import { LessonVideoUpload } from "../components/LessonVideoUpload";
-import { HlsVideoPlayer } from "@/components/VideoPlayer";
+import { HlsVideoPlayer } from "@/components/HlsVideoPlayer";
 
 export default function LessonPage() {
   const { courseId, lessonId } = useParams<{
@@ -172,9 +172,22 @@ export default function LessonPage() {
           <motion.div variants={item}>
             <Card className="overflow-hidden border-0 shadow-lg bg-black">
               <CardContent className="p-0">
+                {/* 👇 כאן השינוי המרכזי 👇 */}
                 <HlsVideoPlayer
                   src={lesson.videoUrl}
                   poster={lesson.thumbnailImage ?? undefined}
+                  transcripts={
+                    lesson.transcriptUrl
+                      ? [
+                          {
+                            src: lesson.transcriptUrl,
+                            label: "עברית",
+                            lang: "he-IL",
+                            isDefault: true, // מופעל כברירת מחדל
+                          },
+                        ]
+                      : []
+                  }
                 />
               </CardContent>
             </Card>

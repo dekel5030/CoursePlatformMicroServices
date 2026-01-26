@@ -8,8 +8,9 @@ export interface LessonModel {
   courseId: string;
   lessonId: string;
   title: string;
-  description: string;  // Non-nullable - mapper ensures a value
+  description: string;
   videoUrl: string | null;
+  transcriptUrl: string | null;
   thumbnailImage: string | null;
   isPreview: boolean;
   order: number;

@@ -14,6 +14,7 @@ function mapToLessonModel(dto: LessonDetailsDto): LessonModel {
     title: dto.title,
     description: dto.description,
     videoUrl: dto.videoUrl,
+    transcriptUrl: dto.transcriptUrl ?? null,
     thumbnailImage: dto.thumbnailUrl,
     isPreview: dto.isPreview,
     order: dto.index,

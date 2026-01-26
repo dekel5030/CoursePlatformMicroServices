@@ -14,5 +14,6 @@ export interface LessonDetailsDto {
   isPreview: boolean;
   thumbnailUrl: string | null;
   videoUrl: string | null;
+  transcriptUrl?: string | null;
   links?: LinkDto[];
 }
