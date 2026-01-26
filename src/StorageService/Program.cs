@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using CoursePlatform.ServiceDefaults;
 using CoursePlatform.ServiceDefaults.Endpoints;
 using CoursePlatform.ServiceDefaults.Swagger;

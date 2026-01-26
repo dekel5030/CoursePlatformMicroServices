@@ -1,5 +1,4 @@
 ﻿using CoursePlatform.ServiceDefaults.Endpoints;
-using Microsoft.AspNetCore.StaticFiles; // תוודא שיש לך את זה או תשתמש בפונקציית עזר ידנית
 using Microsoft.Extensions.Primitives;
 using StorageService.Abstractions;
 
@@ -32,7 +31,7 @@ internal sealed class GetObject : IEndpoint
             return Results.File(
                 fileStream: file.Content,
                 contentType: contentType,
-                enableRangeProcessing: true 
+                enableRangeProcessing: true
             );
 
         })

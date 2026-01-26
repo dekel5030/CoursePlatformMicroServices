@@ -53,6 +53,7 @@ export const LessonRels = {
   DELETE: "delete",
   UPLOAD_VIDEO_URL: "upload-video-url",
   GENERATE_VIDEO_UPLOAD_URL: "generate-video-upload-url",
+  AI_GENERATE: "ai-generate",
 } as const;
 
 /**

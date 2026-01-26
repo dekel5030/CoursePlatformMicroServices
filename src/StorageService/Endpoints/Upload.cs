@@ -1,9 +1,7 @@
-﻿using System.Net.Mime;
-using CoursePlatform.ServiceDefaults.Endpoints;
+﻿using CoursePlatform.ServiceDefaults.Endpoints;
 using Kernel;
 using Kernel.EventBus;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Rewrite;
 using StorageService.Abstractions;
 using StorageService.InternalContracts;
 
@@ -44,7 +42,7 @@ internal sealed class Upload : IEndpoint
             }
 
             await bus.PublishAsync(new FileProcessingEvent
-            { 
+            {
                 FileKey = fileResult.Value,
                 Bucket = bucket,
                 ContentType = contentType,

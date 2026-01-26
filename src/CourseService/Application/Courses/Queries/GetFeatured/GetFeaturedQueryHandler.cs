@@ -3,9 +3,7 @@ using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Courses.Queries.GetCourses;
 using Courses.Application.Services.Actions.States;
-using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Categories.Primitives;
@@ -15,7 +13,6 @@ using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using OpenTelemetry.Trace;
 
 namespace Courses.Application.Courses.Queries.GetFeatured;
 
@@ -133,7 +130,7 @@ internal sealed class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, 
             PageNumber = 1,
             PageSize = courseDtos.Count,
             TotalItems = courseDtos.Count,
-            Links = _courseLinkFactory.CreateCollectionLinks(new PagedQueryDto { Page = 1, PageSize = courseDtos.Count}, courseDtos.Count)
+            Links = _courseLinkFactory.CreateCollectionLinks(new PagedQueryDto { Page = 1, PageSize = courseDtos.Count }, courseDtos.Count)
         };
 
         return Result.Success(response);

@@ -1,4 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Edit2, Check, X } from "lucide-react";
@@ -15,16 +21,26 @@ interface InlineEditableTextProps {
   maxLength?: number;
 }
 
-export function InlineEditableText({
-  value,
-  onSave,
-  className,
-  inputClassName,
-  displayClassName,
-  placeholder = "Enter text...",
-  canEdit = true,
-  maxLength,
-}: InlineEditableTextProps) {
+export interface InlineEditableTextHandle {
+  enterEditMode: () => void;
+}
+
+export const InlineEditableText = forwardRef<
+  InlineEditableTextHandle,
+  InlineEditableTextProps
+>(function InlineEditableText(
+  {
+    value,
+    onSave,
+    className,
+    inputClassName,
+    displayClassName,
+    placeholder = "Enter text...",
+    canEdit = true,
+    maxLength,
+  },
+  ref,
+) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
   const [isSaving, setIsSaving] = useState(false);
@@ -40,6 +56,10 @@ export function InlineEditableText({
       inputRef.current.select();
     }
   }, [isEditing]);
+
+  useImperativeHandle(ref, () => ({
+    enterEditMode: () => setIsEditing(true),
+  }));
 
   const handleSave = async () => {
     // Don't save if value hasn't changed
@@ -91,7 +111,10 @@ export function InlineEditableText({
 
   if (!isEditing) {
     return (
-      <div className={cn("group flex items-center gap-2", className)} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={cn("group flex items-center gap-2", className)}
+        onClick={(e) => e.stopPropagation()}
+      >
         <span className={cn("flex-1", displayClassName)} dir="auto">
           {value || placeholder}
         </span>
@@ -155,4 +178,4 @@ export function InlineEditableText({
       </Button>
     </div>
   );
-}
+});

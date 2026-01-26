@@ -1,5 +1,9 @@
 import { useParams, useLocation } from "react-router-dom";
-import { useLesson, usePatchLesson } from "@/features/lessons";
+import {
+  useLesson,
+  usePatchLesson,
+  useGenerateLessonAi,
+} from "@/features/lessons";
 import { useCourse } from "@/features/courses";
 import {
   Card,
@@ -10,14 +14,17 @@ import {
   BreadcrumbNav,
   InlineEditableText,
   InlineEditableTextarea,
+  Button,
 } from "@/components";
-import { Clock } from "lucide-react";
+import { Clock, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getLink, hasLink, LessonRels } from "@/utils/linkHelpers";
 import { LessonVideoUpload } from "../components/LessonVideoUpload";
+import { AiSuggestionField } from "../components/AiSuggestionField";
 import { HlsVideoPlayer } from "@/components/HlsVideoPlayer";
+import { useState } from "react";
 
 export default function LessonPage() {
   const { courseId, lessonId } = useParams<{
@@ -36,10 +43,15 @@ export default function LessonPage() {
   const { data: course } = useCourse(courseId!);
 
   const patchLesson = usePatchLesson(courseId!, lessonId!);
+  const generateAi = useGenerateLessonAi();
 
   const { t } = useTranslation(["lessons", "translation"]);
 
-  const handleTitleUpdate = async (newTitle: string) => {
+  // State for AI-generated suggestions (tracked separately per field)
+  const [aiTitle, setAiTitle] = useState<string | null>(null);
+  const [aiDescription, setAiDescription] = useState<string | null>(null);
+
+  const handleAcceptTitle = async (newTitle: string) => {
     const updateLink = getLink(lesson?.links, LessonRels.PARTIAL_UPDATE);
     if (!updateLink) {
       console.error("No update link found for this lesson");
@@ -52,13 +64,14 @@ export default function LessonPage() {
         request: { title: newTitle },
       });
       toast.success(t("lessons:actions.titleUpdated"));
+      setAiTitle(null);
     } catch (error) {
       toast.error(t("lessons:actions.titleUpdateFailed"));
       throw error;
     }
   };
 
-  const handleDescriptionUpdate = async (newDescription: string) => {
+  const handleAcceptDescription = async (newDescription: string) => {
     const updateLink = getLink(lesson?.links, LessonRels.PARTIAL_UPDATE);
     if (!updateLink) {
       console.error("No update link found for this lesson");
@@ -71,9 +84,37 @@ export default function LessonPage() {
         request: { description: newDescription },
       });
       toast.success(t("lessons:actions.descriptionUpdated"));
+      setAiDescription(null);
     } catch (error) {
       toast.error(t("lessons:actions.descriptionUpdateFailed"));
       throw error;
+    }
+  };
+
+  const handleGenerateWithAi = async () => {
+    const aiGenerateLink = getLink(lesson?.links, LessonRels.AI_GENERATE);
+    if (!aiGenerateLink) {
+      console.error("No AI generate link found for this lesson");
+      return;
+    }
+
+    try {
+      const result = await generateAi.mutateAsync(aiGenerateLink.href);
+
+      // Store AI suggestions separately
+      setAiTitle(result.title);
+      setAiDescription(result.description);
+
+      toast.success(t("lessons:actions.aiGenerateSuccess"));
+    } catch (error: unknown) {
+      // Handle specific error for no transcript
+      const axiosError = error as { response?: { data?: { title?: string } } };
+      if (axiosError?.response?.data?.title === "Lesson.NoTranscript") {
+        toast.error(t("lessons:actions.aiGenerateNoTranscript"));
+      } else {
+        toast.error(t("lessons:actions.aiGenerateFailed"));
+      }
+      console.error("Failed to generate with AI:", error);
     }
   };
 
@@ -211,66 +252,142 @@ export default function LessonPage() {
 
         <motion.div variants={item}>
           <Card>
-            <CardHeader className="space-y-3">
-              <div className="flex items-start justify-between gap-4 flex-wrap">
-                {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
-                  <InlineEditableText
-                    value={lesson.title}
-                    onSave={handleTitleUpdate}
-                    displayClassName="text-3xl font-semibold"
-                    inputClassName="text-3xl font-semibold"
-                    placeholder={t("lessons:actions.enterTitle")}
-                    maxLength={200}
-                  />
-                ) : (
-                  <CardTitle className="text-3xl" dir="auto">
-                    {lesson.title}
-                  </CardTitle>
-                )}
-                <div className="flex items-center gap-2">
-                  {lesson.duration && (
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
-                      <Clock className="h-4 w-4" />
-                      {formatDuration(lesson.duration)}
+            <CardHeader className="space-y-4">
+              {/* AI Generation Button - Prominent placement */}
+              {hasLink(lesson.links, LessonRels.AI_GENERATE) &&
+                hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) && (
+                  <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
+                        <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-sm">
+                          AI Content Generator
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          Generate optimized title and description from
+                          transcript
+                        </p>
+                      </div>
                     </div>
+                    <Button
+                      onClick={handleGenerateWithAi}
+                      disabled={generateAi.isPending}
+                      variant="default"
+                      size="sm"
+                      className="gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    >
+                      {generateAi.isPending ? (
+                        <>
+                          <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          {t("lessons:actions.generatingWithAi")}
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4" />
+                          {t("lessons:actions.generateWithAi")}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+
+              {/* AI Suggestions Display */}
+              {aiTitle && (
+                <AiSuggestionField
+                  label="Title"
+                  originalValue={lesson.title}
+                  suggestedValue={aiTitle}
+                  onAccept={handleAcceptTitle}
+                  onReject={() => setAiTitle(null)}
+                  type="text"
+                  placeholder={t("lessons:actions.enterTitle")}
+                  maxLength={200}
+                />
+              )}
+
+              {aiDescription && (
+                <AiSuggestionField
+                  label="Description"
+                  originalValue={lesson.description || ""}
+                  suggestedValue={aiDescription}
+                  onAccept={handleAcceptDescription}
+                  onReject={() => setAiDescription(null)}
+                  type="textarea"
+                  placeholder={t("lessons:actions.enterDescription")}
+                  maxLength={2000}
+                  rows={5}
+                />
+              )}
+
+              {/* Title Section - Only show when no AI suggestion */}
+              {!aiTitle && (
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
+                    <div className="flex-1">
+                      <InlineEditableText
+                        value={lesson.title}
+                        onSave={handleAcceptTitle}
+                        displayClassName="text-3xl font-semibold"
+                        inputClassName="text-3xl font-semibold"
+                        placeholder={t("lessons:actions.enterTitle")}
+                        maxLength={200}
+                      />
+                    </div>
+                  ) : (
+                    <CardTitle className="text-3xl" dir="auto">
+                      {lesson.title}
+                    </CardTitle>
                   )}
-                  <LessonVideoUpload
-                    courseId={lesson.courseId}
-                    lessonId={lesson.lessonId}
-                    links={lesson.links}
-                  />
+                  <div className="flex items-center gap-2">
+                    {lesson.duration && (
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
+                        <Clock className="h-4 w-4" />
+                        {formatDuration(lesson.duration)}
+                      </div>
+                    )}
+                    <LessonVideoUpload
+                      courseId={lesson.courseId}
+                      lessonId={lesson.lessonId}
+                      links={lesson.links}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </CardHeader>
 
-            <CardContent>
-              <div className="space-y-2">
-                <h2 className="text-lg font-semibold">
-                  {t("lessons:pages.lesson.description")}
-                </h2>
-                {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
-                  <InlineEditableTextarea
-                    value={lesson.description || ""}
-                    onSave={handleDescriptionUpdate}
-                    displayClassName="text-muted-foreground leading-relaxed"
-                    placeholder={t("lessons:actions.enterDescription")}
-                    rows={5}
-                    maxLength={2000}
-                  />
-                ) : lesson.description ? (
-                  <p
-                    className="text-muted-foreground leading-relaxed"
-                    dir="auto"
-                  >
-                    {lesson.description}
-                  </p>
-                ) : (
-                  <p className="text-muted-foreground italic">
-                    {t("lessons:actions.noDescription")}
-                  </p>
-                )}
-              </div>
-            </CardContent>
+            {/* Description Section - Only show when no AI suggestion */}
+            {!aiDescription && (
+              <CardContent>
+                <div className="space-y-2">
+                  <h2 className="text-lg font-semibold">
+                    {t("lessons:pages.lesson.description")}
+                  </h2>
+                  {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
+                    <InlineEditableTextarea
+                      value={lesson.description || ""}
+                      onSave={handleAcceptDescription}
+                      displayClassName="text-muted-foreground leading-relaxed"
+                      placeholder={t("lessons:actions.enterDescription")}
+                      rows={5}
+                      maxLength={2000}
+                    />
+                  ) : lesson.description ? (
+                    <p
+                      className="text-muted-foreground leading-relaxed"
+                      dir="auto"
+                    >
+                      {lesson.description}
+                    </p>
+                  ) : (
+                    <p className="text-muted-foreground italic">
+                      {t("lessons:actions.noDescription")}
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            )}
           </Card>
         </motion.div>
       </motion.div>

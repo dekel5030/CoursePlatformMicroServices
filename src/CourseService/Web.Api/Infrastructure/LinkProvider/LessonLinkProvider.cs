@@ -67,4 +67,13 @@ internal sealed class LessonLinkProvider : ILessonLinkProvider
             Method = method
         };
     }
+
+    public LinkDto GetAiGenerateLink(Guid moduleId, Guid lessonId)
+    {
+        return CreateLink(
+            nameof(GenerateLessonWithAi),
+            LinkNames.Lessons.AiGenerate,
+            HttpMethods.Post,
+            new { moduleId, lessonId });
+    }
 }

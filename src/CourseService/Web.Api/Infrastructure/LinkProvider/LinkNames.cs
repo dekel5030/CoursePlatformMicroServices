@@ -28,5 +28,6 @@ internal static class LinkNames
     internal static class Lessons
     {
         public const string UploadVideoUrl = "upload-video-url";
+        public const string AiGenerate = "ai-generate";
     }
 }

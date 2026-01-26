@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Courses.Application.Categories.Dtos;
+﻿using Courses.Application.Categories.Dtos;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
