@@ -39,6 +39,7 @@ internal sealed class LessonLinkFactory : ILessonLinkFactory
             links.Add(_lessonLinkService.GetUpdateLink(moduleId, lessonId));
             links.Add(_lessonLinkService.GetDeleteLink(moduleId, lessonId));
             links.Add(_lessonLinkService.GetUploadVideoUrlLink(moduleId, lessonId));
+            links.Add(_lessonLinkService.GetAiGenerateLink(moduleId, lessonId));
         }
 
         return links.AsReadOnly();
