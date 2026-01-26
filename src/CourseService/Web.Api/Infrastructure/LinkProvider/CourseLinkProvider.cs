@@ -77,18 +77,18 @@ internal sealed class CourseLinkProvider : ICourseLinkProvider
         if (query.Page * query.PageSize < totalCount)
         {
             links.Add(CreateLink(
-                nameof(GetCourses), 
-                LinkNames.Pagination.NextPage, 
-                HttpMethods.Get, 
+                nameof(GetCourses),
+                LinkNames.Pagination.NextPage,
+                HttpMethods.Get,
                 query with { Page = query.Page + 1 }));
         }
 
         if (query.Page > 1)
         {
             links.Add(CreateLink(
-                nameof(GetCourses), 
-                LinkNames.Pagination.PreviousPage, 
-                HttpMethods.Get, 
+                nameof(GetCourses),
+                LinkNames.Pagination.PreviousPage,
+                HttpMethods.Get,
                 query with { Page = query.Page - 1 }));
         }
 

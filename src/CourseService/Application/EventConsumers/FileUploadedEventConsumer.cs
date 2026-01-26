@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Net.Http;
 using CoursePlatform.Contracts.StorageEvent;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;

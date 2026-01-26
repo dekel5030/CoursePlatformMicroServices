@@ -30,7 +30,7 @@ internal sealed class OpenAiTranscriptionService : ITranscriptionService
             };
 
             _logger.LogInformation("Sending audio to OpenAI Whisper...");
-            
+
             using FileStream fileStream = File.OpenRead(audioFilePath);
             string fileName = Path.GetFileName(audioFilePath);
 
@@ -45,7 +45,7 @@ internal sealed class OpenAiTranscriptionService : ITranscriptionService
         catch (OperationCanceledException ex)
         {
             _logger.LogInformation(ex, "Transcription operation was cancelled.");
-            return null; 
+            return null;
         }
         catch (IOException ex)
         {

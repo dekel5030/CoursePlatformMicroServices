@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses.Primitives;
 using Kernel;

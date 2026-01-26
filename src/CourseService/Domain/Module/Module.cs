@@ -89,7 +89,7 @@ public class Module : Entity<ModuleId>
         {
             return Result.Failure(LessonErrors.NotFound);
         }
-        lesson.UpdateMedia(thumbnailImageUrl, videoUrl, transcriptUrl ,duration, transcript);
+        lesson.UpdateMedia(thumbnailImageUrl, videoUrl, transcriptUrl, duration, transcript);
         return Result.Success();
     }
 

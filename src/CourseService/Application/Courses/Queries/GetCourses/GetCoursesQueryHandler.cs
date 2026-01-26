@@ -4,7 +4,6 @@ using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Services.Actions.States;
-using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Categories.Primitives;
@@ -12,7 +11,6 @@ using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
-using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 

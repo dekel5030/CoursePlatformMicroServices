@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using Courses.Application.Abstractions.Ai;
+﻿using Courses.Application.Abstractions.Ai;
 using Courses.Application.Abstractions.Data;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
@@ -7,52 +6,52 @@ using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.Lessons.Commands.UpdateLessonWithAi;
+namespace Courses.Application.Lessons.Commands.GenerateLessonWithAi;
 
-internal sealed class UpdateLessonWithAiCommandHandler
-    : ICommandHandler<UpdateLessonWithAiCommand, UpdateLessonAiResponse>
+internal sealed class GenerateLessonWithAiCommandHandler
+    : ICommandHandler<GenerateLessonWithAiCommand, GenerateLessonWithAiResponse>
 {
     private readonly IWriteDbContext _dbContext;
-    private readonly IAiProvider<UpdateLessonAiResponse> _aiProvider;
+    private readonly IAiProvider<GenerateLessonWithAiResponse> _aiProvider;
 
-    public UpdateLessonWithAiCommandHandler(
+    public GenerateLessonWithAiCommandHandler(
         IWriteDbContext dbContext,
-        IAiProvider<UpdateLessonAiResponse> aiProvider)
+        IAiProvider<GenerateLessonWithAiResponse> aiProvider)
     {
         _dbContext = dbContext;
         _aiProvider = aiProvider;
     }
 
-    public async Task<Result<UpdateLessonAiResponse>> Handle(
-        UpdateLessonWithAiCommand request, 
+    public async Task<Result<GenerateLessonWithAiResponse>> Handle(
+        GenerateLessonWithAiCommand request,
         CancellationToken cancellationToken = default)
     {
         Lesson? lesson = await _dbContext.Lessons
             .Where(lesson => lesson.Id == request.LessonId
                     && lesson.ModuleId == request.ModuleId)
-            .FirstOrDefaultAsync( cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (lesson is null)
         {
-            return Result.Failure<UpdateLessonAiResponse>(LessonErrors.NotFound);
+            return Result.Failure<GenerateLessonWithAiResponse>(LessonErrors.NotFound);
         }
 
         if (!lesson.TranscriptLines.Any())
         {
-            return Result.Failure<UpdateLessonAiResponse>(
+            return Result.Failure<GenerateLessonWithAiResponse>(
                 Error.Validation(
-                    "Lesson.NoTranscript", 
+                    "Lesson.NoTranscript",
                     "Cannot update lesson details because transcript lines are empty."));
         }
 
         string fullTranscript = string.Join(" ", lesson.TranscriptLines.Select(line => line.Text));
 
-        UpdateLessonAiResponse response = await SendAiRequest(fullTranscript, cancellationToken);
+        GenerateLessonWithAiResponse response = await SendAiRequest(fullTranscript, cancellationToken);
 
         return Result.Success(response);
     }
 
-    private Task<UpdateLessonAiResponse> SendAiRequest(
+    private Task<GenerateLessonWithAiResponse> SendAiRequest(
         string transcript,
         CancellationToken cancellationToken = default)
     {

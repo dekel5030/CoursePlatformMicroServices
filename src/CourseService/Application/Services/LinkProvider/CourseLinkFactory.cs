@@ -1,4 +1,3 @@
-using Courses.Application.Courses.Dtos;
 using Courses.Application.Services.Actions;
 using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions;
@@ -49,12 +48,12 @@ internal sealed class CourseLinkFactory : ICourseLinkFactory
     public IReadOnlyList<LinkDto> CreateCollectionLinks(PagedQueryDto query, int totalCount)
     {
         List<LinkDto> links = _courseLinkService.GetPaginationLinks(query, totalCount);
-        
+
         if (_policy.CanCreateCourse())
         {
             links.Add(_courseLinkService.GetCreateCourseLink());
         }
-        
+
         return links.AsReadOnly();
     }
 }
