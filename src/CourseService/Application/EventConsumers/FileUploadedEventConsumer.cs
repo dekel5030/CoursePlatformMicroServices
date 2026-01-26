@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
+using System.Net.Http;
 using CoursePlatform.Contracts.StorageEvent;
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Storage;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
@@ -17,15 +19,24 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 {
     private readonly IWriteDbContext _dbContext;
     private readonly ILogger<FileUploadedEventConsumer> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IStorageUrlResolver _urlResolver;
+
     private const string CourseServiceName = "courseservice";
     private const string LessonImage = "lessonimage";
     private const string CourseImage = "courseimage";
     private const string LessonVideo = "lessonvideo";
 
-    public FileUploadedEventConsumer(IWriteDbContext writeDbContext, ILogger<FileUploadedEventConsumer> logger)
+    public FileUploadedEventConsumer(
+        IWriteDbContext writeDbContext,
+        ILogger<FileUploadedEventConsumer> logger,
+        IHttpClientFactory httpClientFactory,
+        IStorageUrlResolver storageUrlResolver)
     {
         _dbContext = writeDbContext;
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
+        _urlResolver = storageUrlResolver;
     }
 
     public async Task HandleAsync(FileUploadedEvent message, CancellationToken cancellationToken = default)
@@ -80,15 +91,38 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 
         var duration = TimeSpan.FromSeconds(durationSeconds);
 
-        Url? transcriptUrl = message.Metadata.GetValueOrDefault("TranscriptKey") is string transcriptFileKey
-            ? new Url(transcriptFileKey)
-            : null;
+        string? vttContent = null;
+        Url? transcriptUrl = null;
 
-        module.UpdateLessonMedia(lessonId, videoUrl: videoUrl, transcriptUrl: transcriptUrl ,duration: duration);
+        if (message.Metadata.TryGetValue("TranscriptKey", out string? transcriptFileKey) &&
+            !string.IsNullOrEmpty(transcriptFileKey))
+        {
+            transcriptUrl = new Url(transcriptFileKey);
+
+            try
+            {
+                string fullUrl = _urlResolver.Resolve(StorageCategory.Public, transcriptFileKey).Value;
+
+                using HttpClient httpClient = _httpClientFactory.CreateClient();
+                vttContent = await httpClient.GetStringAsync(new Uri(fullUrl), cancellationToken);
+
+                _logger.LogInformation("Successfully downloaded transcript content for lesson {LessonId}", lessonId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to download transcript content from {Key}", transcriptFileKey);
+            }
+        }
+
+        module.UpdateLessonMedia(
+            lessonId,
+            videoUrl: videoUrl,
+            transcriptUrl: transcriptUrl,
+            duration: duration,
+            transcript: vttContent);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Updated video for lesson {LessonId}", lessonId);
-
     }
 
     private async Task HandleCourseImageAsync(

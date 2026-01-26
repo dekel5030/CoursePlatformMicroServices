@@ -81,6 +81,7 @@ public class Module : Entity<ModuleId>
         ImageUrl? thumbnailImageUrl = null,
         VideoUrl? videoUrl = null,
         Url? transcriptUrl = null,
+        string? transcript = null,
         TimeSpan? duration = null)
     {
         Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
@@ -88,7 +89,7 @@ public class Module : Entity<ModuleId>
         {
             return Result.Failure(LessonErrors.NotFound);
         }
-        lesson.UpdateMedia(thumbnailImageUrl, videoUrl, transcriptUrl ,duration);
+        lesson.UpdateMedia(thumbnailImageUrl, videoUrl, transcriptUrl ,duration, transcript);
         return Result.Success();
     }
 
