@@ -12,7 +12,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
     {
         builder.ToTable("Lessons");
         builder.HasKey(lesson => lesson.Id);
-        //builder.HasIndex(l => new { l.ModuleId, l.Index }).IsUnique();
+        builder.HasIndex(l => new { l.ModuleId, l.Index }).IsUnique();
 
         builder.Property(lesson => lesson.Id)
             .HasConversion(
@@ -46,10 +46,10 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
                 url => url != null ? url.Path : null,
                 value => value != null ? new VideoUrl(value) : null);
 
-        builder.Property(lesson => lesson.Transcript)
-            .HasConversion(
-                url => url != null ? url.Path : null,
-                value => value != null ? new Url(value) : null);
+        builder.OwnsMany(lesson => lesson.TranscriptLines, lessonBuilder =>
+        {
+            lessonBuilder.ToJson();
+        });
 
         builder.Property(lesson => lesson.Access)
             .HasConversion<string>();
