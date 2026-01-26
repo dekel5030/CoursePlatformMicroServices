@@ -6,8 +6,6 @@ using Kernel;
 
 namespace Courses.Domain.Lessons;
 
-public sealed record Attachment(string Name, string Url, long SizeBytes);
-
 public class Lesson : Entity<LessonId>
 {
     public override LessonId Id { get; protected set; }
@@ -24,15 +22,17 @@ public class Lesson : Entity<LessonId>
     public int Index { get; private set; }
 
     public IReadOnlyList<Attachment> Attachments => _attachments.AsReadOnly();
+    public IReadOnlyList<TranscriptLine> TranscriptLines => _transcriptLines.AsReadOnly();
 
     private readonly List<Attachment> _attachments = new();
+    private List<TranscriptLine> _transcriptLines = new();
 
-#pragma warning disable S1133
-#pragma warning disable CS8618
+    #pragma warning disable S1133
+    #pragma warning disable CS8618
     [Obsolete("This constructor is for EF Core only.", error: true)]
     private Lesson() { }
-#pragma warning restore CS8618
-#pragma warning restore S1133
+    #pragma warning restore CS8618
+    #pragma warning restore S1133
 
     private Lesson(ModuleId moduleId, LessonId id, Slug slug)
     {
@@ -98,7 +98,8 @@ public class Lesson : Entity<LessonId>
         ImageUrl? thumbnailImageUrl = null,
         VideoUrl? videoUrl = null,
         Url? transcriptUrl = null,
-        TimeSpan? duration = null)
+        TimeSpan? duration = null,
+        string? transcript = null)
     {
         if (thumbnailImageUrl is not null && thumbnailImageUrl != ThumbnailImageUrl)
         {
@@ -118,6 +119,11 @@ public class Lesson : Entity<LessonId>
         if (duration is not null && duration != Duration)
         {
             Duration = duration.Value;
+        }
+
+        if (transcript is not null)
+        {
+            _transcriptLines = VttParser.Parse(transcript);
         }
 
         return Result.Success();
