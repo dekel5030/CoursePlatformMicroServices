@@ -25,6 +25,10 @@ export function RichTextViewer({ content, className }: RichTextViewerProps) {
     return null;
   }
 
+  // Pre-process content to fix inline bullets
+  // Convert bullets that are on the same line (• text • text) into separate lines
+  const processedContent = content.replace(/([•])\s*/g, "\n$1 ").trim();
+
   // Custom components for better control
   const components: Components = {
     p: ({ children, ...props }) => (
@@ -75,7 +79,7 @@ export function RichTextViewer({ content, className }: RichTextViewerProps) {
       dir="auto"
     >
       <ReactMarkdown rehypePlugins={[rehypeRaw]} components={components}>
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   );
