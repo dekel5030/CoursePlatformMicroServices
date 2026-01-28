@@ -13,7 +13,7 @@ namespace Courses.Infrastructure.Database;
 
 public class ReadDbContext : AppDbContextBase, IReadDbContext
 {
-    public DbSet<CoursePageReadModel> CoursePages { get; set; }
+    public DbSet<CoursePage> CoursePages { get; set; }
     public ReadDbContext(DbContextOptions<ReadDbContext> options) : base(options)
     {
     }
@@ -37,9 +37,9 @@ public class ReadDbContext : AppDbContextBase, IReadDbContext
     }
 }
 
-public class CoursePageConfiguration : IEntityTypeConfiguration<CoursePageReadModel>
+public class CoursePageConfiguration : IEntityTypeConfiguration<CoursePage>
 {
-    public void Configure(EntityTypeBuilder<CoursePageReadModel> builder)
+    public void Configure(EntityTypeBuilder<CoursePage> builder)
     {
         builder.ToTable("course_pages", SchemaNames.Read);
         builder.HasKey(coursePage => coursePage.Id);

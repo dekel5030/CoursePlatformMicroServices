@@ -27,7 +27,7 @@ internal sealed class GetCoursePageQueryHandler
         GetCoursePageQuery request,
         CancellationToken cancellationToken = default)
     {
-        CoursePageReadModel? page = await _readDbContext.CoursePages
+        CoursePage? page = await _readDbContext.CoursePages
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
         if (page is null)

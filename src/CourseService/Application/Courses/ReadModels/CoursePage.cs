@@ -4,7 +4,7 @@ using Kernel;
 
 namespace Courses.Application.Courses.ReadModels;
 
-public sealed class CoursePageReadModel
+public sealed class CoursePage
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;

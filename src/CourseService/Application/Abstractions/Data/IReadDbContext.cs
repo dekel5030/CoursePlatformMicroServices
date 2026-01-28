@@ -11,11 +11,13 @@ namespace Courses.Application.Abstractions.Data;
 
 public interface IReadDbContext
 {
-    DbSet<CoursePageReadModel> CoursePages { get; }
+    DbSet<CoursePage> CoursePages { get; }
     DbSet<Course> Courses { get; }
     DbSet<Lesson> Lessons { get; }
     DbSet<User> Users { get; }
     DbSet<Module> Modules { get; }
     DbSet<Category> Categories { get; }
     DbSet<Enrollment> Enrollments { get; }
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
