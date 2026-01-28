@@ -2,4 +2,4 @@
 
 namespace Courses.Domain.Courses.Events;
 
-public sealed record CourseDeleted(ICourseSnapshot Course) : IDomainEvent;
+public sealed record CourseUpdated(ICourseSnapshot Course) : IDomainEvent;

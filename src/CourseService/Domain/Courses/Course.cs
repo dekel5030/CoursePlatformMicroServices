@@ -7,7 +7,23 @@ using Kernel;
 
 namespace Courses.Domain.Courses;
 
-public class Course : Entity<CourseId>
+public interface ICourseSnapshot
+{
+    CourseId Id { get; }
+    Title Title { get; }
+    Description Description { get; }
+    CourseStatus Status { get; }
+    DifficultyLevel Difficulty { get; }
+    Money Price { get; }
+    Language Language { get; }
+    Slug Slug { get; }
+    UserId InstructorId { get; }
+    CategoryId CategoryId { get; }
+    IReadOnlyCollection<Tag> Tags { get; }
+    IReadOnlyCollection<ImageUrl> Images { get; }
+}
+
+public class Course : Entity<CourseId>, ICourseSnapshot
 {
     public override CourseId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
@@ -24,7 +40,6 @@ public class Course : Entity<CourseId>
     public IReadOnlyCollection<Tag> Tags => _tags;
     public IReadOnlyCollection<ImageUrl> Images => _images;
     public DateTimeOffset UpdatedAtUtc { get; private set; }
-
 
     private readonly List<ImageUrl> _images = new();
     private readonly HashSet<Tag> _tags = new();
@@ -60,6 +75,8 @@ public class Course : Entity<CourseId>
             Price = price ?? Money.Zero(),
         };
 
+        newCourse.Raise(new CourseCreated(newCourse));
+
         return Result.Success(newCourse);
     }
 
@@ -91,12 +108,15 @@ public class Course : Entity<CourseId>
 
         _images.Add(imageUrl);
 
+        Raise(new CourseUpdated(this));
         return Result.Success();
     }
 
     public Result RemoveImage(ImageUrl imageUrl)
     {
         _images.Remove(imageUrl);
+
+        Raise(new CourseUpdated(this));
         return Result.Success();
     }
 
@@ -124,6 +144,8 @@ public class Course : Entity<CourseId>
         {
             Price = price;
         }
+
+        Raise(new CourseUpdated(this));
 
         return Result.Success();
     }
@@ -169,6 +191,8 @@ public class Course : Entity<CourseId>
             }
         }
 
+        Raise(new CourseUpdated(this));
+
         return Result.Success();
     }
 
@@ -180,7 +204,9 @@ public class Course : Entity<CourseId>
         }
 
         Status = CourseStatus.Deleted;
+
         Raise(new CourseDeleted(this));
+
         return Result.Success();
     }
 }
