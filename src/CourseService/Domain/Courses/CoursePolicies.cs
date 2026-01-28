@@ -30,7 +30,7 @@ public static class CoursePolicies
         return Result.Success();
     }
 
-    public static Result CanPublish(CourseStatus status, int lessonCount)
+    public static Result CanPublish(CourseStatus status)
     {
         if (status == CourseStatus.Deleted)
         {
@@ -40,11 +40,6 @@ public static class CoursePolicies
         if (status == CourseStatus.Published)
         {
             return Result.Failure(CourseErrors.AlreadyPublished);
-        }
-
-        if (lessonCount == 0)
-        {
-            return Result.Failure(CourseErrors.CourseWithoutLessons);
         }
 
         return Result.Success();

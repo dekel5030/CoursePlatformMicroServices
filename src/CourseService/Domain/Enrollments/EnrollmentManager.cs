@@ -30,13 +30,6 @@ public class EnrollmentManager
             return Result.Failure<Enrollment>(enrollmentResult.Error);
         }
 
-        Result courseEnrollResult = course.Enroll();
-
-        if (courseEnrollResult.IsFailure)
-        {
-            return Result.Failure<Enrollment>(courseEnrollResult.Error);
-        }
-
         return Result.Success(enrollmentResult.Value);
     }
 }
