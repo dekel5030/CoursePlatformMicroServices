@@ -34,6 +34,7 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext
 
         var domainEvents = entities
             .SelectMany(entity => entity.DomainEvents)
+            .Distinct()
             .ToList();
 
         foreach (Entity entity in entities)
