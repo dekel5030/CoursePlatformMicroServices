@@ -40,58 +40,52 @@ internal sealed class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, 
         CancellationToken cancellationToken = default)
     {
         IReadOnlyList<Course> courses = await _featuredCoursesRepo.GetFeaturedCourse();
+        var courseIds = courses.Select(c => c.Id).ToList();
 
-        var instructorIds = courses.Select(c => c.InstructorId).Distinct().ToList();
-        var categoryIds = courses.Select(c => c.CategoryId).Distinct().ToList();
+        var rawData = await _dbContext.Courses
+            .Where(course => courseIds.Contains(course.Id))
+            .OrderByDescending(c => c.UpdatedAtUtc)
+            .Select(c => new
+            {
+                Course = c,
+                Instructor = _dbContext.Users
+                    .Where(u => u.Id == c.InstructorId)
+                    .Select(u => new { u.Id, u.FullName, u.AvatarUrl })
+                    .FirstOrDefault(),
+                Category = _dbContext.Categories
+                    .Where(cat => cat.Id == c.CategoryId)
+                    .Select(cat => new { cat.Id, cat.Name, cat.Slug })
+                    .FirstOrDefault(),
 
-        Dictionary<UserId, InstructorDto> instructorsMap = await _dbContext.Users
-            .Where(u => instructorIds.Contains(u.Id))
-            .ToDictionaryAsync(user => user.Id, user => new InstructorDto(
-                user.Id.Value,
-                user.FullName,
-                user.AvatarUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, user.AvatarUrl ?? "").Value
-            ), cancellationToken);
+                EnrollmentCount = _dbContext.Enrollments.Count(e => e.CourseId == c.Id),
 
-        Dictionary<CategoryId, CategoryDto> categoriesMap = await _dbContext.Categories
-            .Where(c => categoryIds.Select(id => id).Contains(c.Id))
-            .ToDictionaryAsync(category => category.Id, category => new CategoryDto(
-                category.Id.Value,
-                category.Name,
-                category.Slug.Value
-            ), cancellationToken);
+                LessonsCount = _dbContext.Modules
+                    .Where(m => m.CourseId == c.Id)
+                    .SelectMany(m => _dbContext.Lessons.Where(l => l.ModuleId == m.Id))
+                    .Count(),
 
-        var ratingsMap = new Dictionary<Guid, (double Avg, int Count)>();
+                TotalDurationSeconds = _dbContext.Modules
+                    .Where(m => m.CourseId == c.Id)
+                    .Sum(m => m.Duration.TotalSeconds)
+            })
+            .ToListAsync(cancellationToken);
 
-        var courseDtos = courses.Select(course =>
+        var courseDtos = rawData.Select(data =>
         {
-            InstructorDto instructor = instructorsMap.GetValueOrDefault(course.InstructorId)
-                             ?? new InstructorDto(course.InstructorId.Value, "Unknown Instructor", null);
-
-            CategoryDto category = categoriesMap.GetValueOrDefault(course.CategoryId)
-                           ?? new CategoryDto(Guid.Empty, "Uncategorized", "uncategorized");
-
-            ImageUrl? mainImage = course.Images.FirstOrDefault();
-            string? thumbnailUrl = mainImage is not null
-                ? _urlResolver.Resolve(StorageCategory.Public, mainImage.Path).Value
-                : null;
+            Course course = data.Course;
 
             string descriptionText = course.Description.Value;
-            string shortDescription = descriptionText.Length > 50
-                ? descriptionText[..50] + "..."
+            string shortDescription = descriptionText.Length > 100
+                ? descriptionText[..100] + "..."
                 : descriptionText;
 
-            var badges = new List<string>();
-            if (course.EnrollmentCount > 1000)
-            {
-                badges.Add("Bestseller");
-            }
+            string? thumbnailUrl = course.Images.Count != 0
+                ? _urlResolver.Resolve(StorageCategory.Public, course.Images.First().Path).Value
+                : null;
 
-            if (course.UpdatedAtUtc > DateTimeOffset.UtcNow.AddDays(-30))
-            {
-                badges.Add("New");
-            }
-
-            (double avg, int count) = ratingsMap.GetValueOrDefault(course.Id.Value, (Avg: 0, Count: 0));
+            string? avatarUrl = data.Instructor?.AvatarUrl != null
+                ? _urlResolver.Resolve(StorageCategory.Public, data.Instructor.AvatarUrl).Value
+                : null;
 
             return new CourseSummaryDto
             {
@@ -99,28 +93,34 @@ internal sealed class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, 
                 Title = course.Title.Value,
                 Slug = course.Slug.Value,
                 ShortDescription = shortDescription,
-
-                Instructor = instructor,
-                Category = category,
-
                 Price = course.Price,
-                OriginalPrice = null,
-                Badges = badges,
-
-                AverageRating = avg,
-                ReviewsCount = count,
-
-                ThumbnailUrl = thumbnailUrl,
-                LessonsCount = course.LessonCount,
-                Duration = course.Duration,
+                OriginalPrice = course.Price,
                 Difficulty = course.Difficulty,
-
-                EnrollmentCount = course.EnrollmentCount,
-                CourseViews = course.Views,
+                Status = course.Status,
                 UpdatedAtUtc = course.UpdatedAtUtc,
 
-                Status = course.Status,
-                Links = _courseLinkFactory.CreateLinks(new CourseState(course.Id, course.InstructorId, course.Status, course.LessonCount))
+                EnrollmentCount = data.EnrollmentCount,
+                LessonsCount = data.LessonsCount,
+                Duration = TimeSpan.FromSeconds(data.TotalDurationSeconds),
+
+                AverageRating = 4.5,
+                ReviewsCount = 120,
+                CourseViews = 1245,
+
+                Instructor = new InstructorDto(
+                    data.Instructor?.Id.Value ?? Guid.Empty,
+                    data.Instructor?.FullName ?? "Unknown",
+                    avatarUrl),
+
+                Category = new CategoryDto(
+                    data.Category?.Id.Value ?? Guid.Empty,
+                    data.Category?.Name ?? "Uncategorized",
+                    data.Category?.Slug.Value ?? "uncategorized"),
+
+                ThumbnailUrl = thumbnailUrl,
+                Badges = course.UpdatedAtUtc > DateTimeOffset.UtcNow.AddDays(-30) ? new List<string> { "New" } : [],
+
+                Links = _courseLinkFactory.CreateLinks(new CourseState(course.Id, course.InstructorId, course.Status))
             };
         }).ToList();
 

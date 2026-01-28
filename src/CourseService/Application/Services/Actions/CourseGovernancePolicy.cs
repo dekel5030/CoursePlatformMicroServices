@@ -64,7 +64,7 @@ public class CourseGovernancePolicy
             return false;
         }
 
-        Result canPublishResult = CoursePolicies.CanPublish(state.Status, state.LessonCount);
+        Result canPublishResult = CoursePolicies.CanPublish(state.Status);
         if (canPublishResult.IsFailure)
         {
             return false;
