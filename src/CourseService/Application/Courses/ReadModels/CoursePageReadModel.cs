@@ -20,14 +20,16 @@ public sealed class CoursePageReadModel
     public TimeSpan Duration { get; set; }
     public DateTimeOffset UpdatedAtUtc { get; set; }
 
-    public List<string> ImageUrls { get; private set; } = new();
-    public List<string> Tags { get; private set; } = new();
+#pragma warning disable CA2227 // Collection properties should be read only
+    public List<string> ImageUrls { get; set; } = new();
+    public List<string> Tags { get; set; } = new();
 
     public Guid CategoryId { get; set; }
     public string CategoryName { get; set; } = string.Empty;
     public string CategorySlug { get; set; } = string.Empty;
 
-    public List<ModuleReadModel> Modules { get; private set; } = new();
+    public List<ModuleReadModel> Modules { get; set; } = new();
+#pragma warning restore CA2227 // Collection properties should be read only
 
     public CoursePageDto ToDto()
     {
