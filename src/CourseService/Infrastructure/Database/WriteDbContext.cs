@@ -17,6 +17,12 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext
         _mediator = mediator;
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.HasDefaultSchema(SchemaNames.Write);
+    }
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         await DispatchDomainEvents(this, cancellationToken);
