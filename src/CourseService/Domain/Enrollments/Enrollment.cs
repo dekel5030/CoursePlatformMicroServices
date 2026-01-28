@@ -8,20 +8,6 @@ using Kernel;
 
 namespace Courses.Domain.Enrollments;
 
-public interface IEnrollmentSnapshot
-{
-    EnrollmentId Id { get; }
-    CourseId CourseId { get; }
-    UserId StudentId { get; }
-    DateTimeOffset EnrolledAt { get; }
-    DateTimeOffset ExpiresAt { get; }
-    EnrollmentStatus Status { get; }
-    DateTimeOffset? CompletedAt { get; }
-    LessonId? LastAccessedLessonId { get; }
-    DateTimeOffset? LastAccessedAt { get; }
-    IReadOnlySet<LessonId> CompletedLessons { get; }
-}
-
 public class Enrollment : Entity<EnrollmentId>, IEnrollmentSnapshot
 {
     public override EnrollmentId Id { get; protected set; }
@@ -101,13 +87,13 @@ public class Enrollment : Entity<EnrollmentId>, IEnrollmentSnapshot
     {
         Status = EnrollmentStatus.Expired;
 
-        Raise(new EnrollmentStatusChangedDomainEvent(this));
+        Raise(new EnrollmentUpdatedDomainEvent(this));
     }
 
     public void Revoke()
     {
         Status = EnrollmentStatus.Revoked;
 
-        Raise(new EnrollmentStatusChangedDomainEvent(this));
+        Raise(new EnrollmentUpdatedDomainEvent(this));
     }
 }
