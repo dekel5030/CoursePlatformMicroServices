@@ -61,7 +61,7 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
         }
 
-        var courseState = new CourseState(course.Id, course.InstructorId, course.Status, course.LessonCount);
+        var courseState = new CourseState(course.Id, course.InstructorId, course.Status);
         var moduleState = new ModuleState(module.Id);
         var lessonState = new LessonState(lesson.Id, lesson.Access);
 
