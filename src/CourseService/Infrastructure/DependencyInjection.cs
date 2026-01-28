@@ -65,7 +65,6 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddStorage();
-        services.AddScoped<EnrollmentManager>();
         return services;
     }
 
