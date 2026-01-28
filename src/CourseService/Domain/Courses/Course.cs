@@ -21,11 +21,6 @@ public class Course : Entity<CourseId>
     public UserId InstructorId { get; private set; }
     public CategoryId CategoryId { get; private set; } = new CategoryId(Guid.Empty);
 
-    public int EnrollmentCount { get; private set; }
-    public int LessonCount { get; private set; }
-    public int Views { get; private set; }
-    public TimeSpan Duration { get; private set; } = TimeSpan.Zero;
-
     public IReadOnlyCollection<Tag> Tags => _tags;
     public IReadOnlyCollection<ImageUrl> Images => _images;
     public DateTimeOffset UpdatedAtUtc { get; private set; }
@@ -71,7 +66,7 @@ public class Course : Entity<CourseId>
     public Result CanModify => CoursePolicies.CanModify(Status);
     public Result CanDelete => CoursePolicies.CanDelete(Status);
     public Result CanEnroll => CoursePolicies.CanEnroll(Status);
-    public Result CanPublish => CoursePolicies.CanPublish(Status, LessonCount);
+    public Result CanPublish => CoursePolicies.CanPublish(Status);
 
     public Result Publish()
     {
@@ -186,17 +181,6 @@ public class Course : Entity<CourseId>
 
         Status = CourseStatus.Deleted;
         Raise(new CourseDeleted(this));
-        return Result.Success();
-    }
-
-    internal Result Enroll()
-    {
-        if (CanEnroll.IsFailure)
-        {
-            return CanEnroll;
-        }
-
-        EnrollmentCount++;
         return Result.Success();
     }
 }

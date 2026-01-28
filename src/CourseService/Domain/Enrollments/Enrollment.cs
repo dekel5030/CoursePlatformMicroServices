@@ -1,4 +1,5 @@
 ﻿using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Enrollments.Errors;
 using Courses.Domain.Enrollments.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared;
@@ -8,28 +9,25 @@ namespace Courses.Domain.Enrollments;
 
 public class Enrollment : Entity<EnrollmentId>
 {
-    public override EnrollmentId Id { get; protected set; } = EnrollmentId.CreateNew();
+    public override EnrollmentId Id { get; protected set; }
     public CourseId CourseId { get; private set; }
     public UserId StudentId { get; private set; }
     public DateTimeOffset EnrolledAt { get; private set; }
     public DateTimeOffset ExpiresAt { get; private set; }
+
     public EnrollmentStatus Status { get; private set; }
 
-    public float ProgressPercentage { get; private set; }
     public DateTimeOffset? CompletedAt { get; private set; }
+    public bool IsCompleted => CompletedAt.HasValue;
+
     public LessonId? LastAccessedLessonId { get; private set; }
     public DateTimeOffset? LastAccessedAt { get; private set; }
 
     public IReadOnlySet<LessonId> CompletedLessons => _completedLessons;
-
     private readonly HashSet<LessonId> _completedLessons = new();
-
-#pragma warning disable S1133
-#pragma warning disable CS8618
-    [Obsolete("This constructor is for EF Core only.", error: true)]
-    private Enrollment() { }
-#pragma warning restore CS8618
-#pragma warning restore S1133
+    
+    public bool IsFullyCompleted(int totalLessonsInCourse)
+        => totalLessonsInCourse > 0 && _completedLessons.Count == totalLessonsInCourse;
 
     private Enrollment(EnrollmentId id, CourseId courseId, UserId studentId)
     {
@@ -38,26 +36,36 @@ public class Enrollment : Entity<EnrollmentId>
         StudentId = studentId;
     }
 
-    internal static Result<Enrollment> Create(
+    public static Result<Enrollment> Create(
         CourseId courseId,
         UserId studentId,
         DateTimeOffset enrolledAt,
         DateTimeOffset expiresAt)
     {
-        var id = EnrollmentId.CreateNew();
+        if (expiresAt <= enrolledAt)
+        {
+            return Result.Failure<Enrollment>(EnrollmentErrors.InvalidExpirationDate);
+        }
 
-        var enrollment = new Enrollment(id, courseId, studentId)
+        var enrollment = new Enrollment(EnrollmentId.CreateNew(), courseId, studentId)
         {
             EnrolledAt = enrolledAt,
             ExpiresAt = expiresAt,
             Status = EnrollmentStatus.Active
         };
 
+        // Raise(new StudentEnrolled(enrollment.Id, enrollment.CourseId));
+
         return Result.Success(enrollment);
     }
 
     public void MarkLessonAsCompleted(LessonId lessonId, int totalLessonsInCourse)
     {
+        if (Status != EnrollmentStatus.Active)
+        {
+            return;
+        }
+
         LastAccessedLessonId = lessonId;
         LastAccessedAt = DateTimeOffset.UtcNow;
 
@@ -66,14 +74,19 @@ public class Enrollment : Entity<EnrollmentId>
             return;
         }
 
-        if (totalLessonsInCourse > 0)
-        {
-            ProgressPercentage = (float)_completedLessons.Count / totalLessonsInCourse * 100;
-        }
-
-        if (_completedLessons.Count == totalLessonsInCourse && CompletedAt is null)
+        if (totalLessonsInCourse > 0 && _completedLessons.Count == totalLessonsInCourse && !IsCompleted)
         {
             CompletedAt = DateTimeOffset.UtcNow;
         }
+    }
+
+    public void Expire()
+    {
+        Status = EnrollmentStatus.Expired;
+    }
+
+    public void Revoke()
+    {
+        Status = EnrollmentStatus.Revoked;
     }
 }

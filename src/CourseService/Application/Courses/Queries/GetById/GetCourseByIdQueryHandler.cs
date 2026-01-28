@@ -54,30 +54,46 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             .FirstAsync(cancellationToken);
 
         List<Module> modules = await _readDbContext.Modules
+            .AsNoTracking()
             .Include(m => m.Lessons)
             .Where(m => m.CourseId == request.Id)
+            .OrderBy(m => m.Index)
             .ToListAsync(cancellationToken);
 
         Category category = await _readDbContext.Categories
             .Where(c => c.Id == course.CategoryId)
             .FirstAsync(cancellationToken);
 
+        int enrollmentCount = await _readDbContext.Enrollments
+            .Where(e => e.CourseId == course.Id)
+            .CountAsync(cancellationToken);
+
+        int lessonCount = modules.Sum(m => m.Lessons.Count);
+
+        var courseDuration = TimeSpan.FromSeconds(
+            modules.SelectMany(m => m.Lessons).Sum(l => l.Duration.TotalSeconds)
+        );
+
         var images = course.Images
             .Select(image => _urlResolver.Resolve(StorageCategory.Public, image.Path).Value)
             .ToList();
 
         var tags = course.Tags.Select(tag => tag.Value).ToList();
-        var courseState = new CourseState(course.Id, course.InstructorId, course.Status, course.LessonCount);
+        var courseState = new CourseState(course.Id, course.InstructorId, course.Status);
 
         var moduleDtos = modules.Select(module =>
         {
             var moduleState = new ModuleState(module.Id);
 
+            var moduleDuration = TimeSpan.FromSeconds(
+                module.Lessons.Sum(l => l.Duration.TotalSeconds)
+            );
+
             return new ModuleDto(
                 Id: module.Id.Value,
                 Title: module.Title.Value,
                 Index: module.Index,
-                Duration: module.Duration,
+                Duration: moduleDuration,
                 Links: _moduleLinkFactory.CreateLinks(courseState, moduleState),
                 LessonCount: module.Lessons.Count,
                 Lessons: module.Lessons.Select(lesson =>
@@ -107,9 +123,9 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             instructor.AvatarUrl,
             course.Status,
             course.Price,
-            course.EnrollmentCount,
-            course.LessonCount,
-            course.Duration,
+            enrollmentCount,
+            lessonCount,
+            courseDuration,
             course.UpdatedAtUtc,
             images,
             tags,
