@@ -47,22 +47,31 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
         }
 
         CoursePageDto dto = innerQueryResult.Value;
-        var courseState = new CourseState(new CourseId(request.Id.Value), new UserId(dto.InstructorId), dto.Status);
+        dto.EnrichWithLinks(_courseLinkFactory, _moduleLinkFactory, _lessonLinkFactory);
 
-        dto.Links.AddRange(_courseLinkFactory.CreateLinks(courseState));
+        return Result.Success(dto);
+    }
+}
 
+internal static class DtoEnrichmentExtensions
+{
+    public static void EnrichWithLinks(
+        this CoursePageDto dto,
+        ICourseLinkFactory courseLinkFactory,
+        IModuleLinkFactory moduleLinkFactory,
+        ILessonLinkFactory lessonLinkFactory)
+    {
+        var courseState = new CourseState(new CourseId(dto.Id), new UserId(dto.InstructorId), dto.Status);
+        dto.Links.AddRange(courseLinkFactory.CreateLinks(courseState));
         foreach (ModuleDto module in dto.Modules)
         {
             var moduleState = new ModuleState(new ModuleId(module.Id));
-            module.Links.AddRange(_moduleLinkFactory.CreateLinks(courseState, moduleState));
-
+            module.Links.AddRange(moduleLinkFactory.CreateLinks(courseState, moduleState));
             foreach (LessonDto lesson in module.Lessons)
             {
                 var lessonState = new LessonState(new LessonId(lesson.Id), lesson.Access);
-                lesson.Links.AddRange(_lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState));
+                lesson.Links.AddRange(lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState));
             }
         }
-
-        return Result.Success(dto);
     }
 }
