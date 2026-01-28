@@ -6,7 +6,7 @@ using Courses.Domain.Shared.Primitives;
 namespace Courses.Domain.Module;
 
 public interface IModuleSnapshot
-{     
+{
     ModuleId Id { get; }
     Title Title { get; }
     int Index { get; }

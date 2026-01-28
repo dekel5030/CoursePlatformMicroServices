@@ -2,7 +2,6 @@
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.GenerateLessonWithAi;
-using Courses.Application.Lessons.Dtos;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Module.Primitives;
 using Kernel;

@@ -40,7 +40,7 @@ internal sealed class GetCoursePageQueryHandler
         pageDto = pageDto with
         {
             ImageUrls = pageDto.ImageUrls
-                .Select(url => url is null ? 
+                .Select(url => url is null ?
                     string.Empty
                     : _urlResolver.Resolve(StorageCategory.Public, url).Value).ToList()
         };

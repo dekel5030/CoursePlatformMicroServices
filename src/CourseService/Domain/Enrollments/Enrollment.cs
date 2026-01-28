@@ -26,7 +26,7 @@ public class Enrollment : Entity<EnrollmentId>, IEnrollmentSnapshot
 
     public IReadOnlySet<LessonId> CompletedLessons => _completedLessons;
     private readonly HashSet<LessonId> _completedLessons = new();
-    
+
     public bool IsFullyCompleted(int totalLessonsInCourse)
         => totalLessonsInCourse > 0 && _completedLessons.Count == totalLessonsInCourse;
 

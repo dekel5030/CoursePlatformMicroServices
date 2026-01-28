@@ -6,7 +6,6 @@ using MassTransit;
 using StorageService.Abstractions;
 using StorageService.InternalContracts;
 using StorageService.Transcription;
-using static MassTransit.Monitoring.Performance.BuiltInCounters;
 
 namespace StorageService.S3;
 
@@ -116,8 +115,8 @@ internal sealed class FileProcessingEventConsumer
     }
 
     private async Task<string?> CreateAndUploadTranscriptionAsync(
-        FileProcessingEvent message, 
-        string outputDir, 
+        FileProcessingEvent message,
+        string outputDir,
         CancellationToken cancellationToken = default)
     {
         string audioPath = Path.Combine(outputDir, "audio.mp3");

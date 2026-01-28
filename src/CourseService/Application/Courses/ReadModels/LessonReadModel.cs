@@ -1,5 +1,4 @@
 ﻿using Courses.Application.Courses.Dtos;
-using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Lessons.Primitives;
 
 namespace Courses.Application.Courses.ReadModels;
