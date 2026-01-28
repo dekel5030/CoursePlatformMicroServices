@@ -128,4 +128,9 @@ public class Lesson : Entity<LessonId>
 
         return Result.Success();
     }
+
+    internal void UpdateIndex(int index)
+    {
+        Index = index;
+    }
 }

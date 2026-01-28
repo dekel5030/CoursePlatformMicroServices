@@ -14,8 +14,6 @@ public class Module : Entity<ModuleId>
     public override ModuleId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
     public int Index { get; private set; }
-    public TimeSpan Duration { get; private set; } = TimeSpan.Zero;
-    public int LessonCount { get; private set; }
 
     public CourseId CourseId { get; private set; }
     public IReadOnlyList<Lesson> Lessons => _lessons.AsReadOnly();
@@ -75,7 +73,6 @@ public class Module : Entity<ModuleId>
         return Result.Success();
     }
 
-
     public Result UpdateLessonMedia(
         LessonId lessonId,
         ImageUrl? thumbnailImageUrl = null,
@@ -102,6 +99,12 @@ public class Module : Entity<ModuleId>
         }
 
         _lessons.Remove(lesson);
+
+        for (int i = 0; i < _lessons.Count; i++)
+        {
+            _lessons[i].UpdateIndex(i);
+        }
+
         return Result.Success();
     }
 }
