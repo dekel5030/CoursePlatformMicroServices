@@ -3,7 +3,7 @@ using Courses.Domain.Lessons.Primitives;
 
 namespace Courses.Application.Courses.ReadModels;
 
-public sealed record LessonReadModel
+public sealed class LessonReadModel
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;

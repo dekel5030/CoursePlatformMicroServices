@@ -46,9 +46,11 @@ public class CoursePageConfiguration : IEntityTypeConfiguration<CoursePageReadMo
 
         builder.OwnsMany(cp => cp.Modules, moduleBuilder =>
         {
-            moduleBuilder.ToJson();
-
-            moduleBuilder.OwnsMany(m => m.Lessons, lessonBuilder => { });
+            moduleBuilder.ToJson("modules");
+            moduleBuilder.OwnsMany(m => m.Lessons, lessonBuilder =>
+            {
+                lessonBuilder.HasJsonPropertyName("lessons");
+            });
         });
     }
 }

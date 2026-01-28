@@ -1,7 +1,7 @@
 ﻿using Courses.Application.Abstractions.Data;
-using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using Courses.Domain.Shared;
 
 namespace Courses.Infrastructure.Database;
 
@@ -34,7 +34,7 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext
         DbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        var entities = dbContext.ChangeTracker.Entries<Entity>()
+        var entities = dbContext.ChangeTracker.Entries<IEntity>()
             .Select(entry => entry.Entity)
             .ToList();
 
@@ -43,7 +43,7 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext
             .Distinct()
             .ToList();
 
-        foreach (Entity entity in entities)
+        foreach (IEntity entity in entities)
         {
             entity.ClearDomainEvents();
         }
