@@ -9,9 +9,12 @@ internal static class MigrationExtensions
     {
         using IServiceScope scope = app.ApplicationServices.CreateScope();
 
-        using WriteDbContext dbContext =
+        using WriteDbContext writeDbContext =
             scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+        writeDbContext.Database.Migrate();
 
-        dbContext.Database.Migrate();
+        using ReadDbContext readDbContext =
+            scope.ServiceProvider.GetRequiredService<ReadDbContext>();
+        readDbContext.Database.Migrate();
     }
 }
