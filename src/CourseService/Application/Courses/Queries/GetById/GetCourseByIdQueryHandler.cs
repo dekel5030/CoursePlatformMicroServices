@@ -54,8 +54,10 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             .FirstAsync(cancellationToken);
 
         List<Module> modules = await _readDbContext.Modules
+            .AsNoTracking()
             .Include(m => m.Lessons)
             .Where(m => m.CourseId == request.Id)
+            .OrderBy(m => m.Index)
             .ToListAsync(cancellationToken);
 
         Category category = await _readDbContext.Categories
@@ -66,9 +68,11 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             .Where(e => e.CourseId == course.Id)
             .CountAsync(cancellationToken);
 
-        int lessonCount = modules.Aggregate(0, (acc, module) => acc + module.Lessons.Count);
+        int lessonCount = modules.Sum(m => m.Lessons.Count);
 
-        TimeSpan courseDuration = modules.Aggregate(TimeSpan.Zero, (acc, module) => acc + module.Duration);
+        var courseDuration = TimeSpan.FromSeconds(
+            modules.SelectMany(m => m.Lessons).Sum(l => l.Duration.TotalSeconds)
+        );
 
         var images = course.Images
             .Select(image => _urlResolver.Resolve(StorageCategory.Public, image.Path).Value)
@@ -81,11 +85,15 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
         {
             var moduleState = new ModuleState(module.Id);
 
+            var moduleDuration = TimeSpan.FromSeconds(
+                module.Lessons.Sum(l => l.Duration.TotalSeconds)
+            );
+
             return new ModuleDto(
                 Id: module.Id.Value,
                 Title: module.Title.Value,
                 Index: module.Index,
-                Duration: module.Duration,
+                Duration: moduleDuration,
                 Links: _moduleLinkFactory.CreateLinks(courseState, moduleState),
                 LessonCount: module.Lessons.Count,
                 Lessons: module.Lessons.Select(lesson =>

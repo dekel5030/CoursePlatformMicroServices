@@ -66,7 +66,8 @@ internal sealed class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, 
 
                 TotalDurationSeconds = _dbContext.Modules
                     .Where(m => m.CourseId == c.Id)
-                    .Sum(m => m.Duration.TotalSeconds)
+                    .SelectMany(m => _dbContext.Lessons.Where(l => l.ModuleId == m.Id))
+                    .Sum(l => l.Duration.TotalSeconds)
             })
             .ToListAsync(cancellationToken);
 

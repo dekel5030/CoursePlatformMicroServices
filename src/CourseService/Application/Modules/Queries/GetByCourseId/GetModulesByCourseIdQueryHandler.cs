@@ -28,22 +28,28 @@ internal sealed class GetModulesByCourseIdQueryHandler
             .Where(module => module.CourseId == request.CourseId)
             .ToListAsync(cancellationToken);
 
-        var moduleDetailsDtos = modules.Select(module => new ModuleDetailsDto(
-            module.Id.Value,
-            module.Title.Value,
-            module.Index,
-            module.Lessons.Count,
-            module.Duration,
-            module.Lessons
-                .OrderBy(lesson => lesson.Index)
-                .Select(lesson => new LessonSummaryDto(
-                    module.Id.Value,
-                    lesson.Id.Value,
-                    lesson.Title.Value,
-                    lesson.Index,
-                    lesson.Duration,
-                    lesson.ThumbnailImageUrl?.Path,
-                    lesson.Access)).ToList())).ToList();
+        var moduleDetailsDtos = modules.Select(module =>
+        {
+            var moduleDuration = TimeSpan.FromSeconds(
+                module.Lessons.Sum(l => l.Duration.TotalSeconds));
+
+            return new ModuleDetailsDto(
+                module.Id.Value,
+                module.Title.Value,
+                module.Index,
+                module.Lessons.Count,
+                moduleDuration,
+                module.Lessons
+                    .OrderBy(lesson => lesson.Index)
+                    .Select(lesson => new LessonSummaryDto(
+                        module.Id.Value,
+                        lesson.Id.Value,
+                        lesson.Title.Value,
+                        lesson.Index,
+                        lesson.Duration,
+                        lesson.ThumbnailImageUrl?.Path,
+                        lesson.Access)).ToList());
+        }).ToList();
 
         var moduleCollectionDto = new ModuleCollectionDto
         {
