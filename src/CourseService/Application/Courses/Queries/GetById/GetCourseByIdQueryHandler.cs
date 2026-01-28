@@ -62,12 +62,20 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             .Where(c => c.Id == course.CategoryId)
             .FirstAsync(cancellationToken);
 
+        int enrollmentCount = await _readDbContext.Enrollments
+            .Where(e => e.CourseId == course.Id)
+            .CountAsync(cancellationToken);
+
+        int lessonCount = modules.Aggregate(0, (acc, module) => acc + module.Lessons.Count);
+
+        TimeSpan courseDuration = modules.Aggregate(TimeSpan.Zero, (acc, module) => acc + module.Duration);
+
         var images = course.Images
             .Select(image => _urlResolver.Resolve(StorageCategory.Public, image.Path).Value)
             .ToList();
 
         var tags = course.Tags.Select(tag => tag.Value).ToList();
-        var courseState = new CourseState(course.Id, course.InstructorId, course.Status, course.LessonCount);
+        var courseState = new CourseState(course.Id, course.InstructorId, course.Status);
 
         var moduleDtos = modules.Select(module =>
         {
@@ -107,9 +115,9 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             instructor.AvatarUrl,
             course.Status,
             course.Price,
-            course.EnrollmentCount,
-            course.LessonCount,
-            course.Duration,
+            enrollmentCount,
+            lessonCount,
+            courseDuration,
             course.UpdatedAtUtc,
             images,
             tags,
