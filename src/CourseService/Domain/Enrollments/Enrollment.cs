@@ -1,5 +1,6 @@
 ﻿using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments.Errors;
+using Courses.Domain.Enrollments.Events;
 using Courses.Domain.Enrollments.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared;
@@ -7,7 +8,21 @@ using Kernel;
 
 namespace Courses.Domain.Enrollments;
 
-public class Enrollment : Entity<EnrollmentId>
+public interface IEnrollmentSnapshot
+{
+    EnrollmentId Id { get; }
+    CourseId CourseId { get; }
+    UserId StudentId { get; }
+    DateTimeOffset EnrolledAt { get; }
+    DateTimeOffset ExpiresAt { get; }
+    EnrollmentStatus Status { get; }
+    DateTimeOffset? CompletedAt { get; }
+    LessonId? LastAccessedLessonId { get; }
+    DateTimeOffset? LastAccessedAt { get; }
+    IReadOnlySet<LessonId> CompletedLessons { get; }
+}
+
+public class Enrollment : Entity<EnrollmentId>, IEnrollmentSnapshot
 {
     public override EnrollmentId Id { get; protected set; }
     public CourseId CourseId { get; private set; }
@@ -54,7 +69,7 @@ public class Enrollment : Entity<EnrollmentId>
             Status = EnrollmentStatus.Active
         };
 
-        // Raise(new StudentEnrolled(enrollment.Id, enrollment.CourseId));
+        enrollment.Raise(new EnrollmentCreatedDomainEvent(enrollment));
 
         return Result.Success(enrollment);
     }
@@ -78,15 +93,21 @@ public class Enrollment : Entity<EnrollmentId>
         {
             CompletedAt = DateTimeOffset.UtcNow;
         }
+
+        Raise(new EnrollmentUpdatedDomainEvent(this));
     }
 
     public void Expire()
     {
         Status = EnrollmentStatus.Expired;
+
+        Raise(new EnrollmentStatusChangedDomainEvent(this));
     }
 
     public void Revoke()
     {
         Status = EnrollmentStatus.Revoked;
+
+        Raise(new EnrollmentStatusChangedDomainEvent(this));
     }
 }

@@ -4,4 +4,4 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Domain.Enrollments.Events;
 
-public record StudentEnrolled(Course Course, UserId StudentId) : IDomainEvent;
+public sealed record EnrollmentCreatedDomainEvent(IEnrollmentSnapshot Enrollment) : IDomainEvent;

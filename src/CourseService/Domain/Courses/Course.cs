@@ -7,22 +7,6 @@ using Kernel;
 
 namespace Courses.Domain.Courses;
 
-public interface ICourseSnapshot
-{
-    CourseId Id { get; }
-    Title Title { get; }
-    Description Description { get; }
-    CourseStatus Status { get; }
-    DifficultyLevel Difficulty { get; }
-    Money Price { get; }
-    Language Language { get; }
-    Slug Slug { get; }
-    UserId InstructorId { get; }
-    CategoryId CategoryId { get; }
-    IReadOnlyCollection<Tag> Tags { get; }
-    IReadOnlyCollection<ImageUrl> Images { get; }
-}
-
 public class Course : Entity<CourseId>, ICourseSnapshot
 {
     public override CourseId Id { get; protected set; }
@@ -75,7 +59,7 @@ public class Course : Entity<CourseId>, ICourseSnapshot
             Price = price ?? Money.Zero(),
         };
 
-        newCourse.Raise(new CourseCreated(newCourse));
+        newCourse.Raise(new CourseCreatedDomainEvent(newCourse));
 
         return Result.Success(newCourse);
     }
@@ -94,7 +78,7 @@ public class Course : Entity<CourseId>, ICourseSnapshot
 
         Status = CourseStatus.Published;
 
-        Raise(new CoursePublished(this));
+        Raise(new CoursePublishedDomainEvent(this));
 
         return Result.Success();
     }
@@ -108,7 +92,7 @@ public class Course : Entity<CourseId>, ICourseSnapshot
 
         _images.Add(imageUrl);
 
-        Raise(new CourseUpdated(this));
+        Raise(new CourseUpdatedDomainEvent(this));
         return Result.Success();
     }
 
@@ -116,7 +100,7 @@ public class Course : Entity<CourseId>, ICourseSnapshot
     {
         _images.Remove(imageUrl);
 
-        Raise(new CourseUpdated(this));
+        Raise(new CourseUpdatedDomainEvent(this));
         return Result.Success();
     }
 
@@ -145,7 +129,7 @@ public class Course : Entity<CourseId>, ICourseSnapshot
             Price = price;
         }
 
-        Raise(new CourseUpdated(this));
+        Raise(new CourseUpdatedDomainEvent(this));
 
         return Result.Success();
     }
@@ -191,7 +175,7 @@ public class Course : Entity<CourseId>, ICourseSnapshot
             }
         }
 
-        Raise(new CourseUpdated(this));
+        Raise(new CourseUpdatedDomainEvent(this));
 
         return Result.Success();
     }
@@ -205,7 +189,7 @@ public class Course : Entity<CourseId>, ICourseSnapshot
 
         Status = CourseStatus.Deleted;
 
-        Raise(new CourseDeleted(this));
+        Raise(new CourseDeletedDomainEvent(this));
 
         return Result.Success();
     }
