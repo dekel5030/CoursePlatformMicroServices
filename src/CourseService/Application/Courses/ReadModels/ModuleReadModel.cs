@@ -2,14 +2,14 @@
 
 namespace Courses.Application.Courses.ReadModels;
 
-public sealed record ModuleReadModel
+public sealed class ModuleReadModel
 {
-    public required Guid Id { get; init; }
-    public required string Title { get; init; }
-    public required int Index { get; init; }
-    public required TimeSpan Duration { get; init; }
-    public required int LessonCount { get; init; }
-    public required List<LessonReadModel> Lessons { get; init; }
+    public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public int Index { get; set; }
+    public TimeSpan Duration { get; set; }
+    public int LessonCount { get; set; }
+    public List<LessonReadModel> Lessons { get; private set; } = new();
 
     public ModuleDto ToDto()
     {

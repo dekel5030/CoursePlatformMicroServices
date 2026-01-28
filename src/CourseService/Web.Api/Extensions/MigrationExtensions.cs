@@ -1,5 +1,7 @@
 ﻿using Courses.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Courses.Api.Extensions;
 

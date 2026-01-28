@@ -7,6 +7,7 @@ using Courses.Domain.Lessons;
 using Courses.Domain.Module;
 using Courses.Domain.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Courses.Infrastructure.Database;
 
@@ -27,18 +28,27 @@ public class ReadDbContext : AppDbContextBase, IReadDbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.HasDefaultSchema(SchemaNames.Read);
+        modelBuilder.Entity<Course>().ToTable("Courses", SchemaNames.Write, t => t.ExcludeFromMigrations());
+        modelBuilder.Entity<Lesson>().ToTable("Lessons", SchemaNames.Write, t => t.ExcludeFromMigrations());
+        modelBuilder.Entity<User>().ToTable("Users", SchemaNames.Write, t => t.ExcludeFromMigrations());
+        modelBuilder.Entity<Enrollment>().ToTable("Enrollments", SchemaNames.Write, t => t.ExcludeFromMigrations());
+        modelBuilder.Entity<Category>().ToTable("Categories", SchemaNames.Write, t => t.ExcludeFromMigrations());
+        modelBuilder.Entity<Module>().ToTable("Modules", SchemaNames.Write, t => t.ExcludeFromMigrations());
+    }
+}
 
-        modelBuilder.Entity<CoursePageReadModel>(builder =>
+public class CoursePageConfiguration : IEntityTypeConfiguration<CoursePageReadModel>
+{
+    public void Configure(EntityTypeBuilder<CoursePageReadModel> builder)
+    {
+        builder.ToTable("course_pages", SchemaNames.Read);
+        builder.HasKey(coursePage => coursePage.Id);
+
+        builder.OwnsMany(cp => cp.Modules, moduleBuilder =>
         {
-            builder.ToTable("course_pages");
-            builder.HasKey(x => x.Id);
+            moduleBuilder.ToJson();
 
-            builder.OwnsMany(x => x.Modules, m =>
-            {
-                m.ToJson();
-                m.OwnsMany(module => module.Lessons);
-            });
+            moduleBuilder.OwnsMany(m => m.Lessons, lessonBuilder => { });
         });
-
     }
 }

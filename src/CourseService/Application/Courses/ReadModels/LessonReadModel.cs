@@ -3,20 +3,20 @@ using Courses.Domain.Lessons.Primitives;
 
 namespace Courses.Application.Courses.ReadModels;
 
-public record LessonReadModel
+public sealed record LessonReadModel
 {
-    public required Guid LessonId { get; init; }
-    public required string Title { get; init; }
-    public required int Index { get; init; }
-    public required TimeSpan Duration { get; init; }
-    public required string? ThumbnailUrl { get; init; }
-    public required LessonAccess Access { get; init; }
+    public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public int Index { get; set; }
+    public TimeSpan Duration { get; set; }
+    public string? ThumbnailUrl { get; set; }
+    public LessonAccess Access { get; set; }
 
     public LessonDto ToDto()
     {
         return new LessonDto
         {
-            Id = LessonId,
+            Id = Id,
             Title = Title,
             Index = Index,
             Duration = Duration,

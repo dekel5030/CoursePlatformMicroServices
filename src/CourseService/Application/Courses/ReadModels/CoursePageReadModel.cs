@@ -4,30 +4,30 @@ using Kernel;
 
 namespace Courses.Application.Courses.ReadModels;
 
-public class CoursePageReadModel
+public sealed class CoursePageReadModel
 {
-    public required Guid Id { get; init; }
-    public required string Title { get; init; }
-    public required string Description { get; init; }
-    public required Guid InstructorId { get; init; }
-    public required string InstructorName { get; init; }
-    public string? InstructorAvatarUrl { get; init; }
-    public required CourseStatus Status { get; init; }
-    public required decimal PriceAmount { get; init; }
-    public required string PriceCurrency { get; init; }
-    public required int EnrollmentCount { get; init; }
-    public required int LessonsCount { get; init; }
-    public required TimeSpan Duration { get; init; }
-    public required DateTimeOffset UpdatedAtUtc { get; init; }
+    public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public Guid InstructorId { get; set; }
+    public string InstructorName { get; set; } = string.Empty;
+    public string? InstructorAvatarUrl { get; set; }
+    public CourseStatus Status { get; set; }
+    public decimal PriceAmount { get; set; }
+    public string PriceCurrency { get; set; } = string.Empty;
+    public int EnrollmentCount { get; set; }
+    public int LessonsCount { get; set; }
+    public TimeSpan Duration { get; set; }
+    public DateTimeOffset UpdatedAtUtc { get; set; }
 
-    public required List<string> ImageUrls { get; init; }
-    public required List<string> Tags { get; init; }
+    public List<string> ImageUrls { get; private set; } = new();
+    public List<string> Tags { get; private set; } = new();
 
-    public required Guid CategoryId { get; init; }
-    public required string CategoryName { get; init; }
-    public required string CategorySlug { get; init; }
+    public Guid CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
+    public string CategorySlug { get; set; } = string.Empty;
 
-    public required List<ModuleReadModel> Modules { get; init; }
+    public List<ModuleReadModel> Modules { get; private set; } = new();
 
     public CoursePageDto ToDto()
     {
