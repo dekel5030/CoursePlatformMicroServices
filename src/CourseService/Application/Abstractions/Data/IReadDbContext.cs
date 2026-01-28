@@ -1,4 +1,5 @@
-﻿using Courses.Domain.Categories;
+﻿using Courses.Application.Courses.ReadModels;
+using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
@@ -10,6 +11,7 @@ namespace Courses.Application.Abstractions.Data;
 
 public interface IReadDbContext
 {
+    DbSet<CoursePageReadModel> CoursePages { get; }
     DbSet<Course> Courses { get; }
     DbSet<Lesson> Lessons { get; }
     DbSet<User> Users { get; }

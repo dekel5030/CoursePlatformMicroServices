@@ -1,6 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
+using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetById;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
