@@ -1,5 +1,4 @@
 ﻿using Courses.Domain.Categories.Primitives;
-using Courses.Domain.Courses.Events;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;

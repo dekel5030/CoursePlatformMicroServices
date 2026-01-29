@@ -2,7 +2,6 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Shared.Primitives;
 using Kernel.EventBus;
 using Microsoft.EntityFrameworkCore;
 
@@ -82,9 +81,11 @@ internal sealed class CoursePageProjector :
     {
         return UpdateCourseAsync(
             message.CourseId,
-            coursePage => { 
-                coursePage.PriceAmount = message.NewAmount; 
-                coursePage.PriceCurrency = message.NewCurrency; },
+            coursePage =>
+            {
+                coursePage.PriceAmount = message.NewAmount;
+                coursePage.PriceCurrency = message.NewCurrency;
+            },
             cancellationToken);
     }
 
@@ -154,10 +155,11 @@ internal sealed class CoursePageProjector :
     {
         await UpdateCourseAsync(
             message.CourseId,
-            coursePage => { 
+            coursePage =>
+            {
                 if (!coursePage.ImageUrls.Contains(message.ImageUrl))
-                { 
-                    coursePage.ImageUrls.Add(message.ImageUrl); 
+                {
+                    coursePage.ImageUrls.Add(message.ImageUrl);
                 }
             },
             cancellationToken);

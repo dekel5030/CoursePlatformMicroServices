@@ -1,5 +1,5 @@
 ﻿using CoursePlatform.Contracts.CourseEvents;
-using Courses.Domain.Courses.Events;
+using Courses.Domain.Courses;
 using Kernel.EventBus;
 using Kernel.Messaging.Abstractions;
 

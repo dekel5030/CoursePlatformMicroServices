@@ -4,7 +4,7 @@ using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Domain.Courses.Events;
+namespace Courses.Domain.Courses;
 
 public sealed record CourseCreatedDomainEvent(
     CourseId Id,
