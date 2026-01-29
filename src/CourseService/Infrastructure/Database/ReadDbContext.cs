@@ -1,5 +1,5 @@
 ﻿using Courses.Application.Abstractions.Data;
-using Courses.Application.Courses.ReadModels;
+using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Enrollments;

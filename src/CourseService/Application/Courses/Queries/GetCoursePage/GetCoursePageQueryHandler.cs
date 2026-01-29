@@ -1,7 +1,7 @@
 ﻿using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Courses.ReadModels;
 using Courses.Domain.Courses.Errors;
 using Kernel;
 using Kernel.Messaging.Abstractions;

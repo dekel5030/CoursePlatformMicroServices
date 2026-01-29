@@ -1,6 +1,6 @@
 ﻿using CoursePlatform.Contracts.CourseEvents;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Courses.ReadModels;
+using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel.EventBus;
