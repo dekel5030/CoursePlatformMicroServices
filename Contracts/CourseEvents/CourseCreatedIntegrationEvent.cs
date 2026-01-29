@@ -1,14 +1,14 @@
-﻿namespace CoursePlatform.Contracts.CourseEvents;
+namespace CoursePlatform.Contracts.CourseEvents;
 
-public record CourseCreatedIntegrationEvent
-{
-    public required Guid CourseId { get; init; }
-    public required Guid InstructorId { get; init; }
-    public required string InstructorName { get; init; }
-    public required string Title { get; init; }
-    public required string Slug { get; init; }
-    public required decimal PriceAmount { get; init; }
-    public required string PriceCurrency { get; init; }
-    public required string Status { get; init; }
-    public required DateTimeOffset CreatedAt { get; init; }
-}
+public record CourseCreatedIntegrationEvent(
+    Guid CourseId,
+    Guid InstructorId,
+    string Title,
+    string Description,
+    decimal PriceAmount,
+    string PriceCurrency,
+    string Status,
+    string Slug,
+    string Difficulty,
+    string Language,
+    Guid CategoryId);
