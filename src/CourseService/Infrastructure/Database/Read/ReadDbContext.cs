@@ -13,6 +13,10 @@ namespace Courses.Infrastructure.Database.Read;
 public class ReadDbContext : AppDbContextBase, IReadDbContext
 {
     public DbSet<CoursePage> CoursePages { get; set; }
+    public DbSet<CourseHeaderReadModel> CourseHeaders { get; set; }
+    public DbSet<CourseStructureReadModel> CourseStructures { get; set; }
+    public DbSet<CourseStatsReadModel> CourseStats { get; set; }
+
     public ReadDbContext(DbContextOptions<ReadDbContext> options) : base(options)
     {
     }
