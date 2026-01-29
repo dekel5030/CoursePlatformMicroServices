@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CoursePlatform.Contracts.CourseService;
 
-public record LessonCreatedIntegrationEvent(
+public sealed record LessonCreatedIntegrationEvent(
     Guid Id,
     Guid ModuleId,
     Guid CourseId,
@@ -18,7 +18,7 @@ public record LessonCreatedIntegrationEvent(
     string? ThumbnailUrl,
     string? TranscriptUrl);
 
-public record LessonMetadataChangedIntegrationEvent(
+public sealed record LessonMetadataChangedIntegrationEvent(
     Guid Id,
     Guid ModuleId,
     Guid CourseId,
@@ -26,7 +26,7 @@ public record LessonMetadataChangedIntegrationEvent(
     string Description,
     string Slug);
 
-public record LessonMediaChangedIntegrationEvent(
+public sealed record LessonMediaChangedIntegrationEvent(
     Guid Id,
     Guid ModuleId,
     Guid CourseId,
@@ -34,25 +34,25 @@ public record LessonMediaChangedIntegrationEvent(
     string? ThumbnailUrl,
     TimeSpan Duration);
 
-public record LessonAccessChangedIntegrationEvent(
+public sealed record LessonAccessChangedIntegrationEvent(
     Guid Id,
     Guid ModuleId,
     Guid CourseId,
     string NewAccess);
 
-public record LessonIndexChangedIntegrationEvent(
+public sealed record LessonIndexChangedIntegrationEvent(
     Guid Id,
     Guid ModuleId,
     Guid CourseId,
     int NewIndex);
 
-public record LessonTranscriptChangedIntegrationEvent(
+public sealed record LessonTranscriptChangedIntegrationEvent(
     Guid Id,
     Guid ModuleId,
     Guid CourseId,
     string? TranscriptUrl);
 
-public record LessonDeletedIntegrationEvent(
+public sealed record LessonDeletedIntegrationEvent(
     Guid Id,
     Guid ModuleId,
     Guid CourseId);
