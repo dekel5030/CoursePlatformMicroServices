@@ -133,6 +133,7 @@ public class Module : Entity<ModuleId>
             return Result.Failure(LessonErrors.NotFound);
         }
 
+        lesson.Delete();
         _lessons.Remove(lesson);
 
         for (int i = 0; i < _lessons.Count; i++)

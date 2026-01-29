@@ -2,7 +2,6 @@ using CoursePlatform.Contracts.CourseService;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Data.ReadModels;
 using Kernel.EventBus;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.EventConsumers;
 
@@ -27,7 +26,6 @@ internal sealed class CourseStatsProjector :
     {
         var stats = new CourseStatsReadModel
         {
-            Id = Guid.NewGuid(),
             CourseId = message.CourseId,
             TotalDuration = TimeSpan.Zero,
             LessonsCount = 0,
@@ -45,7 +43,7 @@ internal sealed class CourseStatsProjector :
     {
         return UpdateStatsAsync(
             message.CourseId,
-            stats => stats.ModulesCount++,
+            stats => stats.IncrementModules(),
             cancellationToken);
     }
 
@@ -55,7 +53,7 @@ internal sealed class CourseStatsProjector :
     {
         return UpdateStatsAsync(
             message.CourseId,
-            stats => stats.ModulesCount--,
+            stats => stats.DecrementModules(),
             cancellationToken);
     }
 
@@ -65,72 +63,27 @@ internal sealed class CourseStatsProjector :
     {
         return UpdateStatsAsync(
             message.CourseId,
-            stats =>
-            {
-                stats.LessonsCount++;
-                stats.TotalDuration += message.Duration;
-            },
+            stats => stats.AddLesson(message.Id, message.Duration),
             cancellationToken);
     }
 
-    public async Task HandleAsync(
+    public Task HandleAsync(
         LessonMediaChangedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        CourseStructureReadModel? structure = await _readDbContext.CourseStructures
-            .FirstOrDefaultAsync(s => s.CourseId == message.CourseId, cancellationToken);
-
-        if (structure is null)
-        {
-            return;
-        }
-
-        StructureModuleReadModel? module = structure.Modules.Find(m => m.Id == message.ModuleId);
-        StructureLessonReadModel? lesson = module?.Lessons.Find(l => l.Id == message.Id);
-
-        if (lesson is null)
-        {
-            return;
-        }
-
-        TimeSpan oldDuration = lesson.Duration;
-        TimeSpan durationDiff = message.Duration - oldDuration;
-
-        await UpdateStatsAsync(
+        return UpdateStatsAsync(
             message.CourseId,
-            stats => stats.TotalDuration += durationDiff,
+            stats => stats.UpdateLessonDuration(message.Id, message.Duration),
             cancellationToken);
     }
 
-    public async Task HandleAsync(
+    public Task HandleAsync(
         LessonDeletedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        CourseStructureReadModel? structure = await _readDbContext.CourseStructures
-            .FirstOrDefaultAsync(s => s.CourseId == message.CourseId, cancellationToken);
-
-        if (structure is null)
-        {
-            return;
-        }
-
-        StructureModuleReadModel? module = structure.Modules.Find(m => m.Id == message.ModuleId);
-        StructureLessonReadModel? lesson = module?.Lessons.Find(l => l.Id == message.Id);
-
-        if (lesson is null)
-        {
-            return;
-        }
-
-        TimeSpan lessonDuration = lesson.Duration;
-
-        await UpdateStatsAsync(
+        return UpdateStatsAsync(
             message.CourseId,
-            stats =>
-            {
-                stats.LessonsCount--;
-                stats.TotalDuration -= lessonDuration;
-            },
+            stats => stats.RemoveLesson(message.Id),
             cancellationToken);
     }
 
@@ -140,7 +93,7 @@ internal sealed class CourseStatsProjector :
         CancellationToken cancellationToken)
     {
         CourseStatsReadModel? stats = await _readDbContext.CourseStats
-            .FirstOrDefaultAsync(s => s.CourseId == courseId, cancellationToken);
+            .FindAsync([courseId], cancellationToken);
 
         if (stats is not null)
         {

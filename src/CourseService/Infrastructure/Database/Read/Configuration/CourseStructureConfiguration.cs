@@ -9,10 +9,7 @@ public sealed class CourseStructureConfiguration : IEntityTypeConfiguration<Cour
     public void Configure(EntityTypeBuilder<CourseStructureReadModel> builder)
     {
         builder.ToTable("course_structures", SchemaNames.Read);
-        builder.HasKey(structure => structure.Id);
-
-        builder.Property(structure => structure.CourseId).IsRequired();
-        builder.HasIndex(structure => structure.CourseId).IsUnique();
+        builder.HasKey(structure => structure.CourseId);
 
         builder.OwnsMany(structure => structure.Modules, moduleBuilder =>
         {

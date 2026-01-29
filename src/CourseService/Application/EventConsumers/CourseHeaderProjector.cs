@@ -3,7 +3,6 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Domain.Courses.Primitives;
 using Kernel.EventBus;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.EventConsumers;
 
@@ -180,7 +179,7 @@ internal sealed class CourseHeaderProjector :
         CancellationToken cancellationToken)
     {
         CourseHeaderReadModel? header = await _readDbContext.CourseHeaders
-            .FirstOrDefaultAsync(h => h.Id == courseId, cancellationToken);
+            .FindAsync([courseId], cancellationToken);
 
         if (header is not null)
         {
