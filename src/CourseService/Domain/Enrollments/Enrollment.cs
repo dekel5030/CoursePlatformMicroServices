@@ -1,6 +1,5 @@
 ﻿using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments.Errors;
-using Courses.Domain.Enrollments.Events;
 using Courses.Domain.Enrollments.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Shared;

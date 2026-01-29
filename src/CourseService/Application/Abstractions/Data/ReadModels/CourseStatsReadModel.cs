@@ -55,4 +55,17 @@ public sealed class CourseStatsReadModel
     {
         ModulesCount--;
     }
+
+    public void IncrementEnrollments()
+    {
+        EnrollmentCount++;
+    }
+
+    public void DecrementEnrollments()
+    {
+        if (EnrollmentCount > 0)
+        {
+            EnrollmentCount--;
+        }
+    }
 }

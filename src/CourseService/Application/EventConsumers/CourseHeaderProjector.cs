@@ -1,8 +1,11 @@
 using CoursePlatform.Contracts.CourseService;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Data.ReadModels;
+using Courses.Domain.Categories;
+using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses.Primitives;
 using Kernel.EventBus;
+using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.EventConsumers;
 
@@ -21,16 +24,23 @@ internal sealed class CourseHeaderProjector :
     IEventConsumer<CourseImageRemovedIntegrationEvent>
 {
     private readonly IReadDbContext _readDbContext;
+    private readonly IWriteDbContext _writeDbContext;
 
-    public CourseHeaderProjector(IReadDbContext readDbContext)
+    public CourseHeaderProjector(IReadDbContext readDbContext, IWriteDbContext writeDbContext)
     {
         _readDbContext = readDbContext;
+        _writeDbContext = writeDbContext;
     }
 
     public async Task HandleAsync(
         CourseCreatedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
+        // Fetch category details to denormalize
+        var category = await _readDbContext.Categories
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == new CategoryId(message.CategoryId), cancellationToken);
+
         var courseHeader = new CourseHeaderReadModel
         {
             Id = message.CourseId,
@@ -44,6 +54,8 @@ internal sealed class CourseHeaderProjector :
             Difficulty = Enum.Parse<DifficultyLevel>(message.Difficulty),
             Slug = message.Slug,
             CategoryId = message.CategoryId,
+            CategoryName = category?.Name ?? string.Empty,
+            CategorySlug = category?.Slug.Value ?? string.Empty,
             UpdatedAtUtc = DateTime.UtcNow,
             ImageUrls = [],
             Tags = []
@@ -97,13 +109,27 @@ internal sealed class CourseHeaderProjector :
             cancellationToken);
     }
 
-    public Task HandleAsync(
+    public async Task HandleAsync(
         CourseCategoryChangedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        return UpdateCourseHeaderAsync(
+        Category? category = await _writeDbContext.Categories
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == new CategoryId(message.NewCategoryId), cancellationToken);
+
+        if (category is null)
+        {
+            return;
+        }
+
+        await UpdateCourseHeaderAsync(
             message.CourseId,
-            header => header.CategoryId = message.NewCategoryId,
+            header =>
+            {
+                header.CategoryId = message.NewCategoryId;
+                header.CategoryName = category.Name;
+                header.CategorySlug = category.Slug.Value;
+            },
             cancellationToken);
     }
 
