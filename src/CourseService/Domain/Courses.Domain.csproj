@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\Kernel\Kernel.csproj" />
+    <Compile Remove="Lessons\Events\**" />
+    <EmbeddedResource Remove="Lessons\Events\**" />
+    <None Remove="Lessons\Events\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Lessons\Events\" />
+    <ProjectReference Include="..\..\Shared\Kernel\Kernel.csproj" />
   </ItemGroup>
 
 </Project>

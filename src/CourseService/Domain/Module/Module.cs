@@ -71,7 +71,7 @@ public class Module : Entity<ModuleId>
     public Result AddLesson(Title? title, Description? description)
     {
         int index = _lessons.Count;
-        Result<Lesson> lessonResult = Lesson.Create(Id, title, description, index);
+        Result<Lesson> lessonResult = Lesson.Create(CourseId, Id, title, description, index);
 
         if (lessonResult.IsFailure)
         {
@@ -91,15 +91,15 @@ public class Module : Entity<ModuleId>
         int? index = null,
         Slug? slug = null)
     {
-
         Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
         if (lesson is null)
         {
             return Result.Failure(LessonErrors.NotFound);
         }
 
-        lesson.UpdateDetails(title, description, access, index, slug);
-
+        lesson.UpdateMetadata(title ?? lesson.Title, description ?? lesson.Description, slug ?? lesson.Slug);
+        lesson.ChangeAccess(access ?? lesson.Access);
+        lesson.ChangeIndex(index ?? lesson.Index);
         return Result.Success();
 
     }
@@ -119,7 +119,8 @@ public class Module : Entity<ModuleId>
             return Result.Failure(LessonErrors.NotFound);
         }
 
-        lesson.UpdateMedia(thumbnailImageUrl, videoUrl, transcriptUrl, duration, transcript);
+        lesson.UpdateMedia(videoUrl, thumbnailImageUrl, duration ?? lesson.Duration);
+        lesson.UpdateTranscript(transcriptUrl, transcript);
 
         return Result.Success();
     }
@@ -136,7 +137,7 @@ public class Module : Entity<ModuleId>
 
         for (int i = 0; i < _lessons.Count; i++)
         {
-            _lessons[i].UpdateIndex(i);
+            _lessons[i].ChangeIndex(i);
         }
 
         return Result.Success();

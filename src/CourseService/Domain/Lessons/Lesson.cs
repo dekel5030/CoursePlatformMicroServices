@@ -121,7 +121,7 @@ public class Lesson : Entity<LessonId>
         return Result.Success();
     }
 
-    public void UpdateIndex(int newIndex)
+    public void ChangeIndex(int newIndex)
     {
         if (Index == newIndex)
         {
