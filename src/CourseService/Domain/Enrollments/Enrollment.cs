@@ -8,7 +8,7 @@ using Kernel;
 
 namespace Courses.Domain.Enrollments;
 
-public class Enrollment : Entity<EnrollmentId>, IEnrollmentSnapshot
+public class Enrollment : Entity<EnrollmentId>
 {
     public override EnrollmentId Id { get; protected set; }
     public CourseId CourseId { get; private set; }
@@ -55,7 +55,11 @@ public class Enrollment : Entity<EnrollmentId>, IEnrollmentSnapshot
             Status = EnrollmentStatus.Active
         };
 
-        enrollment.Raise(new EnrollmentCreatedDomainEvent(enrollment));
+        enrollment.Raise(new EnrollmentCreatedDomainEvent(
+            enrollment.Id,
+            enrollment.CourseId,
+            enrollment.StudentId,
+            enrollment.EnrolledAt));
 
         return Result.Success(enrollment);
     }
@@ -67,33 +71,42 @@ public class Enrollment : Entity<EnrollmentId>, IEnrollmentSnapshot
             return;
         }
 
-        LastAccessedLessonId = lessonId;
-        LastAccessedAt = DateTimeOffset.UtcNow;
+        TrackProgress(lessonId);
 
         if (!_completedLessons.Add(lessonId))
         {
             return;
         }
 
+        bool fullyCompleted = false;
         if (totalLessonsInCourse > 0 && _completedLessons.Count == totalLessonsInCourse && !IsCompleted)
         {
             CompletedAt = DateTimeOffset.UtcNow;
+            fullyCompleted = true;
         }
 
-        Raise(new EnrollmentUpdatedDomainEvent(this));
+        Raise(new LessonCompletedDomainEvent(Id, CourseId, StudentId, lessonId, fullyCompleted));
     }
 
     public void Expire()
     {
-        Status = EnrollmentStatus.Expired;
+        if (Status == EnrollmentStatus.Expired)
+        {
+            return;
+        }
 
-        Raise(new EnrollmentUpdatedDomainEvent(this));
+        Status = EnrollmentStatus.Expired;
+        Raise(new EnrollmentStatusChangedDomainEvent(Id, CourseId, Status));
     }
 
-    public void Revoke()
+    public void TrackProgress(LessonId lessonId)
     {
-        Status = EnrollmentStatus.Revoked;
+        if (Status != EnrollmentStatus.Active)
+        {
+            return;
+        }
 
-        Raise(new EnrollmentUpdatedDomainEvent(this));
+        LastAccessedLessonId = lessonId;
+        LastAccessedAt = DateTimeOffset.UtcNow;
     }
 }
