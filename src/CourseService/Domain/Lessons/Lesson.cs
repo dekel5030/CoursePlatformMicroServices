@@ -1,4 +1,5 @@
-﻿using Courses.Domain.Lessons.Primitives;
+﻿using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Module.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
@@ -10,6 +11,7 @@ public class Lesson : Entity<LessonId>
 {
     public override LessonId Id { get; protected set; }
     public ModuleId ModuleId { get; private set; }
+    public CourseId CourseId { get; private set; }
     public Title Title { get; private set; } = Title.Empty;
     public Description Description { get; private set; } = Description.Empty;
     public LessonAccess Access { get; private set; } = LessonAccess.Private;
@@ -18,14 +20,13 @@ public class Lesson : Entity<LessonId>
     public Url? Transcript { get; private set; }
     public TimeSpan Duration { get; private set; } = TimeSpan.Zero;
     public Slug Slug { get; private set; }
-
     public int Index { get; private set; }
 
     public IReadOnlyList<Attachment> Attachments => _attachments.AsReadOnly();
     public IReadOnlyList<TranscriptLine> TranscriptLines => _transcriptLines.AsReadOnly();
 
-    private readonly List<Attachment> _attachments = new();
-    private List<TranscriptLine> _transcriptLines = new();
+    private readonly List<Attachment> _attachments = [];
+    private readonly List<TranscriptLine> _transcriptLines = [];
 
 #pragma warning disable S1133
 #pragma warning disable CS8618
@@ -34,14 +35,16 @@ public class Lesson : Entity<LessonId>
 #pragma warning restore CS8618
 #pragma warning restore S1133
 
-    private Lesson(ModuleId moduleId, LessonId id, Slug slug)
+    private Lesson(ModuleId moduleId, CourseId courseId, LessonId id, Slug slug)
     {
         ModuleId = moduleId;
+        CourseId = courseId;
         Id = id;
         Slug = slug;
     }
 
-    internal static Result<Lesson> Create(
+    public static Result<Lesson> Create(
+        CourseId courseId,
         ModuleId moduleId,
         Title? title,
         Description? description,
@@ -49,88 +52,103 @@ public class Lesson : Entity<LessonId>
     {
         var lessonId = LessonId.CreateNew();
         var slug = new Slug(lessonId.ToString());
-        var lesson = new Lesson(moduleId, lessonId, slug)
+        var lesson = new Lesson(moduleId, courseId, lessonId, slug)
         {
             Title = title ?? Title.Empty,
             Description = description ?? Description.Empty,
             Index = index,
         };
 
+        lesson.Raise(new LessonCreatedDomainEvent(
+            lesson.Id,
+            lesson.ModuleId,
+            lesson.CourseId,
+            lesson.Slug,
+            lesson.Title,
+            lesson.Description,
+            lesson.Access,
+            lesson.Duration,
+            lesson.Index,
+            lesson.VideoUrl,
+            lesson.ThumbnailImageUrl,
+            lesson.Transcript));
+
         return Result.Success(lesson);
     }
 
-    internal Result UpdateDetails(
-        Title? title = null,
-        Description? description = null,
-        LessonAccess? access = null,
-        int? index = null,
-        Slug? slug = null)
+    public Result UpdateMetadata(Title title, Description description, Slug slug)
     {
-        if (title is not null && title != Title)
+        if (Title == title && Description == description && Slug == slug)
         {
-            Title = title;
+            return Result.Success();
         }
 
-        if (description is not null && description != Description)
-        {
-            Description = description;
-        }
+        Title = title;
+        Description = description;
+        Slug = slug;
 
-        if (access is not null && access != Access)
-        {
-            Access = access.Value;
-        }
-
-        if (index is not null && index != Index)
-        {
-            Index = index.Value;
-        }
-
-        if (slug is not null && slug != Slug)
-        {
-            Slug = slug;
-        }
-
+        Raise(new LessonMetadataChangedDomainEvent(Id, ModuleId, CourseId, Title, Description, Slug));
         return Result.Success();
     }
 
-    internal Result UpdateMedia(
-        ImageUrl? thumbnailImageUrl = null,
-        VideoUrl? videoUrl = null,
-        Url? transcriptUrl = null,
-        TimeSpan? duration = null,
-        string? transcript = null)
+    public Result UpdateTranscript(Url? transcriptUrl, string? vttContent = null)
     {
-        if (thumbnailImageUrl is not null && thumbnailImageUrl != ThumbnailImageUrl)
+        if (Transcript == transcriptUrl && vttContent == null)
         {
-            ThumbnailImageUrl = thumbnailImageUrl;
+            return Result.Success();
         }
 
-        if (videoUrl is not null && videoUrl != VideoUrl)
+        Transcript = transcriptUrl;
+        if (!string.IsNullOrEmpty(vttContent))
         {
-            VideoUrl = videoUrl;
+            _transcriptLines.Clear();
+            _transcriptLines.AddRange(VttParser.Parse(vttContent));
         }
 
-        if (transcriptUrl is not null && transcriptUrl != Transcript)
-        {
-            Transcript = transcriptUrl;
-        }
-
-        if (duration is not null && duration != Duration)
-        {
-            Duration = duration.Value;
-        }
-
-        if (transcript is not null)
-        {
-            _transcriptLines = VttParser.Parse(transcript);
-        }
-
+        Raise(new LessonTranscriptChangedDomainEvent(Id, ModuleId, CourseId, Transcript));
         return Result.Success();
     }
 
-    internal void UpdateIndex(int index)
+    public Result ChangeAccess(LessonAccess newAccess)
     {
-        Index = index;
+        if (Access == newAccess)
+        {
+            return Result.Success();
+        }
+
+        Access = newAccess;
+        Raise(new LessonAccessChangedDomainEvent(Id, ModuleId, CourseId, Access));
+        return Result.Success();
+    }
+
+    public void UpdateIndex(int newIndex)
+    {
+        if (Index == newIndex)
+        {
+            return;
+        }
+
+        Index = newIndex;
+        Raise(new LessonIndexChangedDomainEvent(Id, ModuleId, CourseId, Index));
+    }
+
+    public Result UpdateMedia(VideoUrl? videoUrl, ImageUrl? thumbnailUrl, TimeSpan duration)
+    {
+        if (VideoUrl == videoUrl && ThumbnailImageUrl == thumbnailUrl && Duration == duration)
+        {
+            return Result.Success();
+        }
+
+        VideoUrl = videoUrl;
+        ThumbnailImageUrl = thumbnailUrl;
+        Duration = duration;
+
+        Raise(new LessonMediaChangedDomainEvent(Id, ModuleId, CourseId, VideoUrl, ThumbnailImageUrl, Duration));
+        return Result.Success();
+    }
+
+    public void Delete()
+    {
+        Raise(new LessonDeletedDomainEvent(Id, ModuleId, CourseId));
     }
 }
