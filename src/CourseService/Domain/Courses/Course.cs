@@ -165,7 +165,9 @@ public class Course : Entity<CourseId>
         Slug? slug = null)
     {
         if (CanModify.IsFailure)
+        {
             return CanModify;
+        }
 
         if (difficulty is not null && difficulty != Difficulty)
         {

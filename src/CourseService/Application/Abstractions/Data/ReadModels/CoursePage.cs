@@ -3,7 +3,7 @@ using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 
-namespace Courses.Application.Courses.ReadModels;
+namespace Courses.Application.Abstractions.Data.ReadModels;
 
 public sealed class CoursePage
 {

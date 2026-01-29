@@ -1,6 +1,8 @@
 ﻿using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Repositories;
+using Courses.Infrastructure.Database.Read;
 using Courses.Infrastructure.Database.Repositories;
+using Courses.Infrastructure.Database.Write;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +26,7 @@ internal static class DatabaseExtensions
                 .UseNpgsql(connectionString, npgsqlOptions =>
                 {
                     npgsqlOptions.MigrationsHistoryTable(
-                        HistoryRepository.DefaultTableName);
+                        HistoryRepository.DefaultTableName, SchemaNames.Write);
                 })
                 .UseSnakeCaseNamingConvention();
         });
@@ -38,10 +40,9 @@ internal static class DatabaseExtensions
                 .UseNpgsql(connectionString, npgsqlOptions =>
                 {
                     npgsqlOptions.MigrationsHistoryTable(
-                        HistoryRepository.DefaultTableName);
+                        HistoryRepository.DefaultTableName, SchemaNames.Read);
                 })
-                .UseSnakeCaseNamingConvention()
-                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                .UseSnakeCaseNamingConvention();
         });
 
         services.AddScoped<IWriteDbContext>(sp => sp.GetRequiredService<WriteDbContext>());

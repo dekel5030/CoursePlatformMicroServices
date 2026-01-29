@@ -6,7 +6,7 @@ using Courses.Domain.Shared.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Courses.Infrastructure.Database.Configuration;
+namespace Courses.Infrastructure.Database.Write.Configuration;
 
 public class ModuleConfiguration : IEntityTypeConfiguration<Module>
 {

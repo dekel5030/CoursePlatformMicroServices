@@ -3,7 +3,7 @@ using Courses.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Courses.Infrastructure.Database.Configuration;
+namespace Courses.Infrastructure.Database.Write.Configuration;
 
 internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 {

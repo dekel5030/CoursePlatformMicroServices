@@ -420,14 +420,17 @@ dotnet_diagnostic.S1144.severity = none
 # CA1724: Type names should not match namespaces
 dotnet_diagnostic.CA1724.severity = none
 
-[**/Migrations/*.cs]
-generated_code = true
-[**/Migrations/Read/*.cs]
-generated_code = true
 [**/Migrations/**/*.cs]
 generated_code = true
 
-[**/Migrations/**/*.*]
+[**/Migrations/*.cs]
+generated_code = true
+
+[**/Infrastructure/Database/**/Migrations/**/*.cs]
+generated_code = true
+
+
+[**/Infrastructure/Database/**/Migrations/*.cs]
 generated_code = true
 
 dotnet_diagnostic.S1186.severity = none

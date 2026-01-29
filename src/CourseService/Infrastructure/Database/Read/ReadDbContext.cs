@@ -7,9 +7,8 @@ using Courses.Domain.Lessons;
 using Courses.Domain.Module;
 using Courses.Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Courses.Infrastructure.Database;
+namespace Courses.Infrastructure.Database.Read;
 
 public class ReadDbContext : AppDbContextBase, IReadDbContext
 {
@@ -18,14 +17,18 @@ public class ReadDbContext : AppDbContextBase, IReadDbContext
     {
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        //modelBuilder.ApplyConfigurationsFromAssembly(
+        //    typeof(DependencyInjection).Assembly,
+        //    type => type.Namespace is not null &&
+        //        type.Namespace.StartsWith(
+        //            typeof(ReadDbContext).Namespace!,
+        //            StringComparison.InvariantCultureIgnoreCase));
+
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DependencyInjection).Assembly);
 
         modelBuilder.HasDefaultSchema(SchemaNames.Read);
         modelBuilder.Entity<Course>().ToTable("Courses", SchemaNames.Write, t => t.ExcludeFromMigrations());
@@ -34,23 +37,5 @@ public class ReadDbContext : AppDbContextBase, IReadDbContext
         modelBuilder.Entity<Enrollment>().ToTable("Enrollments", SchemaNames.Write, t => t.ExcludeFromMigrations());
         modelBuilder.Entity<Category>().ToTable("Categories", SchemaNames.Write, t => t.ExcludeFromMigrations());
         modelBuilder.Entity<Module>().ToTable("Modules", SchemaNames.Write, t => t.ExcludeFromMigrations());
-    }
-}
-
-public class CoursePageConfiguration : IEntityTypeConfiguration<CoursePage>
-{
-    public void Configure(EntityTypeBuilder<CoursePage> builder)
-    {
-        builder.ToTable("course_pages", SchemaNames.Read);
-        builder.HasKey(coursePage => coursePage.Id);
-
-        builder.OwnsMany(cp => cp.Modules, moduleBuilder =>
-        {
-            moduleBuilder.ToJson("modules");
-            moduleBuilder.OwnsMany(m => m.Lessons, lessonBuilder =>
-            {
-                lessonBuilder.HasJsonPropertyName("lessons");
-            });
-        });
     }
 }
