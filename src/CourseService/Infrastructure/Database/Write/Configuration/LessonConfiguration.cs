@@ -1,5 +1,7 @@
-﻿using Courses.Domain.Lessons;
+﻿using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Module.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -18,6 +20,16 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
             .HasConversion(
                 id => id.Value,
                 value => new LessonId(value));
+
+        builder.Property(lesson => lesson.ModuleId)
+            .HasConversion(
+                id => id.Value,
+                value => new ModuleId(value));
+
+        builder.Property(lesson => lesson.CourseId)
+            .HasConversion(
+                id => id.Value,
+                value => new CourseId(value));
 
         builder.Property(lesson => lesson.Title)
             .HasConversion(
