@@ -9,7 +9,7 @@ using Kernel.EventBus;
 
 namespace Courses.Application.EventConsumers;
 
-internal sealed class CourseCreatedEventConsumer : IEventConsumer<CourseCreatedEvent>
+internal sealed class CourseCreatedEventConsumer : IEventConsumer<CourseCreatedIntegrationEvent>
 {
     private readonly IReadDbContext _readDbContext;
 
@@ -18,7 +18,7 @@ internal sealed class CourseCreatedEventConsumer : IEventConsumer<CourseCreatedE
         _readDbContext = readDbContext;
     }
 
-    public Task HandleAsync(CourseCreatedEvent message, CancellationToken cancellationToken = default)
+    public Task HandleAsync(CourseCreatedIntegrationEvent message, CancellationToken cancellationToken = default)
     {
         var coursePage = new CoursePage
         {

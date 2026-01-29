@@ -7,7 +7,7 @@ using Kernel;
 
 namespace Courses.Domain.Courses;
 
-public class Course : Entity<CourseId>, ICourseSnapshot
+public class Course : Entity<CourseId>
 {
     public override CourseId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
@@ -50,7 +50,7 @@ public class Course : Entity<CourseId>, ICourseSnapshot
     {
         var courseId = CourseId.CreateNew();
         var slug = new Slug(courseId.ToString());
-        var newCourse = new Course(courseId, instructorId, slug)
+        var course = new Course(courseId, instructorId, slug)
         {
             Title = title ?? Title.Empty,
             Description = description ?? Description.Empty,
@@ -59,9 +59,20 @@ public class Course : Entity<CourseId>, ICourseSnapshot
             Price = price ?? Money.Zero(),
         };
 
-        newCourse.Raise(new CourseCreatedDomainEvent(newCourse));
+        course.Raise(new CourseCreatedDomainEvent(
+            course.Id,
+            course.InstructorId,
+            course.Title,
+            course.Description,
+            course.Price,
+            course.Status,
+            course.Slug,
+            course.Difficulty,
+            course.Language,
+            course.CategoryId
+        ));
 
-        return Result.Success(newCourse);
+        return Result.Success(course);
     }
 
     public Result CanModify => CoursePolicies.CanModify(Status);
@@ -69,67 +80,79 @@ public class Course : Entity<CourseId>, ICourseSnapshot
     public Result CanEnroll => CoursePolicies.CanEnroll(Status);
     public Result CanPublish => CoursePolicies.CanPublish(Status);
 
-    public Result Publish()
-    {
-        if (CanPublish.IsFailure)
-        {
-            return CanPublish;
-        }
+    #region Specific Update Methods
 
-        Status = CourseStatus.Published;
-
-        Raise(new CoursePublishedDomainEvent(this));
-
-        return Result.Success();
-    }
-
-    public Result AddImage(ImageUrl imageUrl)
-    {
-        if (_images.Contains(imageUrl))
-        {
-            return Result.Success();
-        }
-
-        _images.Add(imageUrl);
-
-        Raise(new CourseUpdatedDomainEvent(this));
-        return Result.Success();
-    }
-
-    public Result RemoveImage(ImageUrl imageUrl)
-    {
-        _images.Remove(imageUrl);
-
-        Raise(new CourseUpdatedDomainEvent(this));
-        return Result.Success();
-    }
-
-    public Result UpdateDetails(
-        Title? title = null,
-        Description? description = null,
-        Money? price = null)
+    public Result ChangeTitle(Title title)
     {
         if (CanModify.IsFailure)
         {
             return CanModify;
         }
 
-        if (title is not null && title != Title)
+        if (Title == title)
         {
-            Title = title;
+            return Result.Success();
         }
 
-        if (description is not null && description != Description)
+        Title = title;
+        Raise(new CourseTitleChangedDomainEvent(Id, Title));
+        return Result.Success();
+    }
+
+    public Result ChangeDescription(Description description)
+    {
+        if (CanModify.IsFailure)
         {
-            Description = description;
+            return CanModify;
         }
 
-        if (price is not null && price != Price)
+        if (Description == description)
         {
-            Price = price;
+            return Result.Success();
         }
 
-        Raise(new CourseUpdatedDomainEvent(this));
+        Description = description;
+        Raise(new CourseDescriptionChangedDomainEvent(Id, Description));
+        return Result.Success();
+    }
+
+    public Result ChangePrice(Money price)
+    {
+        if (CanModify.IsFailure)
+        {
+            return CanModify;
+        }
+
+        if (Price == price)
+        {
+            return Result.Success();
+        }
+
+        Price = price;
+        Raise(new CoursePriceChangedDomainEvent(Id, Price));
+        return Result.Success();
+    }
+    #endregion
+
+    public Result UpdateDetails(
+        Title? title = null,
+        Description? description = null,
+        Money? price = null)
+    {
+        if (title is not null)
+        {
+            ChangeTitle(title);
+        }
+
+        if (description is not null)
+        {
+            ChangeDescription(description);
+        }
+
+        if (price is not null)
+        {
+            ChangePrice(price);
+        }
 
         return Result.Success();
     }
@@ -142,28 +165,30 @@ public class Course : Entity<CourseId>, ICourseSnapshot
         Slug? slug = null)
     {
         if (CanModify.IsFailure)
-        {
             return CanModify;
-        }
 
         if (difficulty is not null && difficulty != Difficulty)
         {
             Difficulty = difficulty.Value;
+            Raise(new CourseDifficultyChangedDomainEvent(Id, Difficulty));
         }
 
         if (categoryId is not null && categoryId != CategoryId)
         {
             CategoryId = categoryId;
+            Raise(new CourseCategoryChangedDomainEvent(Id, CategoryId));
         }
 
         if (language is not null && language != Language)
         {
             Language = language;
+            Raise(new CourseLanguageChangedDomainEvent(Id, Language));
         }
 
         if (slug is not null && slug != Slug)
         {
             Slug = slug;
+            Raise(new CourseSlugChangedDomainEvent(Id, Slug));
         }
 
         if (tags is not null)
@@ -173,10 +198,47 @@ public class Course : Entity<CourseId>, ICourseSnapshot
             {
                 _tags.Add(tag);
             }
+
+            Raise(new CourseTagsUpdatedDomainEvent(Id, Tags));
         }
 
-        Raise(new CourseUpdatedDomainEvent(this));
+        return Result.Success();
+    }
 
+    public Result Publish()
+    {
+        if (CanPublish.IsFailure)
+        {
+            return CanPublish;
+        }
+
+        Status = CourseStatus.Published;
+        Raise(new CourseStatusChangedDomainEvent(Id, Status));
+
+        return Result.Success();
+    }
+
+    public Result AddImage(ImageUrl imageUrl)
+    {
+        if (_images.Contains(imageUrl))
+        {
+            return Result.Success();
+        }
+
+        _images.Add(imageUrl);
+        Raise(new CourseImageAddedDomainEvent(Id, imageUrl));
+        return Result.Success();
+    }
+
+    public Result RemoveImage(ImageUrl imageUrl)
+    {
+        if (!_images.Contains(imageUrl))
+        {
+            return Result.Success();
+        }
+
+        _images.Remove(imageUrl);
+        Raise(new CourseImageRemovedDomainEvent(Id, imageUrl));
         return Result.Success();
     }
 
@@ -188,8 +250,7 @@ public class Course : Entity<CourseId>, ICourseSnapshot
         }
 
         Status = CourseStatus.Deleted;
-
-        Raise(new CourseDeletedDomainEvent(this));
+        Raise(new CourseStatusChangedDomainEvent(Id, Status));
 
         return Result.Success();
     }

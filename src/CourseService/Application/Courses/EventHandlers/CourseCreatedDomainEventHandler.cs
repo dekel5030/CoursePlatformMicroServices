@@ -23,7 +23,7 @@ internal sealed class CourseCreatedDomainEventHandler : IDomainEventHandler<Cour
     {
         ICourseSnapshot course = message.Course;
 
-        var integrationEvent = new CourseCreatedEvent
+        var integrationEvent = new CourseCreatedIntegrationEvent
         {
             CourseId = course.Id.Value,
             InstructorId = course.InstructorId.Value,
