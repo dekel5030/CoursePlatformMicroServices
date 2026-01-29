@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Courses.Infrastructure.Database;
+﻿namespace Courses.Infrastructure.Database;
 
 internal static class SchemaNames
 {

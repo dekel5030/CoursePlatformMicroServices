@@ -1,8 +1,6 @@
 ﻿using Courses.Infrastructure.Database.Read;
 using Courses.Infrastructure.Database.Write;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Courses.Api.Extensions;
 

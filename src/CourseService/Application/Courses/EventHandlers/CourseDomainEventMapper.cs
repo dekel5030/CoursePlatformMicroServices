@@ -1,5 +1,5 @@
 ﻿using CoursePlatform.Contracts.CourseEvents;
-using Courses.Domain.Courses.Events;
+using Courses.Domain.Courses;
 using Kernel.EventBus;
 using Kernel.Messaging.Abstractions;
 
@@ -11,7 +11,7 @@ internal sealed class CourseDomainEventMapper :
     IDomainEventHandler<CourseDescriptionChangedDomainEvent>,
     IDomainEventHandler<CoursePriceChangedDomainEvent>,
     IDomainEventHandler<CourseStatusChangedDomainEvent>,
-    IDomainEventHandler<CourseCategoryChangedDomainEvent>,
+    IDomainEventHandler<CourseDomainEvents>,
     IDomainEventHandler<CourseDifficultyChangedDomainEvent>,
     IDomainEventHandler<CourseLanguageChangedDomainEvent>,
     IDomainEventHandler<CourseSlugChangedDomainEvent>,
@@ -92,7 +92,7 @@ internal sealed class CourseDomainEventMapper :
     }
 
     public Task HandleAsync(
-        CourseCategoryChangedDomainEvent message,
+        CourseDomainEvents message,
         CancellationToken cancellationToken = default)
     {
         return _eventBus.PublishAsync(

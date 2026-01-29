@@ -1,7 +1,5 @@
 ﻿using Courses.Application.Abstractions.Data;
 using Courses.Domain.Shared;
-using Courses.Infrastructure.Database.Read;
-using Courses.Infrastructure.Database.Write.Configuration;
 using Kernel.Messaging.Abstractions;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
