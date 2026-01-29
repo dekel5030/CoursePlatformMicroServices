@@ -1,9 +1,7 @@
 ﻿using Courses.Application.Abstractions.Ai;
 using Courses.Application.Abstractions.Data;
-using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
-using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;

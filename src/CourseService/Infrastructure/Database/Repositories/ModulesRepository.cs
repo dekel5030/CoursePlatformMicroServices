@@ -2,6 +2,7 @@
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Module;
 using Courses.Domain.Module.Primitives;
+using Courses.Infrastructure.Database.Write;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Database.Repositories;

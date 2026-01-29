@@ -2,6 +2,7 @@
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Module.Events;
 using Courses.Domain.Module.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
@@ -9,7 +10,7 @@ using Kernel;
 
 namespace Courses.Domain.Module;
 
-public class Module : Entity<ModuleId>
+public class Module : Entity<ModuleId>, IModuleSnapshot
 {
     public override ModuleId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
@@ -38,6 +39,8 @@ public class Module : Entity<ModuleId>
     public static Result<Module> Create(CourseId courseId, int index, Title? title = null)
     {
         var module = new Module(courseId, index, title ?? Title.Empty);
+
+        module.Raise(new ModuleCreateDomainEvent(module));
         return Result.Success(module);
     }
 
@@ -52,6 +55,8 @@ public class Module : Entity<ModuleId>
         }
 
         _lessons.Add(lessonResult.Value);
+
+        Raise(new ModuleUpdatedDomainEvent(this));
         return Result.Success();
     }
 
@@ -70,6 +75,8 @@ public class Module : Entity<ModuleId>
         }
 
         lesson.UpdateDetails(title, description, access, index, slug);
+
+        Raise(new ModuleUpdatedDomainEvent(this));
         return Result.Success();
     }
 
@@ -87,6 +94,8 @@ public class Module : Entity<ModuleId>
             return Result.Failure(LessonErrors.NotFound);
         }
         lesson.UpdateMedia(thumbnailImageUrl, videoUrl, transcriptUrl, duration, transcript);
+
+        Raise(new ModuleUpdatedDomainEvent(this));
         return Result.Success();
     }
 
@@ -104,6 +113,8 @@ public class Module : Entity<ModuleId>
         {
             _lessons[i].UpdateIndex(i);
         }
+
+        Raise(new ModuleUpdatedDomainEvent(this));
 
         return Result.Success();
     }

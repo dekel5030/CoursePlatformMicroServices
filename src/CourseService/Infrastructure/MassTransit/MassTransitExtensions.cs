@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using Courses.Infrastructure.Database;
+using Courses.Infrastructure.Database.Write;
 using Kernel.EventBus;
 using MassTransit;
 using Microsoft.Extensions.Configuration;

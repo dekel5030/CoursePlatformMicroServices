@@ -4,4 +4,8 @@
     <ProjectReference Include="..\..\Shared\Kernel\Kernel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Lessons\Events\" />
+  </ItemGroup>
+
 </Project>

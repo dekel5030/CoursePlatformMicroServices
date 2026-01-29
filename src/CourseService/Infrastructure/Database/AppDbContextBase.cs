@@ -5,13 +5,14 @@ using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
 using Courses.Domain.Module;
 using Courses.Domain.Users;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Database;
 
 public abstract class AppDbContextBase : DbContext, IUnitOfWork
+
 {
+    private bool _hasSaved;
     public DbSet<Course> Courses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
     public DbSet<User> Users { get; set; }
@@ -23,11 +24,15 @@ public abstract class AppDbContextBase : DbContext, IUnitOfWork
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        base.OnModelCreating(modelBuilder);
+        if (_hasSaved)
+        {
+            //throw new InvalidOperationException(
+            //    "SaveChangesAsync can only be called once per request. Use CommitAsync in the UnitOfWork instead.");
+        }
 
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DependencyInjection).Assembly);
-        modelBuilder.AddTransactionalOutboxEntities();
+        _hasSaved = true;
+        return base.SaveChangesAsync(cancellationToken);
     }
 }

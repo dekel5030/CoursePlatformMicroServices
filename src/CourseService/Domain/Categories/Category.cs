@@ -1,11 +1,12 @@
-﻿using Courses.Domain.Categories.Primitives;
+﻿using Courses.Domain.Categories.Events;
+using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 
 namespace Courses.Domain.Categories;
 
-public class Category : Entity<CategoryId>
+public class Category : Entity<CategoryId>, ICategorySnapshot
 {
     public override CategoryId Id { get; protected set; }
     public string Name { get; private set; }
@@ -30,6 +31,8 @@ public class Category : Entity<CategoryId>
         var slug = new Slug(name);
 
         var category = new Category(CategoryId.CreateNew(), name, slug);
+
+        category.Raise(new CategoryCreatedDomainEvent(category));
 
         return Result.Success(category);
     }

@@ -2,7 +2,7 @@
 
 namespace Courses.Domain.Shared;
 
-public abstract class Entity<TId> : IHasId<TId>
+public abstract class Entity<TId> : IHasId<TId>, IEntity
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 
@@ -19,4 +19,10 @@ public abstract class Entity<TId> : IHasId<TId>
     {
         _domainEvents.Add(domainEvent);
     }
+}
+
+public interface IEntity
+{
+    IReadOnlyCollection<IDomainEvent> DomainEvents { get; }
+    void ClearDomainEvents();
 }

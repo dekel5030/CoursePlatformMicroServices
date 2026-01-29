@@ -1,140 +1,72 @@
-using System.Data;
-using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Storage;
+using Courses.Application.Courses.Dtos;
+using Courses.Application.Courses.Queries.GetCoursePage;
 using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
-using Courses.Domain.Categories;
-using Courses.Domain.Courses;
-using Courses.Domain.Courses.Errors;
-using Courses.Domain.Module;
-using Courses.Domain.Users;
+using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Module.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Queries.GetById;
 
 internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CoursePageDto>
 {
-    private readonly IReadDbContext _readDbContext;
-    private readonly IStorageUrlResolver _urlResolver;
     private readonly ICourseLinkFactory _courseLinkFactory;
     private readonly IModuleLinkFactory _moduleLinkFactory;
     private readonly ILessonLinkFactory _lessonLinkFactory;
+    private readonly IMediator _mediator;
 
     public GetCourseByIdQueryHandler(
-        IStorageUrlResolver urlResolver,
-        IReadDbContext readDbContext,
         ICourseLinkFactory courseLinkFactory,
         IModuleLinkFactory moduleLinkFactory,
-        ILessonLinkFactory lessonLinkFactory)
+        ILessonLinkFactory lessonLinkFactory,
+        IMediator mediator)
     {
-        _urlResolver = urlResolver;
-        _readDbContext = readDbContext;
         _courseLinkFactory = courseLinkFactory;
         _moduleLinkFactory = moduleLinkFactory;
         _lessonLinkFactory = lessonLinkFactory;
+        _mediator = mediator;
     }
 
     public async Task<Result<CoursePageDto>> Handle(
         GetCourseByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        Course? course = await _readDbContext.Courses
-            .Where(c => c.Id == request.Id)
-            .FirstOrDefaultAsync(cancellationToken);
+        var innerQuery = new GetCoursePageQuery(request.Id.Value);
+        Result<CoursePageDto> innerQueryResult = await _mediator.Send(innerQuery, cancellationToken);
 
-        if (course is null)
+        if (innerQueryResult.IsFailure)
         {
-            return Result<CoursePageDto>.Failure(CourseErrors.NotFound);
+            return innerQueryResult;
         }
 
-        User instructor = await _readDbContext.Users
-            .Where(u => u.Id == course.InstructorId)
-            .FirstAsync(cancellationToken);
+        CoursePageDto dto = innerQueryResult.Value;
+        dto.EnrichWithLinks(_courseLinkFactory, _moduleLinkFactory, _lessonLinkFactory);
 
-        List<Module> modules = await _readDbContext.Modules
-            .AsNoTracking()
-            .Include(m => m.Lessons)
-            .Where(m => m.CourseId == request.Id)
-            .OrderBy(m => m.Index)
-            .ToListAsync(cancellationToken);
+        return Result.Success(dto);
+    }
+}
 
-        Category category = await _readDbContext.Categories
-            .Where(c => c.Id == course.CategoryId)
-            .FirstAsync(cancellationToken);
-
-        int enrollmentCount = await _readDbContext.Enrollments
-            .Where(e => e.CourseId == course.Id)
-            .CountAsync(cancellationToken);
-
-        int lessonCount = modules.Sum(m => m.Lessons.Count);
-
-        var courseDuration = TimeSpan.FromSeconds(
-            modules.SelectMany(m => m.Lessons).Sum(l => l.Duration.TotalSeconds)
-        );
-
-        var images = course.Images
-            .Select(image => _urlResolver.Resolve(StorageCategory.Public, image.Path).Value)
-            .ToList();
-
-        var tags = course.Tags.Select(tag => tag.Value).ToList();
-        var courseState = new CourseState(course.Id, course.InstructorId, course.Status);
-
-        var moduleDtos = modules.Select(module =>
+internal static class DtoEnrichmentExtensions
+{
+    public static void EnrichWithLinks(
+        this CoursePageDto dto,
+        ICourseLinkFactory courseLinkFactory,
+        IModuleLinkFactory moduleLinkFactory,
+        ILessonLinkFactory lessonLinkFactory)
+    {
+        var courseState = new CourseState(new CourseId(dto.Id), new UserId(dto.InstructorId), dto.Status);
+        dto.Links.AddRange(courseLinkFactory.CreateLinks(courseState));
+        foreach (ModuleDto module in dto.Modules)
         {
-            var moduleState = new ModuleState(module.Id);
-
-            var moduleDuration = TimeSpan.FromSeconds(
-                module.Lessons.Sum(l => l.Duration.TotalSeconds)
-            );
-
-            return new ModuleDto(
-                Id: module.Id.Value,
-                Title: module.Title.Value,
-                Index: module.Index,
-                Duration: moduleDuration,
-                Links: _moduleLinkFactory.CreateLinks(courseState, moduleState),
-                LessonCount: module.Lessons.Count,
-                Lessons: module.Lessons.Select(lesson =>
-                {
-                    var lessonState = new LessonState(lesson.Id, lesson.Access);
-
-                    return new LessonDto(
-                        LessonId: lesson.Id.Value,
-                        Title: lesson.Title.Value,
-                        Index: lesson.Index,
-                        Duration: lesson.Duration,
-                        ThumbnailUrl: lesson.ThumbnailImageUrl == null ? null :
-                            _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
-                        Access: lesson.Access,
-                        Links: _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState).ToList()
-                    );
-                }).ToList()
-            );
-        }).ToList();
-
-        var response = new CoursePageDto(
-            course.Id.Value,
-            course.Title.Value,
-            course.Description.Value,
-            instructor.Id.Value,
-            instructor.FullName,
-            instructor.AvatarUrl,
-            course.Status,
-            course.Price,
-            enrollmentCount,
-            lessonCount,
-            courseDuration,
-            course.UpdatedAtUtc,
-            images,
-            tags,
-            category.Id.Value,
-            category.Name,
-            category.Slug.Value,
-            moduleDtos,
-            _courseLinkFactory.CreateLinks(courseState).ToList());
-
-        return Result<CoursePageDto>.Success(response);
+            var moduleState = new ModuleState(new ModuleId(module.Id));
+            module.Links.AddRange(moduleLinkFactory.CreateLinks(courseState, moduleState));
+            foreach (LessonDto lesson in module.Lessons)
+            {
+                var lessonState = new LessonState(new LessonId(lesson.Id), lesson.Access);
+                lesson.Links.AddRange(lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState));
+            }
+        }
     }
 }
