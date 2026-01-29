@@ -40,7 +40,7 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext
         if (_isSaving)
         {
             throw new InvalidOperationException(
-                "Nested SaveChanges detected! וודא ש-Domain Event Handlers לא קוראים ל-SaveChanges בעצמם.");
+                "Nested SaveChanges detected!");
         }
 
         _isSaving = true;
