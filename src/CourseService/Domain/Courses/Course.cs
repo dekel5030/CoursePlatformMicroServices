@@ -178,7 +178,7 @@ public class Course : Entity<CourseId>
         if (categoryId is not null && categoryId != CategoryId)
         {
             CategoryId = categoryId;
-            Raise(new CourseCategoryChangedDomainEvent(Id, CategoryId));
+            Raise(new CourseDomainEvents(Id, CategoryId));
         }
 
         if (language is not null && language != Language)
