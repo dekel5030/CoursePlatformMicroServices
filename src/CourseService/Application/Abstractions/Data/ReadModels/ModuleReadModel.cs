@@ -9,7 +9,9 @@ public sealed class ModuleReadModel
     public int Index { get; set; }
     public TimeSpan Duration { get; set; }
     public int LessonCount { get; set; }
-    public List<LessonReadModel> Lessons { get; private set; } = new();
+#pragma warning disable CA2227 // Collection properties should be read only
+    public List<LessonReadModel> Lessons { get; set; } = new();
+#pragma warning restore CA2227 // Collection properties should be read only
 
     public ModuleDto ToDto()
     {

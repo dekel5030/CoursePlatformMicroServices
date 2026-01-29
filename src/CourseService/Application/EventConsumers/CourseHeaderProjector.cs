@@ -1,4 +1,4 @@
-﻿using CoursePlatform.Contracts.CourseEvents;
+using CoursePlatform.Contracts.CourseService;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Domain.Courses.Primitives;
@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.EventConsumers;
 
-internal sealed class CoursePageProjector :
+internal sealed class CourseHeaderProjector :
     IEventConsumer<CourseCreatedIntegrationEvent>,
     IEventConsumer<CourseTitleChangedIntegrationEvent>,
     IEventConsumer<CourseDescriptionChangedIntegrationEvent>,
@@ -23,7 +23,7 @@ internal sealed class CoursePageProjector :
 {
     private readonly IReadDbContext _readDbContext;
 
-    public CoursePageProjector(IReadDbContext readDbContext)
+    public CourseHeaderProjector(IReadDbContext readDbContext)
     {
         _readDbContext = readDbContext;
     }
@@ -32,7 +32,7 @@ internal sealed class CoursePageProjector :
         CourseCreatedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        var coursePage = new CoursePage
+        var courseHeader = new CourseHeaderReadModel
         {
             Id = message.CourseId,
             Title = message.Title,
@@ -41,17 +41,16 @@ internal sealed class CoursePageProjector :
             PriceAmount = message.PriceAmount,
             PriceCurrency = message.PriceCurrency,
             Status = Enum.Parse<CourseStatus>(message.Status),
-            UpdatedAtUtc = DateTime.UtcNow,
             Language = message.Language,
             Difficulty = Enum.Parse<DifficultyLevel>(message.Difficulty),
             Slug = message.Slug,
             CategoryId = message.CategoryId,
-            ImageUrls = new List<string>(),
-            Tags = new List<string>(),
-            Modules = new List<ModuleReadModel>()
+            UpdatedAtUtc = DateTime.UtcNow,
+            ImageUrls = [],
+            Tags = []
         };
 
-        _readDbContext.CoursePages.Add(coursePage);
+        _readDbContext.CourseHeaders.Add(courseHeader);
         await _readDbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -59,9 +58,9 @@ internal sealed class CoursePageProjector :
         CourseTitleChangedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        return UpdateCourseAsync(
+        return UpdateCourseHeaderAsync(
             message.CourseId,
-            coursePage => coursePage.Title = message.NewTitle,
+            header => header.Title = message.NewTitle,
             cancellationToken);
     }
 
@@ -69,9 +68,9 @@ internal sealed class CoursePageProjector :
         CourseDescriptionChangedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        return UpdateCourseAsync(
+        return UpdateCourseHeaderAsync(
             message.CourseId,
-            coursePage => coursePage.Description = message.NewDescription,
+            header => header.Description = message.NewDescription,
             cancellationToken);
     }
 
@@ -79,12 +78,12 @@ internal sealed class CoursePageProjector :
         CoursePriceChangedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        return UpdateCourseAsync(
+        return UpdateCourseHeaderAsync(
             message.CourseId,
-            coursePage =>
+            header =>
             {
-                coursePage.PriceAmount = message.NewAmount;
-                coursePage.PriceCurrency = message.NewCurrency;
+                header.PriceAmount = message.NewAmount;
+                header.PriceCurrency = message.NewCurrency;
             },
             cancellationToken);
     }
@@ -93,9 +92,9 @@ internal sealed class CoursePageProjector :
         CourseStatusChangedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        return UpdateCourseAsync(
+        return UpdateCourseHeaderAsync(
             message.CourseId,
-            coursePage => coursePage.Status = Enum.Parse<CourseStatus>(message.NewStatus),
+            header => header.Status = Enum.Parse<CourseStatus>(message.NewStatus),
             cancellationToken);
     }
 
@@ -103,9 +102,9 @@ internal sealed class CoursePageProjector :
         CourseCategoryChangedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        return UpdateCourseAsync(
+        return UpdateCourseHeaderAsync(
             message.CourseId,
-            coursePage => coursePage.CategoryId = message.NewCategoryId,
+            header => header.CategoryId = message.NewCategoryId,
             cancellationToken);
     }
 
@@ -113,9 +112,9 @@ internal sealed class CoursePageProjector :
         CourseDifficultyChangedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        return UpdateCourseAsync(
+        return UpdateCourseHeaderAsync(
             message.CourseId,
-            coursePage => coursePage.Difficulty = Enum.Parse<DifficultyLevel>(message.NewDifficulty),
+            header => header.Difficulty = Enum.Parse<DifficultyLevel>(message.NewDifficulty),
             cancellationToken);
     }
 
@@ -123,9 +122,9 @@ internal sealed class CoursePageProjector :
         CourseLanguageChangedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        return UpdateCourseAsync(
+        return UpdateCourseHeaderAsync(
             message.CourseId,
-            coursePage => coursePage.Language = message.NewLanguage,
+            header => header.Language = message.NewLanguage,
             cancellationToken);
     }
 
@@ -133,9 +132,9 @@ internal sealed class CoursePageProjector :
         CourseSlugChangedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        return UpdateCourseAsync(
+        return UpdateCourseHeaderAsync(
             message.CourseId,
-            coursePage => coursePage.Slug = message.NewSlug,
+            header => header.Slug = message.NewSlug,
             cancellationToken);
     }
 
@@ -143,50 +142,50 @@ internal sealed class CoursePageProjector :
         CourseTagsUpdatedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        return UpdateCourseAsync(
+        return UpdateCourseHeaderAsync(
             message.CourseId,
-            coursePage => coursePage.Tags = message.NewTags,
+            header => header.Tags = message.NewTags,
             cancellationToken);
     }
 
-    public async Task HandleAsync(
+    public Task HandleAsync(
         CourseImageAddedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        await UpdateCourseAsync(
+        return UpdateCourseHeaderAsync(
             message.CourseId,
-            coursePage =>
+            header =>
             {
-                if (!coursePage.ImageUrls.Contains(message.ImageUrl))
+                if (!header.ImageUrls.Contains(message.ImageUrl))
                 {
-                    coursePage.ImageUrls.Add(message.ImageUrl);
+                    header.ImageUrls.Add(message.ImageUrl);
                 }
             },
             cancellationToken);
     }
 
-    public async Task HandleAsync(
+    public Task HandleAsync(
         CourseImageRemovedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        await UpdateCourseAsync(
+        return UpdateCourseHeaderAsync(
             message.CourseId,
-            coursePage => coursePage.ImageUrls.Remove(message.ImageUrl),
+            header => header.ImageUrls.Remove(message.ImageUrl),
             cancellationToken);
     }
 
-    private async Task UpdateCourseAsync(
+    private async Task UpdateCourseHeaderAsync(
         Guid courseId,
-        Action<CoursePage> updateAction,
+        Action<CourseHeaderReadModel> updateAction,
         CancellationToken cancellationToken)
     {
-        CoursePage? page = await _readDbContext.CoursePages
-            .FirstOrDefaultAsync(p => p.Id == courseId, cancellationToken);
+        CourseHeaderReadModel? header = await _readDbContext.CourseHeaders
+            .FirstOrDefaultAsync(h => h.Id == courseId, cancellationToken);
 
-        if (page is not null)
+        if (header is not null)
         {
-            updateAction(page);
-            page.UpdatedAtUtc = DateTime.UtcNow;
+            updateAction(header);
+            header.UpdatedAtUtc = DateTime.UtcNow;
             await _readDbContext.SaveChangesAsync(cancellationToken);
         }
     }

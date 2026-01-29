@@ -1,4 +1,4 @@
-﻿using CoursePlatform.Contracts.CourseEvents;
+﻿using CoursePlatform.Contracts.CourseService;
 using Courses.Domain.Courses;
 using Kernel.EventBus;
 using Kernel.Messaging.Abstractions;

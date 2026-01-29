@@ -1,4 +1,4 @@
-﻿namespace CoursePlatform.Contracts.CourseEvents;
+﻿namespace CoursePlatform.Contracts.CourseService;
 
 public sealed record CourseCreatedIntegrationEvent(
     Guid CourseId,

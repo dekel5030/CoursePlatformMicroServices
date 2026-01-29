@@ -12,6 +12,9 @@ namespace Courses.Application.Abstractions.Data;
 public interface IReadDbContext
 {
     DbSet<CoursePage> CoursePages { get; }
+    DbSet<CourseHeaderReadModel> CourseHeaders { get; }
+    DbSet<CourseStructureReadModel> CourseStructures { get; }
+    DbSet<CourseStatsReadModel> CourseStats { get; }
     DbSet<Course> Courses { get; }
     DbSet<Lesson> Lessons { get; }
     DbSet<User> Users { get; }
