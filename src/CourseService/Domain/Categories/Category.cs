@@ -1,12 +1,11 @@
-﻿using Courses.Domain.Categories.Events;
-using Courses.Domain.Categories.Primitives;
+﻿using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 
 namespace Courses.Domain.Categories;
 
-public class Category : Entity<CategoryId>, ICategorySnapshot
+public class Category : Entity<CategoryId>
 {
     public override CategoryId Id { get; protected set; }
     public string Name { get; private set; }
@@ -32,8 +31,27 @@ public class Category : Entity<CategoryId>, ICategorySnapshot
 
         var category = new Category(CategoryId.CreateNew(), name, slug);
 
-        category.Raise(new CategoryCreatedDomainEvent(category));
+        category.Raise(new CategoryCreatedDomainEvent(category.Id, category.Name, category.Slug));
 
         return Result.Success(category);
+    }
+
+    public Result Rename(string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName))
+        {
+            return Result.Failure(Error.Validation("Category.NameEmpty", "Name cannot be empty"));
+        }
+
+        if (Name == newName)
+        {
+            return Result.Success();
+        }
+
+        Name = newName;
+        Slug = new Slug(newName);
+
+        Raise(new CategoryRenamedDomainEvent(Id, Name, Slug));
+        return Result.Success();
     }
 }

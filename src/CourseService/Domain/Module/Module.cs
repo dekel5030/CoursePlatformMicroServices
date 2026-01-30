@@ -1,5 +1,4 @@
-﻿using System;
-using Courses.Domain.Courses.Primitives;
+﻿using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;

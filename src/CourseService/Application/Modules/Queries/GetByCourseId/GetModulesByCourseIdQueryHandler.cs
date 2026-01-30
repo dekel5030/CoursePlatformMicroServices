@@ -1,4 +1,3 @@
-using System.Data;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
@@ -24,42 +23,54 @@ internal sealed class GetModulesByCourseIdQueryHandler
         CancellationToken cancellationToken = default)
     {
         List<Module> modules = await _readDbContext.Modules
-            .Include(module => module.Lessons)
-            .Where(module => module.CourseId == request.CourseId)
+            .Include(m => m.Lessons)
+            .Where(module => module.CourseId.Value == request.CourseId.Value)
+            .OrderBy(module => module.Index)
             .ToListAsync(cancellationToken);
+
+        if (modules.Count == 0)
+        {
+            return Result.Success(new ModuleCollectionDto
+            {
+                Items = [],
+                PageNumber = 1,
+                PageSize = 1,
+                TotalItems = 0,
+                Links = null
+            });
+        }
 
         var moduleDetailsDtos = modules.Select(module =>
         {
-            var moduleDuration = TimeSpan.FromSeconds(
-                module.Lessons.Sum(l => l.Duration.TotalSeconds));
+            var lessonDtos = module.Lessons
+                .OrderBy(l => l.Index)
+                .Select(lesson => new LessonSummaryDto(
+                    module.Id.Value,
+                    lesson.Id.Value,
+                    lesson.Title.Value,
+                    lesson.Index,
+                    lesson.Duration,
+                    null,
+                    lesson.Access
+                )).ToList();
 
             return new ModuleDetailsDto(
                 module.Id.Value,
                 module.Title.Value,
                 module.Index,
                 module.Lessons.Count,
-                moduleDuration,
-                module.Lessons
-                    .OrderBy(lesson => lesson.Index)
-                    .Select(lesson => new LessonSummaryDto(
-                        module.Id.Value,
-                        lesson.Id.Value,
-                        lesson.Title.Value,
-                        lesson.Index,
-                        lesson.Duration,
-                        lesson.ThumbnailImageUrl?.Path,
-                        lesson.Access)).ToList());
+                TimeSpan.FromSeconds(module.Lessons.Sum(l => l.Duration.TotalSeconds)),
+                lessonDtos
+            );
         }).ToList();
 
-        var moduleCollectionDto = new ModuleCollectionDto
+        return Result.Success(new ModuleCollectionDto
         {
             Items = moduleDetailsDtos,
             PageNumber = 1,
-            PageSize = 1,
-            TotalItems = 1,
+            PageSize = moduleDetailsDtos.Count,
+            TotalItems = moduleDetailsDtos.Count,
             Links = null
-        };
-
-        return Result.Success(moduleCollectionDto);
+        });
     }
 }

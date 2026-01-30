@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CoursePlatform.Contracts.CourseService;
+﻿using CoursePlatform.Contracts.CourseService;
 using Courses.Domain.Module;
 using Kernel.EventBus;
 using Kernel.Messaging.Abstractions;

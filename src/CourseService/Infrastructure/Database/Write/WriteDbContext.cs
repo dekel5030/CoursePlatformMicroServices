@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Database.Write;
 
-public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext
+public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfWork
 {
     private readonly IMediator _mediator;
     private bool _isSaving;

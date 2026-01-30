@@ -1,136 +1,74 @@
-using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Repositories;
-using Courses.Application.Abstractions.Storage;
-using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
+using Courses.Application.Courses.Queries.GetCourseSummaries;
+using Courses.Application.Courses.Queries.GetFeaturedCourseSummaries;
 using Courses.Application.Services.Actions.States;
+using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Application.Shared.Dtos;
-using Courses.Domain.Courses;
+using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Users;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Queries.GetFeatured;
 
 internal sealed class GetFeaturedQueryHandler : IQueryHandler<GetFeaturedQuery, CourseCollectionDto>
 {
-    private readonly IFeaturedCoursesRepository _featuredCoursesRepo;
-    private readonly IStorageUrlResolver _urlResolver;
-    private readonly IReadDbContext _dbContext;
     private readonly ICourseLinkFactory _courseLinkFactory;
+    private readonly IMediator _mediator;
 
     public GetFeaturedQueryHandler(
-        IFeaturedCoursesRepository featuredCoursesProvider,
-        IStorageUrlResolver urlResolver,
-        IReadDbContext dbContext,
-        ICourseLinkFactory courseLinkFactory)
+        ICourseLinkFactory courseLinkFactory,
+        IMediator mediator)
     {
-        _featuredCoursesRepo = featuredCoursesProvider;
-        _urlResolver = urlResolver;
-        _dbContext = dbContext;
         _courseLinkFactory = courseLinkFactory;
+        _mediator = mediator;
     }
 
     public async Task<Result<CourseCollectionDto>> Handle(
         GetFeaturedQuery request,
         CancellationToken cancellationToken = default)
     {
-        IReadOnlyList<Course> courses = await _featuredCoursesRepo.GetFeaturedCourse();
-        var courseIds = courses.Select(c => c.Id).ToList();
+        var innerQuery = new GetFeaturedCourseSummariesQuery();
+        Result<CourseCollectionDto> innerQueryResult = await _mediator.Send(innerQuery, cancellationToken);
 
-        var rawData = await _dbContext.Courses
-            .Where(course => courseIds.Contains(course.Id))
-            .OrderByDescending(c => c.UpdatedAtUtc)
-            .Select(c => new
-            {
-                Course = c,
-                Instructor = _dbContext.Users
-                    .Where(u => u.Id == c.InstructorId)
-                    .Select(u => new { u.Id, u.FullName, u.AvatarUrl })
-                    .FirstOrDefault(),
-                Category = _dbContext.Categories
-                    .Where(cat => cat.Id == c.CategoryId)
-                    .Select(cat => new { cat.Id, cat.Name, cat.Slug })
-                    .FirstOrDefault(),
-
-                EnrollmentCount = _dbContext.Enrollments.Count(e => e.CourseId == c.Id),
-
-                LessonsCount = _dbContext.Modules
-                    .Where(m => m.CourseId == c.Id)
-                    .SelectMany(m => _dbContext.Lessons.Where(l => l.ModuleId == m.Id))
-                    .Count(),
-
-                TotalDurationSeconds = _dbContext.Modules
-                    .Where(m => m.CourseId == c.Id)
-                    .SelectMany(m => _dbContext.Lessons.Where(l => l.ModuleId == m.Id))
-                    .Sum(l => l.Duration.TotalSeconds)
-            })
-            .ToListAsync(cancellationToken);
-
-        var courseDtos = rawData.Select(data =>
+        if (innerQueryResult.IsFailure)
         {
-            Course course = data.Course;
+            return innerQueryResult;
+        }
 
-            string descriptionText = course.Description.Value;
-            string shortDescription = descriptionText.Length > 100
-                ? descriptionText[..100] + "..."
-                : descriptionText;
+        CourseCollectionDto dto = innerQueryResult.Value;
+        CourseCollectionDto enrichedDto = dto.EnrichWithFeaturedLinks(_courseLinkFactory);
 
-            string? thumbnailUrl = course.Images.Count != 0
-                ? _urlResolver.Resolve(StorageCategory.Public, course.Images.First().Path).Value
-                : null;
+        return Result.Success(enrichedDto);
+    }
+}
 
-            string? avatarUrl = data.Instructor?.AvatarUrl != null
-                ? _urlResolver.Resolve(StorageCategory.Public, data.Instructor.AvatarUrl).Value
-                : null;
-
-            return new CourseSummaryDto
-            {
-                Id = course.Id.Value,
-                Title = course.Title.Value,
-                Slug = course.Slug.Value,
-                ShortDescription = shortDescription,
-                Price = course.Price,
-                OriginalPrice = course.Price,
-                Difficulty = course.Difficulty,
-                Status = course.Status,
-                UpdatedAtUtc = course.UpdatedAtUtc,
-
-                EnrollmentCount = data.EnrollmentCount,
-                LessonsCount = data.LessonsCount,
-                Duration = TimeSpan.FromSeconds(data.TotalDurationSeconds),
-
-                AverageRating = 4.5,
-                ReviewsCount = 120,
-                CourseViews = 1245,
-
-                Instructor = new InstructorDto(
-                    data.Instructor?.Id.Value ?? Guid.Empty,
-                    data.Instructor?.FullName ?? "Unknown",
-                    avatarUrl),
-
-                Category = new CategoryDto(
-                    data.Category?.Id.Value ?? Guid.Empty,
-                    data.Category?.Name ?? "Uncategorized",
-                    data.Category?.Slug.Value ?? "uncategorized"),
-
-                ThumbnailUrl = thumbnailUrl,
-                Badges = course.UpdatedAtUtc > DateTimeOffset.UtcNow.AddDays(-30) ? new List<string> { "New" } : [],
-
-                Links = _courseLinkFactory.CreateLinks(new CourseState(course.Id, course.InstructorId, course.Status))
-            };
+internal static class FeaturedCourseCollectionDtoEnrichmentExtensions
+{
+    public static CourseCollectionDto EnrichWithFeaturedLinks(
+        this CourseCollectionDto dto,
+        ICourseLinkFactory courseLinkFactory)
+    {
+        var courseDtos = dto.Items.Select(courseDto =>
+        {
+            var courseId = new CourseId(courseDto.Id);
+            var instructorId = new UserId(courseDto.Instructor.Id);
+            IReadOnlyList<LinkDto> links = courseLinkFactory.CreateLinks(
+                new CourseState(courseId, instructorId, courseDto.Status));
+            
+            return courseDto with { Links = links };
         }).ToList();
 
-        var response = new CourseCollectionDto
+        return new CourseCollectionDto
         {
             Items = courseDtos,
-            PageNumber = 1,
-            PageSize = courseDtos.Count,
-            TotalItems = courseDtos.Count,
-            Links = _courseLinkFactory.CreateCollectionLinks(new PagedQueryDto { Page = 1, PageSize = courseDtos.Count }, courseDtos.Count)
+            PageNumber = dto.PageNumber,
+            PageSize = dto.PageSize,
+            TotalItems = dto.TotalItems,
+            Links = courseLinkFactory.CreateCollectionLinks(
+                new PagedQueryDto { Page = dto.PageNumber, PageSize = dto.PageSize },
+                dto.TotalItems)
         };
-
-        return Result.Success(response);
     }
 }

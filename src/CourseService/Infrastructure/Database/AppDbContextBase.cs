@@ -9,10 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Database;
 
-public abstract class AppDbContextBase : DbContext, IUnitOfWork
 
+public abstract class AppDbContextBase : DbContext, IUnitOfWork
 {
-    private bool _hasSaved;
     public DbSet<Course> Courses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
     public DbSet<User> Users { get; set; }
@@ -22,17 +21,5 @@ public abstract class AppDbContextBase : DbContext, IUnitOfWork
 
     protected AppDbContextBase(DbContextOptions options) : base(options)
     {
-    }
-
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        if (_hasSaved)
-        {
-            //throw new InvalidOperationException(
-            //    "SaveChangesAsync can only be called once per request. Use CommitAsync in the UnitOfWork instead.");
-        }
-
-        _hasSaved = true;
-        return base.SaveChangesAsync(cancellationToken);
     }
 }
