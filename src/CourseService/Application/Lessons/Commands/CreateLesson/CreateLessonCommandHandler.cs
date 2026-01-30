@@ -1,6 +1,8 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Repositories;
-using Courses.Domain.Module;
+using Courses.Domain.Abstractions.Repositories;
+using Courses.Domain.Lessons;
+using Courses.Domain.Modules;
+using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -9,13 +11,16 @@ namespace Courses.Application.Lessons.Commands.CreateLesson;
 public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, CreateLessonResponse>
 {
     private readonly IModuleRepository _moduleRepository;
+    private readonly LessonManagementService _lessonManagementService;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateLessonCommandHandler(
         IModuleRepository moduleRepository,
+        LessonManagementService lessonManagementService,
         IUnitOfWork unitOfWork)
     {
         _moduleRepository = moduleRepository;
+        _lessonManagementService = lessonManagementService;
         _unitOfWork = unitOfWork;
     }
 
@@ -30,7 +35,12 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, C
             return Result.Failure<CreateLessonResponse>(Error.NotFound("Module.NotFound", "The specified module was not found."));
         }
 
-        Result result = module.AddLesson(request.Title, request.Description);
+        Result<Lesson> result = await _lessonManagementService.CreateLessonAsync(
+            module.CourseId,
+            request.ModuleId,
+            request.Title ?? Title.Empty,
+            request.Description ?? Description.Empty,
+            cancellationToken);
 
         if (result.IsFailure)
         {
@@ -38,7 +48,6 @@ public class CreateLessonCommandHandler : ICommandHandler<CreateLessonCommand, C
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
 
         return Result.Success(new CreateLessonResponse(module.CourseId.Value, module.Id.Value));
     }

@@ -1,6 +1,6 @@
 ﻿using Courses.Domain.Courses.Primitives;
 
-namespace Courses.Application.Abstractions.Repositories;
+namespace Courses.Domain.Abstractions.Repositories;
 
 public interface IFeaturedCoursesRepository
 {

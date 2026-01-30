@@ -1,5 +1,5 @@
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Module.Primitives;
+using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel.Messaging.Abstractions;
 

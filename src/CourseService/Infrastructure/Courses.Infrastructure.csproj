@@ -20,8 +20,4 @@
     <ProjectReference Include="..\Application\Courses.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Database\Migrations\" />
-  </ItemGroup>
-
 </Project>

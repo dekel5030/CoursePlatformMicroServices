@@ -1,5 +1,5 @@
 ﻿using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Repositories;
+using Courses.Domain.Abstractions.Repositories;
 using Courses.Infrastructure.Database.Read;
 using Courses.Infrastructure.Database.Repositories;
 using Courses.Infrastructure.Database.Write;
@@ -39,7 +39,7 @@ internal static class DatabaseExtensions
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IModuleRepository, ModulesRepository>();
-        services.AddScoped<ISqlConnectionFactory, SqlConnectionFactory>();
+        services.AddScoped<ILessonRepository, LessonRepository>();
 
         return services;
     }

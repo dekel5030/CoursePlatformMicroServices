@@ -3,7 +3,7 @@ using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
-using Courses.Domain.Module;
+using Courses.Domain.Modules;
 using Courses.Domain.Users;
 using Courses.Infrastructure.Database.Write;
 using Microsoft.EntityFrameworkCore;

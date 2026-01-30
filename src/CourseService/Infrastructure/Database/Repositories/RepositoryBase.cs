@@ -1,4 +1,5 @@
-﻿using Courses.Application.Abstractions.Repositories;
+﻿using System.Linq.Expressions;
+using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Shared;
 using Courses.Infrastructure.Database.Write;
 using Microsoft.EntityFrameworkCore;
@@ -24,5 +25,19 @@ public abstract class RepositoryBase<TEntity, TId> : IRepository<TEntity, TId>
     public virtual Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         return DbContext.Set<TEntity>().AddAsync(entity, cancellationToken).AsTask();
+    }
+
+    public virtual async Task<IReadOnlyList<TEntity>> ListAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbContext.Set<TEntity>()
+            .Where(predicate)
+            .ToListAsync(cancellationToken);
+    }
+
+    public virtual void Remove(TEntity entity)
+    {
+        DbContext.Set<TEntity>().Remove(entity);
     }
 }

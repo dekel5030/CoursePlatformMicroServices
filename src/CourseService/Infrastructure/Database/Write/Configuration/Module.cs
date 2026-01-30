@@ -1,7 +1,7 @@
 ﻿using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Module;
-using Courses.Domain.Module.Primitives;
+using Courses.Domain.Modules;
+using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -38,12 +38,6 @@ public class ModuleConfiguration : IEntityTypeConfiguration<Module>
         builder.HasOne<Course>()
             .WithMany()
             .HasForeignKey(m => m.CourseId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(m => m.Lessons)
-            .WithOne()
-            .HasForeignKey(l => l.ModuleId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
     }

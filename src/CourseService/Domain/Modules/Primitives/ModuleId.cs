@@ -1,4 +1,4 @@
-﻿namespace Courses.Domain.Module.Primitives;
+﻿namespace Courses.Domain.Modules.Primitives;
 
 public sealed record ModuleId(Guid Value)
 {

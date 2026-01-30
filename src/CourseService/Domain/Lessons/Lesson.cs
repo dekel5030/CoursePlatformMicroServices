@@ -1,6 +1,6 @@
 ﻿using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Module.Primitives;
+using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
@@ -43,7 +43,7 @@ public class Lesson : Entity<LessonId>
         Slug = slug;
     }
 
-    public static Result<Lesson> Create(
+    internal static Result<Lesson> Create(
         CourseId courseId,
         ModuleId moduleId,
         Title? title,
@@ -121,7 +121,7 @@ public class Lesson : Entity<LessonId>
         return Result.Success();
     }
 
-    public void ChangeIndex(int newIndex)
+    internal void ChangeIndex(int newIndex)
     {
         if (Index == newIndex)
         {

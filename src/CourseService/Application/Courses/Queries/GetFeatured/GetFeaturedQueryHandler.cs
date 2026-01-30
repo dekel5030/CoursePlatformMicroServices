@@ -1,12 +1,10 @@
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Courses.Queries.GetCourseSummaries;
 using Courses.Application.Courses.Queries.GetFeaturedCourseSummaries;
 using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Users;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -56,7 +54,7 @@ internal static class FeaturedCourseCollectionDtoEnrichmentExtensions
             var instructorId = new UserId(courseDto.Instructor.Id);
             IReadOnlyList<LinkDto> links = courseLinkFactory.CreateLinks(
                 new CourseState(courseId, instructorId, courseDto.Status));
-            
+
             return courseDto with { Links = links };
         }).ToList();
 

@@ -1,5 +1,5 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Repositories;
+using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Errors;
 using Courses.Domain.Courses;

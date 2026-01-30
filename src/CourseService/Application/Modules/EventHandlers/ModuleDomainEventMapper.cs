@@ -1,5 +1,5 @@
 ﻿using CoursePlatform.Contracts.CourseService;
-using Courses.Domain.Module;
+using Courses.Domain.Modules;
 using Kernel.EventBus;
 using Kernel.Messaging.Abstractions;
 

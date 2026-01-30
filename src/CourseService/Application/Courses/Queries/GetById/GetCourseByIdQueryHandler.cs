@@ -4,7 +4,7 @@ using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Module.Primitives;
+using Courses.Domain.Modules.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

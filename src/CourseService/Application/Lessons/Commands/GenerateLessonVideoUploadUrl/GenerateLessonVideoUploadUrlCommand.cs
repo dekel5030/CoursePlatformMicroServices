@@ -1,6 +1,6 @@
 ﻿using Courses.Application.Shared.Dtos;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Module.Primitives;
+using Courses.Domain.Modules.Primitives;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Lessons.Commands.GenerateLessonVideoUploadUrl;

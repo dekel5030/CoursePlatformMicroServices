@@ -5,7 +5,9 @@ using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Module;
+using Courses.Domain.Lessons;
+using Courses.Domain.Modules;
+using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Users;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -47,18 +49,30 @@ internal sealed class GetCoursePageQueryHandler
             .FirstOrDefaultAsync(c => c.Id == course.CategoryId, cancellationToken);
 
         List<Module> modules = await _readDbContext.Modules
-            .Include(m => m.Lessons)
             .Where(m => m.CourseId == course.Id)
             .OrderBy(m => m.Index)
             .ToListAsync(cancellationToken);
+
+        var moduleIds = modules.Select(m => m.Id).ToList();
+        List<Lesson> lessonsGroupedByModule = await _readDbContext.Lessons
+            .Where(l => moduleIds.Contains(l.ModuleId))
+            .OrderBy(l => l.Index)
+            .ToListAsync(cancellationToken);
+
+        var lessonsByModuleId = lessonsGroupedByModule
+            .GroupBy(l => l.ModuleId)
+            .ToDictionary(g => g.Key, g => g.ToList());
 
         int enrollmentCount = await _readDbContext.Enrollments
             .CountAsync(e => e.CourseId == course.Id, cancellationToken);
 
         var moduleDtos = modules.Select(module =>
         {
-            var lessonDtos = module.Lessons
-            .OrderBy(l => l.Index)
+            List<Lesson> moduleLessons = lessonsByModuleId.TryGetValue(module.Id, out List<Lesson>? lessons) 
+                ? lessons 
+                : [];
+
+            var lessonDtos = moduleLessons
             .Select(l => new LessonDto
             {
                 Id = l.Id.Value,
@@ -77,8 +91,8 @@ internal sealed class GetCoursePageQueryHandler
                 Id = module.Id.Value,
                 Title = module.Title.Value,
                 Index = module.Index,
-                Duration = TimeSpan.FromSeconds(module.Lessons.Sum(l => l.Duration.TotalSeconds)),
-                LessonCount = module.Lessons.Count,
+                Duration = TimeSpan.FromSeconds(moduleLessons.Sum(l => l.Duration.TotalSeconds)),
+                LessonCount = moduleLessons.Count,
                 Lessons = lessonDtos,
                 Links = []
             };
@@ -88,8 +102,8 @@ internal sealed class GetCoursePageQueryHandler
             .Select(img => _urlResolver.Resolve(StorageCategory.Public, img.Path).Value)
             .ToList();
 
-        int totalLessons = modules.Sum(m => m.Lessons.Count);
-        double totalDurationSeconds = modules.Sum(m => m.Lessons.Sum(l => l.Duration.TotalSeconds));
+        int totalLessons = lessonsGroupedByModule.Count;
+        double totalDurationSeconds = lessonsGroupedByModule.Sum(l => l.Duration.TotalSeconds);
 
         var pageDto = new CoursePageDto
         {

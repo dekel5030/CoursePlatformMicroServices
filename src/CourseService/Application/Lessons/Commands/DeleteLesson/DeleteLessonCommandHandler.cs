@@ -1,7 +1,8 @@
 ﻿using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Repositories;
-using Courses.Domain.Module;
-using Courses.Domain.Module.Errors;
+using Courses.Domain.Abstractions.Repositories;
+using Courses.Domain.Lessons;
+using Courses.Domain.Modules;
+using Courses.Domain.Modules.Errors;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -9,33 +10,28 @@ namespace Courses.Application.Lessons.Commands.DeleteLesson;
 
 public class DeleteLessonCommandHandler : ICommandHandler<DeleteLessonCommand>
 {
-    private readonly IModuleRepository _moduleRepository;
+    private readonly LessonManagementService _lessonManagement;
     private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteLessonCommandHandler(IModuleRepository moduleRepository, IUnitOfWork unitOfWork)
+    public DeleteLessonCommandHandler(LessonManagementService lessonManagement, IUnitOfWork unitOfWork)
     {
-        _moduleRepository = moduleRepository;
-        _unitOfWork = unitOfWork;
+        _lessonManagement = lessonManagement;
+        _unitOfWork = unitOfWork; 
     }
 
     public async Task<Result> Handle(
         DeleteLessonCommand request,
         CancellationToken cancellationToken = default)
     {
-        Module? module = await _moduleRepository.GetByIdAsync(request.ModuleId, cancellationToken);
-        if (module is null)
-        {
-            return Result.Failure(ModuleErrors.NotFound);
-        }
+        Result result = await _lessonManagement.RemoveLessonAsync(request.LessonId, cancellationToken);
 
-        Result deletionResult = module.RemoveLesson(request.LessonId);
-        if (deletionResult.IsFailure)
+        if (result.IsFailure)
         {
-            return Result.Failure(deletionResult.Error);
+            return result;
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Success();
+        return result;
     }
 }
