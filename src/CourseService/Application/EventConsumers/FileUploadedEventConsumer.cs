@@ -6,7 +6,6 @@ using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Modules;
 using Courses.Domain.Shared.Primitives;
 using Kernel.EventBus;
 using Microsoft.EntityFrameworkCore;
@@ -82,7 +81,7 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 
         var videoUrl = new VideoUrl(message.FileKey);
 
-        double durationSeconds = 
+        double durationSeconds =
             message.Metadata.GetValueOrDefault("DurationSeconds") is string durationString
             && double.TryParse(durationString, NumberStyles.Any, CultureInfo.InvariantCulture, out double result)
             ? result : 0;

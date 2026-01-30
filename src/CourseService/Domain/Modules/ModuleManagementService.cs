@@ -34,7 +34,7 @@ public sealed class ModuleManagementService
         }
 
         IReadOnlyList<Module> existingModules = await _moduleRepository
-            .ListAsync(m => m.CourseId == courseId , cancellationToken);
+            .ListAsync(m => m.CourseId == courseId, cancellationToken);
 
         int nextIndex = existingModules.Any() ? existingModules.Max(m => m.Index) + 1 : 0;
 

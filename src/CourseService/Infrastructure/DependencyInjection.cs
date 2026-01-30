@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using CoursePlatform.ServiceDefaults.Auth;
+﻿using CoursePlatform.ServiceDefaults.Auth;
 using Courses.Infrastructure.Ai;
 using Courses.Infrastructure.Database;
 using Courses.Infrastructure.MassTransit;

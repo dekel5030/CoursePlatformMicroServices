@@ -1,7 +1,4 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Domain.Abstractions.Repositories;
-using Courses.Domain.Courses;
-using Courses.Domain.Courses.Errors;
 using Courses.Domain.Modules;
 using Courses.Domain.Shared.Primitives;
 using Kernel;

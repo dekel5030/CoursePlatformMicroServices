@@ -1,8 +1,5 @@
 ﻿using Courses.Application.Abstractions.Data;
-using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Lessons;
-using Courses.Domain.Modules;
-using Courses.Domain.Modules.Errors;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -16,7 +13,7 @@ public class DeleteLessonCommandHandler : ICommandHandler<DeleteLessonCommand>
     public DeleteLessonCommandHandler(LessonManagementService lessonManagement, IUnitOfWork unitOfWork)
     {
         _lessonManagement = lessonManagement;
-        _unitOfWork = unitOfWork; 
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result> Handle(
