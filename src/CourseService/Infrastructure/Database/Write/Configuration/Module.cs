@@ -1,7 +1,7 @@
 ﻿using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Module;
-using Courses.Domain.Module.Primitives;
+using Courses.Domain.Modules;
+using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

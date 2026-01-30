@@ -1,6 +1,6 @@
 ﻿using Courses.Domain.Shared;
 
-namespace Courses.Application.Abstractions.Repositories;
+namespace Courses.Domain.Abstractions.Repositories;
 
 public interface IRepository<TEntity, TId>
     where TEntity : IHasId<TId>

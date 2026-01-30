@@ -1,6 +1,6 @@
-﻿using Courses.Application.Abstractions.Repositories;
-using Courses.Application.Abstractions.Storage;
+﻿using Courses.Application.Abstractions.Storage;
 using Courses.Application.Shared.Dtos;
+using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;

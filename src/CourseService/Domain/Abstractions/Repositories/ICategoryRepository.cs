@@ -1,7 +1,7 @@
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
 
-namespace Courses.Application.Abstractions.Repositories;
+namespace Courses.Domain.Abstractions.Repositories;
 
 public interface ICategoryRepository : IRepository<Category, CategoryId>
 {

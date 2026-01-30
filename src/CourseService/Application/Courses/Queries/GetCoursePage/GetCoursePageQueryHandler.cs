@@ -5,7 +5,7 @@ using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Module;
+using Courses.Domain.Modules;
 using Courses.Domain.Users;
 using Kernel;
 using Kernel.Messaging.Abstractions;

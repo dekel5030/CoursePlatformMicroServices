@@ -1,5 +1,5 @@
 ﻿using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Repositories;
+using Courses.Domain.Abstractions.Repositories;
 using Courses.Infrastructure.Database.Read;
 using Courses.Infrastructure.Database.Repositories;
 using Courses.Infrastructure.Database.Write;

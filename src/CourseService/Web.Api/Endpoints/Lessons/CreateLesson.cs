@@ -3,7 +3,7 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Endpoints.Modules;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.CreateLesson;
-using Courses.Domain.Module.Primitives;
+using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;

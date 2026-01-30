@@ -4,7 +4,7 @@ using Courses.Api.Extensions;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Lessons.Queries.GetById;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Module.Primitives;
+using Courses.Domain.Modules.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

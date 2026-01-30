@@ -1,8 +1,8 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Repositories;
+using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
-using Courses.Domain.Module;
+using Courses.Domain.Modules;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

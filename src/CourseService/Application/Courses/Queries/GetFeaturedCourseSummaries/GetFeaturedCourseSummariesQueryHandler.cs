@@ -1,9 +1,9 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Repositories;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
+using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses;

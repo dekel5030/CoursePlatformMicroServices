@@ -6,7 +6,7 @@ using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Module;
+using Courses.Domain.Modules;
 using Courses.Domain.Shared.Primitives;
 using Kernel.EventBus;
 using Microsoft.EntityFrameworkCore;

@@ -1,6 +1,6 @@
 ﻿using Kernel;
 
-namespace Courses.Domain.Module.Errors;
+namespace Courses.Domain.Modules.Errors;
 
 public static class ModuleErrors
 {

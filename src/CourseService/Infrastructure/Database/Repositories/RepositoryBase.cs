@@ -1,4 +1,4 @@
-﻿using Courses.Application.Abstractions.Repositories;
+﻿using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Shared;
 using Courses.Infrastructure.Database.Write;
 using Microsoft.EntityFrameworkCore;

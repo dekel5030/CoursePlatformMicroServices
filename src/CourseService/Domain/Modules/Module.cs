@@ -2,12 +2,12 @@
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Module.Primitives;
+using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 
-namespace Courses.Domain.Module;
+namespace Courses.Domain.Modules;
 
 public class Module : Entity<ModuleId>
 {

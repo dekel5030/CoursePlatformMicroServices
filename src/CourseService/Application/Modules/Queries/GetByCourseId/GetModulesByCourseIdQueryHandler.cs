@@ -1,7 +1,7 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
-using Courses.Domain.Module;
+using Courses.Domain.Modules;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
