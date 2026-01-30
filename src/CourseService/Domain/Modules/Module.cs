@@ -14,11 +14,7 @@ public class Module : Entity<ModuleId>
     public override ModuleId Id { get; protected set; }
     public Title Title { get; private set; } = Title.Empty;
     public int Index { get; private set; }
-
     public CourseId CourseId { get; private set; }
-    public IReadOnlyList<Lesson> Lessons => _lessons.AsReadOnly();
-
-    private readonly List<Lesson> _lessons = new();
 
 #pragma warning disable S1133
 #pragma warning disable CS8618
@@ -66,83 +62,6 @@ public class Module : Entity<ModuleId>
         Raise(new ModuleIndexUpdatedDomainEvent(Id, CourseId, Index));
         return Result.Success();
     }
-
-    public Result AddLesson(Title? title, Description? description)
-    {
-        int index = _lessons.Count;
-        Result<Lesson> lessonResult = Lesson.Create(CourseId, Id, title, description, index);
-
-        if (lessonResult.IsFailure)
-        {
-            return Result.Failure(lessonResult.Error);
-        }
-
-        _lessons.Add(lessonResult.Value);
-
-        return Result.Success();
-    }
-
-    public Result UpdateLesson(
-        LessonId lessonId,
-        Title? title = null,
-        Description? description = null,
-        LessonAccess? access = null,
-        int? index = null,
-        Slug? slug = null)
-    {
-        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
-        if (lesson is null)
-        {
-            return Result.Failure(LessonErrors.NotFound);
-        }
-
-        lesson.UpdateMetadata(title ?? lesson.Title, description ?? lesson.Description, slug ?? lesson.Slug);
-        lesson.ChangeAccess(access ?? lesson.Access);
-        lesson.ChangeIndex(index ?? lesson.Index);
-        return Result.Success();
-
-    }
-
-    public Result UpdateLessonMedia(
-        LessonId lessonId,
-        ImageUrl? thumbnailImageUrl = null,
-        VideoUrl? videoUrl = null,
-        Url? transcriptUrl = null,
-        string? transcript = null,
-        TimeSpan? duration = null)
-    {
-        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
-
-        if (lesson is null)
-        {
-            return Result.Failure(LessonErrors.NotFound);
-        }
-
-        lesson.UpdateMedia(videoUrl, thumbnailImageUrl, duration ?? lesson.Duration);
-        lesson.UpdateTranscript(transcriptUrl, transcript);
-
-        return Result.Success();
-    }
-
-    public Result RemoveLesson(LessonId lessonId)
-    {
-        Lesson? lesson = _lessons.FirstOrDefault(l => l.Id == lessonId);
-        if (lesson is null)
-        {
-            return Result.Failure(LessonErrors.NotFound);
-        }
-
-        lesson.Delete();
-        _lessons.Remove(lesson);
-
-        for (int i = 0; i < _lessons.Count; i++)
-        {
-            _lessons[i].ChangeIndex(i);
-        }
-
-        return Result.Success();
-    }
-
     public void Delete()
     {
         Raise(new ModuleDeletedDomainEvent(Id, CourseId));
