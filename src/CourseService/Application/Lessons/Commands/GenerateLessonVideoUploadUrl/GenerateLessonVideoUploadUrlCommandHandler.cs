@@ -14,29 +14,21 @@ internal sealed class GenerateLessonVideoUploadUrlCommandHandler
     : ICommandHandler<GenerateLessonVideoUploadUrlCommand, GenerateUploadUrlDto>
 {
     private readonly IObjectStorageService _storageService;
-    private readonly IModuleRepository _moduleRepository;
+    private readonly ILessonRepository _lessonRepository;
 
     public GenerateLessonVideoUploadUrlCommandHandler(
         IObjectStorageService storageService,
-        IModuleRepository moduleRepository)
+        ILessonRepository lessonRepository)
     {
         _storageService = storageService;
-        _moduleRepository = moduleRepository;
+        _lessonRepository = lessonRepository;
     }
 
     public async Task<Result<GenerateUploadUrlDto>> Handle(
         GenerateLessonVideoUploadUrlCommand request,
         CancellationToken cancellationToken = default)
     {
-        Module? module = await _moduleRepository.GetByIdAsync(request.ModuleId, cancellationToken);
-
-        if (module is null)
-        {
-            return Result<GenerateUploadUrlDto>.Failure(
-                Error.NotFound("Module.NotFound", "The specified module was not found."));
-        }
-
-        Lesson? lesson = module.Lessons.FirstOrDefault(l => l.Id == request.LessonId);
+        Lesson? lesson = await _lessonRepository.GetByIdAsync(request.LessonId, cancellationToken);
 
         if (lesson is null)
         {

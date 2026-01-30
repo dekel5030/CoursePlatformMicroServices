@@ -53,7 +53,7 @@ public sealed class LessonManagementService
         return lessonResult;
     }
 
-    public async Task<Result> RemoveLesson(LessonId lessonId, CancellationToken cancellationToken = default)
+    public async Task<Result> RemoveLessonAsync(LessonId lessonId, CancellationToken cancellationToken = default)
     {
         Lesson? lessonToRemove = await _lessonRepository.GetByIdAsync(lessonId, cancellationToken);
         if (lessonToRemove is null)

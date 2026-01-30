@@ -1,5 +1,7 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Domain.Abstractions.Repositories;
+using Courses.Domain.Lessons;
+using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Modules;
 using Courses.Domain.Modules.Errors;
 using Kernel;
@@ -9,14 +11,14 @@ namespace Courses.Application.Lessons.Commands.PatchLesson;
 
 internal sealed class PatchLessonCommandHandler : ICommandHandler<PatchLessonCommand>
 {
-    private readonly IModuleRepository _moduleRepository;
+    private readonly ILessonRepository _lessonRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public PatchLessonCommandHandler(
-        IModuleRepository moduleRepository,
+        ILessonRepository lessonRepository,
         IUnitOfWork unitOfWork)
     {
-        _moduleRepository = moduleRepository;
+        _lessonRepository = lessonRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -24,19 +26,17 @@ internal sealed class PatchLessonCommandHandler : ICommandHandler<PatchLessonCom
         PatchLessonCommand request,
         CancellationToken cancellationToken = default)
     {
-        Module? module = await _moduleRepository.GetByIdAsync(request.ModuleId, cancellationToken);
+        Lesson? lesson = await _lessonRepository.GetByIdAsync(request.LessonId, cancellationToken);
 
-        if (module is null)
+        if (lesson is null)
         {
-            return Result.Failure(ModuleErrors.NotFound);
+            return Result.Failure(LessonErrors.NotFound);
         }
 
-        Result updateResult = module.UpdateLesson(
-            request.LessonId,
-            request.Title,
-            request.Description,
-            request.Access,
-            null);
+        Result updateResult = lesson.UpdateMetadata(
+            request.Title ?? lesson.Title,
+            request.Description ?? lesson.Description,
+            lesson.Slug);
 
         if (updateResult.IsFailure)
         {

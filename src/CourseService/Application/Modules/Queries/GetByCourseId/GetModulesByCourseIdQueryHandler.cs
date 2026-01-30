@@ -1,7 +1,9 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
+using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
+using Courses.Domain.Modules.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +25,6 @@ internal sealed class GetModulesByCourseIdQueryHandler
         CancellationToken cancellationToken = default)
     {
         List<Module> modules = await _readDbContext.Modules
-            .Include(m => m.Lessons)
             .Where(module => module.CourseId.Value == request.CourseId.Value)
             .OrderBy(module => module.Index)
             .ToListAsync(cancellationToken);
@@ -40,10 +41,23 @@ internal sealed class GetModulesByCourseIdQueryHandler
             });
         }
 
+        var moduleIds = modules.Select(m => m.Id).ToList();
+        List<Lesson> lessonsGroupedByModule = await _readDbContext.Lessons
+            .Where(l => moduleIds.Contains(l.ModuleId))
+            .OrderBy(l => l.Index)
+            .ToListAsync(cancellationToken);
+
+        var lessonsByModuleId = lessonsGroupedByModule
+            .GroupBy(l => l.ModuleId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
         var moduleDetailsDtos = modules.Select(module =>
         {
-            var lessonDtos = module.Lessons
-                .OrderBy(l => l.Index)
+            List<Lesson> moduleLessons = lessonsByModuleId.TryGetValue(module.Id, out List<Lesson>? lessons) 
+                ? lessons 
+                : [];
+
+            var lessonDtos = moduleLessons
                 .Select(lesson => new LessonSummaryDto(
                     module.Id.Value,
                     lesson.Id.Value,
@@ -58,8 +72,8 @@ internal sealed class GetModulesByCourseIdQueryHandler
                 module.Id.Value,
                 module.Title.Value,
                 module.Index,
-                module.Lessons.Count,
-                TimeSpan.FromSeconds(module.Lessons.Sum(l => l.Duration.TotalSeconds)),
+                moduleLessons.Count,
+                TimeSpan.FromSeconds(moduleLessons.Sum(l => l.Duration.TotalSeconds)),
                 lessonDtos
             );
         }).ToList();

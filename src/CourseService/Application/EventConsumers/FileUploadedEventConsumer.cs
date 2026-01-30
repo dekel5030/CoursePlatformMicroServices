@@ -81,12 +81,11 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
         }
 
         var videoUrl = new VideoUrl(message.FileKey);
-        Module module = await _dbContext.Modules.FirstAsync(module => module.Id == lesson.ModuleId, cancellationToken: cancellationToken);
 
-        double durationSeconds = message.Metadata.GetValueOrDefault("DurationSeconds") is string durationString
-                         && double.TryParse(durationString, NumberStyles.Any, CultureInfo.InvariantCulture, out double result)
-                         ? result
-                         : 0;
+        double durationSeconds = 
+            message.Metadata.GetValueOrDefault("DurationSeconds") is string durationString
+            && double.TryParse(durationString, NumberStyles.Any, CultureInfo.InvariantCulture, out double result)
+            ? result : 0;
 
         var duration = TimeSpan.FromSeconds(durationSeconds);
 
@@ -113,12 +112,8 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
             }
         }
 
-        module.UpdateLessonMedia(
-            lessonId,
-            videoUrl: videoUrl,
-            transcriptUrl: transcriptUrl,
-            duration: duration,
-            transcript: vttContent);
+        lesson.UpdateMedia(videoUrl, thumbnailUrl: null, duration);
+        lesson.UpdateTranscript(transcriptUrl, vttContent);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Updated video for lesson {LessonId}", lessonId);

@@ -8,10 +8,9 @@ public interface IRepository<TEntity, TId>
     where TId : IEquatable<TId>
 {
     Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
-    void Add(TEntity entity);
+    Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<TEntity>> ListAsync(
         Expression<Func<TEntity, bool>> predicate,
         CancellationToken cancellationToken = default);
-
     void Remove(TEntity entity);
 }

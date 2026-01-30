@@ -79,14 +79,14 @@ internal sealed class GetCourseSummariesQueryHandler : IQueryHandler<GetCourseSu
             .Where(c => categoryIds.Contains(c.Id))
             .ToDictionaryAsync(c => c.Id, cancellationToken);
 
-        var courseStats = await _dbContext.Modules
-            .Where(m => courseIds.Contains(m.CourseId))
-            .GroupBy(m => m.CourseId)
+        var courseStats = await _dbContext.Lessons
+            .Where(l => courseIds.Contains(l.CourseId))
+            .GroupBy(l => l.CourseId)
             .Select(g => new
             {
                 CourseId = g.Key,
-                LessonCount = g.Sum(m => m.Lessons.Count),
-                TotalDurationSeconds = g.Sum(m => m.Lessons.Sum(l => l.Duration.TotalSeconds))
+                LessonCount = g.Count(),
+                TotalDurationSeconds = g.Sum(l => l.Duration.TotalSeconds)
             })
             .ToDictionaryAsync(x => x.CourseId, cancellationToken);
 
