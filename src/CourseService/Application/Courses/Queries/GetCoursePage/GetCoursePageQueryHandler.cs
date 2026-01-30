@@ -1,9 +1,12 @@
 ﻿using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Shared.Extensions;
+using Courses.Domain.Categories;
+using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
+using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Module;
+using Courses.Domain.Users;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -28,84 +31,85 @@ internal sealed class GetCoursePageQueryHandler
         GetCoursePageQuery request,
         CancellationToken cancellationToken = default)
     {
-        CourseReadModel? course = await _readDbContext.Courses
-            .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
+        CourseId requestedId = new(request.Id);
+        Course? course = await _readDbContext.Courses
+            .FirstOrDefaultAsync(course => course.Id == requestedId, cancellationToken);
 
         if (course is null)
         {
             return Result.Failure<CoursePageDto>(CourseErrors.NotFound);
         }
 
-        InstructorReadModel? instructor = await _readDbContext.Instructors
+        User? instructor = await _readDbContext.Users
             .FirstOrDefaultAsync(i => i.Id == course.InstructorId, cancellationToken);
 
-        CategoryReadModel? category = await _readDbContext.Categories
+        Category? category = await _readDbContext.Categories
             .FirstOrDefaultAsync(c => c.Id == course.CategoryId, cancellationToken);
 
-        List<ModuleReadModel> modules = await _readDbContext.Modules
-            .Where(m => m.CourseId == request.Id)
+        List<Module> modules = await _readDbContext.Modules
+            .Include(m => m.Lessons)
+            .Where(m => m.CourseId == course.Id)
             .OrderBy(m => m.Index)
             .ToListAsync(cancellationToken);
 
-        var moduleIds = modules.Select(m => m.Id).ToList();
-        List<LessonReadModel> lessons = await _readDbContext.Lessons
-            .Where(l => moduleIds.Contains(l.ModuleId))
-            .OrderBy(l => l.Index)
-            .ToListAsync(cancellationToken);
-
-        var lessonsByModule = lessons
-            .GroupBy(l => l.ModuleId)
-            .ToDictionary(g => g.Key, g => g.ToList());
+        int enrollmentCount = await _readDbContext.Enrollments
+            .CountAsync(e => e.CourseId == course.Id, cancellationToken);
 
         var moduleDtos = modules.Select(module =>
         {
-            lessonsByModule.TryGetValue(module.Id, out List<LessonReadModel>? moduleLessons);
-            moduleLessons ??= [];
+            var lessonDtos = module.Lessons
+            .OrderBy(l => l.Index)
+            .Select(l => new LessonDto
+            {
+                Id = l.Id.Value,
+                Title = l.Title.Value,
+                Index = l.Index,
+                Duration = l.Duration,
+                ThumbnailUrl = l.ThumbnailImageUrl != null
+                    ? _urlResolver.Resolve(StorageCategory.Public, l.ThumbnailImageUrl.Path).Value
+                    : null,
+                Access = l.Access,
+                Links = []
+            }).ToList();
 
             return new ModuleDto
             {
-                Id = module.Id,
-                Title = module.Title,
+                Id = module.Id.Value,
+                Title = module.Title.Value,
                 Index = module.Index,
-                Duration = TimeSpan.FromSeconds(module.TotalDurationSeconds),
-                LessonCount = module.LessonCount,
-                Lessons = moduleLessons.Select(l => new LessonDto
-                {
-                    Id = l.Id,
-                    Title = l.Title,
-                    Index = l.Index,
-                    Duration = l.Duration,
-                    ThumbnailUrl = l.ThumbnailUrl,
-                    Access = l.Access,
-                    Links = []
-                }).ToList(),
+                Duration = TimeSpan.FromSeconds(module.Lessons.Sum(l => l.Duration.TotalSeconds)),
+                LessonCount = module.Lessons.Count,
+                Lessons = lessonDtos,
                 Links = []
             };
         }).ToList();
 
-        var resolvedImageUrls = course.ImageUrls
-            .Select(url => _urlResolver.Resolve(StorageCategory.Public, url).Value)
+        var resolvedImageUrls = course.Images
+            .Select(img => _urlResolver.Resolve(StorageCategory.Public, img.Path).Value)
             .ToList();
+
+        int totalLessons = modules.Sum(m => m.Lessons.Count);
+        double totalDurationSeconds = modules.Sum(m => m.Lessons.Sum(l => l.Duration.TotalSeconds));
 
         var pageDto = new CoursePageDto
         {
-            Id = course.Id,
-            Title = course.Title,
-            Description = course.Description,
-            InstructorId = course.InstructorId,
+            Id = course.Id.Value,
+            Title = course.Title.Value,
+            Description = course.Description.Value,
+            InstructorId = course.InstructorId.Value,
             InstructorName = instructor?.FullName ?? "Unknown",
             InstructorAvatarUrl = instructor?.AvatarUrl,
             Status = course.Status,
-            Price = new Money(course.PriceAmount, course.PriceCurrency),
-            EnrollmentCount = course.EnrollmentCount,
-            LessonsCount = course.TotalLessons,
-            TotalDuration = TimeSpan.FromSeconds(course.TotalDurationSeconds),
+            Price = course.Price,
+            EnrollmentCount = enrollmentCount,
+            LessonsCount = totalLessons,
+            TotalDuration = TimeSpan.FromSeconds(totalDurationSeconds),
             UpdatedAtUtc = course.UpdatedAtUtc,
             ImageUrls = resolvedImageUrls.AsReadOnly(),
-            Tags = course.Tags.AsReadOnly(),
-            CategoryId = course.CategoryId,
+            Tags = course.Tags.Select(t => t.Value).ToList().AsReadOnly(),
+            CategoryId = course.CategoryId.Value,
             CategoryName = category?.Name ?? "Unknown",
-            CategorySlug = category?.Slug ?? string.Empty,
+            CategorySlug = category?.Slug.Value ?? string.Empty,
             Modules = moduleDtos,
             Links = []
         };

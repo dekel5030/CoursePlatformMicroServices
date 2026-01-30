@@ -1,7 +1,7 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Data.ReadModels;
+using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
-using Courses.Application.Shared.Extensions;
+using Courses.Domain.Module;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -22,8 +22,9 @@ internal sealed class GetModulesByCourseIdQueryHandler
         GetModulesByCourseIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        List<ModuleReadModel> modules = await _readDbContext.Modules
-            .Where(module => module.CourseId == request.CourseId.Value)
+        List<Module> modules = await _readDbContext.Modules
+            .Include(m => m.Lessons)
+            .Where(module => module.CourseId.Value == request.CourseId.Value)
             .OrderBy(module => module.Index)
             .ToListAsync(cancellationToken);
 
@@ -39,21 +40,28 @@ internal sealed class GetModulesByCourseIdQueryHandler
             });
         }
 
-        var moduleIds = modules.Select(m => m.Id).ToList();
-
-        List<LessonReadModel> lessons = await _readDbContext.Lessons
-            .Where(lesson => moduleIds.Contains(lesson.ModuleId))
-            .OrderBy(lesson => lesson.Index)
-            .ToListAsync(cancellationToken);
-
-        var lessonsByModule = lessons
-            .GroupBy(l => l.ModuleId)
-            .ToDictionary(g => g.Key, g => g.ToList());
-
         var moduleDetailsDtos = modules.Select(module =>
         {
-            lessonsByModule.TryGetValue(module.Id, out List<LessonReadModel>? moduleLessons);
-            return module.ToModuleDetailsDto(moduleLessons ?? []);
+            var lessonDtos = module.Lessons
+                .OrderBy(l => l.Index)
+                .Select(lesson => new LessonSummaryDto(
+                    module.Id.Value,
+                    lesson.Id.Value,
+                    lesson.Title.Value,
+                    lesson.Index,
+                    lesson.Duration,
+                    null,
+                    lesson.Access
+                )).ToList();
+
+            return new ModuleDetailsDto(
+                module.Id.Value,
+                module.Title.Value,
+                module.Index,
+                module.Lessons.Count,
+                TimeSpan.FromSeconds(module.Lessons.Sum(l => l.Duration.TotalSeconds)),
+                lessonDtos
+            );
         }).ToList();
 
         return Result.Success(new ModuleCollectionDto

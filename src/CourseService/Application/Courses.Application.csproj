@@ -11,4 +11,8 @@
     <ProjectReference Include="..\Domain\Courses.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Shared\Extensions\" />
+  </ItemGroup>
+
 </Project>

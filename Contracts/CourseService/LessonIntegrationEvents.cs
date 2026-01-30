@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CoursePlatform.Contracts.CourseService;
+﻿namespace CoursePlatform.Contracts.CourseService;
 
 public sealed record LessonCreatedIntegrationEvent(
     Guid LessonId,

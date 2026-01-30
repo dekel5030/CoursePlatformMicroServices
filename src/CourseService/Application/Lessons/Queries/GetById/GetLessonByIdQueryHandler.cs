@@ -1,14 +1,11 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
-using Courses.Application.Shared.Extensions;
-using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Courses;
+using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
-using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Module.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -35,15 +32,15 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
         GetLessonByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        LessonReadModel? lesson = await _dbContext.Lessons
-            .FirstOrDefaultAsync(l => l.Id == request.LessonId.Value, cancellationToken);
+        Lesson? lesson = await _dbContext.Lessons
+            .FirstOrDefaultAsync(lesson => lesson.Id == request.LessonId, cancellationToken);
 
         if (lesson is null)
         {
             return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
         }
 
-        CourseReadModel? course = await _dbContext.Courses
+        Course? course = await _dbContext.Courses
             .FirstOrDefaultAsync(c => c.Id == lesson.CourseId, cancellationToken);
 
         if (course is null)
@@ -51,30 +48,30 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
         }
 
-        string? thumbnailUrl = lesson.ThumbnailUrl != null
-            ? _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailUrl).Value
+        string? thumbnailUrl = lesson.ThumbnailImageUrl != null
+            ? _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value
             : null;
 
         string? videoUrl = lesson.VideoUrl != null
-            ? _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl).Value
+            ? _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value
             : null;
 
-        string? transcriptUrl = lesson.TranscriptUrl != null
-            ? _urlResolver.Resolve(StorageCategory.Public, lesson.TranscriptUrl).Value
+        string? transcriptUrl = lesson.Transcript != null
+            ? _urlResolver.Resolve(StorageCategory.Public, lesson.Transcript.Path).Value
             : null;
 
-        var courseState = new CourseState(new CourseId(course.Id), new UserId(course.InstructorId), course.Status);
-        var moduleState = new ModuleState(new ModuleId(lesson.ModuleId));
-        var lessonState = new LessonState(new LessonId(lesson.Id), lesson.Access);
+        var courseState = new CourseState(course.Id, course.InstructorId, course.Status);
+        var moduleState = new ModuleState(lesson.ModuleId);
+        var lessonState = new LessonState(lesson.Id, lesson.Access);
 
         var pageDto = new LessonDetailsPageDto
         {
-            LessonId = lesson.Id,
-            ModuleId = lesson.ModuleId,
-            CourseId = lesson.CourseId,
-            CourseName = course.Title,
-            Title = lesson.Title,
-            Description = lesson.Description,
+            LessonId = lesson.Id.Value,
+            ModuleId = lesson.ModuleId.Value,
+            CourseId = lesson.CourseId.Value,
+            CourseName = course.Title.Value,
+            Title = lesson.Title.Value,
+            Description = lesson.Description.Value,
             Index = lesson.Index,
             Duration = lesson.Duration,
             ThumbnailUrl = thumbnailUrl,

@@ -1,24 +1,18 @@
-﻿using Courses.Application.Abstractions.Data.ReadModels;
-using Microsoft.EntityFrameworkCore;
+﻿using Courses.Domain.Categories;
+using Courses.Domain.Courses;
+using Courses.Domain.Enrollments;
+using Courses.Domain.Lessons;
+using Courses.Domain.Module;
+using Courses.Domain.Users;
 
 namespace Courses.Application.Abstractions.Data;
 
 public interface IReadDbContext
 {
-    // Core Read Models (new architecture)
-    DbSet<CourseReadModel> Courses { get; }
-    DbSet<ModuleReadModel> Modules { get; }
-    DbSet<LessonReadModel> Lessons { get; }
-    DbSet<InstructorReadModel> Instructors { get; }
-    DbSet<CategoryReadModel> Categories { get; }
-
-    // Legacy Read Models (to be removed after migration)
-    DbSet<CourseHeaderReadModel> CourseHeaders { get; }
-    DbSet<CourseStructureReadModel> CourseStructures { get; }
-    DbSet<CourseStatsReadModel> CourseStats { get; }
-    DbSet<CourseListItemReadModel> CourseListItems { get; }
-    DbSet<LessonDetailsReadModel> LessonDetails { get; }
-    DbSet<ModuleDetailsReadModel> ModuleDetails { get; }
-
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    IQueryable<Course> Courses { get; }
+    IQueryable<Module> Modules { get; }
+    IQueryable<Lesson> Lessons { get; }
+    IQueryable<User> Users { get; }
+    IQueryable<Category> Categories { get; }
+    IQueryable<Enrollment> Enrollments { get; }
 }
