@@ -6,25 +6,19 @@ import HttpApi from "i18next-http-backend";
 // Import locale files directly for better reliability
 import translationEN from "./locales/en/translation.json";
 import translationHE from "./locales/he/translation.json";
-import coursesEN from "./features/courses/locales/en/courses.json";
-import coursesHE from "./features/courses/locales/he/courses.json";
-import lessonsEN from "./features/lessons/locales/en/lessons.json";
-import lessonsHE from "./features/lessons/locales/he/lessons.json";
 import authEN from "./features/auth/locales/en/auth.json";
 import authHE from "./features/auth/locales/he/auth.json";
 
+// Note: courses and lessons locales are loaded dynamically via HttpApi
+// They are located in dist/locales/en/courses.json and dist/locales/en/lessons.json
 // Define resources with feature-based structure
 const resources = {
   en: {
     translation: translationEN,
-    courses: coursesEN,
-    lessons: lessonsEN,
     auth: authEN,
   },
   he: {
     translation: translationHE,
-    courses: coursesHE,
-    lessons: lessonsHE,
     auth: authHE,
   },
 };

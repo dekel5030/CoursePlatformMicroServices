@@ -1,6 +1,8 @@
-﻿using Courses.Domain.Courses.Primitives;
+﻿using Courses.Domain.Courses;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Modules;
 using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +17,16 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
         builder.ToTable("Lessons");
         builder.HasKey(lesson => lesson.Id);
         builder.HasIndex(l => new { l.ModuleId, l.Index }).IsUnique();
+
+        builder.HasOne<Module>()
+        .WithMany()
+        .HasForeignKey(lesson => lesson.ModuleId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne<Course>()
+            .WithMany()
+            .HasForeignKey(lesson => lesson.CourseId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(lesson => lesson.Id)
             .HasConversion(

@@ -27,7 +27,7 @@ internal sealed class OpenAiTranscriptionService : ITranscriptionService
             var options = new AudioTranscriptionOptions
             {
                 ResponseFormat = AudioTranscriptionFormat.Vtt,
-                Prompt = "Short captions. Max 5-8 words per line. Break lines frequently."
+                Prompt = "Short captions. Max 5-8 words per line. Break lines frequently." + "הדרכה על Revit, AutoCAD, SketchUp, V-Ray, BIM, תוכנות אדריכלות ושרטוט."
             };
 
             _logger.LogInformation("Sending audio to OpenAI Whisper...");
