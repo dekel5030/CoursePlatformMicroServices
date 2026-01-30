@@ -18,11 +18,13 @@ internal sealed class ModulesRepository : RepositoryBase<Module, ModuleId>, IMod
 
     public override Task<Module?> GetByIdAsync(ModuleId id, CancellationToken cancellationToken = default)
     {
-        return _dbContext.Modules.Include(module => module.Lessons)
+        return _dbContext.Modules
             .FirstOrDefaultAsync(module => module.Id == id, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Module>> GetAllByCourseIdAsync(CourseId courseId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Module>> GetAllByCourseIdAsync(
+        CourseId courseId,
+        CancellationToken cancellationToken = default)
     {
         return await _dbContext.Modules
             .Where(m => m.CourseId == courseId)

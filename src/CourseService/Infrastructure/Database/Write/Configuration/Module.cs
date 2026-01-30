@@ -40,11 +40,5 @@ public class ModuleConfiguration : IEntityTypeConfiguration<Module>
             .HasForeignKey(m => m.CourseId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(m => m.Lessons)
-            .WithOne()
-            .HasForeignKey(l => l.ModuleId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }
