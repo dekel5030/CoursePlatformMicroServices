@@ -47,7 +47,7 @@ public sealed class LessonManagementService
 
         if (lessonResult.IsSuccess)
         {
-            _lessonRepository.Add(lessonResult.Value);
+            await _lessonRepository.AddAsync(lessonResult.Value, cancellationToken);
         }
 
         return lessonResult;

@@ -3,7 +3,4 @@ using Courses.Domain.Courses.Primitives;
 
 namespace Courses.Domain.Abstractions.Repositories;
 
-public interface ICourseRepository : IRepository<Course, CourseId>
-{
-    Task AddAsync(Course entity, CancellationToken cancellationToken = default);
-}
+public interface ICourseRepository : IRepository<Course, CourseId>;

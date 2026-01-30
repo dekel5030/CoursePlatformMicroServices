@@ -6,6 +6,5 @@ namespace Courses.Domain.Abstractions.Repositories;
 
 public interface IModuleRepository : IRepository<Module, ModuleId>
 {
-    Task AddAsync(Module entity, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Module>> GetAllByCourseIdAsync(CourseId courseId, CancellationToken cancellationToken = default);
 }
