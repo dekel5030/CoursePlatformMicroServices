@@ -1,8 +1,7 @@
-using System.Data;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Lessons.Dtos;
+using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Application.Modules.Dtos;
-using Courses.Domain.Module;
+using Courses.Application.Shared.Extensions;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -23,43 +22,47 @@ internal sealed class GetModulesByCourseIdQueryHandler
         GetModulesByCourseIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        List<Module> modules = await _readDbContext.Modules
-            .Include(module => module.Lessons)
-            .Where(module => module.CourseId == request.CourseId)
+        List<ModuleReadModel> modules = await _readDbContext.Modules
+            .Where(module => module.CourseId == request.CourseId.Value)
+            .OrderBy(module => module.Index)
             .ToListAsync(cancellationToken);
+
+        if (modules.Count == 0)
+        {
+            return Result.Success(new ModuleCollectionDto
+            {
+                Items = [],
+                PageNumber = 1,
+                PageSize = 1,
+                TotalItems = 0,
+                Links = null
+            });
+        }
+
+        var moduleIds = modules.Select(m => m.Id).ToList();
+
+        List<LessonReadModel> lessons = await _readDbContext.Lessons
+            .Where(lesson => moduleIds.Contains(lesson.ModuleId))
+            .OrderBy(lesson => lesson.Index)
+            .ToListAsync(cancellationToken);
+
+        var lessonsByModule = lessons
+            .GroupBy(l => l.ModuleId)
+            .ToDictionary(g => g.Key, g => g.ToList());
 
         var moduleDetailsDtos = modules.Select(module =>
         {
-            var moduleDuration = TimeSpan.FromSeconds(
-                module.Lessons.Sum(l => l.Duration.TotalSeconds));
-
-            return new ModuleDetailsDto(
-                module.Id.Value,
-                module.Title.Value,
-                module.Index,
-                module.Lessons.Count,
-                moduleDuration,
-                module.Lessons
-                    .OrderBy(lesson => lesson.Index)
-                    .Select(lesson => new LessonSummaryDto(
-                        module.Id.Value,
-                        lesson.Id.Value,
-                        lesson.Title.Value,
-                        lesson.Index,
-                        lesson.Duration,
-                        lesson.ThumbnailImageUrl?.Path,
-                        lesson.Access)).ToList());
+            lessonsByModule.TryGetValue(module.Id, out List<LessonReadModel>? moduleLessons);
+            return module.ToModuleDetailsDto(moduleLessons ?? []);
         }).ToList();
 
-        var moduleCollectionDto = new ModuleCollectionDto
+        return Result.Success(new ModuleCollectionDto
         {
             Items = moduleDetailsDtos,
             PageNumber = 1,
-            PageSize = 1,
-            TotalItems = 1,
+            PageSize = moduleDetailsDtos.Count,
+            TotalItems = moduleDetailsDtos.Count,
             Links = null
-        };
-
-        return Result.Success(moduleCollectionDto);
+        });
     }
 }

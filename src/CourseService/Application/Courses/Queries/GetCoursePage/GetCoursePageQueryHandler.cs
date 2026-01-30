@@ -2,6 +2,7 @@
 using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Dtos;
+using Courses.Application.Shared.Extensions;
 using Courses.Domain.Courses.Errors;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -27,81 +28,88 @@ internal sealed class GetCoursePageQueryHandler
         GetCoursePageQuery request,
         CancellationToken cancellationToken = default)
     {
-        CourseHeaderReadModel? header = await _readDbContext.CourseHeaders
-            .FirstOrDefaultAsync(h => h.Id == request.Id, cancellationToken);
+        CourseReadModel? course = await _readDbContext.Courses
+            .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
-        if (header is null)
+        if (course is null)
         {
             return Result.Failure<CoursePageDto>(CourseErrors.NotFound);
         }
 
-        CourseStructureReadModel? structure = await _readDbContext.CourseStructures
-            .FirstOrDefaultAsync(s => s.CourseId == request.Id, cancellationToken);
+        InstructorReadModel? instructor = await _readDbContext.Instructors
+            .FirstOrDefaultAsync(i => i.Id == course.InstructorId, cancellationToken);
 
-        CourseStatsReadModel? stats = await _readDbContext.CourseStats
-            .FirstOrDefaultAsync(s => s.CourseId == request.Id, cancellationToken);
+        CategoryReadModel? category = await _readDbContext.Categories
+            .FirstOrDefaultAsync(c => c.Id == course.CategoryId, cancellationToken);
 
-        CoursePageDto pageDto = ComposeCoursePageDto(header, structure, stats);
+        List<ModuleReadModel> modules = await _readDbContext.Modules
+            .Where(m => m.CourseId == request.Id)
+            .OrderBy(m => m.Index)
+            .ToListAsync(cancellationToken);
 
-        pageDto = pageDto with
+        var moduleIds = modules.Select(m => m.Id).ToList();
+        List<LessonReadModel> lessons = await _readDbContext.Lessons
+            .Where(l => moduleIds.Contains(l.ModuleId))
+            .OrderBy(l => l.Index)
+            .ToListAsync(cancellationToken);
+
+        var lessonsByModule = lessons
+            .GroupBy(l => l.ModuleId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        var moduleDtos = modules.Select(module =>
         {
-            ImageUrls = pageDto.ImageUrls
-                .Select(url => url is null ?
-                    string.Empty
-                    : _urlResolver.Resolve(StorageCategory.Public, url).Value).ToList()
+            lessonsByModule.TryGetValue(module.Id, out List<LessonReadModel>? moduleLessons);
+            moduleLessons ??= [];
+
+            return new ModuleDto
+            {
+                Id = module.Id,
+                Title = module.Title,
+                Index = module.Index,
+                Duration = TimeSpan.FromSeconds(module.TotalDurationSeconds),
+                LessonCount = module.LessonCount,
+                Lessons = moduleLessons.Select(l => new LessonDto
+                {
+                    Id = l.Id,
+                    Title = l.Title,
+                    Index = l.Index,
+                    Duration = l.Duration,
+                    ThumbnailUrl = l.ThumbnailUrl,
+                    Access = l.Access,
+                    Links = []
+                }).ToList(),
+                Links = []
+            };
+        }).ToList();
+
+        var resolvedImageUrls = course.ImageUrls
+            .Select(url => _urlResolver.Resolve(StorageCategory.Public, url).Value)
+            .ToList();
+
+        var pageDto = new CoursePageDto
+        {
+            Id = course.Id,
+            Title = course.Title,
+            Description = course.Description,
+            InstructorId = course.InstructorId,
+            InstructorName = instructor?.FullName ?? "Unknown",
+            InstructorAvatarUrl = instructor?.AvatarUrl,
+            Status = course.Status,
+            Price = new Money(course.PriceAmount, course.PriceCurrency),
+            EnrollmentCount = course.EnrollmentCount,
+            LessonsCount = course.TotalLessons,
+            TotalDuration = TimeSpan.FromSeconds(course.TotalDurationSeconds),
+            UpdatedAtUtc = course.UpdatedAtUtc,
+            ImageUrls = resolvedImageUrls.AsReadOnly(),
+            Tags = course.Tags.AsReadOnly(),
+            CategoryId = course.CategoryId,
+            CategoryName = category?.Name ?? "Unknown",
+            CategorySlug = category?.Slug ?? string.Empty,
+            Modules = moduleDtos,
+            Links = []
         };
 
         return Result.Success(pageDto);
-    }
-
-    private static CoursePageDto ComposeCoursePageDto(
-        CourseHeaderReadModel header,
-        CourseStructureReadModel? structure,
-        CourseStatsReadModel? stats)
-    {
-        List<ModuleDto> modules = structure?.Modules.Select(m => new ModuleDto
-        {
-            Id = m.Id,
-            Title = m.Title,
-            Index = m.Index,
-            Duration = m.Lessons.Sum(l => l.Duration.Ticks) > 0
-                ? TimeSpan.FromTicks(m.Lessons.Sum(l => l.Duration.Ticks))
-                : TimeSpan.Zero,
-            LessonCount = m.Lessons.Count,
-            Lessons = m.Lessons.Select(l => new LessonDto
-            {
-                Id = l.Id,
-                Title = l.Title,
-                Index = l.Index,
-                Duration = l.Duration,
-                ThumbnailUrl = l.ThumbnailUrl,
-                Access = l.Access,
-                Links = []
-            }).ToList(),
-            Links = []
-        }).ToList() ?? [];
-
-        return new CoursePageDto
-        {
-            Id = header.Id,
-            Title = header.Title,
-            Description = header.Description,
-            InstructorId = header.InstructorId,
-            InstructorName = header.InstructorName,
-            InstructorAvatarUrl = header.InstructorAvatarUrl,
-            Status = header.Status,
-            Price = new Money(header.PriceAmount, header.PriceCurrency),
-            EnrollmentCount = stats?.EnrollmentCount ?? 0,
-            LessonsCount = stats?.LessonsCount ?? 0,
-            TotalDuration = stats?.TotalDuration ?? TimeSpan.Zero,
-            UpdatedAtUtc = header.UpdatedAtUtc,
-            ImageUrls = header.ImageUrls.AsReadOnly(),
-            Tags = header.Tags.AsReadOnly(),
-            CategoryId = header.CategoryId,
-            CategoryName = header.CategoryName,
-            CategorySlug = header.CategorySlug,
-            Modules = modules,
-            Links = []
-        };
     }
 }

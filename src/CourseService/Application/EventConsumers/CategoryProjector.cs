@@ -21,13 +21,30 @@ internal sealed class CategoryProjector :
         CategoryCreatedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
-        await Task.CompletedTask;
+        var categoryReadModel = new CategoryReadModel
+        {
+            Id = message.Id,
+            Name = message.Name,
+            Slug = message.Slug
+        };
+
+        _readDbContext.Categories.Add(categoryReadModel);
+        await _readDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task HandleAsync(
         CategoryRenamedIntegrationEvent message,
         CancellationToken cancellationToken = default)
     {
+        CategoryReadModel? category = await _readDbContext.Categories
+            .FirstOrDefaultAsync(c => c.Id == message.Id, cancellationToken);
+
+        if (category is not null)
+        {
+            category.Name = message.NewName;
+            category.Slug = message.NewSlug;
+        }
+
         List<CourseHeaderReadModel> courseHeaders = await _readDbContext.CourseHeaders
             .Where(h => h.CategoryId == message.Id)
             .ToListAsync(cancellationToken);
@@ -39,7 +56,18 @@ internal sealed class CategoryProjector :
             header.UpdatedAtUtc = DateTimeOffset.UtcNow;
         }
 
-        if (courseHeaders.Count > 0)
+        List<CourseListItemReadModel> courseListItems = await _readDbContext.CourseListItems
+            .Where(c => c.CategoryId == message.Id)
+            .ToListAsync(cancellationToken);
+
+        foreach (CourseListItemReadModel item in courseListItems)
+        {
+            item.CategoryName = message.NewName;
+            item.CategorySlug = message.NewSlug;
+            item.UpdatedAtUtc = DateTimeOffset.UtcNow;
+        }
+
+        if (category is not null || courseHeaders.Count > 0 || courseListItems.Count > 0)
         {
             await _readDbContext.SaveChangesAsync(cancellationToken);
         }

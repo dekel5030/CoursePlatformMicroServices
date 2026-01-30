@@ -1,7 +1,7 @@
 using System.Data;
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Application.Categories.Dtos;
-using Courses.Domain.Categories;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -23,10 +23,11 @@ internal sealed class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQue
     {
         int categoryCount = await _readDbContext.Categories.CountAsync(cancellationToken);
 
-        List<Category> categories = await _readDbContext.Categories.ToListAsync(cancellationToken);
+        List<CategoryReadModel> categories = await _readDbContext.Categories
+            .ToListAsync(cancellationToken);
 
         var categoryDtos = categories
-            .Select(c => new CategoryDto(c.Id.Value, c.Name, c.Slug.Value))
+            .Select(c => new CategoryDto(c.Id, c.Name, c.Slug))
             .ToList();
 
         var response = new CategoryCollectionDto

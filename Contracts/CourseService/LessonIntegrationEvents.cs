@@ -5,7 +5,7 @@ using System.Text;
 namespace CoursePlatform.Contracts.CourseService;
 
 public sealed record LessonCreatedIntegrationEvent(
-    Guid Id,
+    Guid LessonId,
     Guid ModuleId,
     Guid CourseId,
     string Slug,
@@ -35,7 +35,7 @@ public sealed record LessonMediaChangedIntegrationEvent(
     TimeSpan Duration);
 
 public sealed record LessonAccessChangedIntegrationEvent(
-    Guid Id,
+    Guid LessonId,
     Guid ModuleId,
     Guid CourseId,
     string NewAccess);

@@ -1,20 +1,10 @@
-﻿using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Repositories;
-using Courses.Domain.Courses;
+﻿using Courses.Application.Abstractions.Repositories;
 using Courses.Domain.Courses.Primitives;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Database.Repositories;
 
 public class FeaturedCoursesRepository : IFeaturedCoursesRepository
 {
-    private readonly IReadDbContext _dbContext;
-
-    public FeaturedCoursesRepository(IReadDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     private static readonly List<CourseId> _featuredCourseIds = new()
     {
         new CourseId(Guid.Parse("019be5ba-c9af-783c-b3f2-201a56e759d0")),
@@ -23,11 +13,8 @@ public class FeaturedCoursesRepository : IFeaturedCoursesRepository
         new CourseId(Guid.Parse("019be5b9-7a87-72b6-86f8-9079d093cc37")),
     };
 
-    public async Task<IReadOnlyList<Course>> GetFeaturedCourse()
+    public Task<IReadOnlyList<CourseId>> GetFeaturedCourseIds()
     {
-        List<Course> course = await _dbContext.Courses
-            .Where(course => _featuredCourseIds.Contains(course.Id)).ToListAsync();
-
-        return course.AsReadOnly();
+        return Task.FromResult<IReadOnlyList<CourseId>>(_featuredCourseIds.AsReadOnly());
     }
 }

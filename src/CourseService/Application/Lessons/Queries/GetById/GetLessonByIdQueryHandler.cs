@@ -1,13 +1,14 @@
-using System.Data;
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Data.ReadModels;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions.Factories;
-using Courses.Domain.Courses;
-using Courses.Domain.Lessons;
+using Courses.Application.Shared.Extensions;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Errors;
-using Courses.Domain.Module;
+using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Module.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -34,54 +35,55 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
         GetLessonByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        Lesson? lesson = await _dbContext.Lessons
-            .Where(lesson => lesson.Id == request.LessonId)
-            .FirstOrDefaultAsync(cancellationToken);
+        LessonReadModel? lesson = await _dbContext.Lessons
+            .FirstOrDefaultAsync(l => l.Id == request.LessonId.Value, cancellationToken);
 
         if (lesson is null)
         {
             return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
         }
 
-        Module? module = await _dbContext.Modules
-            .Where(m => m.Id == lesson.ModuleId)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (module is null)
-        {
-            return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
-        }
-
-        Course? course = await _dbContext.Courses
-            .Where(c => c.Id == module.CourseId)
-            .FirstOrDefaultAsync(cancellationToken);
+        CourseReadModel? course = await _dbContext.Courses
+            .FirstOrDefaultAsync(c => c.Id == lesson.CourseId, cancellationToken);
 
         if (course is null)
         {
             return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
         }
 
-        var courseState = new CourseState(course.Id, course.InstructorId, course.Status);
-        var moduleState = new ModuleState(module.Id);
-        var lessonState = new LessonState(lesson.Id, lesson.Access);
+        string? thumbnailUrl = lesson.ThumbnailUrl != null
+            ? _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailUrl).Value
+            : null;
 
-        var lessonDetailsPageDto = new LessonDetailsPageDto
+        string? videoUrl = lesson.VideoUrl != null
+            ? _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl).Value
+            : null;
+
+        string? transcriptUrl = lesson.TranscriptUrl != null
+            ? _urlResolver.Resolve(StorageCategory.Public, lesson.TranscriptUrl).Value
+            : null;
+
+        var courseState = new CourseState(new CourseId(course.Id), new UserId(course.InstructorId), course.Status);
+        var moduleState = new ModuleState(new ModuleId(lesson.ModuleId));
+        var lessonState = new LessonState(new LessonId(lesson.Id), lesson.Access);
+
+        var pageDto = new LessonDetailsPageDto
         {
-            LessonId = lesson.Id.Value,
-            ModuleId = lesson.ModuleId.Value,
-            CourseId = course.Id.Value,
-            CourseName = course.Title.Value,
-            Title = lesson.Title.Value,
-            Description = lesson.Description.Value,
+            LessonId = lesson.Id,
+            ModuleId = lesson.ModuleId,
+            CourseId = lesson.CourseId,
+            CourseName = course.Title,
+            Title = lesson.Title,
+            Description = lesson.Description,
             Index = lesson.Index,
             Duration = lesson.Duration,
-            ThumbnailUrl = lesson.ThumbnailImageUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value,
+            ThumbnailUrl = thumbnailUrl,
             Access = lesson.Access,
-            VideoUrl = lesson.VideoUrl == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value,
-            TranscriptUrl = lesson.Transcript == null ? null : _urlResolver.Resolve(StorageCategory.Public, lesson.Transcript.Path).Value,
+            VideoUrl = videoUrl,
+            TranscriptUrl = transcriptUrl,
             Links = _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState)
         };
 
-        return Result.Success(lessonDetailsPageDto);
+        return Result.Success(pageDto);
     }
 }

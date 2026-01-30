@@ -1,8 +1,9 @@
 ﻿using Courses.Domain.Courses;
+using Courses.Domain.Courses.Primitives;
 
 namespace Courses.Application.Abstractions.Repositories;
 
 public interface IFeaturedCoursesRepository
 {
-    Task<IReadOnlyList<Course>> GetFeaturedCourse();
+    Task<IReadOnlyList<CourseId>> GetFeaturedCourseIds();
 }
