@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using CoursePlatform.ServiceDefaults.Auth;
+﻿using CoursePlatform.ServiceDefaults.Auth;
 using Courses.Infrastructure.Ai;
 using Courses.Infrastructure.Database;
 using Courses.Infrastructure.MassTransit;
@@ -38,25 +37,6 @@ public static class DependencyInjection
     {
         app.UseAuthentication();
         app.UseAuthorization();
-
-        app.Use(async (context, next) =>
-        {
-            ClaimsPrincipal user = context.User;
-
-            if (user.Identity?.IsAuthenticated == true)
-            {
-                Console.WriteLine($"User Authenticated: {user.Identity.Name}");
-            }
-            else
-            {
-                Console.WriteLine("User NOT Authenticated");
-
-                string? authHeader = context.Request.Headers.Authorization.FirstOrDefault();
-                Console.WriteLine($"Auth Header: {authHeader}");
-            }
-
-            await next();
-        });
 
         return app;
     }

@@ -1,7 +1,4 @@
 ﻿using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons;
-using Courses.Domain.Lessons.Errors;
-using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
@@ -31,7 +28,7 @@ public class Module : Entity<ModuleId>
         Title = title;
     }
 
-    public static Result<Module> Create(CourseId courseId, int index, Title? title = null)
+    internal static Result<Module> Create(CourseId courseId, int index, Title? title = null)
     {
         var module = new Module(courseId, index, title ?? Title.Empty);
 
@@ -51,7 +48,7 @@ public class Module : Entity<ModuleId>
         return Result.Success();
     }
 
-    public Result UpdateIndex(int newIndex)
+    internal Result UpdateIndex(int newIndex)
     {
         if (Index == newIndex)
         {
@@ -62,6 +59,7 @@ public class Module : Entity<ModuleId>
         Raise(new ModuleIndexUpdatedDomainEvent(Id, CourseId, Index));
         return Result.Success();
     }
+
     public void Delete()
     {
         Raise(new ModuleDeletedDomainEvent(Id, CourseId));

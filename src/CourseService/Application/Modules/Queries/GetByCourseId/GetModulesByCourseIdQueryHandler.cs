@@ -3,7 +3,6 @@ using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
-using Courses.Domain.Modules.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -53,8 +52,8 @@ internal sealed class GetModulesByCourseIdQueryHandler
 
         var moduleDetailsDtos = modules.Select(module =>
         {
-            List<Lesson> moduleLessons = lessonsByModuleId.TryGetValue(module.Id, out List<Lesson>? lessons) 
-                ? lessons 
+            List<Lesson> moduleLessons = lessonsByModuleId.TryGetValue(module.Id, out List<Lesson>? lessons)
+                ? lessons
                 : [];
 
             var lessonDtos = moduleLessons

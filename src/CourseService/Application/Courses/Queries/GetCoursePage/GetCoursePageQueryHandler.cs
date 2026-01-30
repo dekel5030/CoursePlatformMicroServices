@@ -7,7 +7,6 @@ using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
-using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Users;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -68,8 +67,8 @@ internal sealed class GetCoursePageQueryHandler
 
         var moduleDtos = modules.Select(module =>
         {
-            List<Lesson> moduleLessons = lessonsByModuleId.TryGetValue(module.Id, out List<Lesson>? lessons) 
-                ? lessons 
+            List<Lesson> moduleLessons = lessonsByModuleId.TryGetValue(module.Id, out List<Lesson>? lessons)
+                ? lessons
                 : [];
 
             var lessonDtos = moduleLessons

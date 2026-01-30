@@ -3,7 +3,6 @@ using Courses.Application.Shared.Dtos;
 using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
-using Courses.Domain.Modules;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
