@@ -29,4 +29,7 @@ internal static class EndpointNames
     public const string CreateCourseRating = "CreateCourseRating";
     public const string UpdateCourseRating = "UpdateCourseRating";
     public const string DeleteCourseRating = "DeleteCourseRating";
+
+    // Enrolled courses (current user)
+    public const string GetEnrolledCourses = "GetEnrolledCourses";
 }

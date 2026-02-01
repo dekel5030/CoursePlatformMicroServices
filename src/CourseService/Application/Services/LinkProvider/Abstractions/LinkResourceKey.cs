@@ -7,5 +7,7 @@ public enum LinkResourceKey
     Lesson,
     CourseCollection,
     CourseRatingEligibility,
-    CourseRating
+    CourseRating,
+    EnrolledCourse,
+    EnrolledCourseCollection
 }

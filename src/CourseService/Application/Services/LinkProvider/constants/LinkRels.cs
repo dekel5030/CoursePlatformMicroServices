@@ -35,4 +35,10 @@ internal static class LinkRels
         public const string NextPage = "next-page";
         public const string PreviousPage = "previous-page";
     }
+
+    internal static class EnrolledCourse
+    {
+        public const string ViewCourse = "course";
+        public const string ContinueLearning = "continue-learning";
+    }
 }
