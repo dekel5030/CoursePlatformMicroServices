@@ -1,4 +1,4 @@
-﻿using Kernel;
+using Kernel;
 
 namespace Courses.Domain.Categories.Errors;
 

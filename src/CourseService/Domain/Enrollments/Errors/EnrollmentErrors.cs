@@ -1,9 +1,13 @@
-﻿using Kernel;
+using Kernel;
 
 namespace Courses.Domain.Enrollments.Errors;
 
 public static class EnrollmentErrors
 {
+    public static readonly Error NotFound = Error.NotFound(
+        "Enrollment.NotFound",
+        "The specified enrollment was not found.");
+
     public static readonly Error UnPublishedCourse = Error.Validation(
         "Enrollment.CourseUnpublished",
         "Cannot enroll in unpublished course");

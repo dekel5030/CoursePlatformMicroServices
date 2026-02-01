@@ -1,4 +1,4 @@
-﻿using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments.Errors;
 using Courses.Domain.Enrollments.Primitives;
 using Courses.Domain.Lessons.Primitives;
@@ -96,6 +96,28 @@ public class Enrollment : Entity<EnrollmentId>
 
         Status = EnrollmentStatus.Expired;
         Raise(new EnrollmentStatusChangedDomainEvent(Id, CourseId, Status));
+    }
+
+    public void Revoke()
+    {
+        if (Status == EnrollmentStatus.Revoked)
+        {
+            return;
+        }
+
+        Status = EnrollmentStatus.Revoked;
+        Raise(new EnrollmentStatusChangedDomainEvent(Id, CourseId, Status));
+    }
+
+    public Result SetExpiry(DateTimeOffset expiresAt)
+    {
+        if (expiresAt <= EnrolledAt)
+        {
+            return Result.Failure(EnrollmentErrors.InvalidExpirationDate);
+        }
+
+        ExpiresAt = expiresAt;
+        return Result.Success();
     }
 
     public void TrackProgress(LessonId lessonId)
