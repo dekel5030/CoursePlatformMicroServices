@@ -1,4 +1,3 @@
-using Courses.Application.Services.Actions;
 using Courses.Domain.Modules.Primitives;
 
 namespace Courses.Application.Services.Actions.States;

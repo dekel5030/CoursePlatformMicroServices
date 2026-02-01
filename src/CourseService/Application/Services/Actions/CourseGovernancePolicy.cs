@@ -1,6 +1,5 @@
 using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider;
-using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;

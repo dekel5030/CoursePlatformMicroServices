@@ -1,10 +1,8 @@
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetCourseSummaries;
-using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Shared.Dtos;
-using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -57,7 +55,7 @@ internal static class CourseCollectionDtoEnrichmentExtensions
         }).ToList();
 
         var collectionContext = (pagedQuery with
-            { Page = dto.PageNumber, PageSize = dto.PageSize }).ToCourseCollectionContext(dto.TotalItems);
+        { Page = dto.PageNumber, PageSize = dto.PageSize }).ToCourseCollectionContext(dto.TotalItems);
         IReadOnlyList<LinkDto> collectionLinks = linkBuilder.BuildLinks(
             LinkResourceKey.CourseCollection,
             collectionContext);

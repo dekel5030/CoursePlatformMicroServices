@@ -1,6 +1,5 @@
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetCoursePage;
-using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Kernel;
