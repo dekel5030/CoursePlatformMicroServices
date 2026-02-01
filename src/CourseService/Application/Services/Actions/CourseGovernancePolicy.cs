@@ -1,4 +1,6 @@
 using Courses.Application.Services.Actions.States;
+using Courses.Application.Services.LinkProvider;
+using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
@@ -136,5 +138,91 @@ public class CourseGovernancePolicy
     public bool CanEditModule(CourseState courseState)
     {
         return CanEditCourseContent(courseState);
+    }
+
+    /// <summary>
+    /// Consolidated entry point for course actions. Uses ILinkEligibilityContext (ResourceId, OwnerId, Status).
+    /// </summary>
+    public bool Can(CourseAction action, ILinkEligibilityContext context)
+    {
+        CourseStatus status = context.Status as CourseStatus? ?? default;
+        var courseState = new CourseState(
+            new CourseId(context.ResourceId),
+            new UserId(context.OwnerId ?? Guid.Empty),
+            status);
+
+        return action switch
+        {
+            CourseAction.Read => CanReadCourse(courseState),
+            CourseAction.Update => CanEditCourseContent(courseState),
+            CourseAction.Delete => CanDeleteCourse(courseState),
+            CourseAction.GenerateImageUploadUrl => CanEditCourseContent(courseState),
+            CourseAction.CreateModule => CanEditCourseContent(courseState),
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// Consolidated entry point for lesson actions. Requires LessonLinkContext for course/lesson/enrollment.
+    /// </summary>
+    public bool Can(LessonAction action, ILinkEligibilityContext context)
+    {
+        if (context is not LessonLinkContext lessonContext)
+        {
+            return false;
+        }
+
+        return action switch
+        {
+            LessonAction.Read => CanReadLesson(lessonContext.CourseState, lessonContext.LessonState, lessonContext.EnrollmentState),
+            LessonAction.Update => CanEditLesson(lessonContext.CourseState),
+            LessonAction.Delete => CanEditLesson(lessonContext.CourseState),
+            LessonAction.UploadVideoUrl => CanEditLesson(lessonContext.CourseState),
+            LessonAction.AiGenerate => CanEditLesson(lessonContext.CourseState),
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// Consolidated entry point for module actions. Requires ModuleLinkContext for course scope.
+    /// </summary>
+    public bool Can(ModuleAction action, ILinkEligibilityContext context)
+    {
+        if (context is not ModuleLinkContext moduleContext)
+        {
+            return false;
+        }
+
+        return action switch
+        {
+            ModuleAction.CreateLesson => CanEditModule(moduleContext.CourseState),
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// Consolidated entry point for course collection actions.
+    /// </summary>
+    public bool Can(CourseCollectionAction action, ILinkEligibilityContext context)
+    {
+        if (action is CourseCollectionAction.NextPage or CourseCollectionAction.PreviousPage
+            && context is CourseCollectionContext collectionContext)
+        {
+            int page = collectionContext.Query.Page ?? 1;
+            int pageSize = collectionContext.Query.PageSize ?? 10;
+            return action switch
+            {
+                CourseCollectionAction.NextPage => page * pageSize < collectionContext.TotalCount,
+                CourseCollectionAction.PreviousPage => page > 1,
+                _ => false
+            };
+        }
+
+        return action switch
+        {
+            CourseCollectionAction.Self => true,
+            CourseCollectionAction.Create => CanCreateCourse(),
+            _ => false
+        };
     }
 }

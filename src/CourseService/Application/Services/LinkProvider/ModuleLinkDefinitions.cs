@@ -13,7 +13,7 @@ internal sealed class ModuleLinkDefinitions : ILinkDefinitionRegistry
         _policy = policy;
     }
 
-    public string ResourceKey => LinkResourceKeys.Module;
+    public LinkResourceKey ResourceKey => LinkResourceKey.Module;
 
     public IReadOnlyList<ILinkDefinition> GetDefinitions()
     {
@@ -25,10 +25,10 @@ internal sealed class ModuleLinkDefinitions : ILinkDefinitionRegistry
         _definitions = new List<ILinkDefinition>
         {
             new LinkDefinition<ModuleLinkContext>(
-                rel: "create-lesson",
-                method: "POST",
-                endpointName: "CreateLesson",
-                policyCheck: ctx => _policy.CanEditModule(ctx.CourseState),
+                rel: LinkRels.Module.CreateLesson,
+                method: LinkHttpMethod.Post,
+                endpointName: EndpointNames.CreateLesson,
+                policyCheck: ctx => _policy.Can(ModuleAction.CreateLesson, ctx),
                 getRouteValues: ctx => new { moduleId = ctx.ModuleState.Id.Value })
         }.AsReadOnly();
 

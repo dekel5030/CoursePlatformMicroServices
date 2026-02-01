@@ -80,7 +80,7 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             Access = lesson.Access,
             VideoUrl = videoUrl,
             TranscriptUrl = transcriptUrl,
-            Links = _linkBuilder.BuildLinks(LinkResourceKeys.Lesson, lessonContext)
+            Links = _linkBuilder.BuildLinks(LinkResourceKey.Lesson, lessonContext)
         };
 
         return Result.Success(pageDto);

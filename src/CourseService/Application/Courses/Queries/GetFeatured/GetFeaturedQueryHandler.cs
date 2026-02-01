@@ -4,7 +4,6 @@ using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Shared.Dtos;
-using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -50,19 +49,15 @@ internal static class FeaturedCourseCollectionDtoEnrichmentExtensions
     {
         var courseDtos = dto.Items.Select(courseDto =>
         {
-            var courseState = new CourseState(
-                new CourseId(courseDto.Id),
-                new UserId(courseDto.Instructor.Id),
-                courseDto.Status);
-            IReadOnlyList<LinkDto> links = linkBuilder.BuildLinks(LinkResourceKeys.Course, courseState);
+            var courseState = courseDto.ToCourseState();
+            IReadOnlyList<LinkDto> links = linkBuilder.BuildLinks(LinkResourceKey.Course, courseState);
             return courseDto with { Links = links };
         }).ToList();
 
-        var collectionContext = new CourseCollectionContext(
-            new PagedQueryDto { Page = dto.PageNumber, PageSize = dto.PageSize },
-            dto.TotalItems);
+        var collectionContext = new PagedQueryDto
+            { Page = dto.PageNumber, PageSize = dto.PageSize }.ToCourseCollectionContext(dto.TotalItems);
         IReadOnlyList<LinkDto> collectionLinks = linkBuilder.BuildLinks(
-            LinkResourceKeys.CourseCollection,
+            LinkResourceKey.CourseCollection,
             collectionContext);
 
         return new CourseCollectionDto

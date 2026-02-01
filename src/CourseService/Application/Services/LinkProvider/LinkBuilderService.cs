@@ -4,7 +4,7 @@ namespace Courses.Application.Services.LinkProvider;
 
 internal sealed class LinkBuilderService : ILinkBuilderService
 {
-    private readonly Dictionary<string, IReadOnlyList<ILinkDefinition>> _definitionsByResource;
+    private readonly Dictionary<LinkResourceKey, IReadOnlyList<ILinkDefinition>> _definitionsByResource;
     private readonly IHttpLinkResolver _resolver;
 
     public LinkBuilderService(
@@ -15,7 +15,7 @@ internal sealed class LinkBuilderService : ILinkBuilderService
         _resolver = resolver;
     }
 
-    public IReadOnlyList<LinkDto> BuildLinks<TContext>(string resourceKey, TContext context)
+    public IReadOnlyList<LinkDto> BuildLinks<TContext>(LinkResourceKey resourceKey, TContext context)
     {
         if (!_definitionsByResource.TryGetValue(resourceKey, out IReadOnlyList<ILinkDefinition>? definitions))
         {

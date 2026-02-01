@@ -13,7 +13,7 @@ internal sealed class LessonLinkDefinitions : ILinkDefinitionRegistry
         _policy = policy;
     }
 
-    public string ResourceKey => LinkResourceKeys.Lesson;
+    public LinkResourceKey ResourceKey => LinkResourceKey.Lesson;
 
     public IReadOnlyList<ILinkDefinition> GetDefinitions()
     {
@@ -25,38 +25,38 @@ internal sealed class LessonLinkDefinitions : ILinkDefinitionRegistry
         _definitions = new List<ILinkDefinition>
         {
             new LinkDefinition<LessonLinkContext>(
-                rel: "self",
-                method: "GET",
-                endpointName: "GetLessonById",
-                policyCheck: ctx => _policy.CanReadLesson(ctx.CourseState, ctx.LessonState, ctx.EnrollmentState),
+                rel: LinkRels.Self,
+                method: LinkHttpMethod.Get,
+                endpointName: EndpointNames.GetLessonById,
+                policyCheck: ctx => _policy.Can(LessonAction.Read, ctx),
                 getRouteValues: ctx => new { moduleId = ctx.ModuleState.Id.Value, lessonId = ctx.LessonState.Id.Value }),
 
             new LinkDefinition<LessonLinkContext>(
-                rel: "partial-update",
-                method: "PATCH",
-                endpointName: "PatchLesson",
-                policyCheck: ctx => _policy.CanEditLesson(ctx.CourseState),
+                rel: LinkRels.PartialUpdate,
+                method: LinkHttpMethod.Patch,
+                endpointName: EndpointNames.PatchLesson,
+                policyCheck: ctx => _policy.Can(LessonAction.Update, ctx),
                 getRouteValues: ctx => new { moduleId = ctx.ModuleState.Id.Value, lessonId = ctx.LessonState.Id.Value }),
 
             new LinkDefinition<LessonLinkContext>(
-                rel: "delete",
-                method: "DELETE",
-                endpointName: "DeleteLesson",
-                policyCheck: ctx => _policy.CanEditLesson(ctx.CourseState),
+                rel: LinkRels.Delete,
+                method: LinkHttpMethod.Delete,
+                endpointName: EndpointNames.DeleteLesson,
+                policyCheck: ctx => _policy.Can(LessonAction.Delete, ctx),
                 getRouteValues: ctx => new { moduleId = ctx.ModuleState.Id.Value, lessonId = ctx.LessonState.Id.Value }),
 
             new LinkDefinition<LessonLinkContext>(
-                rel: "upload-video-url",
-                method: "POST",
-                endpointName: "GenerateLessonVideoUploadUrl",
-                policyCheck: ctx => _policy.CanEditLesson(ctx.CourseState),
+                rel: LinkRels.Lesson.UploadVideoUrl,
+                method: LinkHttpMethod.Post,
+                endpointName: EndpointNames.GenerateLessonVideoUploadUrl,
+                policyCheck: ctx => _policy.Can(LessonAction.UploadVideoUrl, ctx),
                 getRouteValues: ctx => new { moduleId = ctx.ModuleState.Id.Value, lessonId = ctx.LessonState.Id.Value }),
 
             new LinkDefinition<LessonLinkContext>(
-                rel: "ai-generate",
-                method: "POST",
-                endpointName: "GenerateLessonWithAi",
-                policyCheck: ctx => _policy.CanEditLesson(ctx.CourseState),
+                rel: LinkRels.Lesson.AiGenerate,
+                method: LinkHttpMethod.Post,
+                endpointName: EndpointNames.GenerateLessonWithAi,
+                policyCheck: ctx => _policy.Can(LessonAction.AiGenerate, ctx),
                 getRouteValues: ctx => new { moduleId = ctx.ModuleState.Id.Value, lessonId = ctx.LessonState.Id.Value })
         }.AsReadOnly();
 

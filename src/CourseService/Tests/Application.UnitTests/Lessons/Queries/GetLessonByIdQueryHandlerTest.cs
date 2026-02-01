@@ -31,7 +31,7 @@ public class GetLessonByIdQueryHandlerTest
             .Returns(new ResolvedUrl("https://example.com/", StorageCategory.Public));
 
         _linkBuilderMock
-            .Setup(l => l.BuildLinks(It.IsAny<string>(), It.IsAny<object>()))
+            .Setup(l => l.BuildLinks(It.IsAny<LinkResourceKey>(), It.IsAny<object>()))
             .Returns(new List<LinkDto>().AsReadOnly());
 
         _handler = new GetLessonByIdQueryHandler(

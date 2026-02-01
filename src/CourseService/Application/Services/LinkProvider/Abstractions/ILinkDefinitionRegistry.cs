@@ -2,6 +2,6 @@ namespace Courses.Application.Services.LinkProvider.Abstractions;
 
 internal interface ILinkDefinitionRegistry
 {
-    string ResourceKey { get; }
+    LinkResourceKey ResourceKey { get; }
     IReadOnlyList<ILinkDefinition> GetDefinitions();
 }

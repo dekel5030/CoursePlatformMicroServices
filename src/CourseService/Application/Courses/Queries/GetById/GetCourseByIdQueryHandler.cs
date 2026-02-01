@@ -3,9 +3,6 @@ using Courses.Application.Courses.Queries.GetCoursePage;
 using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
-using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Modules.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -47,18 +44,19 @@ internal static class DtoEnrichmentExtensions
 {
     public static void EnrichWithLinks(this CoursePageDto dto, ILinkBuilderService linkBuilder)
     {
-        var courseState = new CourseState(new CourseId(dto.Id), new UserId(dto.InstructorId), dto.Status);
-        dto.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKeys.Course, courseState));
+        var courseState = dto.ToCourseState();
+        dto.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Course, courseState));
         foreach (ModuleDto module in dto.Modules)
         {
-            var moduleState = new ModuleState(new ModuleId(module.Id));
-            var moduleContext = new ModuleLinkContext(courseState, moduleState);
-            module.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKeys.Module, moduleContext));
+            var moduleContext = module.ToModuleLinkContext(courseState);
+            module.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Module, moduleContext));
             foreach (LessonDto lesson in module.Lessons)
             {
-                var lessonState = new LessonState(new LessonId(lesson.Id), lesson.Access);
-                var lessonContext = new LessonLinkContext(courseState, moduleState, lessonState, null);
-                lesson.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKeys.Lesson, lessonContext));
+                var lessonContext = lesson.ToLessonLinkContext(
+                    courseState,
+                    moduleContext.ModuleState,
+                    null);
+                lesson.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Lesson, lessonContext));
             }
         }
     }

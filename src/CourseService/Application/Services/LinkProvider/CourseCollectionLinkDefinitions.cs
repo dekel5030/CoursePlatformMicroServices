@@ -13,7 +13,7 @@ internal sealed class CourseCollectionLinkDefinitions : ILinkDefinitionRegistry
         _policy = policy;
     }
 
-    public string ResourceKey => LinkResourceKeys.CourseCollection;
+    public LinkResourceKey ResourceKey => LinkResourceKey.CourseCollection;
 
     public IReadOnlyList<ILinkDefinition> GetDefinitions()
     {
@@ -25,31 +25,31 @@ internal sealed class CourseCollectionLinkDefinitions : ILinkDefinitionRegistry
         _definitions = new List<ILinkDefinition>
         {
             new LinkDefinition<CourseCollectionContext>(
-                rel: "self",
-                method: "GET",
-                endpointName: "GetCourses",
-                policyCheck: _ => true,
+                rel: LinkRels.Self,
+                method: LinkHttpMethod.Get,
+                endpointName: EndpointNames.GetCourses,
+                policyCheck: ctx => _policy.Can(CourseCollectionAction.Self, ctx),
                 getRouteValues: ctx => ctx.Query),
 
             new LinkDefinition<CourseCollectionContext>(
-                rel: "next-page",
-                method: "GET",
-                endpointName: "GetCourses",
-                policyCheck: ctx => (ctx.Query.Page ?? 1) * (ctx.Query.PageSize ?? 10) < ctx.TotalCount,
+                rel: LinkRels.Pagination.NextPage,
+                method: LinkHttpMethod.Get,
+                endpointName: EndpointNames.GetCourses,
+                policyCheck: ctx => _policy.Can(CourseCollectionAction.NextPage, ctx),
                 getRouteValues: ctx => ctx.Query with { Page = (ctx.Query.Page ?? 1) + 1 }),
 
             new LinkDefinition<CourseCollectionContext>(
-                rel: "previous-page",
-                method: "GET",
-                endpointName: "GetCourses",
-                policyCheck: ctx => (ctx.Query.Page ?? 1) > 1,
+                rel: LinkRels.Pagination.PreviousPage,
+                method: LinkHttpMethod.Get,
+                endpointName: EndpointNames.GetCourses,
+                policyCheck: ctx => _policy.Can(CourseCollectionAction.PreviousPage, ctx),
                 getRouteValues: ctx => ctx.Query with { Page = (ctx.Query.Page ?? 1) - 1 }),
 
             new LinkDefinition<CourseCollectionContext>(
-                rel: "create",
-                method: "POST",
-                endpointName: "CreateCourse",
-                policyCheck: _ => _policy.CanCreateCourse(),
+                rel: LinkRels.Create,
+                method: LinkHttpMethod.Post,
+                endpointName: EndpointNames.CreateCourse,
+                policyCheck: ctx => _policy.Can(CourseCollectionAction.Create, ctx),
                 getRouteValues: _ => (object?)null)
         }.AsReadOnly();
 
