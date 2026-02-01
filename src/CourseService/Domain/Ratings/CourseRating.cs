@@ -5,6 +5,7 @@ namespace Courses.Domain.Ratings;
 public sealed class CourseRating : RatingBase
 {
     public CourseId CourseId { get; private set; }
+
     private CourseRating(CourseId courseId, UserId userId, int score, string? comment)
         : base(userId, score, comment)
     {

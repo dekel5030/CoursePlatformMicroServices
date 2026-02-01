@@ -4,6 +4,7 @@ using Courses.Domain.Courses;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
+using Courses.Domain.Ratings;
 using Courses.Domain.Users;
 using Courses.Infrastructure.Database.Write;
 using Microsoft.EntityFrameworkCore;
@@ -25,4 +26,5 @@ internal sealed class ReadDbContext : IReadDbContext
     public IQueryable<User> Users => _context.Users.AsNoTracking();
     public IQueryable<Category> Categories => _context.Categories.AsNoTracking();
     public IQueryable<Enrollment> Enrollments => _context.Enrollments.AsNoTracking();
+    public IQueryable<CourseRating> CourseRatings => _context.CourseRatings.AsNoTracking();
 }
