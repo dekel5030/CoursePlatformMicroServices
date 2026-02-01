@@ -36,7 +36,7 @@ internal sealed class CourseLinkDefinitions : ILinkDefinitionRegistry
                 rel: LinkRels.PartialUpdate,
                 method: LinkHttpMethod.Patch,
                 endpointName: EndpointNames.PatchCourse,
-                policyCheck: ctx => _policy.CanEditCourseContent(ctx),
+                policyCheck: ctx => _policy.CanEditCourse(ctx),
                 getRouteValues: ctx => new { id = ctx.Id.Value }),
 
             new LinkDefinition<CourseContext>(
@@ -51,6 +51,13 @@ internal sealed class CourseLinkDefinitions : ILinkDefinitionRegistry
                 method: LinkHttpMethod.Get,
                 endpointName: EndpointNames.GetCourseRatings,
                 policyCheck: _ => true,
+                getRouteValues: ctx => new { courseId = ctx.Id.Value }),
+
+            new LinkDefinition<CourseContext>(
+                rel: LinkRels.Course.CreateModule,
+                method: LinkHttpMethod.Post,
+                endpointName: EndpointNames.CreateModule,
+                policyCheck: ctx => _policy.CanEditCourse(ctx),
                 getRouteValues: ctx => new { courseId = ctx.Id.Value })
         }.AsReadOnly();
 

@@ -28,13 +28,13 @@ internal sealed record ModuleContext(
 }
 
 internal sealed record LessonContext(
-    CourseContext Course,
+    ModuleContext Module,
     LessonId Id,
     LessonAccess Access,
     bool HasEnrollment) : ILinkEligibilityContext
 {
     public Guid ResourceId => Id.Value;
-    public Guid? OwnerId => Course.InstructorId.Value;
+    public Guid? OwnerId => Module.Course.InstructorId.Value;
     object? ILinkEligibilityContext.Status => Access;
 }
 

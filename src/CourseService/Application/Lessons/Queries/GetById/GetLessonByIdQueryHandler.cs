@@ -61,9 +61,10 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             : null;
 
         var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
+        var moduleContext = new ModuleContext(courseContext, lesson.ModuleId);
 
         var lessonContext = new LessonContext(
-            courseContext,
+            moduleContext,
             lesson.Id,
             lesson.Access,
             HasEnrollment: false);

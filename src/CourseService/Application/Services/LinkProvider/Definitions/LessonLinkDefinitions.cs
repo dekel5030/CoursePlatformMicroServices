@@ -30,21 +30,21 @@ internal sealed class LessonLinkDefinitions : ILinkDefinitionRegistry
                 method: LinkHttpMethod.Get,
                 endpointName: EndpointNames.GetLessonById,
                 policyCheck: ctx => _policy.CanReadLesson(ctx),
-                getRouteValues: ctx => new { lessonId = ctx.Id.Value }),
+                getRouteValues: ctx => new { moduleId = ctx.Module.Id.Value, lessonId = ctx.Id.Value }),
 
             new LinkDefinition<LessonContext>(
                 rel: LinkRels.PartialUpdate,
                 method: LinkHttpMethod.Patch,
                 endpointName: EndpointNames.PatchLesson,
                 policyCheck: ctx => _policy.CanEditLesson(ctx),
-                getRouteValues: ctx => new { lessonId = ctx.Id.Value }),
+                getRouteValues: ctx => new { moduleId = ctx.Module.Id.Value, lessonId = ctx.Id.Value }),
 
             new LinkDefinition<LessonContext>(
                 rel: LinkRels.Lesson.UploadVideoUrl,
                 method: LinkHttpMethod.Post,
                 endpointName: EndpointNames.GenerateLessonVideoUploadUrl,
                 policyCheck: ctx => _policy.CanEditLesson(ctx),
-                getRouteValues: ctx => new { lessonId = ctx.Id.Value })
+                getRouteValues: ctx => new { moduleId = ctx.Module.Id.Value, lessonId = ctx.Id.Value })
         }.AsReadOnly();
 
         return _definitions;

@@ -79,7 +79,7 @@ internal static class DtoEnrichmentExtensions
             foreach (LessonDto lesson in module.Lessons)
             {
                 var lessonContext = lesson.ToLessonContext(
-                    courseContext,
+                    moduleContext,
                     false);
 
                 lesson.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Lesson, lessonContext));

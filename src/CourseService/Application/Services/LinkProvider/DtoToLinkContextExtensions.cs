@@ -34,11 +34,11 @@ internal static class DtoToLinkContextExtensions
 
     public static LessonContext ToLessonContext(
         this LessonDto lesson,
-        CourseContext courseContext,
+        ModuleContext moduleContext,
         bool hasEnrollment = false)
     {
         return new LessonContext(
-            courseContext,
+            moduleContext,
             new LessonId(lesson.Id),
             lesson.Access,
             hasEnrollment);

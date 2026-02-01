@@ -35,7 +35,7 @@ internal sealed class CourseGovernancePolicy
                 ResourceId.Create(ctx.Id.Value.ToString()));
     }
 
-    public bool CanEditCourseContent(CourseContext ctx)
+    public bool CanEditCourse(CourseContext ctx)
     {
         if (_userContext.Id is null || CoursePolicies.CanModify(ctx.Status).IsFailure)
         {
@@ -71,12 +71,12 @@ internal sealed class CourseGovernancePolicy
 
     public bool CanReadLesson(LessonContext ctx)
     {
-        if (CanEditCourseContent(ctx.Course))
+        if (CanEditCourse(ctx.Module.Course))
         {
             return true;
         }
 
-        if (ctx.Course.Status != CourseStatus.Published)
+        if (ctx.Module.Course.Status != CourseStatus.Published)
         {
             return false;
         }
@@ -89,9 +89,9 @@ internal sealed class CourseGovernancePolicy
         return ctx.HasEnrollment;
     }
 
-    public bool CanEditModule(ModuleContext ctx) => CanEditCourseContent(ctx.Course);
+    public bool CanEditModule(ModuleContext ctx) => CanEditCourse(ctx.Course);
 
-    public bool CanEditLesson(LessonContext ctx) => CanEditCourseContent(ctx.Course);
+    public bool CanEditLesson(LessonContext ctx) => CanEditCourse(ctx.Module.Course);
 
     public static bool CanShowNextPage(CourseCollectionContext ctx)
     {
