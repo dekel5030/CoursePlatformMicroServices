@@ -3,7 +3,7 @@ import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function Catalog() {
-  const { t } = useTranslation(['courses', 'translation']);
+  const { t } = useTranslation(['course-catalog', 'translation']);
 
   return (
     <div className="space-y-4">
@@ -13,13 +13,13 @@ export default function Catalog() {
         </h2>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
-          {t('courses:catalog.addCourse')}
+          {t('course-catalog:catalog.addCourse')}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="p-12 border border-dashed rounded-lg text-center text-muted-foreground">
-          {t('courses:catalog.noCourses')}
+          {t('course-catalog:catalog.noCourses')}
         </div>
       </div>
     </div>

@@ -51,25 +51,5 @@
     "cancel": "Cancel",
     "submitting": "Creating...",
     "submit": "Create Course"
-  },
-  "catalog": {
-    "errorLoading": "Error loading courses: {{message}}",
-    "noCourses": "No courses found",
-    "addCourse": "Add Course",
-    "all": "All",
-    "subtitle": "Browse and manage your courses",
-    "filters": "Filters"
-  },
-  "difficulty": {
-    "label": "Difficulty",
-    "easy": "Easy",
-    "medium": "Medium",
-    "hard": "Hard"
-  },
-  "card": {
-    "sale": "Sale"
-  },
-  "status": {
-    "draft": "Draft"
   }
 }

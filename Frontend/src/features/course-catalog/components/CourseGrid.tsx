@@ -11,7 +11,7 @@ interface CourseGridProps {
 }
 
 export function CourseGrid({ courses, isLoading, error }: CourseGridProps) {
-  const { t } = useTranslation(["courses", "translation"]);
+  const { t } = useTranslation(["course-catalog", "translation"]);
 
   const container = {
     hidden: { opacity: 0 },
@@ -41,7 +41,7 @@ export function CourseGrid({ courses, isLoading, error }: CourseGridProps) {
   if (error) {
     return (
       <div className="bg-destructive/10 border border-destructive/20 text-destructive px-6 py-4 rounded-lg">
-        {t("courses:catalog.errorLoading", { message: error.message })}
+        {t("course-catalog:catalog.errorLoading", { message: error.message })}
       </div>
     );
   }
@@ -65,7 +65,7 @@ export function CourseGrid({ courses, isLoading, error }: CourseGridProps) {
           </svg>
         </div>
         <p className="text-lg font-medium text-muted-foreground">
-          {t("courses:catalog.noCourses")}
+          {t("course-catalog:catalog.noCourses")}
         </p>
       </div>
     );

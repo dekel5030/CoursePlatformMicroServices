@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function CourseCard({ course }: Props) {
-  const { t, i18n } = useTranslation(["courses", "translation"]);
+  const { t, i18n } = useTranslation(["course-catalog", "translation"]);
 
   const safeCurrency = course.price?.currency || "ILS";
   const safeAmount = course.price?.amount || 0;
@@ -41,7 +41,7 @@ export default function CourseCard({ course }: Props) {
     );
     const key = difficultyKey?.toLowerCase() || "";
     if (!key) return "";
-    return t(`courses:difficulty.${key}`, { defaultValue: difficultyKey || "" });
+    return t(`course-catalog:difficulty.${key}`, { defaultValue: difficultyKey || "" });
   };
 
   // Don't show "Empty" category
@@ -69,7 +69,7 @@ export default function CourseCard({ course }: Props) {
             {/* Difficulty Badge */}
             {course.difficulty !== undefined && (
               <Badge className="bg-primary text-white font-semibold shadow-lg border-0">
-                {t("courses:difficulty.label")}{" "}
+                {t("course-catalog:difficulty.label")}{" "}
                 {getDifficultyLabel(course.difficulty)}
               </Badge>
             )}
@@ -78,7 +78,7 @@ export default function CourseCard({ course }: Props) {
             {hasDiscount && (
               <Badge className="bg-red-500 text-white font-semibold shadow-lg border-0">
                 <TrendingUp className="h-3 w-3 mr-1" />
-                {t("courses:card.sale")}
+                {t("course-catalog:card.sale")}
               </Badge>
             )}
           </div>
@@ -87,7 +87,7 @@ export default function CourseCard({ course }: Props) {
           {course.status === CourseStatus.Draft && (
             <div className="absolute top-2 right-2">
               <Badge variant="secondary" className="shadow-md font-medium">
-                {t("courses:status.draft")}
+                {t("course-catalog:status.draft")}
               </Badge>
             </div>
           )}

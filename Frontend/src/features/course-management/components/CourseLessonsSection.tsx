@@ -14,7 +14,7 @@ interface CourseLessonsSectionProps {
 }
 
 export function CourseLessonsSection({ course }: CourseLessonsSectionProps) {
-  const { t } = useTranslation(["courses", "translation"]);
+  const { t } = useTranslation(["course-management", "translation"]);
   const createModule = useCreateModule(course.id);
 
   const sortedModules = useMemo(() => {
@@ -28,7 +28,7 @@ export function CourseLessonsSection({ course }: CourseLessonsSectionProps) {
   const handleCreateModule = async () => {
     if (!createModuleLink) return;
     const moduleNumber = sortedModules.length + 1;
-    const title = `${t("courses:detail.module")} ${moduleNumber}`;
+    const title = `${t("course-management:detail.module")} ${moduleNumber}`;
     await createModule.mutateAsync({
       url: createModuleLink.href,
       request: { title },
@@ -39,7 +39,7 @@ export function CourseLessonsSection({ course }: CourseLessonsSectionProps) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-4 py-4">
         <CardTitle className="text-start text-lg">
-          {t("courses:detail.courseContent")}
+          {t("course-management:detail.courseContent")}
         </CardTitle>
         {canCreateModule && (
           <Button
@@ -50,7 +50,7 @@ export function CourseLessonsSection({ course }: CourseLessonsSectionProps) {
             disabled={createModule.isPending}
           >
             <FolderPlus className="h-4 w-4" />
-            {t("courses:detail.addModule")}
+            {t("course-management:detail.addModule")}
           </Button>
         )}
       </CardHeader>
@@ -69,7 +69,7 @@ export function CourseLessonsSection({ course }: CourseLessonsSectionProps) {
         ) : (
           <div className="py-10 text-center space-y-4">
             <p className="text-muted-foreground text-start">
-              {t("courses:detail.noModules")}
+              {t("course-management:detail.noModules")}
             </p>
             {canCreateModule && (
               <Button
@@ -79,7 +79,7 @@ export function CourseLessonsSection({ course }: CourseLessonsSectionProps) {
                 disabled={createModule.isPending}
               >
                 <Plus className="h-4 w-4" />
-                {t("courses:detail.createFirstModule")}
+                {t("course-management:detail.createFirstModule")}
               </Button>
             )}
           </div>

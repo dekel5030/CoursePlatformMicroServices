@@ -3,7 +3,7 @@ import { useFeaturedCourses } from "@/domain/courses";
 import { PaginatedCourseList } from "../components/PaginatedCourseList";
 
 export default function CourseCatalogPage() {
-  const { t } = useTranslation(["courses", "translation"]);
+  const { t } = useTranslation(["course-catalog", "translation"]);
   const { data: courses = [], isLoading, error } = useFeaturedCourses();
 
   const breadcrumbItems = [

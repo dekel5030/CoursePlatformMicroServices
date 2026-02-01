@@ -31,7 +31,7 @@ export function AddLessonDialog({
 }: AddLessonDialogProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const { t, i18n } = useTranslation(["lessons", "translation"]);
+  const { t, i18n } = useTranslation(["lesson-viewer", "translation"]);
 
   const createLessonMutation = useCreateLesson(courseId);
   const createLessonLink = getLink(links, CourseRels.CREATE_LESSON);
@@ -46,13 +46,13 @@ export function AddLessonDialog({
     e.preventDefault();
 
     if (!title.trim()) {
-      toast.error(t("lessons:addDialog.validationError"));
+      toast.error(t("lesson-viewer:addDialog.validationError"));
       return;
     }
 
     if (!createLessonLink) {
       console.error("No create-lesson link found for this course");
-      toast.error(t("lessons:addDialog.errorMessage", { message: "Missing create link" }));
+      toast.error(t("lesson-viewer:addDialog.errorMessage", { message: "Missing create link" }));
       return;
     }
 
@@ -66,12 +66,12 @@ export function AddLessonDialog({
       },
       {
         onSuccess: () => {
-          toast.success(t("lessons:addDialog.successMessage"));
+          toast.success(t("lesson-viewer:addDialog.successMessage"));
           handleClose();
         },
         onError: (error: Error) => {
           toast.error(
-            t("lessons:addDialog.errorMessage", { message: error.message })
+            t("lesson-viewer:addDialog.errorMessage", { message: error.message })
           );
         },
       }
@@ -82,9 +82,9 @@ export function AddLessonDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[525px]" dir={i18n.dir()}>
         <DialogHeader dir={i18n.dir()}>
-          <DialogTitle dir={i18n.dir()}>{t("lessons:addDialog.title")}</DialogTitle>
+          <DialogTitle dir={i18n.dir()}>{t("lesson-viewer:addDialog.title")}</DialogTitle>
           <DialogDescription>
-            {t("lessons:addDialog.description")}
+            {t("lesson-viewer:addDialog.description")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} dir={i18n.dir()}>
@@ -95,7 +95,7 @@ export function AddLessonDialog({
                 className="text-sm font-medium leading-none"
                 dir={i18n.dir()}
               >
-                {t("lessons:addDialog.titleLabel")}
+                {t("lesson-viewer:addDialog.titleLabel")}
                 <span className="text-destructive ml-1">*</span>
               </label>
               <Input
@@ -103,7 +103,7 @@ export function AddLessonDialog({
                 name="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder={t("lessons:addDialog.titlePlaceholder")}
+                placeholder={t("lesson-viewer:addDialog.titlePlaceholder")}
                 dir={i18n.dir()}
                 required
               />
@@ -114,14 +114,14 @@ export function AddLessonDialog({
                 className="text-sm font-medium leading-none"
                 dir={i18n.dir()}
               >
-                {t("lessons:addDialog.descriptionLabel")}
+                {t("lesson-viewer:addDialog.descriptionLabel")}
               </label>
               <textarea
                 id="description"
                 name="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder={t("lessons:addDialog.descriptionPlaceholder")}
+                placeholder={t("lesson-viewer:addDialog.descriptionPlaceholder")}
                 dir={i18n.dir()}
                 className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
@@ -134,12 +134,12 @@ export function AddLessonDialog({
               onClick={handleClose}
               disabled={createLessonMutation.isPending}
             >
-              {t("lessons:addDialog.cancel")}
+              {t("lesson-viewer:addDialog.cancel")}
             </Button>
             <Button type="submit" disabled={createLessonMutation.isPending}>
               {createLessonMutation.isPending
-                ? t("lessons:addDialog.submitting")
-                : t("lessons:addDialog.submit")}
+                ? t("lesson-viewer:addDialog.submitting")
+                : t("lesson-viewer:addDialog.submit")}
             </Button>
           </DialogFooter>
         </form>

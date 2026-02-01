@@ -33,7 +33,7 @@ export function PaginatedCourseList({
   breadcrumbItems,
 }: PaginatedCourseListProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { t } = useTranslation(["courses", "translation"]);
+  const { t } = useTranslation(["course-catalog", "translation"]);
 
   const categories = useMemo(() => {
     const set = new Set<string>();

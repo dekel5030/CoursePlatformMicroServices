@@ -7,7 +7,7 @@ import { CourseGrid } from "../components/CourseGrid";
 import { Pagination } from "../components/Pagination";
 
 export default function AllCoursesPage() {
-  const { t } = useTranslation(["courses", "translation"]);
+  const { t } = useTranslation(["course-catalog", "translation"]);
   const [currentUrl, setCurrentUrl] = useState<string | undefined>(undefined);
   const { data, isLoading, error } = useAllCourses(currentUrl);
   

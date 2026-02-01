@@ -16,7 +16,7 @@ interface CourseActionsProps {
 }
 
 export function CourseActions({ links }: CourseActionsProps) {
-  const { t } = useTranslation(['courses', 'translation']);
+  const { t } = useTranslation(['course-management', 'translation']);
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const deleteCourse = useDeleteCourse();
@@ -27,7 +27,7 @@ export function CourseActions({ links }: CourseActionsProps) {
   const deleteLink = getLink(links, CourseRels.DELETE);
 
   const handleEdit = () => {
-    toast.info(t('courses:actions.editNotImplemented'));
+    toast.info(t('course-management:actions.editNotImplemented'));
   };
 
   const handleDeleteClick = () => {
@@ -42,11 +42,11 @@ export function CourseActions({ links }: CourseActionsProps) {
     
     try {
       await deleteCourse.mutateAsync(deleteLink.href);
-      toast.success(t('courses:actions.deleteSuccess'));
+      toast.success(t('course-management:actions.deleteSuccess'));
       // Navigate back to all courses page after successful deletion
       navigate('/courses');
     } catch (error) {
-      toast.error(t('courses:actions.deleteFailed'));
+      toast.error(t('course-management:actions.deleteFailed'));
       console.error('Failed to delete course:', error);
     } finally {
       setIsDeleteDialogOpen(false);
@@ -81,7 +81,7 @@ export function CourseActions({ links }: CourseActionsProps) {
             disabled={deleteCourse.isPending}
           >
             <Trash2 className="h-4 w-4" />
-            {t('courses:detail.delete')}
+            {t('course-management:detail.delete')}
           </Button>
         )}
       </div>
@@ -90,8 +90,8 @@ export function CourseActions({ links }: CourseActionsProps) {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleConfirmDelete}
-        title={t('courses:actions.deleteConfirmTitle')}
-        message={t('courses:actions.deleteConfirmMessage')}
+        title={t('course-management:actions.deleteConfirmTitle')}
+        message={t('course-management:actions.deleteConfirmMessage')}
         confirmText={t('common.delete')}
         cancelText={t('common.cancel')}
         isLoading={deleteCourse.isPending}

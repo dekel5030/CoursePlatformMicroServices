@@ -21,7 +21,7 @@ const ALLOWED_IMAGE_TYPES = [
 ];
 
 export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
-  const { t } = useTranslation(["courses"]);
+  const { t } = useTranslation(["course-management", "translation"]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadImage, isUploading, reset } = useCourseImageUpload(courseId);
 
@@ -51,7 +51,7 @@ export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
 
     // Validate file type
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-      toast.error(t("courses:detail.invalidFileType"));
+      toast.error(t("course-management:detail.invalidFileType"));
       resetFileInput();
       return;
     }
@@ -59,10 +59,10 @@ export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
     try {
       reset();
       await uploadImage(file, uploadLink.href);
-      toast.success(t("courses:detail.uploadSuccess"));
+      toast.success(t("course-management:detail.uploadSuccess"));
       resetFileInput();
     } catch (err) {
-      toast.error(t("courses:detail.uploadFailed"));
+      toast.error(t("course-management:detail.uploadFailed"));
       console.error("Failed to upload image:", err);
       resetFileInput();
     }
@@ -88,12 +88,12 @@ export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
         {isUploading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            {t("courses:detail.uploading")}
+            {t("course-management:detail.uploading")}
           </>
         ) : (
           <>
             <Upload className="h-4 w-4" />
-            {t("courses:detail.uploadImage")}
+            {t("course-management:detail.uploadImage")}
           </>
         )}
       </Button>

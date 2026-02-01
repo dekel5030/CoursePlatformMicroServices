@@ -29,7 +29,7 @@ export function LessonVideoUpload({
   lessonId,
   links,
 }: LessonVideoUploadProps) {
-  const { t } = useTranslation(["lessons"]);
+  const { t } = useTranslation(["lesson-viewer", "translation"]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadVideo, isUploading, reset } = useLessonVideoUpload(
     courseId,
@@ -62,7 +62,7 @@ export function LessonVideoUpload({
 
     // Validate file type
     if (!ALLOWED_VIDEO_TYPES.includes(file.type as typeof ALLOWED_VIDEO_TYPES[number])) {
-      toast.error(t("lessons:detail.invalidVideoType"));
+      toast.error(t("lesson-viewer:detail.invalidVideoType"));
       resetFileInput();
       return;
     }
@@ -70,10 +70,10 @@ export function LessonVideoUpload({
     try {
       reset();
       await uploadVideo(file, uploadLink.href);
-      toast.success(t("lessons:detail.videoUploadSuccess"));
+      toast.success(t("lesson-viewer:detail.videoUploadSuccess"));
       resetFileInput();
     } catch (err) {
-      toast.error(t("lessons:detail.videoUploadFailed"));
+      toast.error(t("lesson-viewer:detail.videoUploadFailed"));
       console.error("Failed to upload video:", err);
       resetFileInput();
     }
@@ -99,12 +99,12 @@ export function LessonVideoUpload({
         {isUploading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            {t("lessons:detail.uploadingVideo")}
+            {t("lesson-viewer:detail.uploadingVideo")}
           </>
         ) : (
           <>
             <Upload className="h-4 w-4" />
-            {t("lessons:detail.uploadVideo")}
+            {t("lesson-viewer:detail.uploadVideo")}
           </>
         )}
       </Button>

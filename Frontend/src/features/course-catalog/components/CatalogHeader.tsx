@@ -12,7 +12,7 @@ interface CatalogHeaderProps {
 }
 
 export function CatalogHeader({ collectionLinks }: CatalogHeaderProps) {
-  const { t } = useTranslation(['courses', 'translation']);
+  const { t } = useTranslation(['course-catalog', 'translation']);
   const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
   
   // Show create button only if the "create" link exists in collection-level links
@@ -26,7 +26,7 @@ export function CatalogHeader({ collectionLinks }: CatalogHeaderProps) {
             {t("navbar.catalog")}
           </h1>
           <p className="text-lg text-muted-foreground">
-            {t('courses:catalog.subtitle')}
+            {t('course-catalog:catalog.subtitle')}
           </p>
         </div>
 
@@ -37,7 +37,7 @@ export function CatalogHeader({ collectionLinks }: CatalogHeaderProps) {
             className="hidden md:flex gap-2"
           >
             <SlidersHorizontal className="h-4 w-4" />
-            {t('courses:catalog.filters')}
+            {t('course-catalog:catalog.filters')}
           </Button>
 
           {canCreateCourse && (
@@ -47,7 +47,7 @@ export function CatalogHeader({ collectionLinks }: CatalogHeaderProps) {
               onClick={() => setIsAddCourseOpen(true)}
             >
               <Plus className="h-4 w-4" />
-              {t('courses:catalog.addCourse')}
+              {t('course-catalog:catalog.addCourse')}
             </Button>
           )}
         </div>

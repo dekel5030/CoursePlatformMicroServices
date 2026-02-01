@@ -13,7 +13,7 @@ interface CourseMetadataProps {
  * CourseMetadata: Displays course information like instructor, stats, category, and tags
  */
 export function CourseMetadata({ course }: CourseMetadataProps) {
-  const { t, i18n } = useTranslation(["courses", "translation"]);
+  const { t, i18n } = useTranslation(["course-management", "translation"]);
   const isRTL = i18n.dir() === "rtl";
   const textAlignClass = isRTL ? "text-right" : "text-left";
 
@@ -23,7 +23,7 @@ export function CourseMetadata({ course }: CourseMetadataProps) {
     <Card>
       <CardHeader>
         <CardTitle className={textAlignClass}>
-          {t("courses:detail.courseInfo")}
+          {t("course-management:detail.courseInfo")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -46,7 +46,7 @@ export function CourseMetadata({ course }: CourseMetadataProps) {
           </Avatar>
           <div className={textAlignClass}>
             <p className="text-sm text-muted-foreground">
-              {t("courses:detail.instructor")}
+              {t("course-management:detail.instructor")}
             </p>
             <p className="font-semibold">{course.instructorName}</p>
           </div>
@@ -60,7 +60,7 @@ export function CourseMetadata({ course }: CourseMetadataProps) {
             <Users className="h-4 w-4 text-muted-foreground" />
             <div className={textAlignClass}>
               <p className="text-sm text-muted-foreground">
-                {t("courses:detail.enrolled")}
+                {t("course-management:detail.enrolled")}
               </p>
               <p className="font-semibold">{course.enrollmentCount || 0}</p>
             </div>
@@ -72,7 +72,7 @@ export function CourseMetadata({ course }: CourseMetadataProps) {
             <BookOpen className="h-4 w-4 text-muted-foreground" />
             <div className={textAlignClass}>
               <p className="text-sm text-muted-foreground">
-                {t("courses:detail.lessons")}
+                {t("course-management:detail.lessons")}
               </p>
               <p className="font-semibold">{course.lessonCount || 0}</p>
             </div>
@@ -85,7 +85,7 @@ export function CourseMetadata({ course }: CourseMetadataProps) {
               <Clock className="h-4 w-4 text-muted-foreground" />
               <div className={textAlignClass}>
                 <p className="text-sm text-muted-foreground">
-                  {t("courses:detail.duration")}
+                  {t("course-management:detail.duration")}
                 </p>
                 <p className="font-semibold">{formattedDuration}</p>
               </div>
@@ -99,7 +99,7 @@ export function CourseMetadata({ course }: CourseMetadataProps) {
               <FolderTree className="h-4 w-4 text-muted-foreground" />
               <div className={textAlignClass}>
                 <p className="text-sm text-muted-foreground">
-                  {t("courses:detail.category")}
+                  {t("course-management:detail.category")}
                 </p>
                 <p className="font-semibold">{course.categoryName}</p>
               </div>
@@ -115,7 +115,7 @@ export function CourseMetadata({ course }: CourseMetadataProps) {
             >
               <Tag className="h-4 w-4 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
-                {t("courses:detail.tags")}
+                {t("course-management:detail.tags")}
               </p>
             </div>
             <div

@@ -19,7 +19,7 @@ interface LessonProps {
 
 export default function LessonCard({ lesson, index, courseId }: LessonProps) {
   const navigate = useNavigate();
-  const { t } = useTranslation(["lessons", "translation"]);
+  const { t } = useTranslation(["lesson-viewer", "translation"]);
 
   const patchLesson = usePatchLesson(courseId, lesson.lessonId);
   const deleteLesson = useDeleteLesson(lesson.courseId);
@@ -61,9 +61,9 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
         url: updateLink.href,
         request: { title: newTitle },
       });
-      toast.success(t("lessons:actions.titleUpdated"));
+      toast.success(t("lesson-viewer:actions.titleUpdated"));
     } catch (error) {
-      toast.error(t("lessons:actions.titleUpdateFailed"));
+      toast.error(t("lesson-viewer:actions.titleUpdateFailed"));
       throw error;
     }
   };
@@ -103,7 +103,7 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
                       onSave={handleTitleUpdate}
                       displayClassName="font-medium text-sm text-start truncate"
                       inputClassName="font-medium text-sm text-start"
-                      placeholder={t("lessons:actions.enterTitle")}
+                      placeholder={t("lesson-viewer:actions.enterTitle")}
                       maxLength={200}
                     />
                   </div>
@@ -119,7 +119,7 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
             <div className="flex items-center gap-2 shrink-0">
               {lesson.isPreview && (
                 <Badge variant="secondary" className="text-xs h-5 font-normal">
-                  {t("lessons:card.preview")}
+                  {t("lesson-viewer:card.preview")}
                 </Badge>
               )}
               {durationText && (
@@ -149,8 +149,8 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleConfirmDelete}
-        title={t("lessons:actions.deleteConfirmTitle")}
-        message={t("lessons:actions.deleteConfirmMessage")}
+        title={t("lesson-viewer:actions.deleteConfirmTitle")}
+        message={t("lesson-viewer:actions.deleteConfirmMessage")}
         confirmText={t("common.delete")}
         cancelText={t("common.cancel")}
         isLoading={deleteLesson.isPending}

@@ -8,7 +8,7 @@ interface CategoryFilterProps {
 }
 
 export function CategoryFilter({ categories, selectedCategory, onSelectCategory }: CategoryFilterProps) {
-  const { t } = useTranslation(['courses', 'translation']);
+  const { t } = useTranslation(['course-catalog', 'translation']);
 
   if (categories.length === 0) return null;
 
@@ -23,7 +23,7 @@ export function CategoryFilter({ categories, selectedCategory, onSelectCategory 
         onClick={() => onSelectCategory(null)}
         className="rounded-full px-6 transition-all"
       >
-        {t('courses:catalog.all')}
+        {t('course-catalog:catalog.all')}
       </Button>
       {categories.map((cat) => (
         <Button

@@ -17,7 +17,7 @@ interface CourseHeaderProps {
 }
 
 export function CourseHeader({ course }: CourseHeaderProps) {
-  const { t } = useTranslation(["courses", "translation"]);
+  const { t } = useTranslation(["course-management", "translation"]);
   const patchCourse = usePatchCourse(course.id);
 
   const canUpdate = hasLink(course.links, CourseRels.PARTIAL_UPDATE);
@@ -30,9 +30,9 @@ export function CourseHeader({ course }: CourseHeaderProps) {
     }
     try {
       await patchCourse.mutateAsync({ url: updateLink.href, request: { title: newTitle } });
-      toast.success(t("courses:detail.titleUpdated"));
+      toast.success(t("course-management:detail.titleUpdated"));
     } catch (error) {
-      toast.error(t("courses:detail.titleUpdateFailed"));
+      toast.error(t("course-management:detail.titleUpdateFailed"));
       throw error;
     }
   };
@@ -69,7 +69,7 @@ export function CourseHeader({ course }: CourseHeaderProps) {
                 onSave={handleTitleUpdate}
                 displayClassName="text-2xl font-bold break-words text-start"
                 inputClassName="text-2xl font-bold text-start"
-                placeholder={t("courses:detail.enterTitle")}
+                placeholder={t("course-management:detail.enterTitle")}
                 maxLength={200}
               />
             ) : (
@@ -95,7 +95,7 @@ export function CourseHeader({ course }: CourseHeaderProps) {
               )}
             </Avatar>
             <div className="text-start min-w-0">
-              <p className="text-xs text-muted-foreground">{t("courses:detail.instructor")}</p>
+              <p className="text-xs text-muted-foreground">{t("course-management:detail.instructor")}</p>
               <p className="font-medium truncate">{course.instructorName}</p>
             </div>
           </div>
@@ -105,12 +105,12 @@ export function CourseHeader({ course }: CourseHeaderProps) {
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Users className="h-3.5 w-3.5 shrink-0" />
               <span>{course.enrollmentCount ?? 0}</span>
-              <span>{t("courses:detail.enrolled")}</span>
+              <span>{t("course-management:detail.enrolled")}</span>
             </div>
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <BookOpen className="h-3.5 w-3.5 shrink-0" />
               <span>{course.lessonCount ?? 0}</span>
-              <span>{t("courses:detail.lessons")}</span>
+              <span>{t("course-management:detail.lessons")}</span>
             </div>
             {formattedDuration && (
               <div className="flex items-center gap-1.5 text-muted-foreground">
@@ -146,7 +146,7 @@ export function CourseHeader({ course }: CourseHeaderProps) {
             <p className="text-xl font-semibold text-start">
               {course.price.amount > 0
                 ? `${course.price.amount} ${course.price.currency}`
-                : t("courses:detail.free")}
+                : t("course-management:detail.free")}
             </p>
             <div className="flex items-center gap-2">
               <CourseImageUpload courseId={course.id} links={course.links} />
@@ -158,11 +158,11 @@ export function CourseHeader({ course }: CourseHeaderProps) {
           <div className="flex gap-2 pt-1">
             <Button className="flex-1 gap-2 min-w-0" size="default">
               <CreditCard className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t("courses:detail.buyNow")}</span>
+              <span className="truncate">{t("course-management:detail.buyNow")}</span>
             </Button>
             <Button variant="outline" className="flex-1 gap-2 min-w-0" size="default">
               <ShoppingCart className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t("courses:detail.addToCart")}</span>
+              <span className="truncate">{t("course-management:detail.addToCart")}</span>
             </Button>
           </div>
         </div>

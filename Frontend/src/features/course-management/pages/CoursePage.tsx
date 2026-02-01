@@ -21,7 +21,7 @@ export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
   const { data: course, isLoading, error } = useCourse(id);
   const patchCourse = usePatchCourse(id!);
-  const { t, i18n } = useTranslation(["courses", "translation"]);
+  const { t, i18n } = useTranslation(["course-management", "translation"]);
   const dir = i18n.dir();
 
   const handleDescriptionUpdate = async (newDescription: string) => {
@@ -36,9 +36,9 @@ export default function CoursePage() {
         url: updateLink.href,
         request: { description: newDescription },
       });
-      toast.success(t("courses:detail.descriptionUpdated"));
+      toast.success(t("course-management:detail.descriptionUpdated"));
     } catch (error) {
-      toast.error(t("courses:detail.descriptionUpdateFailed"));
+      toast.error(t("course-management:detail.descriptionUpdateFailed"));
       throw error;
     }
   };
@@ -96,7 +96,7 @@ export default function CoursePage() {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
-          {t("courses:detail.notFound")}
+          {t("course-management:detail.notFound")}
         </div>
       </div>
     );
@@ -144,7 +144,7 @@ export default function CoursePage() {
           <motion.div variants={item}>
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-start">{t("courses:detail.about")}</CardTitle>
+                <CardTitle className="text-start">{t("course-management:detail.about")}</CardTitle>
               </CardHeader>
               <CardContent className="text-start" dir={dir}>
                 {canUpdate ? (
@@ -152,7 +152,7 @@ export default function CoursePage() {
                     value={course.description || ""}
                     onSave={handleDescriptionUpdate}
                     displayClassName="text-muted-foreground text-start"
-                    placeholder={t("courses:detail.enterDescription")}
+                    placeholder={t("course-management:detail.enterDescription")}
                     rows={4}
                     maxLength={2000}
                     renderAsMarkdown={true}

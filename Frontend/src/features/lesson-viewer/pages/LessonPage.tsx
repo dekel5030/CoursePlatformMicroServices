@@ -45,7 +45,7 @@ export default function LessonPage() {
   const patchLesson = usePatchLesson(courseId!, lessonId!);
   const generateAi = useGenerateLessonAi();
 
-  const { t } = useTranslation(["lessons", "translation"]);
+  const { t } = useTranslation(["lesson-viewer", "translation"]);
 
   const [aiTitle, setAiTitle] = useState<string | null>(null);
   const [aiDescription, setAiDescription] = useState<string | null>(null);
@@ -62,10 +62,10 @@ export default function LessonPage() {
         url: updateLink.href,
         request: { title: newTitle },
       });
-      toast.success(t("lessons:actions.titleUpdated"));
+      toast.success(t("lesson-viewer:actions.titleUpdated"));
       setAiTitle(null);
     } catch (error) {
-      toast.error(t("lessons:actions.titleUpdateFailed"));
+      toast.error(t("lesson-viewer:actions.titleUpdateFailed"));
       throw error;
     }
   };
@@ -82,10 +82,10 @@ export default function LessonPage() {
         url: updateLink.href,
         request: { description: newDescription },
       });
-      toast.success(t("lessons:actions.descriptionUpdated"));
+      toast.success(t("lesson-viewer:actions.descriptionUpdated"));
       setAiDescription(null);
     } catch (error) {
-      toast.error(t("lessons:actions.descriptionUpdateFailed"));
+      toast.error(t("lesson-viewer:actions.descriptionUpdateFailed"));
       throw error;
     }
   };
@@ -103,13 +103,13 @@ export default function LessonPage() {
       setAiTitle(result.title);
       setAiDescription(result.description);
 
-      toast.success(t("lessons:actions.aiGenerateSuccess"));
+      toast.success(t("lesson-viewer:actions.aiGenerateSuccess"));
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { title?: string } } };
       if (axiosError?.response?.data?.title === "Lesson.NoTranscript") {
-        toast.error(t("lessons:actions.aiGenerateNoTranscript"));
+        toast.error(t("lesson-viewer:actions.aiGenerateNoTranscript"));
       } else {
-        toast.error(t("lessons:actions.aiGenerateFailed"));
+        toast.error(t("lesson-viewer:actions.aiGenerateFailed"));
       }
       console.error("Failed to generate with AI:", error);
     }
@@ -230,7 +230,7 @@ export default function LessonPage() {
             <Card className="overflow-hidden border-0 shadow-lg">
               <CardContent className="p-12 text-center space-y-4">
                 <p className="text-muted-foreground">
-                  {t("lessons:pages.lesson.noVideo")}
+                  {t("lesson-viewer:pages.lesson.noVideo")}
                 </p>
                 <LessonVideoUpload
                   courseId={lesson.courseId}
@@ -273,12 +273,12 @@ export default function LessonPage() {
                       {generateAi.isPending ? (
                         <>
                           <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          {t("lessons:actions.generatingWithAi")}
+                          {t("lesson-viewer:actions.generatingWithAi")}
                         </>
                       ) : (
                         <>
                           <Sparkles className="h-4 w-4" />
-                          {t("lessons:actions.generateWithAi")}
+                          {t("lesson-viewer:actions.generateWithAi")}
                         </>
                       )}
                     </Button>
@@ -294,7 +294,7 @@ export default function LessonPage() {
                   onAccept={handleAcceptTitle}
                   onReject={() => setAiTitle(null)}
                   type="text"
-                  placeholder={t("lessons:actions.enterTitle")}
+                  placeholder={t("lesson-viewer:actions.enterTitle")}
                   maxLength={200}
                 />
               )}
@@ -307,7 +307,7 @@ export default function LessonPage() {
                   onAccept={handleAcceptDescription}
                   onReject={() => setAiDescription(null)}
                   type="textarea"
-                  placeholder={t("lessons:actions.enterDescription")}
+                  placeholder={t("lesson-viewer:actions.enterDescription")}
                   maxLength={2000}
                   rows={5}
                 />
@@ -323,7 +323,7 @@ export default function LessonPage() {
                         onSave={handleAcceptTitle}
                         displayClassName="text-3xl font-semibold"
                         inputClassName="text-3xl font-semibold"
-                        placeholder={t("lessons:actions.enterTitle")}
+                        placeholder={t("lesson-viewer:actions.enterTitle")}
                         maxLength={200}
                       />
                     </div>
@@ -354,14 +354,14 @@ export default function LessonPage() {
               <CardContent>
                 <div className="space-y-2">
                   <h2 className="text-lg font-semibold">
-                    {t("lessons:pages.lesson.description")}
+                    {t("lesson-viewer:pages.lesson.description")}
                   </h2>
                   {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
                     <InlineEditableTextarea
                       value={lesson.description || ""}
                       onSave={handleAcceptDescription}
                       displayClassName="text-muted-foreground leading-relaxed"
-                      placeholder={t("lessons:actions.enterDescription")}
+                      placeholder={t("lesson-viewer:actions.enterDescription")}
                       rows={5}
                       maxLength={2000}
                       renderAsMarkdown={true}
@@ -370,7 +370,7 @@ export default function LessonPage() {
                     <RichTextViewer content={lesson.description} />
                   ) : (
                     <p className="text-muted-foreground italic">
-                      {t("lessons:actions.noDescription")}
+                      {t("lesson-viewer:actions.noDescription")}
                     </p>
                   )}
                 </div>

@@ -15,7 +15,7 @@ interface ModuleCardProps {
 }
 
 export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
-  const { t } = useTranslation(["courses", "lessons", "translation"]);
+  const { t } = useTranslation(["course-management", "translation"]);
   const [isExpanded, setIsExpanded] = useState(true);
   const [isAddLessonOpen, setIsAddLessonOpen] = useState(false);
 
@@ -44,7 +44,7 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
                 </h3>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5 flex-wrap">
                   <span>
-                    {module.lessonCount} {t("courses:detail.lessons")}
+                    {module.lessonCount} {t("course-management:detail.lessons")}
                   </span>
                   {durationText && (
                     <>
@@ -71,7 +71,7 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
                   }}
                 >
                   <Plus className="h-3.5 w-3.5" />
-                  <span className="text-xs">{t("courses:detail.addLesson")}</span>
+                  <span className="text-xs">{t("course-management:detail.addLesson")}</span>
                 </Button>
               )}
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0 shrink-0">
@@ -94,7 +94,7 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
               ))
             ) : (
               <p className="text-muted-foreground text-sm py-3 text-start">
-                {t("courses:detail.noLessons")}
+                {t("course-management:detail.noLessons")}
               </p>
             )}
           </CardContent>
