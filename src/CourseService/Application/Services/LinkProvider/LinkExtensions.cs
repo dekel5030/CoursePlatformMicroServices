@@ -1,4 +1,5 @@
 using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Services.LinkProvider.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Courses.Application.Services.LinkProvider;
@@ -11,6 +12,8 @@ internal static class LinkExtensions
         services.AddScoped<ILinkDefinitionRegistry, ModuleLinkDefinitions>();
         services.AddScoped<ILinkDefinitionRegistry, LessonLinkDefinitions>();
         services.AddScoped<ILinkDefinitionRegistry, CourseCollectionLinkDefinitions>();
+        services.AddScoped<ILinkDefinitionRegistry, CourseRatingEligibilityLinkDefinitions>();
+        services.AddScoped<ILinkDefinitionRegistry, CourseRatingLinkDefinitions>();
         services.AddScoped<ILinkBuilderService, LinkBuilderService>();
 
         return services;

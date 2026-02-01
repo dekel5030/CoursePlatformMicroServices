@@ -1,7 +1,7 @@
 using Courses.Application.Services.Actions;
 using Courses.Application.Services.LinkProvider.Abstractions;
 
-namespace Courses.Application.Services.LinkProvider;
+namespace Courses.Application.Services.LinkProvider.Contracts;
 
 internal sealed class CourseCollectionLinkDefinitions : ILinkDefinitionRegistry
 {

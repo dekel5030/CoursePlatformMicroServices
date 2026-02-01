@@ -1,4 +1,4 @@
-namespace Courses.Application.Services.LinkProvider;
+namespace Courses.Application.Services.LinkProvider.Contracts;
 
 internal static class LinkHttpMethod
 {

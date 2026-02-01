@@ -1,4 +1,4 @@
-namespace Courses.Application.Services.LinkProvider;
+namespace Courses.Application.Services.LinkProvider.Contracts;
 
 /// <summary>
 /// Endpoint display names used for link generation. Must match the names used when mapping endpoints in Web.Api (e.g. WithName).
@@ -23,4 +23,10 @@ internal static class EndpointNames
     public const string DeleteLesson = "DeleteLesson";
     public const string GenerateLessonVideoUploadUrl = "GenerateLessonVideoUploadUrl";
     public const string GenerateLessonWithAi = "GenerateLessonWithAi";
+
+    // Course ratings
+    public const string GetCourseRatings = "GetCourseRatings";
+    public const string CreateCourseRating = "CreateCourseRating";
+    public const string UpdateCourseRating = "UpdateCourseRating";
+    public const string DeleteCourseRating = "DeleteCourseRating";
 }

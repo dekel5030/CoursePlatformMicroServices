@@ -1,4 +1,6 @@
-﻿namespace Courses.Application.Courses.Dtos;
+using Courses.Application.Services.LinkProvider.Abstractions;
+
+namespace Courses.Application.Courses.Dtos;
 
 public sealed record CourseRatingDto
 {
@@ -9,5 +11,5 @@ public sealed record CourseRatingDto
     public required string Comment { get; init; } = string.Empty;
     public required DateTimeOffset CreatedAt { get; init; }
     public required DateTimeOffset? UpdatedAt { get; init; }
-
+    public required List<LinkDto> Links { get; init; }
 }

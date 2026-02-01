@@ -4,6 +4,7 @@ using Courses.Api.Extensions;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetCourseRatings;
 using Kernel;
+using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.CourseRatings;
@@ -15,6 +16,7 @@ internal sealed class GetCourseRatings : IEndpoint
         app.MapGet("courses/{courseId:Guid}/ratings", async (
             Guid courseId,
             IMediator mediator,
+            IUserContext userContext,
             CancellationToken cancellationToken,
             int pageNumber = 1,
             int pageSize = 10) =>

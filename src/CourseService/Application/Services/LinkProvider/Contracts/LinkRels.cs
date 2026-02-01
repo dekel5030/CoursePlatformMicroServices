@@ -1,4 +1,4 @@
-namespace Courses.Application.Services.LinkProvider;
+namespace Courses.Application.Services.LinkProvider.Contracts;
 
 internal static class LinkRels
 {
@@ -22,6 +22,12 @@ internal static class LinkRels
     internal static class Module
     {
         public const string CreateLesson = "create-lesson";
+    }
+
+    internal static class CourseRating
+    {
+        public const string Ratings = "ratings";
+        public const string CreateRating = "create-rating";
     }
 
     internal static class Pagination
