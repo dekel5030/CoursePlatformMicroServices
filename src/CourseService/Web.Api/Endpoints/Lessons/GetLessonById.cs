@@ -4,7 +4,6 @@ using Courses.Api.Extensions;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Lessons.Queries.GetById;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Modules.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -14,15 +13,13 @@ internal sealed class GetLessonById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("modules/{moduleId:Guid}/lessons/{lessonId:Guid}", async (
-            Guid moduleId,
+        app.MapGet("lessons/{lessonId:Guid}", async (
             Guid lessonId,
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var moduleIdObj = new ModuleId(moduleId);
             var lessonIdObj = new LessonId(lessonId);
-            var query = new GetLessonByIdQuery(moduleIdObj, lessonIdObj);
+            var query = new GetLessonByIdQuery(lessonIdObj);
 
             Result<LessonDetailsPageDto> result = await mediator.Send(query, cancellationToken);
 

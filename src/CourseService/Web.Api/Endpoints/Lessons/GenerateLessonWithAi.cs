@@ -1,9 +1,8 @@
-﻿using CoursePlatform.ServiceDefaults.CustomResults;
+using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.GenerateLessonWithAi;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Modules.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -13,15 +12,13 @@ internal sealed class GenerateLessonWithAi : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("modules/{moduleId:Guid}/lessons/{lessonId:Guid}/ai-generate", async (
-            Guid moduleId,
+        app.MapPost("lessons/{lessonId:Guid}/ai-generate", async (
             Guid lessonId,
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var moduleIdObj = new ModuleId(moduleId);
             var lessonIdObj = new LessonId(lessonId);
-            var command = new GenerateLessonWithAiCommand(moduleIdObj, lessonIdObj);
+            var command = new GenerateLessonWithAiCommand(lessonIdObj);
 
             Result<GenerateLessonWithAiResponse> result = await mediator.Send(command, cancellationToken);
 

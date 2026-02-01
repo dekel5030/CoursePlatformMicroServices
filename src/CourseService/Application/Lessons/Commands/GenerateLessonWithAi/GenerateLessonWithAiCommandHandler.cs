@@ -1,4 +1,4 @@
-﻿using Courses.Application.Abstractions.Ai;
+using Courses.Application.Abstractions.Ai;
 using Courses.Application.Abstractions.Data;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
@@ -27,9 +27,7 @@ internal sealed class GenerateLessonWithAiCommandHandler
         CancellationToken cancellationToken = default)
     {
         Lesson? lesson = await _dbContext.Lessons
-            .Where(lesson => lesson.Id == request.LessonId
-                    && lesson.ModuleId == request.ModuleId)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(l => l.Id == request.LessonId, cancellationToken);
 
         if (lesson is null)
         {

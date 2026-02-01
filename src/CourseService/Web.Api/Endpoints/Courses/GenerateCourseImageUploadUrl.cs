@@ -17,7 +17,7 @@ internal sealed class GenerateCourseImageUploadUrl : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/courses/{id:guid}/image-upload-url", async (
+        app.MapPost("courses/{id:Guid}/image-upload-url", async (
             Guid id,
             GenerateUploadUrlRequest request,
             IMediator mediator) =>

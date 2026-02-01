@@ -4,7 +4,6 @@ using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.GenerateLessonVideoUploadUrl;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Modules.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -16,17 +15,15 @@ internal sealed class GenerateLessonVideoUploadUrl : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("modules/{moduleId:Guid}/lessons/{lessonId:Guid}/video-upload-url", async (
-            Guid moduleId,
+        app.MapPost("lessons/{lessonId:Guid}/video-upload-url", async (
             Guid lessonId,
             GenerateLessonVideoUploadUrlRequest request,
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            ModuleId moduleIdObj = new(moduleId);
             LessonId lessonIdObj = new(lessonId);
             var command = new GenerateLessonVideoUploadUrlCommand(
-                moduleIdObj, lessonIdObj, request.FileName, request.ContentType);
+                lessonIdObj, request.FileName, request.ContentType);
 
             Result<GenerateUploadUrlDto> result = await mediator.Send(command, cancellationToken);
 

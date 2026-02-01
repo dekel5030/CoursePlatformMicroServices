@@ -3,7 +3,6 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.PatchLesson;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -20,8 +19,7 @@ internal sealed class PatchLesson : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("modules/{moduleId:Guid}/lessons/{lessonId:Guid}", async (
-            Guid moduleId,
+        app.MapPatch("lessons/{lessonId:Guid}", async (
             Guid lessonId,
             PatchLessonRequest request,
             IMediator mediator) =>
@@ -30,7 +28,6 @@ internal sealed class PatchLesson : IEndpoint
             Description? description = string.IsNullOrWhiteSpace(request.Description) ? null : new Description(request.Description);
 
             var command = new PatchLessonCommand(
-                new ModuleId(moduleId),
                 new LessonId(lessonId),
                 title,
                 description,
