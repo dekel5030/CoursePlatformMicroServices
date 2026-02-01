@@ -22,9 +22,15 @@
     "next": "הבא"
   },
   "time": {
-    "hour": "ש",
-    "minute": "ד",
-    "second": "ש"
+    "hour": "שעות",
+    "minute": "דקות",
+    "second": "שניות",
+    "hour_one": "שעה",
+    "hour_other": "שעות",
+    "minute_one": "דקה",
+    "minute_other": "דקות",
+    "second_one": "שנייה",
+    "second_other": "שניות"
   },
   "breadcrumbs": {
     "home": "בית",

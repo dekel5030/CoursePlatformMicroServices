@@ -19,7 +19,7 @@ import { Clock, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { getLink, hasLink } from "@/shared/utils";
+import { getLink, hasLink, formatDuration } from "@/shared/utils";
 import { LessonRels } from "@/domain/lessons";
 import { LessonVideoUpload } from "../components/LessonVideoUpload";
 import { AiSuggestionField } from "../components/AiSuggestionField";
@@ -166,11 +166,7 @@ export default function LessonPage() {
     );
   }
 
-  const formatDuration = (duration: string | null | undefined) => {
-    if (!duration) return null;
-    const parts = duration.split(":");
-    return `${parseInt(parts[1])}m ${parseInt(parts[2])}s`;
-  };
+  const formattedDuration = formatDuration(lesson.duration);
 
   const breadcrumbItems = [
     { label: t("breadcrumbs.home"), path: "/" },
@@ -337,10 +333,10 @@ export default function LessonPage() {
                     </CardTitle>
                   )}
                   <div className="flex items-center gap-2">
-                    {lesson.duration && (
+                    {formattedDuration && (
                       <div className="flex items-center gap-1 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
                         <Clock className="h-4 w-4" />
-                        {formatDuration(lesson.duration)}
+                        {formattedDuration}
                       </div>
                     )}
                     <LessonVideoUpload

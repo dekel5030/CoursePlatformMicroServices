@@ -8,7 +8,7 @@ import { CourseActions } from "./CourseActions";
 import { CourseImageUpload } from "./CourseImageUpload";
 import { usePatchCourse } from "@/domain/courses";
 import { toast } from "sonner";
-import { hasLink, getLink } from "@/shared/utils";
+import { hasLink, getLink, formatDuration } from "@/shared/utils";
 import { CourseRels } from "@/domain/courses";
 import type { CourseModel } from "@/domain/courses";
 
@@ -17,13 +17,9 @@ interface CourseHeaderProps {
 }
 
 export function CourseHeader({ course }: CourseHeaderProps) {
-  const { t, i18n } = useTranslation(["courses", "translation"]);
+  const { t } = useTranslation(["courses", "translation"]);
   const patchCourse = usePatchCourse(course.id);
 
-  const isRTL = i18n.dir() === "rtl";
-  const textAlignClass = isRTL ? "text-right" : "text-left";
-  
-  // Check if user can update course based on HATEOAS links
   const canUpdate = hasLink(course.links, CourseRels.PARTIAL_UPDATE);
   const updateLink = getLink(course.links, CourseRels.PARTIAL_UPDATE);
 
@@ -32,7 +28,6 @@ export function CourseHeader({ course }: CourseHeaderProps) {
       console.error("No update link found for this course");
       return;
     }
-    
     try {
       await patchCourse.mutateAsync({ url: updateLink.href, request: { title: newTitle } });
       toast.success(t("courses:detail.titleUpdated"));
@@ -42,118 +37,102 @@ export function CourseHeader({ course }: CourseHeaderProps) {
     }
   };
 
-  const formatDuration = (duration: string | undefined) => {
-    if (!duration || duration === "00:00:00") return null;
-    return duration;
-  };
-
   const formattedDuration = formatDuration(course.totalDuration);
+
+  const showCategory = course.categoryName && course.categoryName !== "Empty";
+  const showTags = course.tags && course.tags.length > 0;
 
   return (
     <Card className="overflow-hidden">
-      <div className="grid lg:grid-cols-[2fr_3fr] gap-6 p-6">
-        {/* Image Section */}
+      <div className="grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)] gap-6 p-6">
+        {/* Image */}
         {course.imageUrl && (
-          <div className="relative h-64 lg:h-80 overflow-hidden rounded-lg">
+          <div className="relative aspect-video lg:aspect-[4/3] overflow-hidden rounded-lg bg-muted">
             <motion.img
-              initial={{ scale: 1.1 }}
+              initial={{ scale: 1.05 }}
               animate={{ scale: 1 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.4 }}
               src={course.imageUrl}
               alt={course.title}
               className="h-full w-full object-cover"
             />
           </div>
         )}
-        
-        {/* Content Section */}
-        <div className="space-y-4">
+
+        {/* Content */}
+        <div className="flex flex-col min-w-0 gap-4">
           {/* Title */}
-          <div className={textAlignClass}>
+          <div className="text-start" dir="auto">
             {canUpdate ? (
               <InlineEditableText
                 value={course.title}
                 onSave={handleTitleUpdate}
-                displayClassName={`text-3xl font-bold break-words ${textAlignClass}`}
-                inputClassName={`text-3xl font-bold ${textAlignClass}`}
+                displayClassName="text-2xl font-bold break-words text-start"
+                inputClassName="text-2xl font-bold text-start"
                 placeholder={t("courses:detail.enterTitle")}
                 maxLength={200}
               />
             ) : (
-              <h1
-                dir="auto"
-                className={`text-3xl font-bold break-words ${textAlignClass}`}
-              >
+              <h1 className="text-2xl font-bold break-words text-start" dir="auto">
                 {course.title}
               </h1>
             )}
           </div>
 
-          {/* Instructor Info */}
-          <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
-            <Avatar className="h-10 w-10">
+          {/* Instructor */}
+          <div className="flex items-center gap-3">
+            <Avatar className="h-9 w-9 shrink-0">
               {course.instructorAvatarUrl ? (
                 <img
                   src={course.instructorAvatarUrl}
-                  alt={course.instructorName || "Instructor"}
+                  alt={course.instructorName || ""}
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary font-semibold text-sm">
-                  {course.instructorName?.charAt(0) || "I"}
+                <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary text-sm font-medium">
+                  {course.instructorName?.charAt(0) || "—"}
                 </div>
               )}
             </Avatar>
-            <div className={textAlignClass}>
-              <p className="text-sm text-muted-foreground">
-                {t("courses:detail.instructor")}
-              </p>
-              <p className="font-medium">{course.instructorName}</p>
+            <div className="text-start min-w-0">
+              <p className="text-xs text-muted-foreground">{t("courses:detail.instructor")}</p>
+              <p className="font-medium truncate">{course.instructorName}</p>
             </div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-4 py-2">
-            <div className={`flex flex-col ${textAlignClass}`}>
-              <div className={`flex items-center gap-1.5 text-muted-foreground mb-1 ${isRTL ? "flex-row-reverse" : ""}`}>
-                <Users className="h-4 w-4" />
-                <span className="text-xs">{t("courses:detail.enrolled")}</span>
-              </div>
-              <span className="text-lg font-semibold">{course.enrollmentCount || 0}</span>
+          {/* Stats: enrolled, lessons, duration */}
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Users className="h-3.5 w-3.5 shrink-0" />
+              <span>{course.enrollmentCount ?? 0}</span>
+              <span>{t("courses:detail.enrolled")}</span>
             </div>
-
-            <div className={`flex flex-col ${textAlignClass}`}>
-              <div className={`flex items-center gap-1.5 text-muted-foreground mb-1 ${isRTL ? "flex-row-reverse" : ""}`}>
-                <BookOpen className="h-4 w-4" />
-                <span className="text-xs">{t("courses:detail.lessons")}</span>
-              </div>
-              <span className="text-lg font-semibold">{course.lessonCount || 0}</span>
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <BookOpen className="h-3.5 w-3.5 shrink-0" />
+              <span>{course.lessonCount ?? 0}</span>
+              <span>{t("courses:detail.lessons")}</span>
             </div>
-
             {formattedDuration && (
-              <div className={`flex flex-col ${textAlignClass}`}>
-                <div className={`flex items-center gap-1.5 text-muted-foreground mb-1 ${isRTL ? "flex-row-reverse" : ""}`}>
-                  <Clock className="h-4 w-4" />
-                  <span className="text-xs">{t("courses:detail.duration")}</span>
-                </div>
-                <span className="text-lg font-semibold">{formattedDuration}</span>
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Clock className="h-3.5 w-3.5 shrink-0" />
+                <span>{formattedDuration}</span>
               </div>
             )}
           </div>
 
           {/* Category & Tags */}
-          {(course.categoryName || (course.tags && course.tags.length > 0)) && (
-            <div className={`space-y-2 ${textAlignClass}`}>
-              {course.categoryName && course.categoryName !== "Empty" && (
-                <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
-                  <Tag className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">{course.categoryName}</span>
+          {(showCategory || showTags) && (
+            <div className="flex flex-wrap items-center gap-2 text-start">
+              {showCategory && (
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Tag className="h-3.5 w-3.5 shrink-0" />
+                  <span className="text-sm">{course.categoryName}</span>
                 </div>
               )}
-              {course.tags && course.tags.length > 0 && (
-                <div className={`flex flex-wrap gap-1.5 ${isRTL ? "justify-end" : ""}`}>
-                  {course.tags.map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
+              {showTags && (
+                <div className="flex flex-wrap gap-1.5">
+                  {course.tags!.map((tag, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs font-normal">
                       {tag}
                     </Badge>
                   ))}
@@ -162,45 +141,29 @@ export function CourseHeader({ course }: CourseHeaderProps) {
             </div>
           )}
 
-          {/* Price & Actions */}
-          <div className="flex items-center justify-between gap-3 pt-2">
-            <div className={textAlignClass}>
-              <p className="text-2xl font-bold">
-                {course.price.amount > 0 
-                  ? `${course.price.amount} ${course.price.currency}`
-                  : t("courses:detail.free")
-                }
-              </p>
-            </div>
-            
-            <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+          {/* Price & actions row */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border">
+            <p className="text-xl font-semibold text-start">
+              {course.price.amount > 0
+                ? `${course.price.amount} ${course.price.currency}`
+                : t("courses:detail.free")}
+            </p>
+            <div className="flex items-center gap-2">
               <CourseImageUpload courseId={course.id} links={course.links} />
               <CourseActions courseId={course.id} links={course.links} />
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
-            <motion.div
-              className="flex-1"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button className="w-full gap-2" size="lg">
-                <CreditCard className="h-4 w-4" />
-                {t("courses:detail.buyNow")}
-              </Button>
-            </motion.div>
-            <motion.div
-              className="flex-1"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button variant="outline" className="w-full gap-2" size="lg">
-                <ShoppingCart className="h-4 w-4" />
-                {t("courses:detail.addToCart")}
-              </Button>
-            </motion.div>
+          {/* Primary actions */}
+          <div className="flex gap-2 pt-1">
+            <Button className="flex-1 gap-2 min-w-0" size="default">
+              <CreditCard className="h-4 w-4 shrink-0" />
+              <span className="truncate">{t("courses:detail.buyNow")}</span>
+            </Button>
+            <Button variant="outline" className="flex-1 gap-2 min-w-0" size="default">
+              <ShoppingCart className="h-4 w-4 shrink-0" />
+              <span className="truncate">{t("courses:detail.addToCart")}</span>
+            </Button>
           </div>
         </div>
       </div>

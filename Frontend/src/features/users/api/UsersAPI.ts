@@ -1,4 +1,4 @@
-import { axiosClient } from "@/axios/axiosClient";
+import { axiosClient } from "@/app/axios";
 import type { User } from "../types/User";
 import type { UpdateUserRequest } from "../types/UpdateUserRequest";
 

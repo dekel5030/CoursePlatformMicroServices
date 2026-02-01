@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatDuration } from "@/shared/utils";
 import type { CourseModel } from "@/domain/courses";
 import { DifficultyLevel, CourseStatus } from "@/domain/courses";
 import { Card, CardContent, CardHeader, Badge, Avatar } from "@/shared/ui";
@@ -31,15 +32,6 @@ export default function CourseCard({ course }: Props) {
 
   const hasDiscount =
     course.originalPrice && course.originalPrice.amount > safeAmount;
-
-  const formatDuration = (duration?: string) => {
-    if (!duration || duration === "00:00:00") return null;
-    const parts = duration.split(":");
-    const hours = parseInt(parts[0]);
-    const minutes = parseInt(parts[1]);
-    if (hours > 0) return `${hours}h ${minutes}m`;
-    return `${minutes}m`;
-  };
 
   const durationText = formatDuration(course.totalDuration);
 

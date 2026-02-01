@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Card, CardHeader, CardTitle, CardContent, Badge } from "@/shared/ui";
 import { Avatar } from "@/shared/ui";
 import { Users, BookOpen, Clock, Tag, FolderTree } from "lucide-react";
+import { formatDuration } from "@/shared/utils";
 import type { CourseModel } from "@/domain/courses";
 
 interface CourseMetadataProps {
@@ -16,10 +17,7 @@ export function CourseMetadata({ course }: CourseMetadataProps) {
   const isRTL = i18n.dir() === "rtl";
   const textAlignClass = isRTL ? "text-right" : "text-left";
 
-  const formatDuration = (duration: string | undefined) => {
-    if (!duration) return "00:00:00";
-    return duration;
-  };
+  const formattedDuration = formatDuration(course.totalDuration);
 
   return (
     <Card>
@@ -80,7 +78,7 @@ export function CourseMetadata({ course }: CourseMetadataProps) {
             </div>
           </div>
 
-          {course.totalDuration && (
+          {formattedDuration && (
             <div
               className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}
             >
@@ -89,9 +87,7 @@ export function CourseMetadata({ course }: CourseMetadataProps) {
                 <p className="text-sm text-muted-foreground">
                   {t("courses:detail.duration")}
                 </p>
-                <p className="font-semibold">
-                  {formatDuration(course.totalDuration)}
-                </p>
+                <p className="font-semibold">{formattedDuration}</p>
               </div>
             </div>
           )}

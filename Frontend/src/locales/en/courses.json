@@ -1,0 +1,75 @@
+{
+  "detail": {
+    "descriptionUpdated": "Description updated successfully",
+    "titleUpdated": "Title updated successfully",
+    "titleUpdateFailed": "Failed to update title",
+    "notFound": "Course not found",
+    "about": "About",
+    "enterDescription": "Enter course description",
+    "enterTitle": "Enter course title",
+    "instructor": "Instructor",
+    "enrolled": "Enrolled",
+    "lessons": "Lessons",
+    "duration": "Duration",
+    "free": "Free",
+    "buyNow": "Buy Now",
+    "addToCart": "Add to Cart",
+    "delete": "Delete",
+    "courseInfo": "Course Info",
+    "category": "Category",
+    "tags": "Tags",
+    "invalidFileType": "Invalid file type",
+    "uploadSuccess": "Image uploaded successfully",
+    "uploadFailed": "Failed to upload image",
+    "uploading": "Uploading...",
+    "uploadImage": "Upload Image",
+    "addLesson": "Add Lesson",
+    "noLessons": "No lessons",
+    "module": "Module",
+    "courseContent": "Course Content",
+    "addModule": "Add Module",
+    "noModules": "No modules yet",
+    "createFirstModule": "Create your first module"
+  },
+  "actions": {
+    "editNotImplemented": "Edit is not yet implemented",
+    "deleteSuccess": "Course deleted successfully",
+    "deleteFailed": "Failed to delete course",
+    "deleteConfirmTitle": "Delete Course",
+    "deleteConfirmMessage": "Are you sure you want to delete this course? This action cannot be undone."
+  },
+  "addDialog": {
+    "validationError": "Please fill in all required fields",
+    "successMessage": "Course created successfully",
+    "errorMessage": "Failed to create course: {{message}}",
+    "title": "Add Course",
+    "description": "Create a new course for your catalog.",
+    "titleLabel": "Course Title",
+    "titlePlaceholder": "Enter course title",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Enter course description",
+    "cancel": "Cancel",
+    "submitting": "Creating...",
+    "submit": "Create Course"
+  },
+  "catalog": {
+    "errorLoading": "Error loading courses: {{message}}",
+    "noCourses": "No courses found",
+    "addCourse": "Add Course",
+    "all": "All",
+    "subtitle": "Browse and manage your courses",
+    "filters": "Filters"
+  },
+  "difficulty": {
+    "label": "Difficulty",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "card": {
+    "sale": "Sale"
+  },
+  "status": {
+    "draft": "Draft"
+  }
+}

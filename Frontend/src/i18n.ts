@@ -1,30 +1,33 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import HttpApi from "i18next-http-backend";
 
-// Import locale files directly for better reliability
+// Import locale files directly for reliable loading (no HTTP)
 import translationEN from "./locales/en/translation.json";
 import translationHE from "./locales/he/translation.json";
 import authEN from "./features/auth/locales/en/auth.json";
 import authHE from "./features/auth/locales/he/auth.json";
+import coursesEN from "./locales/en/courses.json";
+import coursesHE from "./locales/he/courses.json";
+import lessonsEN from "./locales/en/lessons.json";
+import lessonsHE from "./locales/he/lessons.json";
 
-// Note: courses and lessons locales are loaded dynamically via HttpApi
-// They are located in dist/locales/en/courses.json and dist/locales/en/lessons.json
-// Define resources with feature-based structure
 const resources = {
   en: {
     translation: translationEN,
     auth: authEN,
+    courses: coursesEN,
+    lessons: lessonsEN,
   },
   he: {
     translation: translationHE,
     auth: authHE,
+    courses: coursesHE,
+    lessons: lessonsHE,
   },
 };
 
 i18n
-  .use(HttpApi)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({

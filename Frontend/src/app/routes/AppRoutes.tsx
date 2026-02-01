@@ -1,12 +1,7 @@
 import { Routes, Route } from "react-router-dom";
-// TODO: Move layouts to app/layouts
 import { Layout, ManagementLayout } from "@/components/layout";
 import { ProtectedRoute } from "@/shared/common";
-// TODO: Update imports after features are migrated
-import {
-  CourseCatalogPage,
-  AllCoursesPage,
-} from "@/features/course-catalog";
+import { CourseCatalogPage, AllCoursesPage } from "@/features/course-catalog";
 import { CoursePage } from "@/features/course-management";
 import { LessonPage } from "@/features/lesson-viewer";
 import { UserProfilePage } from "@/features/user-profile";

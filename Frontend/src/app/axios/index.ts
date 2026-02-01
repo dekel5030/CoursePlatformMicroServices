@@ -1,3 +1,8 @@
 export * from './config';
-export { axiosClient, setLogoutCallback, getLogoutCallback } from './axiosClient';
+export {
+  axiosClient,
+  setLogoutCallback,
+  getLogoutCallback,
+  type ApiErrorResponse,
+} from './axiosClient';
 export { AxiosInterceptorProvider } from './AxiosInterceptorProvider';

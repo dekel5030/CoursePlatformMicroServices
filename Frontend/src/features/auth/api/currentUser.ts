@@ -1,4 +1,4 @@
-import { axiosClient } from "@/axios/axiosClient";
+import { axiosClient } from "@/app/axios";
 import type { CurrentUserDto } from "../types/CurrentUserDto";
 import type { UserModel } from "../types/UserModel";
 

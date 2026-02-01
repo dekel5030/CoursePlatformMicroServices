@@ -22,10 +22,7 @@ export default function CoursePage() {
   const { data: course, isLoading, error } = useCourse(id);
   const patchCourse = usePatchCourse(id!);
   const { t, i18n } = useTranslation(["courses", "translation"]);
-
-  // Determine text alignment based on interface locale
-  const isRTL = i18n.dir() === "rtl";
-  const textAlignClass = isRTL ? "text-right" : "text-left";
+  const dir = i18n.dir();
 
   const handleDescriptionUpdate = async (newDescription: string) => {
     const updateLink = getLink(course?.links, CourseRels.PARTIAL_UPDATE);
@@ -105,8 +102,6 @@ export default function CoursePage() {
     );
   }
 
-  const contentDir = i18n.dir();
-
   // Check if user can update course based on HATEOAS links
   const canUpdate = hasLink(course.links, CourseRels.PARTIAL_UPDATE);
 
@@ -149,16 +144,14 @@ export default function CoursePage() {
           <motion.div variants={item}>
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className={textAlignClass}>
-                  {t("courses:detail.about")}
-                </CardTitle>
+                <CardTitle className="text-start">{t("courses:detail.about")}</CardTitle>
               </CardHeader>
-              <CardContent className={textAlignClass}>
+              <CardContent className="text-start" dir={dir}>
                 {canUpdate ? (
                   <InlineEditableTextarea
                     value={course.description || ""}
                     onSave={handleDescriptionUpdate}
-                    displayClassName={`text-muted-foreground ${textAlignClass}`}
+                    displayClassName="text-muted-foreground text-start"
                     placeholder={t("courses:detail.enterDescription")}
                     rows={4}
                     maxLength={2000}
@@ -174,7 +167,7 @@ export default function CoursePage() {
 
         {/* Course Content - Modules & Lessons */}
         <motion.div variants={item}>
-          <CourseLessonsSection course={course} contentDir={contentDir} />
+          <CourseLessonsSection course={course} />
         </motion.div>
       </motion.div>
     </div>

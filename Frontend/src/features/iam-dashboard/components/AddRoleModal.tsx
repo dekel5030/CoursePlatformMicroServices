@@ -10,7 +10,7 @@ import {
 } from "@/components";
 import { Button, FormField } from "@/components";
 import { AlertCircle } from "lucide-react";
-import type { ApiErrorResponse } from "@/axios/axiosClient";
+import type { ApiErrorResponse } from "@/app/axios";
 import { useTranslation } from "react-i18next";
 
 interface AddRoleModalProps {

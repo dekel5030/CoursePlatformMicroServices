@@ -1,0 +1,75 @@
+{
+  "detail": {
+    "descriptionUpdated": "התיאור עודכן בהצלחה",
+    "titleUpdated": "הכותרת עודכנה בהצלחה",
+    "titleUpdateFailed": "עדכון הכותרת נכשל",
+    "notFound": "הקורס לא נמצא",
+    "about": "אודות",
+    "enterDescription": "הזן תיאור קורס",
+    "enterTitle": "הזן כותרת קורס",
+    "instructor": "מרצה",
+    "enrolled": "נרשמו",
+    "lessons": "שיעורים",
+    "duration": "משך",
+    "free": "חינם",
+    "buyNow": "קנה עכשיו",
+    "addToCart": "הוסף לעגלה",
+    "delete": "מחק",
+    "courseInfo": "מידע על הקורס",
+    "category": "קטגוריה",
+    "tags": "תגיות",
+    "invalidFileType": "סוג קובץ לא תקין",
+    "uploadSuccess": "התמונה הועלתה בהצלחה",
+    "uploadFailed": "העלאת התמונה נכשלה",
+    "uploading": "מעלה...",
+    "uploadImage": "העלה תמונה",
+    "addLesson": "הוסף שיעור",
+    "noLessons": "אין שיעורים",
+    "module": "מודול",
+    "courseContent": "תוכן הקורס",
+    "addModule": "הוסף מודול",
+    "noModules": "אין מודולים עדיין",
+    "createFirstModule": "צור את המודול הראשון שלך"
+  },
+  "actions": {
+    "editNotImplemented": "עריכה טרם מיושמת",
+    "deleteSuccess": "הקורס נמחק בהצלחה",
+    "deleteFailed": "מחיקת הקורס נכשלה",
+    "deleteConfirmTitle": "מחיקת קורס",
+    "deleteConfirmMessage": "האם אתה בטוח שברצונך למחוק קורס זה? לא ניתן לבטל פעולה זו."
+  },
+  "addDialog": {
+    "validationError": "נא למלא את כל השדות הנדרשים",
+    "successMessage": "הקורס נוצר בהצלחה",
+    "errorMessage": "יצירת הקורס נכשלה: {{message}}",
+    "title": "הוסף קורס",
+    "description": "צור קורס חדש לקטלוג.",
+    "titleLabel": "כותרת הקורס",
+    "titlePlaceholder": "הזן כותרת קורס",
+    "descriptionLabel": "תיאור",
+    "descriptionPlaceholder": "הזן תיאור קורס",
+    "cancel": "ביטול",
+    "submitting": "יוצר...",
+    "submit": "צור קורס"
+  },
+  "catalog": {
+    "errorLoading": "שגיאה בטעינת קורסים: {{message}}",
+    "noCourses": "לא נמצאו קורסים",
+    "addCourse": "הוסף קורס",
+    "all": "הכל",
+    "subtitle": "עיין ונהל את הקורסים שלך",
+    "filters": "מסננים"
+  },
+  "difficulty": {
+    "label": "רמת קושי",
+    "easy": "קל",
+    "medium": "בינוני",
+    "hard": "קשה"
+  },
+  "card": {
+    "sale": "מבצע"
+  },
+  "status": {
+    "draft": "טיוטה"
+  }
+}

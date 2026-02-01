@@ -11,14 +11,10 @@ import type { CourseModel } from "@/domain/courses";
 
 interface CourseLessonsSectionProps {
   course: CourseModel;
-  contentDir: string;
 }
 
-export function CourseLessonsSection({
-  course,
-  contentDir,
-}: CourseLessonsSectionProps) {
-  const { t, i18n } = useTranslation(["courses", "translation"]);
+export function CourseLessonsSection({ course }: CourseLessonsSectionProps) {
+  const { t } = useTranslation(["courses", "translation"]);
   const createModule = useCreateModule(course.id);
 
   const sortedModules = useMemo(() => {
@@ -26,19 +22,13 @@ export function CourseLessonsSection({
     return [...course.modules].sort((a, b) => a.order - b.order);
   }, [course.modules]);
 
-  const isRTL = i18n.dir() === "rtl";
-  const textAlignClass = isRTL ? "text-right" : "text-left";
-
-  // Check permissions based on HATEOAS links
   const canCreateModule = hasLink(course.links, CourseRels.CREATE_MODULE);
   const createModuleLink = getLink(course.links, CourseRels.CREATE_MODULE);
 
   const handleCreateModule = async () => {
     if (!createModuleLink) return;
-
     const moduleNumber = sortedModules.length + 1;
     const title = `${t("courses:detail.module")} ${moduleNumber}`;
-
     await createModule.mutateAsync({
       url: createModuleLink.href,
       request: { title },
@@ -47,15 +37,15 @@ export function CourseLessonsSection({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className={textAlignClass}>
+      <CardHeader className="flex flex-row items-center justify-between gap-4 py-4">
+        <CardTitle className="text-start text-lg">
           {t("courses:detail.courseContent")}
         </CardTitle>
         {canCreateModule && (
           <Button
             size="sm"
             variant="outline"
-            className="gap-2"
+            className="gap-2 shrink-0"
             onClick={handleCreateModule}
             disabled={createModule.isPending}
           >
@@ -64,21 +54,21 @@ export function CourseLessonsSection({
           </Button>
         )}
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2 pb-6 pt-0">
         {sortedModules.length > 0 ? (
           sortedModules.map((module, index) => (
             <motion.div
               key={module.id || `index-${index}`}
-              initial={{ opacity: 0, x: contentDir === "rtl" ? 10 : -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: index * 0.04 }}
             >
               <ModuleCard module={module} courseId={course.id} index={index} />
             </motion.div>
           ))
         ) : (
-          <div className="text-center py-8 space-y-4">
-            <p className={`text-muted-foreground ${textAlignClass}`}>
+          <div className="py-10 text-center space-y-4">
+            <p className="text-muted-foreground text-start">
               {t("courses:detail.noModules")}
             </p>
             {canCreateModule && (
