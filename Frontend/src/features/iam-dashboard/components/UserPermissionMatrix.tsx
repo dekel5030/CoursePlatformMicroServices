@@ -6,7 +6,7 @@ import { useUserManagement } from "../hooks";
 import { groupPermissionsByCategory } from "../utils/permissionUtils";
 import type { AddPermissionRequest } from "../types/AddPermissionRequest";
 import type { PermissionDto } from "../types/PermissionDto";
-import type { ApiErrorResponse } from "@/axios/axiosClient";
+import type { ApiErrorResponse } from "@/app/axios";
 
 interface UserPermissionMatrixProps {
   userId: string;

@@ -3,7 +3,7 @@ import { useUser, useUserManagement } from "../hooks";
 import { Button, Badge, Skeleton } from "@/components";
 import ConfirmationModal from "./ConfirmationModal";
 import AddRoleModal from "./AddRoleModal";
-import type { ApiErrorResponse } from "@/axios/axiosClient";
+import type { ApiErrorResponse } from "@/app/axios";
 
 interface UserRoleManagementProps {
   userId: string;

@@ -1,7 +1,7 @@
 import { BrowserRouter } from "react-router-dom";
-import AppRoutes from "@/routes/AppRoutes";
-import { AuthProvider, AxiosInterceptorProvider } from "@/providers";
-import { Toaster } from "@/components";
+import { AppRoutes } from "@/app/routes";
+import { AuthProvider, AxiosInterceptorProvider } from "@/app/providers";
+import { Toaster } from "@/shared/ui";
 
 export default function App() {
   return (

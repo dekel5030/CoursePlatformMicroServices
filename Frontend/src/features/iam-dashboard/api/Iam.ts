@@ -1,4 +1,4 @@
-import { axiosClient } from "@/axios/axiosClient";
+import { axiosClient } from "@/app/axios";
 import type { AddRoleRequest } from "../types/AddRoleRequest";
 import type { AddPermissionRequest } from "../types/AddPermissionRequest";
 import type { UserDto } from "../types/UserDto";

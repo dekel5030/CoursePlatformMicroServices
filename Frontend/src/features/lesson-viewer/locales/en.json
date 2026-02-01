@@ -1,0 +1,48 @@
+{
+  "actions": {
+    "titleUpdated": "Title updated successfully",
+    "titleUpdateFailed": "Failed to update title",
+    "descriptionUpdated": "Description updated successfully",
+    "descriptionUpdateFailed": "Failed to update description",
+    "aiGenerateSuccess": "Transcript generated successfully",
+    "aiGenerateNoTranscript": "No transcript could be generated",
+    "aiGenerateFailed": "Failed to generate transcript",
+    "generatingWithAi": "Generating with AI...",
+    "generateWithAi": "Generate with AI",
+    "enterTitle": "Enter lesson title",
+    "enterDescription": "Enter lesson description",
+    "noDescription": "No description",
+    "deleteConfirmTitle": "Delete Lesson",
+    "deleteConfirmMessage": "Are you sure you want to delete this lesson? This action cannot be undone."
+  },
+  "pages": {
+    "lesson": {
+      "noVideo": "No video available",
+      "description": "Description"
+    }
+  },
+  "card": {
+    "preview": "Preview"
+  },
+  "addDialog": {
+    "validationError": "Please fill in all required fields",
+    "errorMessage": "Failed to create lesson: {{message}}",
+    "successMessage": "Lesson created successfully",
+    "title": "Add Lesson",
+    "description": "Create a new lesson for this module.",
+    "titleLabel": "Lesson Title",
+    "titlePlaceholder": "Enter lesson title",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Enter lesson description",
+    "cancel": "Cancel",
+    "submitting": "Creating...",
+    "submit": "Create Lesson"
+  },
+  "detail": {
+    "invalidVideoType": "Invalid video file type",
+    "videoUploadSuccess": "Video uploaded successfully",
+    "videoUploadFailed": "Failed to upload video",
+    "uploadingVideo": "Uploading video...",
+    "uploadVideo": "Upload Video"
+  }
+}

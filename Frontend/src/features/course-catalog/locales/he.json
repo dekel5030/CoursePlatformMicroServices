@@ -1,0 +1,22 @@
+{
+  "catalog": {
+    "errorLoading": "שגיאה בטעינת קורסים: {{message}}",
+    "noCourses": "לא נמצאו קורסים",
+    "addCourse": "הוסף קורס",
+    "all": "הכל",
+    "subtitle": "עיין ונהל את הקורסים שלך",
+    "filters": "מסננים"
+  },
+  "difficulty": {
+    "label": "רמת קושי",
+    "easy": "קל",
+    "medium": "בינוני",
+    "hard": "קשה"
+  },
+  "card": {
+    "sale": "מבצע"
+  },
+  "status": {
+    "draft": "טיוטה"
+  }
+}

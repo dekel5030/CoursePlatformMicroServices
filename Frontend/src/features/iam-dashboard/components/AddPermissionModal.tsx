@@ -19,7 +19,7 @@ import {
 } from "@/components";
 import { AlertCircle } from "lucide-react";
 import type { AddPermissionRequest } from "../types/AddPermissionRequest";
-import type { ApiErrorResponse } from "@/axios/axiosClient";
+import type { ApiErrorResponse } from "@/app/axios";
 import { useTranslation } from "react-i18next";
 
 interface AddPermissionModalProps {

@@ -12,7 +12,7 @@ import {
 import { Button, FormField } from "@/components/ui";
 import { AlertCircle } from "lucide-react";
 import { type User, type UpdateUserRequest } from "@/features/users/api";
-import type { ApiErrorResponse } from "@/axios/axiosClient";
+import type { ApiErrorResponse } from "@/app/axios";
 import { useTranslation } from "react-i18next";
 
 type EditProfileModalProps = {

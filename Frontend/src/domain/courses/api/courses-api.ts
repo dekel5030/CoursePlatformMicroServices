@@ -1,0 +1,157 @@
+import { axiosClient } from "@/app/axios";
+import axios from "axios";
+import type {
+  CourseDetailsDto,
+  CourseSummaryDto,
+  CreateCourseRequestDto,
+  UpdateCourseRequestDto,
+} from "../types";
+import type { PagedResponse } from "@/shared/types/LinkDto";
+import {
+  mapCourseDetailsToModel,
+  mapCourseSummaryToModel,
+} from "../mappers";
+import type { CourseModel } from "../types/CourseModel";
+
+export interface CreateCourseResponse {
+  courseId: string;
+}
+
+export interface FetchAllCoursesResult {
+  courses: CourseModel[];
+  links: import("@/shared/types/LinkDto").LinkDto[];
+}
+
+export interface GenerateUploadUrlRequest {
+  fileName: string;
+  contentType: string;
+}
+
+export interface GenerateUploadUrlResponse {
+  uploadUrl: string;
+  fileKey: string;
+  expiresAt: string;
+}
+
+export interface CreateModuleRequest {
+  title?: string;
+}
+
+export interface CreateModuleResponse {
+  moduleId: string;
+  courseId: string;
+  title: string;
+}
+
+/**
+ * Fetch featured courses
+ */
+export async function fetchFeaturedCourses(): Promise<CourseModel[]> {
+  const response = await axiosClient.get<
+    CourseSummaryDto[] | PagedResponse<CourseSummaryDto>
+  >("/courses/featured");
+  const data = response.data;
+  const dtos = Array.isArray(data) ? data : data.items || [];
+  return dtos.map(mapCourseSummaryToModel);
+}
+
+/**
+ * Fetch a course by ID
+ */
+export async function fetchCourseById(id: string): Promise<CourseModel> {
+  const response = await axiosClient.get<CourseDetailsDto>(`/courses/${id}`);
+  return mapCourseDetailsToModel(response.data);
+}
+
+/**
+ * Create a new course
+ */
+export async function createCourse(
+  request: CreateCourseRequestDto,
+): Promise<CreateCourseResponse> {
+  const response = await axiosClient.post<{ id: string }>("/courses", request);
+  return { courseId: response.data.id };
+}
+
+/**
+ * Update a course (partial update via HATEOAS link)
+ */
+export async function patchCourse(
+  url: string,
+  request: UpdateCourseRequestDto,
+): Promise<void> {
+  await axiosClient.patch(url, request);
+}
+
+/**
+ * Delete a course (via HATEOAS link)
+ */
+export async function deleteCourse(url: string): Promise<void> {
+  await axiosClient.delete(url);
+}
+
+/**
+ * Fetch all courses with pagination support
+ */
+export async function fetchAllCourses(
+  url?: string,
+): Promise<FetchAllCoursesResult> {
+  const endpoint = url || "/courses";
+  const response = await axiosClient.get<
+    CourseSummaryDto[] | PagedResponse<CourseSummaryDto>
+  >(endpoint);
+  const data = response.data;
+
+  // Handle both legacy array format and new PagedResponse format
+  if (Array.isArray(data)) {
+    return {
+      courses: data.map(mapCourseSummaryToModel),
+      links: [],
+    };
+  }
+
+  return {
+    courses: data.items.map(mapCourseSummaryToModel),
+    links: data.links,
+  };
+}
+
+/**
+ * Generate an upload URL for course image
+ */
+export async function generateImageUploadUrl(
+  uploadUrl: string,
+  request: GenerateUploadUrlRequest,
+): Promise<GenerateUploadUrlResponse> {
+  const response = await axiosClient.post<GenerateUploadUrlResponse>(
+    uploadUrl,
+    request,
+  );
+  return response.data;
+}
+
+/**
+ * Upload image to storage
+ */
+export async function uploadImageToStorage(
+  uploadUrl: string,
+  file: File,
+): Promise<void> {
+  // Use a raw axios instance for binary upload to avoid default JSON headers
+  await axios.put(uploadUrl, file, {
+    headers: {
+      "Content-Type": file.type,
+    },
+  });
+}
+
+/**
+ * Create a new module in a course
+ */
+export async function createModule(
+  url: string,
+  request: CreateModuleRequest = {},
+): Promise<CreateModuleResponse> {
+  const response = await axiosClient.post<CreateModuleResponse>(url, request);
+  return response.data;
+}
