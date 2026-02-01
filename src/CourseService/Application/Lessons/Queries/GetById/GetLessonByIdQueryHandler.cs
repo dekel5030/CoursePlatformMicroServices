@@ -1,7 +1,6 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Dtos;
-using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses;
@@ -34,7 +33,7 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
         CancellationToken cancellationToken = default)
     {
         Lesson? lesson = await _dbContext.Lessons
-            .FirstOrDefaultAsync(lesson => lesson.Id == request.LessonId, cancellationToken);
+            .FirstOrDefaultAsync(l => l.Id == request.LessonId, cancellationToken);
 
         if (lesson is null)
         {
@@ -61,10 +60,14 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             ? _urlResolver.Resolve(StorageCategory.Public, lesson.Transcript.Path).Value
             : null;
 
-        var courseState = new CourseState(course.Id, course.InstructorId, course.Status);
-        var moduleState = new ModuleState(lesson.ModuleId);
-        var lessonState = new LessonState(lesson.Id, lesson.Access);
-        var lessonContext = new LessonLinkContext(courseState, moduleState, lessonState, null);
+        var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
+        var moduleContext = new ModuleContext(courseContext, lesson.ModuleId);
+
+        var lessonContext = new LessonContext(
+            moduleContext,
+            lesson.Id,
+            lesson.Access,
+            HasEnrollment: false);
 
         var pageDto = new LessonDetailsPageDto
         {

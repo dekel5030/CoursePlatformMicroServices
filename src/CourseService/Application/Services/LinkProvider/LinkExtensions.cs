@@ -1,5 +1,5 @@
 using Courses.Application.Services.LinkProvider.Abstractions;
-using Courses.Application.Services.LinkProvider.Contracts;
+using Courses.Application.Services.LinkProvider.Definitions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Courses.Application.Services.LinkProvider;

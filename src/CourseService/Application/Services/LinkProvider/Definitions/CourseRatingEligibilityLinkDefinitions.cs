@@ -1,12 +1,9 @@
 using Courses.Application.Services.Actions;
 using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Services.LinkProvider.constants;
 
-namespace Courses.Application.Services.LinkProvider.Contracts;
+namespace Courses.Application.Services.LinkProvider.Definitions;
 
-/// <summary>
-/// Link definitions for CourseRatingEligibility context.
-/// Used in GetCourseById to add "ratings" and "create-rating" links.
-/// </summary>
 internal sealed class CourseRatingEligibilityLinkDefinitions : ILinkDefinitionRegistry
 {
     private IReadOnlyList<ILinkDefinition>? _definitions;
@@ -26,14 +23,14 @@ internal sealed class CourseRatingEligibilityLinkDefinitions : ILinkDefinitionRe
                 rel: LinkRels.CourseRating.Ratings,
                 method: LinkHttpMethod.Get,
                 endpointName: EndpointNames.GetCourseRatings,
-                policyCheck: ctx => CourseRatingGovernancePolicy.Can(CourseRatingAction.ReadRatings, ctx),
+                policyCheck: _ => CourseRatingGovernancePolicy.CanReadRatings(),
                 getRouteValues: ctx => new { courseId = ctx.CourseId.Value }),
 
             new LinkDefinition<CourseRatingEligibilityContext>(
                 rel: LinkRels.CourseRating.CreateRating,
                 method: LinkHttpMethod.Post,
                 endpointName: EndpointNames.CreateCourseRating,
-                policyCheck: ctx => CourseRatingGovernancePolicy.Can(CourseRatingAction.Create, ctx),
+                policyCheck: ctx => CourseRatingGovernancePolicy.CanCreateRating(ctx),
                 getRouteValues: ctx => new { courseId = ctx.CourseId.Value })
         }.AsReadOnly();
 

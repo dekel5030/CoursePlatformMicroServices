@@ -1,8 +1,8 @@
 using Courses.Application.Services.Actions;
-using Courses.Application.Services.Actions.States;
 using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Services.LinkProvider.constants;
 
-namespace Courses.Application.Services.LinkProvider.Contracts;
+namespace Courses.Application.Services.LinkProvider.Definitions;
 
 internal sealed class CourseLinkDefinitions : ILinkDefinitionRegistry
 {
@@ -25,40 +25,40 @@ internal sealed class CourseLinkDefinitions : ILinkDefinitionRegistry
 
         _definitions = new List<ILinkDefinition>
         {
-            new LinkDefinition<CourseState>(
+            new LinkDefinition<CourseContext>(
                 rel: LinkRels.Self,
                 method: LinkHttpMethod.Get,
                 endpointName: EndpointNames.GetCourseById,
-                policyCheck: state => _policy.Can(CourseAction.Read, state),
-                getRouteValues: state => new { id = state.Id.Value }),
+                policyCheck: ctx => _policy.CanReadCourse(ctx),
+                getRouteValues: ctx => new { id = ctx.Id.Value }),
 
-            new LinkDefinition<CourseState>(
+            new LinkDefinition<CourseContext>(
                 rel: LinkRels.PartialUpdate,
                 method: LinkHttpMethod.Patch,
                 endpointName: EndpointNames.PatchCourse,
-                policyCheck: state => _policy.Can(CourseAction.Update, state),
-                getRouteValues: state => new { id = state.Id.Value }),
+                policyCheck: ctx => _policy.CanEditCourse(ctx),
+                getRouteValues: ctx => new { id = ctx.Id.Value }),
 
-            new LinkDefinition<CourseState>(
+            new LinkDefinition<CourseContext>(
                 rel: LinkRels.Delete,
                 method: LinkHttpMethod.Delete,
                 endpointName: EndpointNames.DeleteCourse,
-                policyCheck: state => _policy.Can(CourseAction.Delete, state),
-                getRouteValues: state => new { id = state.Id.Value }),
+                policyCheck: ctx => _policy.CanDeleteCourse(ctx),
+                getRouteValues: ctx => new { id = ctx.Id.Value }),
 
-            new LinkDefinition<CourseState>(
-                rel: LinkRels.Course.GenerateImageUploadUrl,
-                method: LinkHttpMethod.Post,
-                endpointName: EndpointNames.GenerateCourseImageUploadUrl,
-                policyCheck: state => _policy.Can(CourseAction.GenerateImageUploadUrl, state),
-                getRouteValues: state => new { id = state.Id.Value }),
+            new LinkDefinition<CourseContext>(
+                rel: LinkRels.CourseRating.Ratings,
+                method: LinkHttpMethod.Get,
+                endpointName: EndpointNames.GetCourseRatings,
+                policyCheck: _ => true,
+                getRouteValues: ctx => new { courseId = ctx.Id.Value }),
 
-            new LinkDefinition<CourseState>(
+            new LinkDefinition<CourseContext>(
                 rel: LinkRels.Course.CreateModule,
                 method: LinkHttpMethod.Post,
                 endpointName: EndpointNames.CreateModule,
-                policyCheck: state => _policy.Can(CourseAction.CreateModule, state),
-                getRouteValues: state => new { courseId = state.Id.Value })
+                policyCheck: ctx => _policy.CanEditCourse(ctx),
+                getRouteValues: ctx => new { courseId = ctx.Id.Value })
         }.AsReadOnly();
 
         return _definitions;

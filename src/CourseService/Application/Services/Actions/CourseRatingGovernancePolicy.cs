@@ -2,40 +2,20 @@ using Courses.Application.Services.LinkProvider;
 
 namespace Courses.Application.Services.Actions;
 
-/// <summary>
-/// Policy that decides when course rating actions (create, read, update, delete) are allowed.
-/// Used by link definitions to build links based on context.
-/// </summary>
 internal static class CourseRatingGovernancePolicy
 {
-    /// <summary>
-    /// Consolidated entry point for link eligibility checks.
-    /// Handles both CourseRatingEligibilityContext (GetCourseById) and CourseRatingLinkContext (GetCourseRatings).
-    /// </summary>
-    public static bool Can(CourseRatingAction action, object context)
-    {
-        if (context is CourseRatingEligibilityContext eligibilityContext)
-        {
-            return action switch
-            {
-                CourseRatingAction.ReadRatings => true,
-                CourseRatingAction.Create => eligibilityContext.CurrentUserId is not null && !eligibilityContext.UserHasExistingRating,
-                _ => false
-            };
-        }
+#pragma warning disable S3400 
+    public static bool CanReadRatings() => true;
+#pragma warning restore S3400 
 
-        if (context is CourseRatingLinkContext linkContext)
-        {
-            return action switch
-            {
-                CourseRatingAction.Update => linkContext.CurrentUserId is not null &&
-                    linkContext.OwnerIdentifier.Value == linkContext.CurrentUserId.Value,
-                CourseRatingAction.Delete => linkContext.CurrentUserId is not null &&
-                    linkContext.OwnerIdentifier.Value == linkContext.CurrentUserId.Value,
-                _ => false
-            };
-        }
+    public static bool CanCreateRating(CourseRatingEligibilityContext context) =>
+        context.CurrentUserId is not null && !context.UserHasExistingRating;
 
-        return false;
-    }
+    public static bool CanUpdateRating(CourseRatingLinkContext context) =>
+        context.CurrentUserId is not null &&
+        context.OwnerIdentifier.Value == context.CurrentUserId.Value;
+
+    public static bool CanDeleteRating(CourseRatingLinkContext context) =>
+        context.CurrentUserId is not null &&
+        context.OwnerIdentifier.Value == context.CurrentUserId.Value;
 }

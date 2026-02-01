@@ -46,25 +46,29 @@ internal static class FeaturedCourseCollectionDtoEnrichmentExtensions
         this CourseCollectionDto dto,
         ILinkBuilderService linkBuilder)
     {
-        var courseDtos = dto.Items.Select(courseDto =>
+        var enrichedItems = dto.Items.Select(courseSummaryDto =>
         {
-            var courseState = courseDto.ToCourseState();
-            IReadOnlyList<LinkDto> links = linkBuilder.BuildLinks(LinkResourceKey.Course, courseState);
-            return courseDto with { Links = links };
+            var courseContext = courseSummaryDto.ToCourseContext();
+            IReadOnlyList<LinkDto> links = linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext);
+
+            return courseSummaryDto with { Links = links };
         }).ToList();
 
-        var collectionContext = new PagedQueryDto
-        { Page = dto.PageNumber, PageSize = dto.PageSize }.ToCourseCollectionContext(dto.TotalItems);
+        var pagedQuery = new PagedQueryDto
+        {
+            Page = dto.PageNumber,
+            PageSize = dto.PageSize
+        };
+
+        var collectionContext = pagedQuery.ToCourseCollectionContext(dto.TotalItems);
+
         IReadOnlyList<LinkDto> collectionLinks = linkBuilder.BuildLinks(
             LinkResourceKey.CourseCollection,
             collectionContext);
 
-        return new CourseCollectionDto
+        return dto with
         {
-            Items = courseDtos,
-            PageNumber = dto.PageNumber,
-            PageSize = dto.PageSize,
-            TotalItems = dto.TotalItems,
+            Items = enrichedItems,
             Links = collectionLinks.ToList()
         };
     }

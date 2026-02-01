@@ -1,0 +1,52 @@
+using Courses.Application.Services.Actions;
+using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Services.LinkProvider.constants;
+
+namespace Courses.Application.Services.LinkProvider.Definitions;
+
+internal sealed class LessonLinkDefinitions : ILinkDefinitionRegistry
+{
+    private readonly CourseGovernancePolicy _policy;
+    private IReadOnlyList<ILinkDefinition>? _definitions;
+
+    public LessonLinkDefinitions(CourseGovernancePolicy policy)
+    {
+        _policy = policy;
+    }
+
+    public LinkResourceKey ResourceKey => LinkResourceKey.Lesson;
+
+    public IReadOnlyList<ILinkDefinition> GetDefinitions()
+    {
+        if (_definitions is not null)
+        {
+            return _definitions;
+        }
+
+        _definitions = new List<ILinkDefinition>
+        {
+            new LinkDefinition<LessonContext>(
+                rel: LinkRels.Self,
+                method: LinkHttpMethod.Get,
+                endpointName: EndpointNames.GetLessonById,
+                policyCheck: ctx => _policy.CanReadLesson(ctx),
+                getRouteValues: ctx => new { moduleId = ctx.Module.Id.Value, lessonId = ctx.Id.Value }),
+
+            new LinkDefinition<LessonContext>(
+                rel: LinkRels.PartialUpdate,
+                method: LinkHttpMethod.Patch,
+                endpointName: EndpointNames.PatchLesson,
+                policyCheck: ctx => _policy.CanEditLesson(ctx),
+                getRouteValues: ctx => new { moduleId = ctx.Module.Id.Value, lessonId = ctx.Id.Value }),
+
+            new LinkDefinition<LessonContext>(
+                rel: LinkRels.Lesson.UploadVideoUrl,
+                method: LinkHttpMethod.Post,
+                endpointName: EndpointNames.GenerateLessonVideoUploadUrl,
+                policyCheck: ctx => _policy.CanEditLesson(ctx),
+                getRouteValues: ctx => new { moduleId = ctx.Module.Id.Value, lessonId = ctx.Id.Value })
+        }.AsReadOnly();
+
+        return _definitions;
+    }
+}

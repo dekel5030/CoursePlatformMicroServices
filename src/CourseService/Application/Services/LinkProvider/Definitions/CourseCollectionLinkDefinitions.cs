@@ -1,7 +1,8 @@
 using Courses.Application.Services.Actions;
 using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Services.LinkProvider.constants;
 
-namespace Courses.Application.Services.LinkProvider.Contracts;
+namespace Courses.Application.Services.LinkProvider.Definitions;
 
 internal sealed class CourseCollectionLinkDefinitions : ILinkDefinitionRegistry
 {
@@ -28,28 +29,28 @@ internal sealed class CourseCollectionLinkDefinitions : ILinkDefinitionRegistry
                 rel: LinkRels.Self,
                 method: LinkHttpMethod.Get,
                 endpointName: EndpointNames.GetCourses,
-                policyCheck: ctx => _policy.Can(CourseCollectionAction.Self, ctx),
+                policyCheck: _ => true,
                 getRouteValues: ctx => ctx.Query),
 
             new LinkDefinition<CourseCollectionContext>(
                 rel: LinkRels.Pagination.NextPage,
                 method: LinkHttpMethod.Get,
                 endpointName: EndpointNames.GetCourses,
-                policyCheck: ctx => _policy.Can(CourseCollectionAction.NextPage, ctx),
+                policyCheck: ctx => CourseGovernancePolicy.CanShowNextPage(ctx),
                 getRouteValues: ctx => ctx.Query with { Page = (ctx.Query.Page ?? 1) + 1 }),
 
             new LinkDefinition<CourseCollectionContext>(
                 rel: LinkRels.Pagination.PreviousPage,
                 method: LinkHttpMethod.Get,
                 endpointName: EndpointNames.GetCourses,
-                policyCheck: ctx => _policy.Can(CourseCollectionAction.PreviousPage, ctx),
+                policyCheck: ctx => CourseGovernancePolicy.CanShowPreviousPage(ctx),
                 getRouteValues: ctx => ctx.Query with { Page = (ctx.Query.Page ?? 1) - 1 }),
 
             new LinkDefinition<CourseCollectionContext>(
                 rel: LinkRels.Create,
                 method: LinkHttpMethod.Post,
                 endpointName: EndpointNames.CreateCourse,
-                policyCheck: ctx => _policy.Can(CourseCollectionAction.Create, ctx),
+                policyCheck: _ => _policy.CanCreateCourse(),
                 getRouteValues: _ => (object?)null)
         }.AsReadOnly();
 
