@@ -1,32 +1,33 @@
+using Courses.Application.Abstractions.Data;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetCoursePage;
-using Courses.Application.Services.Actions.States;
-using Courses.Application.Services.LinkProvider.Abstractions.Factories;
+using Courses.Application.Services.LinkProvider;
+using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Modules.Primitives;
 using Kernel;
+using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Queries.GetById;
 
 internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CoursePageDto>
 {
-    private readonly ICourseLinkFactory _courseLinkFactory;
-    private readonly IModuleLinkFactory _moduleLinkFactory;
-    private readonly ILessonLinkFactory _lessonLinkFactory;
+    private readonly ILinkBuilderService _linkBuilder;
     private readonly IMediator _mediator;
+    private readonly IReadDbContext _dbContext;
+    private readonly IUserContext _userContext;
 
     public GetCourseByIdQueryHandler(
-        ICourseLinkFactory courseLinkFactory,
-        IModuleLinkFactory moduleLinkFactory,
-        ILessonLinkFactory lessonLinkFactory,
-        IMediator mediator)
+        ILinkBuilderService linkBuilder,
+        IMediator mediator,
+        IReadDbContext dbContext,
+        IUserContext userContext)
     {
-        _courseLinkFactory = courseLinkFactory;
-        _moduleLinkFactory = moduleLinkFactory;
-        _lessonLinkFactory = lessonLinkFactory;
+        _linkBuilder = linkBuilder;
         _mediator = mediator;
+        _dbContext = dbContext;
+        _userContext = userContext;
     }
 
     public async Task<Result<CoursePageDto>> Handle(
@@ -42,7 +43,22 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
         }
 
         CoursePageDto dto = innerQueryResult.Value;
-        dto.EnrichWithLinks(_courseLinkFactory, _moduleLinkFactory, _lessonLinkFactory);
+        var courseId = new CourseId(dto.Id);
+
+        UserId? currentUserId = _userContext.Id == null ? null : new UserId(_userContext.Id.Value);
+
+        bool userHasExistingRating = currentUserId is not null &&
+            await _dbContext.CourseRatings.AnyAsync(
+                r => r.CourseId == courseId && r.UserId == currentUserId,
+                cancellationToken);
+
+        var ratingEligibilityContext = new CourseRatingEligibilityContext(
+            courseId,
+            currentUserId,
+            userHasExistingRating);
+        dto.Links.AddRange(_linkBuilder.BuildLinks(LinkResourceKey.CourseRatingEligibility, ratingEligibilityContext));
+
+        dto.EnrichWithLinks(_linkBuilder);
 
         return Result.Success(dto);
     }
@@ -50,22 +66,21 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
 
 internal static class DtoEnrichmentExtensions
 {
-    public static void EnrichWithLinks(
-        this CoursePageDto dto,
-        ICourseLinkFactory courseLinkFactory,
-        IModuleLinkFactory moduleLinkFactory,
-        ILessonLinkFactory lessonLinkFactory)
+    public static void EnrichWithLinks(this CoursePageDto dto, ILinkBuilderService linkBuilder)
     {
-        var courseState = new CourseState(new CourseId(dto.Id), new UserId(dto.InstructorId), dto.Status);
-        dto.Links.AddRange(courseLinkFactory.CreateLinks(courseState));
+        var courseState = dto.ToCourseState();
+        dto.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Course, courseState));
         foreach (ModuleDto module in dto.Modules)
         {
-            var moduleState = new ModuleState(new ModuleId(module.Id));
-            module.Links.AddRange(moduleLinkFactory.CreateLinks(courseState, moduleState));
+            var moduleContext = module.ToModuleLinkContext(courseState);
+            module.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Module, moduleContext));
             foreach (LessonDto lesson in module.Lessons)
             {
-                var lessonState = new LessonState(new LessonId(lesson.Id), lesson.Access);
-                lesson.Links.AddRange(lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState));
+                var lessonContext = lesson.ToLessonLinkContext(
+                    courseState,
+                    moduleContext.ModuleState,
+                    null);
+                lesson.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Lesson, lessonContext));
             }
         }
     }

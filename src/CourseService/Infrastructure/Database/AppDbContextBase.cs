@@ -4,6 +4,7 @@ using Courses.Domain.Courses;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
+using Courses.Domain.Ratings;
 using Courses.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,7 @@ public abstract class AppDbContextBase : DbContext, IUnitOfWork
     public DbSet<Enrollment> Enrollments { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Module> Modules { get; set; }
+    public DbSet<CourseRating> CourseRatings { get; set; }
 
     protected AppDbContextBase(DbContextOptions options) : base(options)
     {

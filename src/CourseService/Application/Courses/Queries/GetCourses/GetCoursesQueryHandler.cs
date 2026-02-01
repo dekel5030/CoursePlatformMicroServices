@@ -1,10 +1,8 @@
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetCourseSummaries;
-using Courses.Application.Services.Actions.States;
+using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
-using Courses.Application.Services.LinkProvider.Abstractions.Factories;
 using Courses.Application.Shared.Dtos;
-using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -12,14 +10,14 @@ namespace Courses.Application.Courses.Queries.GetCourses;
 
 internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, CourseCollectionDto>
 {
-    private readonly ICourseLinkFactory _courseLinkFactory;
+    private readonly ILinkBuilderService _linkBuilder;
     private readonly IMediator _mediator;
 
     public GetCoursesQueryHandler(
-        ICourseLinkFactory courseLinkFactory,
+        ILinkBuilderService linkBuilder,
         IMediator mediator)
     {
-        _courseLinkFactory = courseLinkFactory;
+        _linkBuilder = linkBuilder;
         _mediator = mediator;
     }
 
@@ -36,7 +34,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
         }
 
         CourseCollectionDto dto = innerQueryResult.Value;
-        CourseCollectionDto enrichedDto = dto.EnrichWithLinks(_courseLinkFactory, request.PagedQuery);
+        CourseCollectionDto enrichedDto = dto.EnrichWithLinks(_linkBuilder, request.PagedQuery);
 
         return Result.Success(enrichedDto);
     }
@@ -46,18 +44,21 @@ internal static class CourseCollectionDtoEnrichmentExtensions
 {
     public static CourseCollectionDto EnrichWithLinks(
         this CourseCollectionDto dto,
-        ICourseLinkFactory courseLinkFactory,
+        ILinkBuilderService linkBuilder,
         PagedQueryDto pagedQuery)
     {
         var courseDtos = dto.Items.Select(courseDto =>
         {
-            var courseId = new CourseId(courseDto.Id);
-            var instructorId = new UserId(courseDto.Instructor.Id);
-            IReadOnlyList<LinkDto> links = courseLinkFactory.CreateLinks(
-                new CourseState(courseId, instructorId, courseDto.Status));
-
+            var courseState = courseDto.ToCourseState();
+            IReadOnlyList<LinkDto> links = linkBuilder.BuildLinks(LinkResourceKey.Course, courseState);
             return courseDto with { Links = links };
         }).ToList();
+
+        var collectionContext = (pagedQuery with
+        { Page = dto.PageNumber, PageSize = dto.PageSize }).ToCourseCollectionContext(dto.TotalItems);
+        IReadOnlyList<LinkDto> collectionLinks = linkBuilder.BuildLinks(
+            LinkResourceKey.CourseCollection,
+            collectionContext);
 
         return new CourseCollectionDto
         {
@@ -65,9 +66,7 @@ internal static class CourseCollectionDtoEnrichmentExtensions
             PageNumber = dto.PageNumber,
             PageSize = dto.PageSize,
             TotalItems = dto.TotalItems,
-            Links = courseLinkFactory.CreateCollectionLinks(
-                pagedQuery with { Page = dto.PageNumber, PageSize = dto.PageSize },
-                dto.TotalItems)
+            Links = collectionLinks.ToList()
         };
     }
 }

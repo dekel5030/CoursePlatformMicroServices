@@ -38,6 +38,29 @@
     "deleteConfirmTitle": "מחיקת קורס",
     "deleteConfirmMessage": "האם אתה בטוח שברצונך למחוק קורס זה? לא ניתן לבטל פעולה זו."
   },
+  "ratings": {
+    "sectionTitle": "ביקורות ודירוגים",
+    "addRating": "הוסף את הדירוג שלך",
+    "noRatings": "אין עדיין דירוגים. היה הראשון לסקור!",
+    "submit": "שלח דירוג",
+    "submitting": "שולח...",
+    "edit": "ערוך",
+    "delete": "מחק",
+    "deleteConfirmTitle": "מחיקת דירוג",
+    "deleteConfirmMessage": "האם אתה בטוח שברצונך למחוק את הדירוג שלך? לא ניתן לבטל פעולה זו.",
+    "editDialog": {
+      "title": "עריכת דירוג",
+      "description": "עדכן את הדירוג והתגובה שלך.",
+      "saving": "שומר..."
+    },
+    "scoreLabel": "הדירוג שלך",
+    "commentLabel": "תגובה",
+    "commentPlaceholder": "שתף את החוויה שלך עם הקורס הזה...",
+    "createSuccess": "תודה על הדירוג שלך!",
+    "updateSuccess": "הדירוג עודכן בהצלחה",
+    "deleteSuccess": "הדירוג נמחק בהצלחה",
+    "error": "משהו השתבש: {{message}}"
+  },
   "addDialog": {
     "validationError": "נא למלא את כל השדות הנדרשים",
     "successMessage": "הקורס נוצר בהצלחה",

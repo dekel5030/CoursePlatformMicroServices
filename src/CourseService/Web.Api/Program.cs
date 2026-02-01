@@ -4,7 +4,7 @@ using Courses.Api.Endpoints;
 using Courses.Api.Extensions;
 using Courses.Api.Infrastructure.LinkProvider;
 using Courses.Application;
-using Courses.Application.Services.LinkProvider.Abstractions.LinkProvider;
+using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Infrastructure;
 using Courses.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Http.Json;
@@ -28,9 +28,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICourseLinkProvider, CourseLinkProvider>();
-builder.Services.AddScoped<IModuleLinkProvider, ModuleLinkProvider>();
-builder.Services.AddScoped<ILessonLinkProvider, LessonLinkProvider>();
+builder.Services.AddScoped<IHttpLinkResolver, HttpLinkResolver>();
 
 WebApplication app = builder.Build();
 

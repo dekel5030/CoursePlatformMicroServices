@@ -3,6 +3,7 @@ using Courses.Domain.Shared;
 using Kernel.Messaging.Abstractions;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Courses.Infrastructure.Database.Write;
 
@@ -22,6 +23,7 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfW
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(DependencyInjection).Assembly,
             type => type.Namespace is not null &&
@@ -45,6 +47,8 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfW
 
         try
         {
+            ApplyAuditing();
+
             await DispatchDomainEvents(this, cancellationToken);
 
             return await base.SaveChangesAsync(cancellationToken);
@@ -78,4 +82,24 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfW
 
         return Task.WhenAll(tasks);
     }
+
+    private void ApplyAuditing()
+    {
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+
+        foreach (EntityEntry<IAuditable> entry in ChangeTracker.Entries<IAuditable>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.CreatedAtUtc = now;
+                    break;
+
+                case EntityState.Modified:
+                    entry.Entity.UpdatedAtUtc = now;
+                    break;
+            }
+        }
+    }
+
 }

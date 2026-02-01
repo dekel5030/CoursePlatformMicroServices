@@ -10,4 +10,16 @@ public record PaginatedCollectionDto<T>
     public required int TotalItems { get; init; }
     public int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize);
     public required IReadOnlyList<LinkDto>? Links { get; init; }
+
+    public static PaginatedCollectionDto<T> Empty(int pageNumber, int pageSize)
+    {
+        return new PaginatedCollectionDto<T>
+        {
+            Items = Array.Empty<T>(),
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalItems = 0,
+            Links = Array.Empty<LinkDto>()
+        };
+    }
 }

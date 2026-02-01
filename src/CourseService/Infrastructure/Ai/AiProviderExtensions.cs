@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenAI.Chat;
-using OpenAI.Responses;
 
 namespace Courses.Infrastructure.Ai;
 

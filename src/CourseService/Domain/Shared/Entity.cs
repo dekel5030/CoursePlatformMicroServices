@@ -20,9 +20,3 @@ public abstract class Entity<TId> : IHasId<TId>, IEntity
         _domainEvents.Add(domainEvent);
     }
 }
-
-public interface IEntity
-{
-    IReadOnlyCollection<IDomainEvent> DomainEvents { get; }
-    void ClearDomainEvents();
-}
