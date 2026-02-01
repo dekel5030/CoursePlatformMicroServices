@@ -10,7 +10,7 @@ internal static class GatewayConfiguration
         {
             // Courses Route
             CreateRoute("courses-route", "courseservice", "/api/courses/{**catch-all}", "/api"),
-            
+            CreateRoute("course-ratings", "courseservice", "/api/course-ratings/{**catch-all}", "/api"),
             // Lessons Route
             CreateRoute("lessons-route", "courseservice", "/api/lessons/{**catch-all}", "/api"),
             CreateRoute("modules-route", "courseservice", "/api/modules/{**catch-all}", "/api"),
