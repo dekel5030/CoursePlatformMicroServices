@@ -49,8 +49,9 @@ internal static class CourseCollectionDtoEnrichmentExtensions
     {
         var courseDtos = dto.Items.Select(courseDto =>
         {
-            var courseState = courseDto.ToCourseState();
-            IReadOnlyList<LinkDto> links = linkBuilder.BuildLinks(LinkResourceKey.Course, courseState);
+            var courseContext = courseDto.ToCourseContext();
+            IReadOnlyList<LinkDto> links = linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext);
+
             return courseDto with { Links = links };
         }).ToList();
 

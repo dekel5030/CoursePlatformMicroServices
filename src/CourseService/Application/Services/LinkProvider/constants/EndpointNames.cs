@@ -1,4 +1,4 @@
-namespace Courses.Application.Services.LinkProvider.Contracts;
+namespace Courses.Application.Services.LinkProvider.constants;
 
 /// <summary>
 /// Endpoint display names used for link generation. Must match the names used when mapping endpoints in Web.Api (e.g. WithName).

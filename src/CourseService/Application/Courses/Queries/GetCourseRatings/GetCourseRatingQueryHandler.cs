@@ -4,7 +4,6 @@ using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Ratings;
-using Courses.Domain.Ratings.Primitives;
 using Courses.Domain.Users;
 using Kernel;
 using Kernel.Auth.Abstractions;
@@ -85,7 +84,7 @@ public sealed class GetCourseRatingQueryHandler
             .Where(r => r.CourseId == courseId);
 
         int count = await query.CountAsync(cancellationToken);
-        
+
         List<CourseRating> items = await query
             .OrderByDescending(r => r.CreatedAtUtc)
             .Skip((request.PageNumber - 1) * request.PageSize)

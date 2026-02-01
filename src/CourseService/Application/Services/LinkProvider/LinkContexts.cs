@@ -1,29 +1,41 @@
-using Courses.Application.Services.Actions;
-using Courses.Application.Services.Actions.States;
+using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Ratings.Primitives;
 
 namespace Courses.Application.Services.LinkProvider;
 
-internal sealed record ModuleLinkContext(
-    CourseState CourseState,
-    ModuleState ModuleState) : ILinkEligibilityContext
+public sealed record CourseContext(
+    CourseId Id,
+    UserId InstructorId,
+    CourseStatus Status
+) : ILinkEligibilityContext
 {
-    public Guid ResourceId => ModuleState.Id.Value;
-    public Guid? OwnerId => CourseState.InstructorId.Value;
-    object? ILinkEligibilityContext.Status => CourseState.Status;
+    public Guid ResourceId => Id.Value;
+    public Guid? OwnerId => InstructorId.Value;
+    object? ILinkEligibilityContext.Status => Status;
 }
 
-internal sealed record LessonLinkContext(
-    CourseState CourseState,
-    ModuleState ModuleState,
-    LessonState LessonState,
-    EnrollmentState? EnrollmentState) : ILinkEligibilityContext
+internal sealed record ModuleContext(
+    CourseContext Course,
+    ModuleId Id) : ILinkEligibilityContext
 {
-    public Guid ResourceId => LessonState.Id.Value;
-    public Guid? OwnerId => CourseState.InstructorId.Value;
-    object? ILinkEligibilityContext.Status => LessonState.LessonAccess;
+    public Guid ResourceId => Id.Value;
+    public Guid? OwnerId => Course.InstructorId.Value;
+    object? ILinkEligibilityContext.Status => Course.Status;
+}
+
+internal sealed record LessonContext(
+    CourseContext Course,
+    LessonId Id,
+    LessonAccess Access,
+    bool HasEnrollment) : ILinkEligibilityContext
+{
+    public Guid ResourceId => Id.Value;
+    public Guid? OwnerId => Course.InstructorId.Value;
+    object? ILinkEligibilityContext.Status => Access;
 }
 
 internal sealed record CourseCollectionContext(
@@ -35,19 +47,16 @@ internal sealed record CourseCollectionContext(
     public object? Status => null;
 }
 
-/// <summary>
-/// Context for rating eligibility links in GetCourseById response.
-/// Used to build "ratings" (GET) and "create-rating" (POST) links.
-/// </summary>
 internal sealed record CourseRatingEligibilityContext(
     CourseId CourseId,
     UserId? CurrentUserId,
-    bool UserHasExistingRating);
+    bool UserHasExistingRating) : ILinkEligibilityContext
+{
+    public Guid ResourceId => CourseId.Value;
+    public Guid? OwnerId => null;
+    public object? Status => UserHasExistingRating;
+}
 
-/// <summary>
-/// Context for per-rating links in GetCourseRatings response.
-/// Used to build update/delete links for each rating according to policy.
-/// </summary>
 internal sealed record CourseRatingLinkContext(
     RatingId RatingId,
     UserId OwnerIdentifier,

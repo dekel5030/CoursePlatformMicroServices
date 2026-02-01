@@ -1,7 +1,8 @@
 using Courses.Application.Services.Actions;
 using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Services.LinkProvider.constants;
 
-namespace Courses.Application.Services.LinkProvider.Contracts;
+namespace Courses.Application.Services.LinkProvider.Definitions;
 
 internal sealed class ModuleLinkDefinitions : ILinkDefinitionRegistry
 {
@@ -24,12 +25,12 @@ internal sealed class ModuleLinkDefinitions : ILinkDefinitionRegistry
 
         _definitions = new List<ILinkDefinition>
         {
-            new LinkDefinition<ModuleLinkContext>(
+            new LinkDefinition<ModuleContext>(
                 rel: LinkRels.Module.CreateLesson,
                 method: LinkHttpMethod.Post,
                 endpointName: EndpointNames.CreateLesson,
-                policyCheck: ctx => _policy.Can(ModuleAction.CreateLesson, ctx),
-                getRouteValues: ctx => new { moduleId = ctx.ModuleState.Id.Value })
+                policyCheck: ctx => _policy.CanEditModule(ctx),
+                getRouteValues: ctx => new { moduleId = ctx.Id.Value })
         }.AsReadOnly();
 
         return _definitions;

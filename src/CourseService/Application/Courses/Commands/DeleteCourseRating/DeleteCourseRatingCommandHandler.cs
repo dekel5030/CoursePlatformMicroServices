@@ -3,7 +3,6 @@ using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Ratings;
 using Courses.Domain.Ratings.Errors;
-using Courses.Domain.Ratings.Primitives;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;

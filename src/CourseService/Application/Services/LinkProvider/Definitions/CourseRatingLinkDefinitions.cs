@@ -1,12 +1,9 @@
 using Courses.Application.Services.Actions;
 using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Services.LinkProvider.constants;
 
-namespace Courses.Application.Services.LinkProvider.Contracts;
+namespace Courses.Application.Services.LinkProvider.Definitions;
 
-/// <summary>
-/// Link definitions for CourseRating context.
-/// Used in GetCourseRatings to add update/delete links per rating according to policy.
-/// </summary>
 internal sealed class CourseRatingLinkDefinitions : ILinkDefinitionRegistry
 {
     private IReadOnlyList<ILinkDefinition>? _definitions;
@@ -26,14 +23,14 @@ internal sealed class CourseRatingLinkDefinitions : ILinkDefinitionRegistry
                 rel: LinkRels.PartialUpdate,
                 method: LinkHttpMethod.Patch,
                 endpointName: EndpointNames.UpdateCourseRating,
-                policyCheck: ctx => CourseRatingGovernancePolicy.Can(CourseRatingAction.Update, ctx),
+                policyCheck: ctx => CourseRatingGovernancePolicy.CanUpdateRating(ctx),
                 getRouteValues: ctx => new { ratingId = ctx.RatingId.Value }),
 
             new LinkDefinition<CourseRatingLinkContext>(
                 rel: LinkRels.Delete,
                 method: LinkHttpMethod.Delete,
                 endpointName: EndpointNames.DeleteCourseRating,
-                policyCheck: ctx => CourseRatingGovernancePolicy.Can(CourseRatingAction.Delete, ctx),
+                policyCheck: ctx => CourseRatingGovernancePolicy.CanDeleteRating(ctx),
                 getRouteValues: ctx => new { ratingId = ctx.RatingId.Value })
         }.AsReadOnly();
 

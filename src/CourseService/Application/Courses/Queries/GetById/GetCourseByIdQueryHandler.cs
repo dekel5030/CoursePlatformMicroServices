@@ -56,7 +56,9 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             courseId,
             currentUserId,
             userHasExistingRating);
-        dto.Links.AddRange(_linkBuilder.BuildLinks(LinkResourceKey.CourseRatingEligibility, ratingEligibilityContext));
+        dto.Links.AddRange(_linkBuilder.BuildLinks(
+            LinkResourceKey.CourseRatingEligibility,
+            ratingEligibilityContext));
 
         dto.EnrichWithLinks(_linkBuilder);
 
@@ -68,18 +70,18 @@ internal static class DtoEnrichmentExtensions
 {
     public static void EnrichWithLinks(this CoursePageDto dto, ILinkBuilderService linkBuilder)
     {
-        var courseState = dto.ToCourseState();
-        dto.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Course, courseState));
+        var courseContext = dto.ToCourseContext();
+        dto.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext));
         foreach (ModuleDto module in dto.Modules)
         {
-            var moduleContext = module.ToModuleLinkContext(courseState);
+            var moduleContext = module.ToModuleContext(courseContext);
             module.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Module, moduleContext));
             foreach (LessonDto lesson in module.Lessons)
             {
-                var lessonContext = lesson.ToLessonLinkContext(
-                    courseState,
-                    moduleContext.ModuleState,
-                    null);
+                var lessonContext = lesson.ToLessonContext(
+                    courseContext,
+                    false);
+
                 lesson.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Lesson, lessonContext));
             }
         }
