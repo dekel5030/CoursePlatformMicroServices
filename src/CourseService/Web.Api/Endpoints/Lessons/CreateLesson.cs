@@ -1,6 +1,5 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
-using Courses.Api.Endpoints.Modules;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Commands.CreateLesson;
 using Courses.Domain.Modules.Primitives;
@@ -36,8 +35,8 @@ internal sealed class CreateLesson : IEndpoint
 
             return result.Match(
                 lessonDto => Results.CreatedAtRoute(
-                    nameof(GetModulesByCourseId),
-                    new { courseId = lessonDto.CourseId },
+                    nameof(GetLessonById),
+                    new { lessonId = lessonDto.LessonId },
                     result.Value
                 ),
                 CustomResults.Problem);

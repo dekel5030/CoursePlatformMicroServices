@@ -5,7 +5,6 @@ using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Modules.Primitives;
 using FluentAssertions;
 using Moq;
 using Moq.EntityFrameworkCore;
@@ -44,9 +43,8 @@ public class GetLessonByIdQueryHandlerTest
     public async Task Handle_ShouldReturnFailure_WhenLessonDoesNotExist()
     {
         // Arrange
-        var moduleId = new ModuleId(Guid.NewGuid());
         var nonExistentLessonId = new LessonId(Guid.NewGuid());
-        var query = new GetLessonByIdQuery(moduleId, nonExistentLessonId);
+        var query = new GetLessonByIdQuery(nonExistentLessonId);
 
         _dbContextMock.Setup(db => db.Lessons).ReturnsDbSet(new List<Lesson>());
 

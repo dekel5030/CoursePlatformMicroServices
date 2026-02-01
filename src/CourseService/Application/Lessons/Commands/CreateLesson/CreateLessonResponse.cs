@@ -1,3 +1,3 @@
 namespace Courses.Application.Lessons.Commands.CreateLesson;
 
-public sealed record CreateLessonResponse(Guid CourseId, Guid ModuleId);
+public sealed record CreateLessonResponse(Guid LessonId, Guid CourseId, Guid ModuleId);
