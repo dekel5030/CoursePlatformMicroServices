@@ -10,8 +10,8 @@ public abstract class RatingBase : Entity<RatingId>, IAuditable
     public int Score { get; private set; }
     public string? Comment { get; private set; }
     public UserId UserId { get; private set; }
-    public DateTimeOffset? UpdatedAtUtc { get; private set; }
-    public DateTimeOffset CreatedAtUtc { get; private set; }
+    public DateTimeOffset? UpdatedAtUtc { get; set; }
+    public DateTimeOffset CreatedAtUtc { get; set; }
 
     protected RatingBase(UserId userId, int score, string? comment)
     {
