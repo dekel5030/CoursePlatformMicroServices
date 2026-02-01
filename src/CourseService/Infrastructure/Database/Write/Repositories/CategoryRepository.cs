@@ -1,7 +1,6 @@
 ﻿using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
-using Courses.Infrastructure.Database.Write;
 
 namespace Courses.Infrastructure.Database.Write.Repositories;
 

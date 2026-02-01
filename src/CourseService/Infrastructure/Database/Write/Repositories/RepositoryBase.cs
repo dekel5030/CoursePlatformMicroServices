@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Shared;
-using Courses.Infrastructure.Database.Write;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Infrastructure.Database.Write.Repositories;

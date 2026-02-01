@@ -2,7 +2,6 @@
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Ratings;
 using Courses.Domain.Ratings.Primitives;
-using Courses.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
