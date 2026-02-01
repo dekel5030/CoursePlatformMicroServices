@@ -26,6 +26,11 @@ public sealed class CourseRatingConfiguration : IEntityTypeConfiguration<CourseR
                 id => id.Value,
                 value => new CourseId(value));
 
+        builder.Property(r => r.UserId)
+            .HasConversion(
+                id => id.Value,
+                value => new UserId(value));
+
         builder.Property(r => r.Score)
             .IsRequired();
 
