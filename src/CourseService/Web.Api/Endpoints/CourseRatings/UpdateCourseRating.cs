@@ -15,7 +15,7 @@ internal sealed class UpdateCourseRating : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("courseRatings/{ratingId:Guid}", async (
+        app.MapPatch("course-ratings/{ratingId:Guid}", async (
             Guid ratingId,
             UpdateCourseRatingRequest request,
             IMediator mediator,

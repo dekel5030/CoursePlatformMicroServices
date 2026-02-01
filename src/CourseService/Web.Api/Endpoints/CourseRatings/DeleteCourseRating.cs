@@ -13,7 +13,7 @@ internal sealed class DeleteCourseRating : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("courseRatings/{ratingId:Guid}", async (
+        app.MapDelete("course-ratings/{ratingId:Guid}", async (
             Guid ratingId,
             IMediator mediator,
             CancellationToken cancellationToken) =>
