@@ -50,7 +50,7 @@ internal sealed class CourseLinkDefinitions : ILinkDefinitionRegistry
                 rel: LinkRels.CourseRating.Ratings,
                 method: LinkHttpMethod.Get,
                 endpointName: EndpointNames.GetCourseRatings,
-                policyCheck: _ => true, 
+                policyCheck: _ => true,
                 getRouteValues: ctx => new { courseId = ctx.Id.Value })
         }.AsReadOnly();
 
