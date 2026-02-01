@@ -15,4 +15,8 @@ public static class EnrollmentErrors
     public static readonly Error InvalidExpirationDate = Error.Validation(
         "Enrollment.InvalidExpirationDate",
         "Expiration date must be after enrollment date");
+
+    public static readonly Error Unauthenticated = Error.Unauthorized(
+        "Enrollment.Unauthenticated",
+        "User must be authenticated to list enrolled courses.");
 }

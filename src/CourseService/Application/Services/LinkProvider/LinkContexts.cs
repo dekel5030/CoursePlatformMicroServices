@@ -66,3 +66,22 @@ internal sealed record CourseRatingLinkContext(
     public Guid? OwnerId => OwnerIdentifier.Value;
     public object? Status => null;
 }
+
+internal sealed record EnrolledCourseContext(
+    CourseId CourseId,
+    LessonId? LastAccessedLessonId) : ILinkEligibilityContext
+{
+    public Guid ResourceId => CourseId.Value;
+    public Guid? OwnerId => null;
+    public object? Status => null;
+}
+
+internal sealed record EnrolledCourseCollectionContext(
+    int PageNumber,
+    int PageSize,
+    int TotalCount) : ILinkEligibilityContext
+{
+    public Guid ResourceId => Guid.Empty;
+    public Guid? OwnerId => null;
+    public object? Status => null;
+}
