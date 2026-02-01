@@ -6,6 +6,7 @@ export type { Money } from "./money";
 
 // Constants
 export { ModuleRels } from "./ModuleRels";
+export { CourseRatingRels } from "./CourseRatingRels";
 
 // Backend DTOs
 export type { CourseSummaryDto, InstructorDto, CategoryDto } from "./CourseSummaryDto";
@@ -14,3 +15,10 @@ export type { CourseDetailsDto } from "./CourseDetailsDto";
 export type { ModuleDto, ModuleLessonDto } from "./ModuleDto";
 export type { CreateCourseRequestDto } from "./CreateCourseRequestDto";
 export type { UpdateCourseRequestDto } from "./UpdateCourseRequestDto";
+export type {
+  CourseRatingDto,
+  CourseRatingCollectionDto,
+  CourseRatingUserDto,
+  CreateCourseRatingRequest,
+  UpdateCourseRatingRequest,
+} from "./CourseRatingDto";

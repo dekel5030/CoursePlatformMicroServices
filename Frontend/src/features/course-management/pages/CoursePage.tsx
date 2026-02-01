@@ -13,6 +13,7 @@ import { InlineEditableTextarea, RichTextViewer } from "@/shared/common";
 import { motion } from "framer-motion";
 import { CourseHeader } from "../components/CourseHeader";
 import { CourseLessonsSection } from "../components/CourseLessonsSection";
+import { CourseRatingsSection } from "../components/CourseRatingsSection";
 import { toast } from "sonner";
 import { hasLink, getLink } from "@/shared/utils";
 import { CourseRels } from "@/domain/courses";
@@ -168,6 +169,11 @@ export default function CoursePage() {
         {/* Course Content - Modules & Lessons */}
         <motion.div variants={item}>
           <CourseLessonsSection course={course} />
+        </motion.div>
+
+        {/* Reviews & Ratings */}
+        <motion.div variants={item}>
+          <CourseRatingsSection course={course} />
         </motion.div>
       </motion.div>
     </div>

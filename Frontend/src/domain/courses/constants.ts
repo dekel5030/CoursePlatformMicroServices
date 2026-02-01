@@ -9,6 +9,8 @@ export const CourseRels = {
   CREATE_MODULE: "create-module",
   CREATE_LESSON: "create-lesson",
   GENERATE_IMAGE_UPLOAD_URL: "generate-image-upload-url",
+  RATINGS: "ratings",
+  CREATE_RATING: "create-rating",
   NEXT_PAGE: "next-page",
   PREVIOUS_PAGE: "previous-page",
 } as const;
