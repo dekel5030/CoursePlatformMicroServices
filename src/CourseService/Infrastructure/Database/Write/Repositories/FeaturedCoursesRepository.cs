@@ -1,7 +1,7 @@
 ﻿using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Courses.Primitives;
 
-namespace Courses.Infrastructure.Database.Repositories;
+namespace Courses.Infrastructure.Database.Write.Repositories;
 
 public class FeaturedCoursesRepository : IFeaturedCoursesRepository
 {

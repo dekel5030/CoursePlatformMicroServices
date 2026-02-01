@@ -3,7 +3,7 @@ using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Infrastructure.Database.Write;
 
-namespace Courses.Infrastructure.Database.Repositories;
+namespace Courses.Infrastructure.Database.Write.Repositories;
 
 public class LessonRepository : RepositoryBase<Lesson, LessonId>, ILessonRepository
 {

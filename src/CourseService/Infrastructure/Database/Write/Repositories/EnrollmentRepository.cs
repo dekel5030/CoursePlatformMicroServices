@@ -3,7 +3,7 @@ using Courses.Domain.Enrollments;
 using Courses.Domain.Enrollments.Primitives;
 using Courses.Infrastructure.Database.Write;
 
-namespace Courses.Infrastructure.Database.Repositories;
+namespace Courses.Infrastructure.Database.Write.Repositories;
 
 public class EnrollmentRepository : RepositoryBase<Enrollment, EnrollmentId>, IEnrollmentRepository
 {

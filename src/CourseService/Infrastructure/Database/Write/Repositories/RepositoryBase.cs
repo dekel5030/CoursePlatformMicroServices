@@ -4,7 +4,7 @@ using Courses.Domain.Shared;
 using Courses.Infrastructure.Database.Write;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Infrastructure.Database.Repositories;
+namespace Courses.Infrastructure.Database.Write.Repositories;
 
 public abstract class RepositoryBase<TEntity, TId> : IRepository<TEntity, TId>
     where TEntity : class, IHasId<TId>

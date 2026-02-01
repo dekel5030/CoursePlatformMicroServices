@@ -3,7 +3,7 @@ using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Users;
 using Courses.Infrastructure.Database.Write;
 
-namespace Courses.Infrastructure.Database.Repositories;
+namespace Courses.Infrastructure.Database.Write.Repositories;
 
 internal sealed class UsersRepository : RepositoryBase<User, UserId>, IUsersRepository
 {

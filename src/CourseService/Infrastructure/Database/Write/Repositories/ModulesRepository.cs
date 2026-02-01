@@ -5,7 +5,7 @@ using Courses.Domain.Modules.Primitives;
 using Courses.Infrastructure.Database.Write;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Infrastructure.Database.Repositories;
+namespace Courses.Infrastructure.Database.Write.Repositories;
 
 internal sealed class ModulesRepository : RepositoryBase<Module, ModuleId>, IModuleRepository
 {
