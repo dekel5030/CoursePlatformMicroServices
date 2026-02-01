@@ -1,4 +1,4 @@
-﻿using CoursePlatform.ServiceDefaults.Messaging;
+using CoursePlatform.ServiceDefaults.Messaging;
 using Courses.Application.Services.Actions;
 using Courses.Application.Services.LinkProvider;
 using Courses.Domain.Lessons;
@@ -18,7 +18,7 @@ public static class DependencyInjection
         services.AddScoped<ModuleManagementService>();
         services.AddActionProvider();
 
-        services.AddLinkFactories();
+        services.AddLinkBuilder();
 
         return services;
     }

@@ -2,7 +2,8 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Services.Actions.States;
-using Courses.Application.Services.LinkProvider.Abstractions.Factories;
+using Courses.Application.Services.LinkProvider;
+using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
@@ -16,16 +17,16 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
 {
     private readonly IReadDbContext _dbContext;
     private readonly IStorageUrlResolver _urlResolver;
-    private readonly ILessonLinkFactory _lessonLinkFactory;
+    private readonly ILinkBuilderService _linkBuilder;
 
     public GetLessonByIdQueryHandler(
         IStorageUrlResolver urlResolver,
         IReadDbContext dbContext,
-        ILessonLinkFactory lessonLinkFactory)
+        ILinkBuilderService linkBuilder)
     {
         _urlResolver = urlResolver;
         _dbContext = dbContext;
-        _lessonLinkFactory = lessonLinkFactory;
+        _linkBuilder = linkBuilder;
     }
 
     public async Task<Result<LessonDetailsPageDto>> Handle(
@@ -63,6 +64,7 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
         var courseState = new CourseState(course.Id, course.InstructorId, course.Status);
         var moduleState = new ModuleState(lesson.ModuleId);
         var lessonState = new LessonState(lesson.Id, lesson.Access);
+        var lessonContext = new LessonLinkContext(courseState, moduleState, lessonState, null);
 
         var pageDto = new LessonDetailsPageDto
         {
@@ -78,7 +80,7 @@ internal sealed class GetLessonByIdQueryHandler : IQueryHandler<GetLessonByIdQue
             Access = lesson.Access,
             VideoUrl = videoUrl,
             TranscriptUrl = transcriptUrl,
-            Links = _lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState)
+            Links = _linkBuilder.BuildLinks(LinkResourceKeys.Lesson, lessonContext)
         };
 
         return Result.Success(pageDto);

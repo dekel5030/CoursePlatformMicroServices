@@ -1,7 +1,8 @@
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetCoursePage;
 using Courses.Application.Services.Actions.States;
-using Courses.Application.Services.LinkProvider.Abstractions.Factories;
+using Courses.Application.Services.LinkProvider;
+using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Modules.Primitives;
@@ -12,20 +13,14 @@ namespace Courses.Application.Courses.Queries.GetById;
 
 internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CoursePageDto>
 {
-    private readonly ICourseLinkFactory _courseLinkFactory;
-    private readonly IModuleLinkFactory _moduleLinkFactory;
-    private readonly ILessonLinkFactory _lessonLinkFactory;
+    private readonly ILinkBuilderService _linkBuilder;
     private readonly IMediator _mediator;
 
     public GetCourseByIdQueryHandler(
-        ICourseLinkFactory courseLinkFactory,
-        IModuleLinkFactory moduleLinkFactory,
-        ILessonLinkFactory lessonLinkFactory,
+        ILinkBuilderService linkBuilder,
         IMediator mediator)
     {
-        _courseLinkFactory = courseLinkFactory;
-        _moduleLinkFactory = moduleLinkFactory;
-        _lessonLinkFactory = lessonLinkFactory;
+        _linkBuilder = linkBuilder;
         _mediator = mediator;
     }
 
@@ -42,7 +37,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
         }
 
         CoursePageDto dto = innerQueryResult.Value;
-        dto.EnrichWithLinks(_courseLinkFactory, _moduleLinkFactory, _lessonLinkFactory);
+        dto.EnrichWithLinks(_linkBuilder);
 
         return Result.Success(dto);
     }
@@ -50,22 +45,20 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
 
 internal static class DtoEnrichmentExtensions
 {
-    public static void EnrichWithLinks(
-        this CoursePageDto dto,
-        ICourseLinkFactory courseLinkFactory,
-        IModuleLinkFactory moduleLinkFactory,
-        ILessonLinkFactory lessonLinkFactory)
+    public static void EnrichWithLinks(this CoursePageDto dto, ILinkBuilderService linkBuilder)
     {
         var courseState = new CourseState(new CourseId(dto.Id), new UserId(dto.InstructorId), dto.Status);
-        dto.Links.AddRange(courseLinkFactory.CreateLinks(courseState));
+        dto.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKeys.Course, courseState));
         foreach (ModuleDto module in dto.Modules)
         {
             var moduleState = new ModuleState(new ModuleId(module.Id));
-            module.Links.AddRange(moduleLinkFactory.CreateLinks(courseState, moduleState));
+            var moduleContext = new ModuleLinkContext(courseState, moduleState);
+            module.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKeys.Module, moduleContext));
             foreach (LessonDto lesson in module.Lessons)
             {
                 var lessonState = new LessonState(new LessonId(lesson.Id), lesson.Access);
-                lesson.Links.AddRange(lessonLinkFactory.CreateLinks(courseState, moduleState, lessonState));
+                var lessonContext = new LessonLinkContext(courseState, moduleState, lessonState, null);
+                lesson.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKeys.Lesson, lessonContext));
             }
         }
     }
