@@ -31,32 +31,14 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
     }
 
     public async Task<Result<IReadOnlyList<LessonDto>>> Handle(
-        GetLessonsQuery request,
-        CancellationToken cancellationToken = default)
+    GetLessonsQuery request,
+    CancellationToken cancellationToken = default)
     {
-        IQueryable<Lesson> query = _readDbContext.Lessons.AsNoTracking();
-
-        if (request.Filter.CourseId is { } courseId)
-        {
-            query = query.Where(l => l.CourseId == courseId);
-        }
-
-        if (request.Filter.Id is { } singleId)
-        {
-            query = query.Where(l => l.Id == singleId);
-        }
-        else if (request.Filter.Ids is { } idsEnumerable)
-        {
-            var ids = idsEnumerable.Distinct().Select(id => new LessonId(id)).ToList();
-            if (ids.Count > 0)
-            {
-                query = query.Where(l => ids.Contains(l.Id));
-            }
-        }
+        IQueryable<Lesson> query = _readDbContext.Lessons;
+        query = ApplyFilters(query, request.Filter);
 
         List<Lesson> lessons = await query
-            .OrderBy(l => l.ModuleId)
-            .ThenBy(l => l.Index)
+            .OrderBy(l => l.ModuleId).ThenBy(l => l.Index)
             .ToListAsync(cancellationToken);
 
         if (lessons.Count == 0)
@@ -64,78 +46,106 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
             return Result.Success<IReadOnlyList<LessonDto>>([]);
         }
 
+        Dictionary<CourseId, Course> coursesById = await GetRequiredCoursesAsync(lessons, cancellationToken);
+
+        Dictionary<ModuleId, ModuleContext> moduleContexts = BuildModuleContexts(lessons, coursesById);
+
+        var response = lessons.Select(lesson => MapToDto(
+            lesson,
+            coursesById[lesson.CourseId],
+            moduleContexts,
+            request.Filter.IncludeDetails)).ToList();
+
+        return Result.Success<IReadOnlyList<LessonDto>>(response);
+    }
+
+    private async Task<Dictionary<CourseId, Course>> GetRequiredCoursesAsync(
+        List<Lesson> lessons,
+        CancellationToken cancellationToken)
+    {
         var courseIds = lessons.Select(l => l.CourseId).Distinct().ToList();
+
         List<Course> courses = await _readDbContext.Courses
             .AsNoTracking()
             .Where(c => courseIds.Contains(c.Id))
             .ToListAsync(cancellationToken);
-        var coursesById = courses.ToDictionary(c => c.Id);
 
-        var moduleContextsByKey = new Dictionary<(CourseId CourseId, ModuleId ModuleId), ModuleContext>();
-        foreach (Course course in courses)
+        return courses.ToDictionary(c => c.Id);
+    }
+    private static IQueryable<Lesson> ApplyFilters(IQueryable<Lesson> query, LessonFilter filter)
+    {
+        if (filter.CourseId is { } courseId)
         {
-            var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
-            foreach (ModuleId moduleId in lessons.Where(l => l.CourseId == course.Id).Select(l => l.ModuleId).Distinct())
-            {
-                moduleContextsByKey[(course.Id, moduleId)] = new ModuleContext(courseContext, moduleId);
-            }
+            query = query.Where(l => l.CourseId == courseId);
         }
 
-        bool includeDetails = request.Filter.IncludeDetails;
-        var result = lessons.Select(lesson =>
+        if (filter.Id is { } id)
         {
-            Course? course = coursesById.GetValueOrDefault(lesson.CourseId);
-            ModuleContext? moduleContext = course is not null
-                ? moduleContextsByKey.GetValueOrDefault<(CourseId, ModuleId), ModuleContext>((lesson.CourseId, lesson.ModuleId))
-                : null;
+            query = query.Where(l => l.Id == id);
+        }
 
-            string? thumbnailUrl = lesson.ThumbnailImageUrl is not null
-                ? _urlResolver.Resolve(StorageCategory.Public, lesson.ThumbnailImageUrl.Path).Value
-                : null;
+        if (filter.Ids is { } ids)
+        {
+            query = query.Where(l => ids.Select(i => new LessonId(i)).Contains(l.Id));
+        }
 
-            string? videoUrl = null;
-            string? transcriptUrl = null;
-            string? courseName = null;
-            string? description = null;
+        return query;
+    }
 
-            if (includeDetails)
+    private static Dictionary<ModuleId, ModuleContext> BuildModuleContexts(
+        List<Lesson> lessons,
+        Dictionary<CourseId, Course> courses)
+    {
+        return lessons
+            .GroupBy(l => l.ModuleId)
+            .ToDictionary(
+                g => g.Key,
+                g => {
+                    Lesson firstLesson = g.First();
+                    Course course = courses[firstLesson.CourseId];
+                    var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
+                    return new ModuleContext(courseContext, g.Key);
+                });
+    }
+
+    private LessonDto MapToDto(
+        Lesson lesson,
+        Course course,
+        Dictionary<ModuleId, ModuleContext> contexts,
+        bool includeDetails)
+    {
+        ModuleContext moduleContext = contexts[lesson.ModuleId];
+        var lessonContext = new LessonContext(moduleContext, lesson.Id, lesson.Access, HasEnrollment: false);
+
+        var dto = new LessonDto
+        {
+            Id = lesson.Id.Value,
+            Title = lesson.Title.Value,
+            Index = lesson.Index,
+            Duration = lesson.Duration,
+            Access = lesson.Access,
+            ThumbnailUrl = ResolveUrl(lesson.ThumbnailImageUrl?.Path),
+            Links = _linkBuilder.BuildLinks(LinkResourceKey.Lesson, lessonContext).ToList()
+        };
+
+        if (includeDetails)
+        {
+            dto = dto with
             {
-                videoUrl = lesson.VideoUrl is not null
-                    ? _urlResolver.Resolve(StorageCategory.Public, lesson.VideoUrl.Path).Value
-                    : null;
-                transcriptUrl = lesson.Transcript is not null
-                    ? _urlResolver.Resolve(StorageCategory.Public, lesson.Transcript.Path).Value
-                    : null;
-                courseName = course?.Title.Value;
-                description = lesson.Description.Value;
-            }
-
-            List<LinkDto> links = moduleContext is not null
-                ? _linkBuilder.BuildLinks(LinkResourceKey.Lesson, new LessonContext(
-                    moduleContext,
-                    lesson.Id,
-                    lesson.Access,
-                    HasEnrollment: false)).ToList()
-                : [];
-
-            return new LessonDto
-            {
-                Id = lesson.Id.Value,
-                Title = lesson.Title.Value,
-                Index = lesson.Index,
-                Duration = lesson.Duration,
-                ThumbnailUrl = thumbnailUrl,
-                Access = lesson.Access,
-                Links = links,
-                ModuleId = includeDetails ? lesson.ModuleId.Value : null,
-                CourseId = includeDetails ? lesson.CourseId.Value : null,
-                CourseName = courseName,
-                Description = description,
-                VideoUrl = videoUrl,
-                TranscriptUrl = transcriptUrl
+                ModuleId = lesson.ModuleId.Value,
+                CourseId = lesson.CourseId.Value,
+                CourseName = course.Title.Value,
+                Description = lesson.Description.Value,
+                VideoUrl = ResolveUrl(lesson.VideoUrl?.Path),
+                TranscriptUrl = ResolveUrl(lesson.Transcript?.Path)
             };
-        }).ToList();
+        }
 
-        return Result.Success<IReadOnlyList<LessonDto>>(result);
+        return dto;
+    }
+
+    private string? ResolveUrl(string? path)
+    {
+        return path is not null ? _urlResolver.Resolve(StorageCategory.Public, path).Value : null;
     }
 }
