@@ -1,8 +1,14 @@
-import type { CourseDetailsDto, CourseSummaryDto } from "../types";
+import type { CourseSummaryDto } from "../types";
+import type { CourseDetailsDto } from "../types/CourseDetailsDto";
 import type { CourseModel } from "../types/CourseModel";
 import { DifficultyLevel } from "../types/CourseModel";
 import type { ModuleDto, ModuleLessonDto } from "../types/ModuleDto";
 import type { ModuleModel } from "../types/ModuleModel";
+import type {
+  CoursePageDto,
+  ModuleDtoApi,
+  LessonDtoApi,
+} from "../types/CoursePageDto";
 import type { LessonSummaryDto, LessonModel } from "@/domain/lessons/types";
 
 /**
@@ -29,6 +35,113 @@ function mapLessonSummaryToModel(
     order: dto.index,
     duration: dto.duration,
     links: dto.links,
+  };
+}
+
+/**
+ * Maps an API lesson DTO (from CoursePageDto.lessons) to LessonModel
+ */
+function mapApiLessonToLessonModel(
+  lesson: LessonDtoApi,
+  courseId: string,
+): LessonModel {
+  return {
+    courseId: lesson.courseId ?? courseId,
+    lessonId: lesson.id,
+    title: lesson.title ?? "",
+    description: lesson.description ?? "",
+    videoUrl: lesson.videoUrl ?? null,
+    transcriptUrl: lesson.transcriptUrl ?? null,
+    thumbnailImage: lesson.thumbnailUrl ?? null,
+    isPreview: lesson.access === "Public",
+    order: lesson.index,
+    duration: lesson.duration ?? null,
+    links: lesson.links ?? undefined,
+  };
+}
+
+/**
+ * Maps an API module DTO (from CoursePageDto.modules) to ModuleModel using the lessons record
+ */
+function mapApiModuleToModuleModel(
+  module: ModuleDtoApi,
+  lessonsRecord: Record<string, LessonDtoApi>,
+  courseId: string,
+): ModuleModel {
+  const lessonIds = module.lessonIds ?? [];
+  const lessonDtos = lessonIds
+    .map((id) => lessonsRecord[id])
+    .filter((l): l is LessonDtoApi => l != null)
+    .sort((a, b) => a.index - b.index);
+  const lessons = lessonDtos.map((l) => mapApiLessonToLessonModel(l, courseId));
+
+  return {
+    id: module.id,
+    title: module.title ?? "",
+    order: module.index,
+    lessonCount: module.lessonCount,
+    duration: module.duration,
+    lessons,
+    links: module.links ?? [],
+  };
+}
+
+/**
+ * Maps the flat CoursePageDto (GET /courses/{id} response) to CourseModel
+ */
+export function mapCoursePageDtoToModel(dto: CoursePageDto): CourseModel {
+  const c = dto.course;
+  const instructors = dto.instructors ?? {};
+  const categories = dto.categories ?? {};
+  const modulesRecord = dto.modules ?? {};
+  const lessonsRecord = dto.lessons ?? {};
+
+  const instructor = c.instructorId ? instructors[c.instructorId] : undefined;
+  const instructorName = instructor
+    ? [instructor.firstName, instructor.lastName].filter(Boolean).join(" ") || null
+    : null;
+  const instructorAvatarUrl = instructor?.avatarUrl ?? null;
+
+  const category = c.categoryId ? categories[c.categoryId] : undefined;
+  const categoryName = category?.name ?? undefined;
+  const categorySlug = category?.slug ?? undefined;
+
+  // Backend may omit course.moduleIds; derive from dto.modules when empty
+  const moduleIds = c.moduleIds ?? [];
+  const moduleDtos =
+    moduleIds.length > 0
+      ? moduleIds
+          .map((moduleId) => modulesRecord[moduleId])
+          .filter((m): m is ModuleDtoApi => m != null)
+      : Object.values(modulesRecord).filter(
+          (m): m is ModuleDtoApi => m != null,
+        );
+  const modules = moduleDtos
+    .sort((a, b) => a.index - b.index)
+    .map((m) => mapApiModuleToModuleModel(m, lessonsRecord, c.id));
+
+  return {
+    id: c.id,
+    title: c.title ?? "",
+    description: c.description ?? "",
+    imageUrl: c.imageUrls?.[0] ?? null,
+    instructorName,
+    instructorAvatarUrl,
+    isPublished: c.status === "Published",
+    price: {
+      amount: c.price.amount,
+      currency: c.price.currency ?? "",
+    },
+    modules,
+    lessonCount: c.lessonsCount,
+    enrollmentCount: c.enrollmentCount,
+    totalDuration: c.totalDuration,
+    updatedAtUtc: c.updatedAtUtc,
+    categoryName,
+    categoryId: c.categoryId,
+    categorySlug,
+    tags: c.tags ?? undefined,
+    links: c.links ?? undefined,
   };
 }
 

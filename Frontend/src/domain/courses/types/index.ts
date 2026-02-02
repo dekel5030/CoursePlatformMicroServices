@@ -11,7 +11,6 @@ export { CourseRatingRels } from "./CourseRatingRels";
 // Backend DTOs
 export type { CourseSummaryDto, InstructorDto, CategoryDto } from "./CourseSummaryDto";
 export { DifficultyLevel as DifficultyLevelDto, CourseStatus as CourseStatusDto, type DifficultyLevel as DifficultyLevelDtoType, type CourseStatus as CourseStatusDtoType } from "./CourseSummaryDto";
-export type { CourseDetailsDto } from "./CourseDetailsDto";
 export type { ModuleDto, ModuleLessonDto } from "./ModuleDto";
 export type { CreateCourseRequestDto } from "./CreateCourseRequestDto";
 export type { UpdateCourseRequestDto } from "./UpdateCourseRequestDto";
