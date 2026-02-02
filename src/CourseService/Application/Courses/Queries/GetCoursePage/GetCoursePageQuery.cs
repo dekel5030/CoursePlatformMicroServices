@@ -1,3 +1,4 @@
+using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
 using Courses.Application.Courses.Dtos;
 using Kernel.Messaging.Abstractions;
 

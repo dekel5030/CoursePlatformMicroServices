@@ -1,4 +1,5 @@
 ﻿using Auth.Application.Abstractions.Caching;
+using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -12,7 +13,7 @@ internal static class HostApplicationExtensions
     {
         builder.AddRedisDistributedCache(redisConnectionString);
 
-        builder.Services.AddSingleton<ICacheService, RedisCache>();
+        builder.Services.AddSingleton<Application.Abstractions.Caching.ICacheService, RedisCache>();
 
         return builder;
     }

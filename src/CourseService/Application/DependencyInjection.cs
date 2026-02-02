@@ -21,6 +21,7 @@ public static class DependencyInjection
         services.AddScoped<ModuleManagementService>();
 
         services.AddOpenBehavior(typeof(LoggingBehavior<,>));
+        services.AddOpenBehavior(typeof(QueryCachingBehavior<,>));
         services.AddActionProvider();
 
         services.AddLinkBuilder();

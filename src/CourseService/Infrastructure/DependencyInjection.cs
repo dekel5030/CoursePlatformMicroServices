@@ -1,5 +1,6 @@
 ﻿using CoursePlatform.ServiceDefaults.Auth;
 using Courses.Infrastructure.Ai;
+using Courses.Infrastructure.Cache;
 using Courses.Infrastructure.Database;
 using Courses.Infrastructure.MassTransit;
 using Courses.Infrastructure.Storage;
@@ -30,7 +31,8 @@ public static class DependencyInjection
             .AddHealthChecksInternal()
             .AddAuthenticationInternal()
             .AddInternalAuth(authUrl)
-            .AddAiProvider();
+            .AddAiProvider()
+            .AddCacheService();
     }
 
     public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder app)

@@ -1,10 +1,11 @@
 ﻿using System.Text.Json;
 using Auth.Application.Abstractions.Caching;
+using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace Auth.Infrastructure.Redis;
 
-internal class RedisCache : ICacheService
+internal class RedisCache : Application.Abstractions.Caching.ICacheService
 {
     private readonly IDistributedCache _distributedCache;
     private static readonly JsonSerializerOptions _serializerOptions = new()
