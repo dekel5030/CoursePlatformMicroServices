@@ -6,7 +6,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace CoursePlatform.ServiceDefaults.Messaging.Behaviors;
 
-internal sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
     where TResponse : Result
 {
