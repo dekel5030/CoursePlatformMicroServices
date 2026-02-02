@@ -1,5 +1,4 @@
-﻿using Auth.Application.Abstractions.Caching;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Auth.Infrastructure.Redis.Extensions;
@@ -12,7 +11,7 @@ internal static class HostApplicationExtensions
     {
         builder.AddRedisDistributedCache(redisConnectionString);
 
-        builder.Services.AddSingleton<ICacheService, RedisCache>();
+        builder.Services.AddSingleton<Application.Abstractions.Caching.ICacheService, RedisCache>();
 
         return builder;
     }

@@ -100,7 +100,8 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
             .GroupBy(l => l.ModuleId)
             .ToDictionary(
                 g => g.Key,
-                g => {
+                g =>
+                {
                     Lesson firstLesson = g.First();
                     Course course = courses[firstLesson.CourseId];
                     var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);

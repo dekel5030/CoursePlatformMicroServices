@@ -5,8 +5,6 @@ using Courses.Application.Services.LinkProvider;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
 using FluentValidation;
-using Kernel;
-using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Courses.Application;
@@ -21,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<ModuleManagementService>();
 
         services.AddOpenBehavior(typeof(LoggingBehavior<,>));
+        services.AddOpenBehavior(typeof(QueryCachingBehavior<,>));
         services.AddActionProvider();
 
         services.AddLinkBuilder();

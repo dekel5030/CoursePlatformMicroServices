@@ -3,7 +3,6 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Enrollments.Commands.CreateEnrollment;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Enrollments.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

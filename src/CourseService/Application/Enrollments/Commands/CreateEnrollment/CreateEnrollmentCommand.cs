@@ -1,5 +1,4 @@
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Enrollments.Primitives;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Enrollments.Commands.CreateEnrollment;
