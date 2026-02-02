@@ -21,6 +21,20 @@ public static class MediatorExtentions
         return services;
     }
 
+    public static IServiceCollection AddOpenBehavior(
+        this IServiceCollection services,
+        Type behaviorType)
+    {
+        if (!behaviorType.IsGenericTypeDefinition)
+        {
+            throw new ArgumentException($"{behaviorType.Name} must be a generic type definition (e.g. typeof(LoggingBehavior<,>))");
+        }
+
+        services.AddScoped(typeof(IPipelineBehavior<,>), behaviorType);
+
+        return services;
+    }
+
     private static IServiceCollection AddRequestHandlers(
         this IServiceCollection services,
         Assembly assembly,
