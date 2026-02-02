@@ -1,14 +1,14 @@
 import { axiosClient } from "@/app/axios";
 import axios from "axios";
 import type {
-  CourseDetailsDto,
   CourseSummaryDto,
   CreateCourseRequestDto,
   UpdateCourseRequestDto,
 } from "../types";
+import type { CoursePageDto } from "../types/CoursePageDto";
 import type { PagedResponse } from "@/shared/types/LinkDto";
 import {
-  mapCourseDetailsToModel,
+  mapCoursePageDtoToModel,
   mapCourseSummaryToModel,
 } from "../mappers";
 import type { CourseModel } from "../types/CourseModel";
@@ -59,8 +59,8 @@ export async function fetchFeaturedCourses(): Promise<CourseModel[]> {
  * Fetch a course by ID
  */
 export async function fetchCourseById(id: string): Promise<CourseModel> {
-  const response = await axiosClient.get<CourseDetailsDto>(`/courses/${id}`);
-  return mapCourseDetailsToModel(response.data);
+  const response = await axiosClient.get<CoursePageDto>(`/courses/${id}`);
+  return mapCoursePageDtoToModel(response.data);
 }
 
 /**
@@ -69,8 +69,11 @@ export async function fetchCourseById(id: string): Promise<CourseModel> {
 export async function createCourse(
   request: CreateCourseRequestDto,
 ): Promise<CreateCourseResponse> {
-  const response = await axiosClient.post<{ id: string }>("/courses", request);
-  return { courseId: response.data.id };
+  const response = await axiosClient.post<{
+    courseId: string;
+    title?: string;
+  }>("/courses", request);
+  return { courseId: response.data.courseId };
 }
 
 /**
