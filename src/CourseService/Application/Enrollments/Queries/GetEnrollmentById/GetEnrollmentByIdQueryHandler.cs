@@ -2,7 +2,6 @@ using Courses.Application.Enrollments.Dtos;
 using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Enrollments.Errors;
-using Courses.Domain.Enrollments.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

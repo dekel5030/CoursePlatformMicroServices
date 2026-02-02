@@ -1,5 +1,4 @@
 using Courses.Application.Categories.Dtos;
-using Courses.Application.Shared.Dtos;
 
 namespace Courses.Application.Courses.Dtos;
 

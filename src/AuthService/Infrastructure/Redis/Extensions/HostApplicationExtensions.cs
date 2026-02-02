@@ -1,6 +1,4 @@
-﻿using Auth.Application.Abstractions.Caching;
-using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Auth.Infrastructure.Redis.Extensions;

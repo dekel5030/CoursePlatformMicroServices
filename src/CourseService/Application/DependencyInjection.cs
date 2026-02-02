@@ -5,8 +5,6 @@ using Courses.Application.Services.LinkProvider;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
 using FluentValidation;
-using Kernel;
-using Kernel.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Courses.Application;

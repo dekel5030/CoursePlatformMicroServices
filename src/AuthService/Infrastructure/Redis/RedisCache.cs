@@ -1,6 +1,4 @@
 ﻿using System.Text.Json;
-using Auth.Application.Abstractions.Caching;
-using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace Auth.Infrastructure.Redis;

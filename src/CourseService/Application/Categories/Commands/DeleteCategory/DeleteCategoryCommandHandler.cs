@@ -4,7 +4,6 @@ using Courses.Domain.Categories;
 using Courses.Domain.Categories.Errors;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Categories.Commands.DeleteCategory;
 

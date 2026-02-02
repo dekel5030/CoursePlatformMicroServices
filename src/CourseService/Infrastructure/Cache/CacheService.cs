@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
+﻿using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Courses.Infrastructure.Cache;

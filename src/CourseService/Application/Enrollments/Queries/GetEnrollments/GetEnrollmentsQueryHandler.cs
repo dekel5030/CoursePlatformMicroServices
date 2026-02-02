@@ -2,7 +2,6 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Enrollments.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
-using Courses.Domain.Enrollments.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
