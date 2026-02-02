@@ -8,17 +8,18 @@ using Courses.Application.Users.Queries.GetInstructorsByCourseId;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Courses.Application.Courses.Queries.GetCoursePage;
 
 internal sealed class GetCoursePageQueryHandler
     : IQueryHandler<GetCoursePageQuery, CoursePageDto>
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public GetCoursePageQueryHandler(IMediator mediator)
+    public GetCoursePageQueryHandler(IServiceScopeFactory scopeFactory)
     {
-        _mediator = mediator;
+        _scopeFactory = scopeFactory;
     }
 
     public async Task<Result<CoursePageDto>> Handle(
@@ -27,15 +28,23 @@ internal sealed class GetCoursePageQueryHandler
     {
         var courseId = new CourseId(request.Id);
 
-        Task<Result<CourseDto>> courseTask = _mediator.Send(new GetCourseByIdQuery(courseId), cancellationToken);
-        Task<Result<IReadOnlyList<ModuleDto>>> modulesTask = _mediator.Send(new GetModulesByCourseIdQuery(courseId), cancellationToken);
-        Task<Result<IReadOnlyList<LessonDto>>> lessonsTask = _mediator.Send(new GetLessonsByCourseIdQuery(courseId), cancellationToken);
-        Task<Result<IReadOnlyList<UserDto>>> instructorTask = _mediator.Send(new GetInstructorsByCourseIdQuery(courseId), cancellationToken);
-        Task<Result<CategoryDto>> categoryTask = _mediator.Send(new GetCategoryByCourseIdQuery(courseId), cancellationToken);
-
+        Task<Result<CourseDto>> courseTask = SendInScopeAsync(new GetCourseByIdQuery(courseId), cancellationToken);
+        Task<Result<IReadOnlyList<ModuleDto>>> modulesTask = SendInScopeAsync(new GetModulesByCourseIdQuery(courseId), cancellationToken);
+        Task<Result<IReadOnlyList<LessonDto>>> lessonsTask = SendInScopeAsync(new GetLessonsByCourseIdQuery(courseId), cancellationToken);
+        Task<Result<IReadOnlyList<UserDto>>> instructorTask = SendInScopeAsync(new GetInstructorsByCourseIdQuery(courseId), cancellationToken);
+        Task<Result<CategoryDto>> categoryTask = SendInScopeAsync(new GetCategoryByCourseIdQuery(courseId), cancellationToken);
         await Task.WhenAll(courseTask, modulesTask, lessonsTask, instructorTask, categoryTask);
 
         return await AssembleCoursePageAsync(courseTask, modulesTask, lessonsTask, instructorTask, categoryTask);
+    }
+
+    private async Task<Result<TResponse>> SendInScopeAsync<TResponse>(
+        IQuery<TResponse> query,
+        CancellationToken ct)
+    {
+        using IServiceScope scope = _scopeFactory.CreateScope();
+        IMediator scopedMediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        return await scopedMediator.Send(query, ct);
     }
 
     private static async Task<Result<CoursePageDto>> AssembleCoursePageAsync(

@@ -1,6 +1,7 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Categories.Dtos;
 using Courses.Domain.Categories;
+using Courses.Domain.Categories.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,10 @@ internal sealed class GetCategoriesByIdsQueryHandler
         GetCategoriesByIdsQuery request,
         CancellationToken cancellationToken = default)
     {
-        var ids = request.Ids.Distinct().ToList();
+        var ids = request.Ids
+            .Distinct()
+            .Select(id => new CategoryId(id))
+            .ToList();
 
         if (ids.Count == 0)
         {
@@ -29,9 +33,9 @@ internal sealed class GetCategoriesByIdsQueryHandler
         }
 
         List<CategoryDto> categoryDtos = await _readDbContext.Categories
-            .Where(c => ids.Contains(c.Id.Value)) 
-            .Select(c => new CategoryDto(c.Id.Value, c.Name, c.Slug.Value))
-            .ToListAsync(cancellationToken: cancellationToken);
+            .Where(category => ids.Contains(category.Id)) 
+            .Select(category => new CategoryDto(category.Id.Value, category.Name, category.Slug.Value))
+            .ToListAsync(cancellationToken);
 
         return Result.Success<IReadOnlyList<CategoryDto>>(categoryDtos);
     }

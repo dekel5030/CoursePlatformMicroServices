@@ -1,5 +1,6 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Courses.Dtos;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Users;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -21,14 +22,17 @@ internal sealed class GetInstructorsByIdsQueryHandler
         GetInstructorsByIdsQuery request,
         CancellationToken cancellationToken = default)
     {
-        var ids = request.Ids.Distinct().ToList();
+        var ids = request.Ids
+            .Distinct()
+            .Select(id => new UserId(id))
+            .ToList();
         if (ids.Count == 0)
         {
             return Result.Success<IReadOnlyList<UserDto>>([]);
         }
 
         List<User> instructors = await _readDbContext.Users
-            .Where(u => ids.Contains(u.Id.Value))
+            .Where(u => ids.Contains(u.Id))
             .ToListAsync(cancellationToken);
 
         var response = instructors.Select(instructor => new UserDto

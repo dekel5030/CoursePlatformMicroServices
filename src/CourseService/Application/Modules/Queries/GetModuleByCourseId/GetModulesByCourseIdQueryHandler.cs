@@ -38,7 +38,7 @@ internal sealed class GetModulesByCourseIdQueryHandler
         }
 
         List<Module> modules = await _readDbContext.Modules
-            .Where(module => module.CourseId.Value == request.CourseId.Value)
+            .Where(module => module.CourseId == request.CourseId)
             .OrderBy(module => module.Index)
             .ToListAsync(cancellationToken);
 
