@@ -1,6 +1,10 @@
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Courses.Dtos;
 using Courses.Application.Lessons.Dtos;
-using Courses.Application.Modules.Dtos;
+using Courses.Application.Services.LinkProvider;
+using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Domain.Courses;
+using Courses.Domain.Courses.Errors;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
 using Kernel;
@@ -10,19 +14,29 @@ using Microsoft.EntityFrameworkCore;
 namespace Courses.Application.Modules.Queries.GetByCourseId;
 
 internal sealed class GetModulesByCourseIdQueryHandler
-    : IQueryHandler<GetModulesByCourseIdQuery, ModuleCollectionDto>
+    : IQueryHandler<GetModulesByCourseIdQuery, IReadOnlyList<ModuleDto>>
 {
     private readonly IReadDbContext _readDbContext;
+    private readonly ILinkBuilderService _linkBuilder;
 
-    public GetModulesByCourseIdQueryHandler(IReadDbContext readDbContext)
+    public GetModulesByCourseIdQueryHandler(IReadDbContext readDbContext, ILinkBuilderService linkBuilder)
     {
         _readDbContext = readDbContext;
+        _linkBuilder = linkBuilder;
     }
 
-    public async Task<Result<ModuleCollectionDto>> Handle(
+    public async Task<Result<IReadOnlyList<ModuleDto>>> Handle(
         GetModulesByCourseIdQuery request,
         CancellationToken cancellationToken = default)
     {
+        Course? course = await _readDbContext.Courses
+            .FirstOrDefaultAsync(course => course.Id == request.CourseId, cancellationToken);
+
+        if (course is null)
+        {
+            return Result.Failure<IReadOnlyList<ModuleDto>>(CourseErrors.NotFound);
+        }
+
         List<Module> modules = await _readDbContext.Modules
             .Where(module => module.CourseId.Value == request.CourseId.Value)
             .OrderBy(module => module.Index)
@@ -30,14 +44,7 @@ internal sealed class GetModulesByCourseIdQueryHandler
 
         if (modules.Count == 0)
         {
-            return Result.Success(new ModuleCollectionDto
-            {
-                Items = [],
-                PageNumber = 1,
-                PageSize = 1,
-                TotalItems = 0,
-                Links = null
-            });
+            return Result.Success<IReadOnlyList<ModuleDto>>([]);
         }
 
         var moduleIds = modules.Select(m => m.Id).ToList();
@@ -67,23 +74,21 @@ internal sealed class GetModulesByCourseIdQueryHandler
                     lesson.Access
                 )).ToList();
 
-            return new ModuleDetailsDto(
-                module.Id.Value,
-                module.Title.Value,
-                module.Index,
-                moduleLessons.Count,
-                TimeSpan.FromSeconds(moduleLessons.Sum(l => l.Duration.TotalSeconds)),
-                lessonDtos
-            );
+            var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
+            var moduleContext = new ModuleContext(courseContext, module.Id);
+
+            return new ModuleDto
+            {
+                Id = module.Id.Value,
+                Title = module.Title.Value,
+                Index = module.Index,
+                LessonCount = lessonDtos.Count,
+                Duration = TimeSpan.FromTicks(lessonDtos.Sum(l => l.Duration.Ticks)),
+                LessonIds = lessonDtos.Select(l => l.LessonId).ToList(),
+                Links = _linkBuilder.BuildLinks(LinkResourceKey.Module, moduleContext).ToList()
+            };
         }).ToList();
 
-        return Result.Success(new ModuleCollectionDto
-        {
-            Items = moduleDetailsDtos,
-            PageNumber = 1,
-            PageSize = moduleDetailsDtos.Count,
-            TotalItems = moduleDetailsDtos.Count,
-            Links = null
-        });
+        return Result.Success<IReadOnlyList<ModuleDto>>(moduleDetailsDtos);
     }
 }

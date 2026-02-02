@@ -1,6 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
+using Courses.Application.Courses.Dtos;
 using Courses.Application.Modules.Dtos;
 using Courses.Application.Modules.Queries.GetByCourseId;
 using Courses.Domain.Courses.Primitives;
@@ -20,13 +21,13 @@ internal sealed class GetModulesByCourseId : IEndpoint
         {
             var query = new GetModulesByCourseIdQuery(new CourseId(courseId));
 
-            Result<ModuleCollectionDto> result = await mediator.Send(query, cancellationToken);
+            Result<IReadOnlyList<ModuleDto>> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
                 dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
-        .WithMetadata<ModuleCollectionDto>(
+        .WithMetadata<IReadOnlyList<ModuleDto>>(
             nameof(GetModulesByCourseId),
             tag: Tags.Modules,
             summary: "Gets all modules for a course by course ID.");

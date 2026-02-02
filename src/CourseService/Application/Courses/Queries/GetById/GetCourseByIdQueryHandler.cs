@@ -1,89 +1,72 @@
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Courses.Queries.GetCoursePage;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Domain.Courses;
+using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
-using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Queries.GetById;
 
-internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CoursePageDto>
+internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CourseDto>
 {
+    private readonly IReadDbContext _readDbContext;
+    private readonly IStorageUrlResolver _urlResolver;
     private readonly ILinkBuilderService _linkBuilder;
-    private readonly IMediator _mediator;
-    private readonly IReadDbContext _dbContext;
-    private readonly IUserContext _userContext;
 
     public GetCourseByIdQueryHandler(
-        ILinkBuilderService linkBuilder,
-        IMediator mediator,
-        IReadDbContext dbContext,
-        IUserContext userContext)
+        IReadDbContext readDbContext,
+        IStorageUrlResolver urlResolver,
+        ILinkBuilderService linkBuilder)
     {
+        _readDbContext = readDbContext;
+        _urlResolver = urlResolver;
         _linkBuilder = linkBuilder;
-        _mediator = mediator;
-        _dbContext = dbContext;
-        _userContext = userContext;
     }
 
-    public async Task<Result<CoursePageDto>> Handle(
+    public async Task<Result<CourseDto>> Handle(
         GetCourseByIdQuery request,
         CancellationToken cancellationToken = default)
     {
-        var innerQuery = new GetCoursePageQuery(request.Id.Value);
-        Result<CoursePageDto> innerQueryResult = await _mediator.Send(innerQuery, cancellationToken);
+        Course? course = await _readDbContext.Courses
+            .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
-        if (innerQueryResult.IsFailure)
+        if (course is null)
         {
-            return innerQueryResult;
+            return Result.Failure<CourseDto>(CourseErrors.NotFound);
         }
 
-        CoursePageDto dto = innerQueryResult.Value;
-        var courseId = new CourseId(dto.Id);
+        int enrollmentCount = await _readDbContext.Enrollments
+            .CountAsync(e => e.CourseId == request.Id, cancellationToken);
 
-        UserId? currentUserId = _userContext.Id == null ? null : new UserId(_userContext.Id.Value);
+        var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
+        var resolvedImageUrls = course.Images
+            .Select(img => _urlResolver.Resolve(StorageCategory.Public, img.Path).Value)
+            .ToList();
 
-        bool userHasExistingRating = currentUserId is not null &&
-            await _dbContext.CourseRatings.AnyAsync(
-                r => r.CourseId == courseId && r.UserId == currentUserId,
-                cancellationToken);
-
-        var ratingEligibilityContext = new CourseRatingEligibilityContext(
-            courseId,
-            currentUserId,
-            userHasExistingRating);
-        dto.Links.AddRange(_linkBuilder.BuildLinks(
-            LinkResourceKey.CourseRatingEligibility,
-            ratingEligibilityContext));
-
-        dto.EnrichWithLinks(_linkBuilder);
-
-        return Result.Success(dto);
-    }
-}
-
-internal static class DtoEnrichmentExtensions
-{
-    public static void EnrichWithLinks(this CoursePageDto dto, ILinkBuilderService linkBuilder)
-    {
-        var courseContext = dto.ToCourseContext();
-        dto.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext));
-        foreach (ModuleDto module in dto.Modules)
+        var courseDto = new CourseDto
         {
-            var moduleContext = module.ToModuleContext(courseContext);
-            module.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Module, moduleContext));
-            foreach (LessonDto lesson in module.Lessons)
-            {
-                var lessonContext = lesson.ToLessonContext(
-                    moduleContext,
-                    false);
+            Id = course.Id.Value,
+            Title = course.Title.Value,
+            Description = course.Description.Value,
+            InstructorId = course.InstructorId.Value,
+            CategoryId = course.CategoryId.Value,
+            Status = course.Status,
+            Price = course.Price,
+            EnrollmentCount = enrollmentCount,
+            LessonsCount = 0,
+            TotalDuration = TimeSpan.Zero,
+            UpdatedAtUtc = course.UpdatedAtUtc,
+            ImageUrls = resolvedImageUrls.AsReadOnly(),
+            Tags = course.Tags.Select(t => t.Value).ToList().AsReadOnly(),
+            ModuleIds = [],
+            Links = _linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext).ToList()
+        };
 
-                lesson.Links.AddRange(linkBuilder.BuildLinks(LinkResourceKey.Lesson, lessonContext));
-            }
-        }
+        return Result.Success(courseDto);
     }
 }
