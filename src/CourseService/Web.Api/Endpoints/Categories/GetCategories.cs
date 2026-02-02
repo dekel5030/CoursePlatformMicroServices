@@ -16,11 +16,22 @@ internal sealed class GetCategories : IEndpoint
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetCategoriesQuery();
-            Result<CategoryCollectionDto> result = await mediator.Send(query, cancellationToken);
+            var query = new GetCategoriesQuery(new CategoryFilter());
+            Result<IReadOnlyList<CategoryDto>> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
-                dto => Results.Ok(dto),
+                list =>
+                {
+                    var dto = new CategoryCollectionDto
+                    {
+                        Items = list,
+                        PageNumber = 1,
+                        PageSize = list.Count,
+                        TotalItems = list.Count,
+                        Links = null
+                    };
+                    return Results.Ok(dto);
+                },
                 CustomResults.Problem);
         })
         .WithMetadata<CategoryCollectionDto>(

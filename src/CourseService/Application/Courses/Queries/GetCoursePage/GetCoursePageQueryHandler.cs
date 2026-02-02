@@ -1,132 +1,99 @@
-﻿using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Storage;
+using Courses.Application.Categories.Dtos;
+using Courses.Application.Categories.Queries.GetCategories;
 using Courses.Application.Courses.Dtos;
-using Courses.Domain.Categories;
-using Courses.Domain.Courses;
-using Courses.Domain.Courses.Errors;
+using Courses.Application.Courses.Queries.GetById;
+using Courses.Application.Lessons.Queries.GetLessons;
+using Courses.Application.Modules.Queries.GetModules;
+using Courses.Application.Users.Queries.GetUsers;
+using Courses.Domain.Categories.Errors;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons;
-using Courses.Domain.Modules;
-using Courses.Domain.Users;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Courses.Application.Courses.Queries.GetCoursePage;
 
 internal sealed class GetCoursePageQueryHandler
     : IQueryHandler<GetCoursePageQuery, CoursePageDto>
 {
-    private readonly IReadDbContext _readDbContext;
-    private readonly IStorageUrlResolver _urlResolver;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public GetCoursePageQueryHandler(
-        IReadDbContext readDbContext,
-        IStorageUrlResolver urlResolver)
+    public GetCoursePageQueryHandler(IServiceScopeFactory scopeFactory)
     {
-        _readDbContext = readDbContext;
-        _urlResolver = urlResolver;
+        _scopeFactory = scopeFactory;
     }
 
     public async Task<Result<CoursePageDto>> Handle(
         GetCoursePageQuery request,
         CancellationToken cancellationToken = default)
     {
-        CourseId requestedId = new(request.Id);
-        Course? course = await _readDbContext.Courses
-            .FirstOrDefaultAsync(course => course.Id == requestedId, cancellationToken);
+        var courseId = new CourseId(request.Id);
 
-        if (course is null)
+        Task<Result<CourseDto>> courseTask = SendInScopeAsync(new GetCourseByIdQuery(courseId), cancellationToken);
+        Task<Result<IReadOnlyList<ModuleDto>>> modulesTask = SendInScopeAsync(
+            new GetModulesQuery(new ModuleFilter(CourseId: courseId)), cancellationToken);
+        Task<Result<IReadOnlyList<LessonDto>>> lessonsTask = SendInScopeAsync(
+            new GetLessonsQuery(new LessonFilter(CourseId: courseId)), cancellationToken);
+        Task<Result<IReadOnlyList<UserDto>>> instructorTask = SendInScopeAsync(
+            new GetUsersQuery(new UserFilter(CourseId: courseId)), cancellationToken);
+        Task<Result<IReadOnlyList<CategoryDto>>> categoryTask = SendInScopeAsync(
+            new GetCategoriesQuery(new CategoryFilter(CourseId: courseId)), cancellationToken);
+        await Task.WhenAll(courseTask, modulesTask, lessonsTask, instructorTask, categoryTask);
+
+        return await AssembleCoursePageAsync(courseTask, modulesTask, lessonsTask, instructorTask, categoryTask);
+    }
+
+    private async Task<Result<TResponse>> SendInScopeAsync<TResponse>(
+        IQuery<TResponse> query,
+        CancellationToken ct)
+    {
+        using IServiceScope scope = _scopeFactory.CreateScope();
+        IMediator scopedMediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        return await scopedMediator.Send(query, ct);
+    }
+
+    private static async Task<Result<CoursePageDto>> AssembleCoursePageAsync(
+        Task<Result<CourseDto>> courseTask,
+        Task<Result<IReadOnlyList<ModuleDto>>> modulesTask,
+        Task<Result<IReadOnlyList<LessonDto>>> lessonsTask,
+        Task<Result<IReadOnlyList<UserDto>>> instructorTask,
+        Task<Result<IReadOnlyList<CategoryDto>>> categoryTask)
+    {
+        Result<CourseDto> courseResult = await courseTask;
+        Result<IReadOnlyList<ModuleDto>> modulesResult = await modulesTask;
+        Result<IReadOnlyList<LessonDto>> lessonsResult = await lessonsTask;
+        Result<IReadOnlyList<UserDto>> instructorsResult = await instructorTask;
+        Result<IReadOnlyList<CategoryDto>> categoryResult = await categoryTask;
+
+        if (categoryResult.IsFailure
+            || courseResult.IsFailure
+            || modulesResult.IsFailure
+            || lessonsResult.IsFailure
+            || instructorsResult.IsFailure)
         {
-            return Result.Failure<CoursePageDto>(CourseErrors.NotFound);
+            return Result.Failure<CoursePageDto>(new ValidationError([
+                categoryResult.Error
+                ?? courseResult.Error
+                ?? modulesResult.Error
+                ?? lessonsResult.Error
+                ?? instructorsResult.Error!]));
         }
 
-        User? instructor = await _readDbContext.Users
-            .FirstOrDefaultAsync(i => i.Id == course.InstructorId, cancellationToken);
-
-        Category? category = await _readDbContext.Categories
-            .FirstOrDefaultAsync(c => c.Id == course.CategoryId, cancellationToken);
-
-        List<Module> modules = await _readDbContext.Modules
-            .Where(m => m.CourseId == course.Id)
-            .OrderBy(m => m.Index)
-            .ToListAsync(cancellationToken);
-
-        var moduleIds = modules.Select(m => m.Id).ToList();
-        List<Lesson> lessonsGroupedByModule = await _readDbContext.Lessons
-            .Where(l => moduleIds.Contains(l.ModuleId))
-            .OrderBy(l => l.Index)
-            .ToListAsync(cancellationToken);
-
-        var lessonsByModuleId = lessonsGroupedByModule
-            .GroupBy(l => l.ModuleId)
-            .ToDictionary(g => g.Key, g => g.ToList());
-
-        int enrollmentCount = await _readDbContext.Enrollments
-            .CountAsync(e => e.CourseId == course.Id, cancellationToken);
-
-        var moduleDtos = modules.Select(module =>
+        CategoryDto? category = categoryResult.Value.Count > 0 ? categoryResult.Value[0] : null;
+        if (category is null)
         {
-            List<Lesson> moduleLessons = lessonsByModuleId.TryGetValue(module.Id, out List<Lesson>? lessons)
-                ? lessons
-                : [];
+            return Result.Failure<CoursePageDto>(CategoryErrors.NotFound);
+        }
 
-            var lessonDtos = moduleLessons
-            .Select(l => new LessonDto
-            {
-                Id = l.Id.Value,
-                Title = l.Title.Value,
-                Index = l.Index,
-                Duration = l.Duration,
-                ThumbnailUrl = l.ThumbnailImageUrl != null
-                    ? _urlResolver.Resolve(StorageCategory.Public, l.ThumbnailImageUrl.Path).Value
-                    : null,
-                Access = l.Access,
-                Links = []
-            }).ToList();
-
-            return new ModuleDto
-            {
-                Id = module.Id.Value,
-                Title = module.Title.Value,
-                Index = module.Index,
-                Duration = TimeSpan.FromSeconds(moduleLessons.Sum(l => l.Duration.TotalSeconds)),
-                LessonCount = moduleLessons.Count,
-                Lessons = lessonDtos,
-                Links = []
-            };
-        }).ToList();
-
-        var resolvedImageUrls = course.Images
-            .Select(img => _urlResolver.Resolve(StorageCategory.Public, img.Path).Value)
-            .ToList();
-
-        int totalLessons = lessonsGroupedByModule.Count;
-        double totalDurationSeconds = lessonsGroupedByModule.Sum(l => l.Duration.TotalSeconds);
-
-        var pageDto = new CoursePageDto
+        var response = new CoursePageDto
         {
-            Id = course.Id.Value,
-            Title = course.Title.Value,
-            Description = course.Description.Value,
-            InstructorId = course.InstructorId.Value,
-            InstructorName = instructor?.FullName ?? "Unknown",
-            InstructorAvatarUrl = instructor?.AvatarUrl,
-            Status = course.Status,
-            Price = course.Price,
-            EnrollmentCount = enrollmentCount,
-            LessonsCount = totalLessons,
-            TotalDuration = TimeSpan.FromSeconds(totalDurationSeconds),
-            UpdatedAtUtc = course.UpdatedAtUtc,
-            ImageUrls = resolvedImageUrls.AsReadOnly(),
-            Tags = course.Tags.Select(t => t.Value).ToList().AsReadOnly(),
-            CategoryId = course.CategoryId.Value,
-            CategoryName = category?.Name ?? "Unknown",
-            CategorySlug = category?.Slug.Value ?? string.Empty,
-            Modules = moduleDtos,
-            Links = []
+            Course = courseResult.Value,
+            Modules = modulesResult.Value.ToDictionary(m => m.Id),
+            Lessons = lessonsResult.Value.ToDictionary(l => l.Id),
+            Instructors = instructorsResult.Value.ToDictionary(i => i.Id),
+            Categories = new Dictionary<Guid, CategoryDto> { [category.Id] = category }
         };
 
-        return Result.Success(pageDto);
+        return Result.Success(response);
     }
 }

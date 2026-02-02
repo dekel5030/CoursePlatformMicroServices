@@ -14,7 +14,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Enrollments.Queries.GetEnrolledCourses;
 
-internal sealed class GetEnrolledCoursesQueryHandler : IQueryHandler<GetEnrolledCoursesQuery, EnrolledCourseCollectionDto>
+internal sealed class GetEnrolledCoursesQueryHandler 
+    : IQueryHandler<GetEnrolledCoursesQuery, EnrolledCourseCollectionDto>
 {
     private readonly ILinkBuilderService _linkBuilder;
     private readonly IReadDbContext _readDbContext;
