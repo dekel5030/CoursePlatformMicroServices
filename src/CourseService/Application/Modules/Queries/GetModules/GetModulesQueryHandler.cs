@@ -4,42 +4,49 @@ using Courses.Application.Lessons.Dtos;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses;
-using Courses.Domain.Courses.Errors;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
+using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Modules;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.Modules.Queries.GetByCourseId;
+namespace Courses.Application.Modules.Queries.GetModules;
 
-internal sealed class GetModulesByCourseIdQueryHandler
-    : IQueryHandler<GetModulesByCourseIdQuery, IReadOnlyList<ModuleDto>>
+internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IReadOnlyList<ModuleDto>>
 {
     private readonly IReadDbContext _readDbContext;
     private readonly ILinkBuilderService _linkBuilder;
 
-    public GetModulesByCourseIdQueryHandler(IReadDbContext readDbContext, ILinkBuilderService linkBuilder)
+    public GetModulesQueryHandler(IReadDbContext readDbContext, ILinkBuilderService linkBuilder)
     {
         _readDbContext = readDbContext;
         _linkBuilder = linkBuilder;
     }
 
     public async Task<Result<IReadOnlyList<ModuleDto>>> Handle(
-        GetModulesByCourseIdQuery request,
+        GetModulesQuery request,
         CancellationToken cancellationToken = default)
     {
-        Course? course = await _readDbContext.Courses
-            .FirstOrDefaultAsync(course => course.Id == request.CourseId, cancellationToken);
+        IQueryable<Module> query = _readDbContext.Modules.AsNoTracking();
 
-        if (course is null)
+        if (request.Filter.CourseId is { } courseId)
         {
-            return Result.Failure<IReadOnlyList<ModuleDto>>(CourseErrors.NotFound);
+            query = query.Where(m => m.CourseId == courseId);
         }
 
-        List<Module> modules = await _readDbContext.Modules
-            .Where(module => module.CourseId == request.CourseId)
-            .OrderBy(module => module.Index)
+        if (request.Filter.Ids is { } idsEnumerable)
+        {
+            var ids = idsEnumerable.Distinct().Select(id => new ModuleId(id)).ToList();
+            if (ids.Count > 0)
+            {
+                query = query.Where(m => ids.Contains(m.Id));
+            }
+        }
+
+        List<Module> modules = await query
+            .OrderBy(m => m.Index)
             .ToListAsync(cancellationToken);
 
         if (modules.Count == 0)
@@ -49,6 +56,7 @@ internal sealed class GetModulesByCourseIdQueryHandler
 
         var moduleIds = modules.Select(m => m.Id).ToList();
         List<Lesson> lessonsGroupedByModule = await _readDbContext.Lessons
+            .AsNoTracking()
             .Where(l => moduleIds.Contains(l.ModuleId))
             .OrderBy(l => l.Index)
             .ToListAsync(cancellationToken);
@@ -56,6 +64,13 @@ internal sealed class GetModulesByCourseIdQueryHandler
         var lessonsByModuleId = lessonsGroupedByModule
             .GroupBy(l => l.ModuleId)
             .ToDictionary(g => g.Key, g => g.ToList());
+
+        var courseIds = modules.Select(m => m.CourseId).Distinct().ToList();
+        List<Course> courses = await _readDbContext.Courses
+            .AsNoTracking()
+            .Where(c => courseIds.Contains(c.Id))
+            .ToListAsync(cancellationToken);
+        var coursesById = courses.ToDictionary(c => c.Id);
 
         var moduleDetailsDtos = modules.Select(module =>
         {
@@ -73,6 +88,21 @@ internal sealed class GetModulesByCourseIdQueryHandler
                     null,
                     lesson.Access
                 )).ToList();
+
+            Course? course = coursesById.GetValueOrDefault(module.CourseId);
+            if (course is null)
+            {
+                return new ModuleDto
+                {
+                    Id = module.Id.Value,
+                    Title = module.Title.Value,
+                    Index = module.Index,
+                    LessonCount = lessonDtos.Count,
+                    Duration = TimeSpan.FromTicks(lessonDtos.Sum(l => l.Duration.Ticks)),
+                    LessonIds = lessonDtos.Select(l => l.LessonId).ToList(),
+                    Links = []
+                };
+            }
 
             var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
             var moduleContext = new ModuleContext(courseContext, module.Id);

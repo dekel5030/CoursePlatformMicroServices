@@ -2,8 +2,7 @@ using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Modules.Dtos;
-using Courses.Application.Modules.Queries.GetByCourseId;
+using Courses.Application.Modules.Queries.GetModules;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -19,7 +18,7 @@ internal sealed class GetModulesByCourseId : IEndpoint
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetModulesByCourseIdQuery(new CourseId(courseId));
+            var query = new GetModulesQuery(new ModuleFilter(CourseId: new CourseId(courseId)));
 
             Result<IReadOnlyList<ModuleDto>> result = await mediator.Send(query, cancellationToken);
 

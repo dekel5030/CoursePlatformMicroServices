@@ -1,13 +1,13 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Categories.Dtos;
-using Courses.Domain.Categories;
+using Courses.Domain.Categories.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Categories.Queries.GetCategories;
 
-internal sealed class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQuery, CategoryCollectionDto>
+internal sealed class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQuery, IReadOnlyList<CategoryDto>>
 {
     private readonly IReadDbContext _readDbContext;
 
@@ -16,28 +16,41 @@ internal sealed class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQue
         _readDbContext = readDbContext;
     }
 
-    public async Task<Result<CategoryCollectionDto>> Handle(
+    public async Task<Result<IReadOnlyList<CategoryDto>>> Handle(
         GetCategoriesQuery request,
         CancellationToken cancellationToken = default)
     {
-        int categoryCount = await _readDbContext.Categories.CountAsync(cancellationToken);
+        IQueryable<Domain.Categories.Category> query = _readDbContext.Categories.AsNoTracking();
 
-        List<Category> categories = await _readDbContext.Categories
+        if (request.Filter.CourseId is { } courseId)
+        {
+            CategoryId? categoryId = await _readDbContext.Courses
+                .AsNoTracking()
+                .Where(c => c.Id == courseId)
+                .Select(c => c.CategoryId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (categoryId is null)
+            {
+                return Result.Success<IReadOnlyList<CategoryDto>>([]);
+            }
+
+            query = query.Where(c => c.Id == categoryId);
+        }
+
+        if (request.Filter.Ids is { } idsEnumerable)
+        {
+            var ids = idsEnumerable.Distinct().Select(id => new CategoryId(id)).ToList();
+            if (ids.Count > 0)
+            {
+                query = query.Where(c => ids.Contains(c.Id));
+            }
+        }
+
+        List<CategoryDto> categoryDtos = await query
+            .Select(c => new CategoryDto(c.Id.Value, c.Name, c.Slug.Value))
             .ToListAsync(cancellationToken);
 
-        var categoryDtos = categories
-            .Select(c => new CategoryDto(c.Id.Value, c.Name, c.Slug.Value))
-            .ToList();
-
-        var response = new CategoryCollectionDto
-        {
-            Items = categoryDtos,
-            PageNumber = 1,
-            PageSize = categoryDtos.Count,
-            TotalItems = categoryCount,
-            Links = null
-        };
-
-        return Result<CategoryCollectionDto>.Success(response);
+        return Result.Success<IReadOnlyList<CategoryDto>>(categoryDtos);
     }
 }

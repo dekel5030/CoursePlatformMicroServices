@@ -1,9 +1,8 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Lessons.Queries.GetById;
+using Courses.Application.Lessons.Queries.GetLessons;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Lessons;
-using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
 using FluentAssertions;
 using Moq;
@@ -12,14 +11,14 @@ using Xunit;
 
 namespace Application.UnitTests.Lessons.Queries;
 
-public class GetLessonByIdQueryHandlerTest
+public class GetLessonsQueryHandlerTest
 {
     private readonly Mock<IReadDbContext> _dbContextMock;
     private readonly Mock<IStorageUrlResolver> _urlResolverMock;
     private readonly Mock<ILinkBuilderService> _linkBuilderMock;
-    private readonly GetLessonByIdQueryHandler _handler;
+    private readonly GetLessonsQueryHandler _handler;
 
-    public GetLessonByIdQueryHandlerTest()
+    public GetLessonsQueryHandlerTest()
     {
         _dbContextMock = new Mock<IReadDbContext>();
         _urlResolverMock = new Mock<IStorageUrlResolver>();
@@ -33,30 +32,27 @@ public class GetLessonByIdQueryHandlerTest
             .Setup(l => l.BuildLinks(It.IsAny<LinkResourceKey>(), It.IsAny<object>()))
             .Returns(new List<LinkDto>().AsReadOnly());
 
-        _handler = new GetLessonByIdQueryHandler(
-            _urlResolverMock.Object,
+        _handler = new GetLessonsQueryHandler(
             _dbContextMock.Object,
+            _urlResolverMock.Object,
             _linkBuilderMock.Object);
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnFailure_WhenLessonDoesNotExist()
+    public async Task Handle_ShouldReturnEmptyList_WhenLessonDoesNotExist()
     {
         // Arrange
         var nonExistentLessonId = new LessonId(Guid.NewGuid());
-        var query = new GetLessonByIdQuery(nonExistentLessonId);
+        var query = new GetLessonsQuery(new LessonFilter(Ids: [nonExistentLessonId.Value], IncludeDetails: true));
 
         _dbContextMock.Setup(db => db.Lessons).ReturnsDbSet(new List<Lesson>());
+        _dbContextMock.Setup(db => db.Courses).ReturnsDbSet(new List<Domain.Courses.Course>());
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(LessonErrors.NotFound);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeEmpty();
     }
-
-    // Further tests (Handle_ShouldReturnSuccess_WhenLessonExists, etc.) require setting up
-    // Lesson and Course in DbSets using the current Domain API (Lesson.Create, Course.CreateCourse)
-    // and asserting on LessonDetailsPageDto (LessonId, Title, Description, VideoUrl, ThumbnailUrl, etc.).
 }
