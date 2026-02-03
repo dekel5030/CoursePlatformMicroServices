@@ -73,11 +73,11 @@ internal sealed class GetCoursePageQueryHandler
             courseData.EnrollmentCount,
             courseData.TotalLessonsCount,
             TimeSpan.FromSeconds(courseData.TotalDurationSeconds));
-        var courseWithAnalytics = new CourseWithAnalyticsDto(courseDto, analyticsDto);
 
         return Result.Success(new CoursePageDto
         {
-            Course = courseWithAnalytics,
+            Course = courseDto,
+            Analytics = analyticsDto,
 
             Modules = courseData.Modules.ToDictionary(
                 m => m.Id.Value,
