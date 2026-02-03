@@ -1,4 +1,5 @@
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Modules.Dtos;
@@ -23,11 +24,16 @@ internal sealed class GetCoursePageQueryHandler
 {
     private readonly IReadDbContext _readDbContext;
     private readonly ILinkBuilderService _linkBuilderService;
+    private readonly IStorageUrlResolver _storageUrlResolver;
 
-    public GetCoursePageQueryHandler(IReadDbContext readDbContext, ILinkBuilderService linkBuilderService)
+    public GetCoursePageQueryHandler(
+        IReadDbContext readDbContext,
+        ILinkBuilderService linkBuilderService,
+        IStorageUrlResolver storageUrlResolver)
     {
         _readDbContext = readDbContext;
         _linkBuilderService = linkBuilderService;
+        _storageUrlResolver = storageUrlResolver;
     }
 
     public async Task<Result<CoursePageDto>> Handle(
@@ -109,7 +115,7 @@ internal sealed class GetCoursePageQueryHandler
             Description = course.Description.Value,
             Price = course.Price,
             Status = course.Status,
-            ImageUrls = course.Images.Select(i => i.Path).ToList(),
+            ImageUrls = course.Images.Select(image => _storageUrlResolver.Resolve(StorageCategory.Public, image.Path).Value).ToList(),
             Tags = course.Tags.Select(t => t.Value).ToList(),
             CategoryId = course.CategoryId.Value,
             InstructorId = course.InstructorId.Value,

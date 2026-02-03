@@ -15,7 +15,6 @@ public record CourseDto
     public required IReadOnlyList<string> ImageUrls { get; init; }
     public required IReadOnlyList<string> Tags { get; init; }
 
-    // Foreign key references (resolved via dictionaries)
     public required Guid InstructorId { get; init; }
     public required Guid CategoryId { get; init; }
 
