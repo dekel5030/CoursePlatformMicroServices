@@ -7,6 +7,7 @@ public sealed record EnrolledCourseDto
     public required Guid EnrollmentId { get; init; }
     public required Guid CourseId { get; init; }
     public required string CourseTitle { get; init; }
+    public required string? CourseImageUrl { get; set; }
     public required string CourseSlug { get; init; }
     public required double ProgressPercentage { get; init; }
     public required DateTimeOffset? LastAccessedAt { get; init; }

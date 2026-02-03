@@ -1,6 +1,7 @@
 {
   "profileMenu": {
     "profile": "דף פרופיל",
+    "myCourses": "הקורסים שלי",
     "management": "ניהול",
     "logout": "התנתק"
   },
@@ -44,12 +45,14 @@
     "roleDetails": "פרטי תפקיד",
     "users": "משתמשים",
     "admin": "לוח בקרה למנהל",
-    "catalog": "קטלוג"
+    "catalog": "קטלוג",
+    "myCourses": "הקורסים שלי"
   },
   "navbar": {
     "login": "התחבר",
     "signup": "הרשמה",
     "catalog": "קטלוג",
+    "myCourses": "הקורסים שלי",
     "explore": "תוכנות",
     "development": "תחומים",
     "design": "עיצוב פנים",
@@ -183,6 +186,14 @@
       "analytics": "ניתוח נתונים",
       "enrollments": "רישומים"
     }
+  },
+  "myCourses": {
+    "title": "הקורסים שלי",
+    "subtitle": "המשך ללמוד מאיפה שהפסקת",
+    "progress": "התקדמות",
+    "lastAccessed": "נגישה לאחרונה",
+    "noEnrollments": "אינך רשום לקורסים עדיין",
+    "pageOf": "עמוד {{current}} מתוך {{total}}"
   },
   "errors": {
     "forbidden": {

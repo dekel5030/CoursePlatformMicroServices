@@ -1,6 +1,7 @@
 {
   "profileMenu": {
     "profile": "Profile Page",
+    "myCourses": "My Courses",
     "management": "Management",
     "logout": "Logout"
   },
@@ -38,12 +39,14 @@
     "roleDetails": "Role Details",
     "users": "Users",
     "admin": "Admin Dashboard",
-    "catalog": "Catalog"
+    "catalog": "Catalog",
+    "myCourses": "My Courses"
   },
   "navbar": {
     "login": "Log in",
     "signup": "Sign up",
     "catalog": "Catalog",
+    "myCourses": "My Courses",
     "explore": "Software",
     "development": "Disciplines",
     "design": "Interiors",
@@ -177,6 +180,14 @@
       "analytics": "Analytics",
       "enrollments": "Enrollments"
     }
+  },
+  "myCourses": {
+    "title": "My Courses",
+    "subtitle": "Continue learning from where you left off",
+    "progress": "Progress",
+    "lastAccessed": "Last accessed",
+    "noEnrollments": "You are not enrolled in any courses yet",
+    "pageOf": "Page {{current}} of {{total}}"
   },
   "errors": {
     "forbidden": {

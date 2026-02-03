@@ -132,6 +132,16 @@ export default function Navbar() {
                 {t("navbar.catalog")}
               </Link>
             </li>
+            {auth.isAuthenticated && (
+              <li>
+                <Link
+                  to="/my-courses"
+                  className="hover:text-foreground transition-colors"
+                >
+                  {t("navbar.myCourses")}
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       </div>
