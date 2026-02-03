@@ -6,7 +6,7 @@ public enum LinkResourceKey
     Module,
     Lesson,
     CourseCollection,
-    CourseRatingEligibility,
+    CourseRatingCollection,
     CourseRating,
     EnrolledCourse,
     EnrolledCourseCollection

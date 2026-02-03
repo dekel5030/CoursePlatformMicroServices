@@ -14,6 +14,16 @@ export interface UserDtoApi {
 }
 
 /**
+ * API CourseAnalyticsDto: analytics for course in CoursePageDto
+ * Matches Courses.Application.Courses.Dtos.CourseAnalyticsDto
+ */
+export interface CourseAnalyticsDtoApi {
+  enrollmentCount: number;
+  lessonsCount: number;
+  totalDuration: string;
+}
+
+/**
  * API CourseDto: the course object in CoursePageDto
  * Matches Courses.Application.Courses.Dtos.CourseDto
  */
@@ -23,30 +33,40 @@ export interface CourseDtoApi {
   description: string | null;
   status: "Draft" | "Published" | "Deleted";
   price: Money;
-  enrollmentCount: number;
-  lessonsCount: number;
-  totalDuration: string;
   updatedAtUtc: string;
   imageUrls: string[] | null;
   tags: string[] | null;
   instructorId: string;
   categoryId: string;
-  moduleIds: string[] | null;
   links: LinkDto[] | null;
 }
 
 /**
- * API ModuleDto: module in CoursePageDto (has lessonIds, not lessons)
+ * API ModuleDto: module in CoursePageDto (pure aggregate, no structure)
  * Matches Courses.Application.Courses.Dtos.ModuleDto
  */
 export interface ModuleDtoApi {
   id: string;
   title: string | null;
-  index: number;
+  links: LinkDto[] | null;
+}
+
+/**
+ * API ModuleAnalyticsDto: analytics for module
+ * Matches Courses.Application.Modules.Dtos.ModuleAnalyticsDto
+ */
+export interface ModuleAnalyticsDtoApi {
   lessonCount: number;
   duration: string;
-  lessonIds: string[] | null;
-  links: LinkDto[] | null;
+}
+
+/**
+ * API ModuleWithAnalyticsDto: module with analytics in CoursePageDto
+ * Matches Courses.Application.Modules.Dtos.ModuleWithAnalyticsDto
+ */
+export interface ModuleWithAnalyticsDtoApi {
+  module: ModuleDtoApi;
+  analytics: ModuleAnalyticsDtoApi;
 }
 
 /**
@@ -70,12 +90,23 @@ export interface LessonDtoApi {
 }
 
 /**
+ * API CourseStructureDto: structure (order) of modules and lessons
+ * Matches Courses.Application.Courses.Dtos.CourseStructureDto
+ */
+export interface CourseStructureDtoApi {
+  moduleIds: string[];
+  moduleLessonIds: Record<string, string[]>;
+}
+
+/**
  * API CoursePageDto: flat response from GET /courses/{id}
  * Matches Courses.Application.Courses.Dtos.CoursePageDto
  */
 export interface CoursePageDto {
   course: CourseDtoApi;
-  modules: Record<string, ModuleDtoApi> | null;
+  analytics: CourseAnalyticsDtoApi;
+  structure: CourseStructureDtoApi;
+  modules: Record<string, ModuleWithAnalyticsDtoApi> | null;
   lessons: Record<string, LessonDtoApi> | null;
   instructors: Record<string, UserDtoApi> | null;
   categories: Record<string, CategoryDto> | null;

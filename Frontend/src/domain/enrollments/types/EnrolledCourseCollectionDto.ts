@@ -1,8 +1,11 @@
 import type { LinkDto } from "@/shared/types/LinkDto";
-import type { EnrolledCourseDto } from "./EnrolledCourseDto";
+import type { EnrolledCourseWithAnalyticsDto } from "./EnrolledCourseWithAnalyticsDto";
 
+/**
+ * API response: Matches EnrolledCourseCollectionDto from CourseService
+ */
 export interface EnrolledCourseCollectionDto {
-  items: EnrolledCourseDto[] | null;
+  items: EnrolledCourseWithAnalyticsDto[] | null;
   pageNumber: number;
   pageSize: number;
   totalItems: number;

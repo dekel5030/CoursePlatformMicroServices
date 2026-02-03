@@ -47,7 +47,7 @@ internal sealed record CourseCollectionContext(
     public object? Status => null;
 }
 
-internal sealed record CourseRatingEligibilityContext(
+internal sealed record CourseRatingCollectionContext(
     CourseId CourseId,
     UserId? CurrentUserId,
     bool UserHasExistingRating) : ILinkEligibilityContext

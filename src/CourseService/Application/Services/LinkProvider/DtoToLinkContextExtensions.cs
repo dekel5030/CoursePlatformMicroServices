@@ -15,6 +15,11 @@ internal static class DtoToLinkContextExtensions
             dto.Status);
     }
 
+    public static CourseContext ToCourseContext(this CourseSummaryWithAnalyticsDto dto)
+    {
+        return dto.Course.ToCourseContext();
+    }
+
     public static CourseCollectionContext ToCourseCollectionContext(
         this PagedQueryDto query,
         int totalCount)

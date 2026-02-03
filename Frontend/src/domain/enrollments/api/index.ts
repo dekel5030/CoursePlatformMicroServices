@@ -1,1 +1,4 @@
-export { fetchMyEnrollments } from "./enrollments-api";
+export {
+  fetchMyEnrollments,
+  type EnrolledCourseCollectionViewDto,
+} from "./enrollments-api";

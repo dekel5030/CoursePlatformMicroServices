@@ -50,7 +50,7 @@ internal sealed class GetFeaturedCourseSummariesQueryHandler
             });
         }
 
-        List<CourseSummaryDto> courseDtos = await GetFeaturedCourseSummariesAsync(
+        List<CourseSummaryWithAnalyticsDto> courseDtos = await GetFeaturedCourseSummariesAsync(
             featuredCourseIds,
             cancellationToken);
 
@@ -66,7 +66,7 @@ internal sealed class GetFeaturedCourseSummariesQueryHandler
         return Result.Success(response);
     }
 
-    private async Task<List<CourseSummaryDto>> GetFeaturedCourseSummariesAsync(
+    private async Task<List<CourseSummaryWithAnalyticsDto>> GetFeaturedCourseSummariesAsync(
         IReadOnlyList<CourseId> featuredCourseIds,
         CancellationToken cancellationToken)
     {
@@ -120,13 +120,15 @@ internal sealed class GetFeaturedCourseSummariesQueryHandler
                 ? _urlResolver.Resolve(StorageCategory.Public, course.Images.First().Path).Value
                 : null;
 
-            return new CourseSummaryDto
+            string shortDescription = course.Description.Value.Length > 100
+                ? course.Description.Value[..100] + "..."
+                : course.Description.Value;
+
+            var summary = new CourseSummaryDto
             {
                 Id = course.Id.Value,
                 Title = course.Title.Value,
-                ShortDescription = course.Description.Value.Length > 150
-                    ? course.Description.Value[..150] + "..."
-                    : course.Description.Value,
+                ShortDescription = shortDescription,
                 Slug = course.Slug.Value,
                 ThumbnailUrl = thumbnailUrl,
                 Instructor = new InstructorDto(
@@ -139,18 +141,20 @@ internal sealed class GetFeaturedCourseSummariesQueryHandler
                     category?.Slug.Value ?? string.Empty),
                 Difficulty = course.Difficulty,
                 Price = course.Price,
-                OriginalPrice = null,
-                Badges = [],
-                AverageRating = 0,
-                ReviewsCount = 0,
-                LessonsCount = stats?.LessonCount ?? 0,
-                Duration = stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero,
-                EnrollmentCount = enrollmentCount?.Count ?? 0,
-                CourseViews = 0,
                 UpdatedAtUtc = course.UpdatedAtUtc,
                 Status = course.Status,
                 Links = []
             };
+
+            var analytics = new CourseSummaryAnalyticsDto(
+                LessonsCount: stats?.LessonCount ?? 0,
+                Duration: stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero,
+                EnrollmentCount: enrollmentCount?.Count ?? 0,
+                AverageRating: 0,
+                ReviewsCount: 0,
+                CourseViews: 0);
+
+            return new CourseSummaryWithAnalyticsDto(summary, analytics);
         }).ToList();
 
         return courseDtos;

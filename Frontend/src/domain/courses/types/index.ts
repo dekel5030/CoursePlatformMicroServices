@@ -9,7 +9,13 @@ export { ModuleRels } from "./ModuleRels";
 export { CourseRatingRels } from "./CourseRatingRels";
 
 // Backend DTOs
-export type { CourseSummaryDto, InstructorDto, CategoryDto } from "./CourseSummaryDto";
+export type {
+  CourseSummaryDto,
+  CourseSummaryAnalyticsDto,
+  CourseSummaryWithAnalyticsDto,
+  InstructorDto,
+  CategoryDto,
+} from "./CourseSummaryDto";
 export { DifficultyLevel as DifficultyLevelDto, CourseStatus as CourseStatusDto, type DifficultyLevel as DifficultyLevelDtoType, type CourseStatus as CourseStatusDtoType } from "./CourseSummaryDto";
 export type { ModuleDto, ModuleLessonDto } from "./ModuleDto";
 export type { CreateCourseRequestDto } from "./CreateCourseRequestDto";

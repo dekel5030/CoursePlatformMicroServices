@@ -12,7 +12,7 @@ internal static class LinkExtensions
         services.AddScoped<ILinkDefinitionRegistry, ModuleLinkDefinitions>();
         services.AddScoped<ILinkDefinitionRegistry, LessonLinkDefinitions>();
         services.AddScoped<ILinkDefinitionRegistry, CourseCollectionLinkDefinitions>();
-        services.AddScoped<ILinkDefinitionRegistry, CourseRatingEligibilityLinkDefinitions>();
+        services.AddScoped<ILinkDefinitionRegistry, CourseRatingCollectionLinkDefinitions>();
         services.AddScoped<ILinkDefinitionRegistry, CourseRatingLinkDefinitions>();
         services.AddScoped<ILinkDefinitionRegistry, EnrolledCourseLinkDefinitions>();
         services.AddScoped<ILinkDefinitionRegistry, EnrolledCourseCollectionLinkDefinitions>();

@@ -4,11 +4,11 @@ using Courses.Application.Services.LinkProvider.constants;
 
 namespace Courses.Application.Services.LinkProvider.Definitions;
 
-internal sealed class CourseRatingEligibilityLinkDefinitions : ILinkDefinitionRegistry
+internal sealed class CourseRatingCollectionLinkDefinitions : ILinkDefinitionRegistry
 {
     private IReadOnlyList<ILinkDefinition>? _definitions;
 
-    public LinkResourceKey ResourceKey => LinkResourceKey.CourseRatingEligibility;
+    public LinkResourceKey ResourceKey => LinkResourceKey.CourseRatingCollection;
 
     public IReadOnlyList<ILinkDefinition> GetDefinitions()
     {
@@ -19,19 +19,19 @@ internal sealed class CourseRatingEligibilityLinkDefinitions : ILinkDefinitionRe
 
         _definitions = new List<ILinkDefinition>
         {
-            new LinkDefinition<CourseRatingEligibilityContext>(
+            new LinkDefinition<CourseRatingCollectionContext>(
                 rel: LinkRels.CourseRating.Ratings,
                 method: LinkHttpMethod.Get,
                 endpointName: EndpointNames.GetCourseRatings,
                 policyCheck: _ => CourseRatingGovernancePolicy.CanReadRatings(),
                 getRouteValues: ctx => new { courseId = ctx.CourseId.Value }),
 
-            new LinkDefinition<CourseRatingEligibilityContext>(
+            new LinkDefinition<CourseRatingCollectionContext>(
                 rel: LinkRels.CourseRating.CreateRating,
                 method: LinkHttpMethod.Post,
                 endpointName: EndpointNames.CreateCourseRating,
                 policyCheck: ctx => CourseRatingGovernancePolicy.CanCreateRating(ctx),
-                getRouteValues: ctx => new { courseId = ctx.CourseId.Value })
+                getRouteValues: ctx => new { courseId = ctx.CourseId.Value }),
         }.AsReadOnly();
 
         return _definitions;

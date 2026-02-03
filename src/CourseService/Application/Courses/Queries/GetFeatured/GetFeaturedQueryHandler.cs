@@ -51,7 +51,7 @@ internal static class FeaturedCourseCollectionDtoEnrichmentExtensions
             var courseContext = courseSummaryDto.ToCourseContext();
             IReadOnlyList<LinkDto> links = linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext);
 
-            return courseSummaryDto with { Links = links };
+            return courseSummaryDto with { Course = courseSummaryDto.Course with { Links = links } };
         }).ToList();
 
         var pagedQuery = new PagedQueryDto

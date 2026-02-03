@@ -34,7 +34,7 @@ public sealed class GetCourseRatingQueryHandler
         CancellationToken cancellationToken = default)
     {
         var courseId = new CourseId(request.CourseId);
-        UserId? currentUserId = _userContext.Id is null ? null : new UserId(_userContext.Id.Value);
+        var currentUserId = new UserId(_userContext.Id ?? Guid.Empty);
 
         (List<CourseRating> ratings, int totalCount) = await GetPagedRatingsAsync(
             courseId,
@@ -43,15 +43,11 @@ public sealed class GetCourseRatingQueryHandler
 
         if (totalCount == 0)
         {
-            return Result.Success(new CourseRatingCollection
-            {
-                Items = [],
-                Links = [],
-                PageNumber = request.PageNumber,
-                PageSize = request.PageSize,
-                TotalItems = 0
-            });
+            return EmptyResult(request);
         }
+
+        bool userHasExistingRating = await _dbContext.CourseRatings
+                .AnyAsync(rating => rating.CourseId == courseId && rating.UserId == currentUserId, cancellationToken);
 
         Dictionary<UserId, User> userMap = await GetUserMapAsync(ratings, cancellationToken);
 
@@ -60,6 +56,7 @@ public sealed class GetCourseRatingQueryHandler
             var ratingLinkContext = new CourseRatingLinkContext(rating.Id, rating.UserId, currentUserId);
             IReadOnlyList<LinkDto> links = _linkBuilder
                 .BuildLinks(LinkResourceKey.CourseRating, ratingLinkContext);
+
             return MapToDto(rating, userMap.GetValueOrDefault(rating.UserId), links);
         }).ToList();
 
@@ -69,10 +66,25 @@ public sealed class GetCourseRatingQueryHandler
             TotalItems = totalCount,
             PageNumber = request.PageNumber,
             PageSize = request.PageSize,
-            Links = []
+            Links = _linkBuilder.BuildLinks(LinkResourceKey.CourseRatingCollection, new CourseRatingCollectionContext(
+                courseId,
+                currentUserId,
+                userHasExistingRating)).ToList()
         };
 
         return Result.Success(result);
+    }
+
+    private static Result<CourseRatingCollection> EmptyResult(GetCourseRatingsQuery request)
+    {
+        return Result.Success(new CourseRatingCollection
+        {
+            Items = [],
+            Links = [],
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+            TotalItems = 0
+        });
     }
 
     private async Task<(List<CourseRating> Items, int TotalCount)> GetPagedRatingsAsync(
