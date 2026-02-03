@@ -8,7 +8,7 @@ internal static class CourseRatingGovernancePolicy
     public static bool CanReadRatings() => true;
 #pragma warning restore S3400 
 
-    public static bool CanCreateRating(CourseRatingEligibilityContext context) =>
+    public static bool CanCreateRating(CourseRatingCollectionContext context) =>
         context.CurrentUserId is not null && !context.UserHasExistingRating;
 
     public static bool CanUpdateRating(CourseRatingLinkContext context) =>

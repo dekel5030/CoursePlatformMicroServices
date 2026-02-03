@@ -47,6 +47,13 @@ internal sealed class CourseLinkDefinitions : ILinkDefinitionRegistry
                 getRouteValues: ctx => new { id = ctx.Id.Value }),
 
             new LinkDefinition<CourseContext>(
+                rel: LinkRels.Course.GenerateImageUploadUrl,
+                method: LinkHttpMethod.Post,
+                endpointName: EndpointNames.GenerateCourseImageUploadUrl,
+                policyCheck: ctx => _policy.CanEditCourse(ctx),
+                getRouteValues: ctx => new { Id = ctx.Id.Value }),
+
+            new LinkDefinition<CourseContext>(
                 rel: LinkRels.CourseRating.Ratings,
                 method: LinkHttpMethod.Get,
                 endpointName: EndpointNames.GetCourseRatings,

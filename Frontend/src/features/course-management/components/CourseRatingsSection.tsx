@@ -26,10 +26,7 @@ export function CourseRatingsSection({ course }: CourseRatingsSectionProps) {
   const pageSize = 10;
 
   const ratingsLink = getLink(course.links, CourseRels.RATINGS);
-  const createRatingLink = getLink(course.links, CourseRels.CREATE_RATING);
-
   const ratingsUrl = ratingsLink?.href;
-  const canAddRating = hasLink(course.links, CourseRels.CREATE_RATING);
 
   const {
     data: ratingsData,
@@ -40,6 +37,13 @@ export function CourseRatingsSection({ course }: CourseRatingsSectionProps) {
     pageSize,
     pageUrl,
   });
+
+  const createRatingLink = ratingsData
+    ? getLink(ratingsData.links, CourseRatingRels.CREATE_RATING)
+    : null;
+  const canAddRating = ratingsData
+    ? hasLink(ratingsData.links, CourseRatingRels.CREATE_RATING)
+    : false;
 
   const createRating = useCreateRating(course.id);
   const patchRating = usePatchRating(course.id);
