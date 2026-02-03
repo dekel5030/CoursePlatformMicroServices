@@ -2,11 +2,15 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ModuleModel } from "@/domain/courses";
 import { Card, CardContent, CardHeader, Button } from "@/shared/ui";
-import { ChevronDown, ChevronUp, Plus, Clock } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Clock, Trash2 } from "lucide-react";
 import { LessonCard } from "@/features/lesson-viewer";
-import { hasLink, formatDuration } from "@/shared/utils";
+import { hasLink, getLink, formatDuration } from "@/shared/utils";
+import { InlineEditableText } from "@/shared/common";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { AddLessonDialog } from "@/features/lesson-viewer/components/AddLessonDialog";
 import { ModuleRels } from "@/domain/courses";
+import { usePatchModule, useDeleteModule } from "@/domain/courses";
+import { toast } from "sonner";
 
 interface ModuleCardProps {
   module: ModuleModel;
@@ -18,13 +22,49 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
   const { t } = useTranslation(["course-management", "translation"]);
   const [isExpanded, setIsExpanded] = useState(true);
   const [isAddLessonOpen, setIsAddLessonOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const patchModule = usePatchModule(courseId);
+  const deleteModule = useDeleteModule(courseId);
 
   const canCreateLesson = hasLink(module.links, ModuleRels.CREATE_LESSON);
+  const canUpdate = hasLink(module.links, ModuleRels.PARTIAL_UPDATE);
+  const canDelete = hasLink(module.links, ModuleRels.DELETE);
+  const updateLink = getLink(module.links, ModuleRels.PARTIAL_UPDATE);
+  const deleteLink = getLink(module.links, ModuleRels.DELETE);
 
   const sortedLessons = [...module.lessons].sort((a, b) => a.order - b.order);
   const durationText = formatDuration(module.duration);
 
   const ChevronIcon = isExpanded ? ChevronUp : ChevronDown;
+
+  const handleTitleUpdate = async (newTitle: string) => {
+    if (!updateLink) return;
+    try {
+      await patchModule.mutateAsync({
+        url: updateLink.href,
+        request: { title: newTitle },
+      });
+      toast.success(t("course-management:detail.titleUpdated"));
+    } catch (error) {
+      toast.error(t("course-management:detail.titleUpdateFailed"));
+      throw error;
+    }
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteLink) return;
+    try {
+      await deleteModule.mutateAsync(deleteLink.href);
+    } finally {
+      setIsDeleteDialogOpen(false);
+    }
+  };
 
   return (
     <>
@@ -39,9 +79,22 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
                 {index + 1}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-start truncate" dir="auto">
-                  {module.title}
-                </h3>
+                {canUpdate ? (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <InlineEditableText
+                      value={module.title}
+                      onSave={handleTitleUpdate}
+                      displayClassName="font-semibold text-start truncate"
+                      inputClassName="font-semibold text-start"
+                      placeholder={t("course-management:detail.enterTitle")}
+                      maxLength={200}
+                    />
+                  </div>
+                ) : (
+                  <h3 className="font-semibold text-start truncate" dir="auto">
+                    {module.title}
+                  </h3>
+                )}
                 <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5 flex-wrap">
                   <span>
                     {module.lessonCount} {t("course-management:detail.lessons")}
@@ -72,6 +125,18 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span className="text-xs">{t("course-management:detail.addLesson")}</span>
+                </Button>
+              )}
+              {canDelete && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 shrink-0 hover:text-destructive hover:bg-destructive/10"
+                  onClick={handleDeleteClick}
+                  title={t("common.delete")}
+                  disabled={deleteModule.isPending}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               )}
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0 shrink-0">
@@ -106,6 +171,17 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
         links={module.links}
         open={isAddLessonOpen}
         onOpenChange={setIsAddLessonOpen}
+      />
+
+      <ConfirmationModal
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        title={t("course-management:detail.moduleDeleteConfirmTitle")}
+        message={t("course-management:detail.moduleDeleteConfirmMessage")}
+        confirmText={t("common.delete")}
+        cancelText={t("common.cancel")}
+        isLoading={deleteModule.isPending}
       />
     </>
   );

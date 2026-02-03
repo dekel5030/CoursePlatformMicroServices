@@ -29,7 +29,9 @@
     "courseContent": "תוכן הקורס",
     "addModule": "הוסף מודול",
     "noModules": "אין מודולים עדיין",
-    "createFirstModule": "צור את המודול הראשון שלך"
+    "createFirstModule": "צור את המודול הראשון שלך",
+    "moduleDeleteConfirmTitle": "מחיקת מודול",
+    "moduleDeleteConfirmMessage": "האם אתה בטוח שברצונך למחוק מודול זה? כל השיעורים במודול יימחקו גם כן. לא ניתן לבטל פעולה זו."
   },
   "actions": {
     "editNotImplemented": "עריכה טרם מיושמת",

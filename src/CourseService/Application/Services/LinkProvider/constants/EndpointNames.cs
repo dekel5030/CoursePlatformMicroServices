@@ -15,6 +15,8 @@ internal static class EndpointNames
 
     // Modules
     public const string CreateModule = "CreateModule";
+    public const string PatchModule = "PatchModule";
+    public const string DeleteModule = "DeleteModule";
 
     // Lessons
     public const string GetLessonById = "GetLessonById";
