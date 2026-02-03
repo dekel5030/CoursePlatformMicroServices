@@ -29,18 +29,27 @@ internal sealed class GetCoursePageQueryHandler
     {
         var courseId = new CourseId(request.Id);
 
-        Task<Result<CourseDto>> courseTask = SendInScopeAsync(new GetCourseByIdQuery(courseId), cancellationToken);
+        Result<CourseDto> courseResult = await SendInScopeAsync(new GetCourseByIdQuery(courseId), cancellationToken);
+        if (courseResult.IsFailure)
+        {
+            return Result.Failure<CoursePageDto>(courseResult.Error);
+        }
+
+        CourseDto course = courseResult.Value;
+        Guid instructorId = course.InstructorId;
+        Guid categoryId = course.CategoryId;
+
         Task<Result<IReadOnlyList<ModuleDto>>> modulesTask = SendInScopeAsync(
             new GetModulesQuery(new ModuleFilter(CourseId: courseId)), cancellationToken);
         Task<Result<IReadOnlyList<LessonDto>>> lessonsTask = SendInScopeAsync(
             new GetLessonsQuery(new LessonFilter(CourseId: courseId)), cancellationToken);
         Task<Result<IReadOnlyList<UserDto>>> instructorTask = SendInScopeAsync(
-            new GetUsersQuery(new UserFilter(CourseId: courseId)), cancellationToken);
+            new GetUsersQuery(new UserFilter(Ids: [instructorId])), cancellationToken);
         Task<Result<IReadOnlyList<CategoryDto>>> categoryTask = SendInScopeAsync(
-            new GetCategoriesQuery(new CategoryFilter(CourseId: courseId)), cancellationToken);
-        await Task.WhenAll(courseTask, modulesTask, lessonsTask, instructorTask, categoryTask);
+            new GetCategoriesQuery(new CategoryFilter(Ids: [categoryId])), cancellationToken);
+        await Task.WhenAll(modulesTask, lessonsTask, instructorTask, categoryTask);
 
-        return await AssembleCoursePageAsync(courseTask, modulesTask, lessonsTask, instructorTask, categoryTask);
+        return await AssembleCoursePageAsync(course, modulesTask, lessonsTask, instructorTask, categoryTask);
     }
 
     private async Task<Result<TResponse>> SendInScopeAsync<TResponse>(
@@ -53,27 +62,24 @@ internal sealed class GetCoursePageQueryHandler
     }
 
     private static async Task<Result<CoursePageDto>> AssembleCoursePageAsync(
-        Task<Result<CourseDto>> courseTask,
+        CourseDto course,
         Task<Result<IReadOnlyList<ModuleDto>>> modulesTask,
         Task<Result<IReadOnlyList<LessonDto>>> lessonsTask,
         Task<Result<IReadOnlyList<UserDto>>> instructorTask,
         Task<Result<IReadOnlyList<CategoryDto>>> categoryTask)
     {
-        Result<CourseDto> courseResult = await courseTask;
         Result<IReadOnlyList<ModuleDto>> modulesResult = await modulesTask;
         Result<IReadOnlyList<LessonDto>> lessonsResult = await lessonsTask;
         Result<IReadOnlyList<UserDto>> instructorsResult = await instructorTask;
         Result<IReadOnlyList<CategoryDto>> categoryResult = await categoryTask;
 
         if (categoryResult.IsFailure
-            || courseResult.IsFailure
             || modulesResult.IsFailure
             || lessonsResult.IsFailure
             || instructorsResult.IsFailure)
         {
             return Result.Failure<CoursePageDto>(new ValidationError([
                 categoryResult.Error
-                ?? courseResult.Error
                 ?? modulesResult.Error
                 ?? lessonsResult.Error
                 ?? instructorsResult.Error!]));
@@ -87,7 +93,7 @@ internal sealed class GetCoursePageQueryHandler
 
         var response = new CoursePageDto
         {
-            Course = courseResult.Value,
+            Course = course,
             Modules = modulesResult.Value.ToDictionary(m => m.Id),
             Lessons = lessonsResult.Value.ToDictionary(l => l.Id),
             Instructors = instructorsResult.Value.ToDictionary(i => i.Id),

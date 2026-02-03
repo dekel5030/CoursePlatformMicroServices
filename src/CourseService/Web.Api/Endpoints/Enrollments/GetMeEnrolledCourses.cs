@@ -8,7 +8,7 @@ using Kernel.Messaging.Abstractions;
 
 namespace Courses.Api.Endpoints.Enrollments;
 
-internal sealed class GetEnrolledCourses : IEndpoint
+internal sealed class GetMeEnrolledCourses : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -28,7 +28,7 @@ internal sealed class GetEnrolledCourses : IEndpoint
         })
         .WithName("GetEnrolledCourses")
         .WithMetadata<EnrolledCourseCollectionDto>(
-            nameof(GetEnrolledCourses),
+            nameof(GetMeEnrolledCourses),
             tag: Tags.Enrollments,
             summary: "Gets the list of courses the current user is enrolled in, with progress and last-accessed metadata.")
         .RequireAuthorization();
