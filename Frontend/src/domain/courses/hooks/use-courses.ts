@@ -7,6 +7,8 @@ import {
   deleteCourse,
   fetchAllCourses,
   createModule,
+  patchModule,
+  deleteModule,
   type FetchAllCoursesResult,
   type CreateModuleRequest,
 } from "../api";
@@ -103,6 +105,42 @@ export function useCreateModule(courseId: string) {
     },
     onError: () => {
       toast.error("Failed to create module");
+    },
+  });
+}
+
+export function usePatchModule(courseId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      url,
+      request,
+    }: {
+      url: string;
+      request: { title?: string };
+    }) => patchModule(url, request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.detail(courseId),
+      });
+    },
+  });
+}
+
+export function useDeleteModule(courseId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (deleteUrl: string) => deleteModule(deleteUrl),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.detail(courseId),
+      });
+      toast.success("Module deleted successfully");
+    },
+    onError: () => {
+      toast.error("Failed to delete module");
     },
   });
 }

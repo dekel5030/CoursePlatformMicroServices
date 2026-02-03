@@ -158,3 +158,20 @@ export async function createModule(
   const response = await axiosClient.post<CreateModuleResponse>(url, request);
   return response.data;
 }
+
+/**
+ * Update a module (partial update via HATEOAS link)
+ */
+export async function patchModule(
+  url: string,
+  request: { title?: string },
+): Promise<void> {
+  await axiosClient.patch(url, request);
+}
+
+/**
+ * Delete a module (via HATEOAS link)
+ */
+export async function deleteModule(url: string): Promise<void> {
+  await axiosClient.delete(url);
+}

@@ -29,7 +29,9 @@
     "courseContent": "Course Content",
     "addModule": "Add Module",
     "noModules": "No modules yet",
-    "createFirstModule": "Create your first module"
+    "createFirstModule": "Create your first module",
+    "moduleDeleteConfirmTitle": "Delete Module",
+    "moduleDeleteConfirmMessage": "Are you sure you want to delete this module? All lessons in the module will also be deleted. This action cannot be undone."
   },
   "actions": {
     "editNotImplemented": "Edit is not yet implemented",
