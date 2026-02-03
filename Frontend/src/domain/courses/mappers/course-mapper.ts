@@ -1,4 +1,4 @@
-import type { CourseSummaryDto } from "../types";
+import type { CourseSummaryWithAnalyticsDto } from "../types";
 import type { CourseDetailsDto } from "../types/CourseDetailsDto";
 import type { CourseModel } from "../types/CourseModel";
 import { DifficultyLevel } from "../types/CourseModel";
@@ -6,7 +6,7 @@ import type { ModuleDto, ModuleLessonDto } from "../types/ModuleDto";
 import type { ModuleModel } from "../types/ModuleModel";
 import type {
   CoursePageDto,
-  ModuleDtoApi,
+  ModuleWithAnalyticsDtoApi,
   LessonDtoApi,
 } from "../types/CoursePageDto";
 import type { LessonSummaryDto, LessonModel } from "@/domain/lessons/types";
@@ -61,14 +61,17 @@ function mapApiLessonToLessonModel(
 }
 
 /**
- * Maps an API module DTO (from CoursePageDto.modules) to ModuleModel using the lessons record
+ * Maps an API module DTO (from CoursePageDto.modules) to ModuleModel using the lessons record.
+ * lessonIds and order come from CourseStructureDto.
  */
 function mapApiModuleToModuleModel(
-  module: ModuleDtoApi,
+  moduleWithAnalytics: ModuleWithAnalyticsDtoApi,
   lessonsRecord: Record<string, LessonDtoApi>,
   courseId: string,
+  lessonIds: string[],
+  order: number,
 ): ModuleModel {
-  const lessonIds = module.lessonIds ?? [];
+  const { module, analytics } = moduleWithAnalytics;
   const lessonDtos = lessonIds
     .map((id) => lessonsRecord[id])
     .filter((l): l is LessonDtoApi => l != null)
@@ -78,9 +81,9 @@ function mapApiModuleToModuleModel(
   return {
     id: module.id,
     title: module.title ?? "",
-    order: module.index,
-    lessonCount: module.lessonCount,
-    duration: module.duration,
+    order,
+    lessonCount: analytics.lessonCount,
+    duration: analytics.duration,
     lessons,
     links: module.links ?? [],
   };
@@ -91,6 +94,7 @@ function mapApiModuleToModuleModel(
  */
 export function mapCoursePageDtoToModel(dto: CoursePageDto): CourseModel {
   const c = dto.course;
+  const a = dto.analytics;
   const instructors = dto.instructors ?? {};
   const categories = dto.categories ?? {};
   const modulesRecord = dto.modules ?? {};
@@ -106,19 +110,21 @@ export function mapCoursePageDtoToModel(dto: CoursePageDto): CourseModel {
   const categoryName = category?.name ?? undefined;
   const categorySlug = category?.slug ?? undefined;
 
-  // Backend may omit course.moduleIds; derive from dto.modules when empty
-  const moduleIds = c.moduleIds ?? [];
-  const moduleDtos =
-    moduleIds.length > 0
-      ? moduleIds
-          .map((moduleId) => modulesRecord[moduleId])
-          .filter((m): m is ModuleDtoApi => m != null)
-      : Object.values(modulesRecord).filter(
-          (m): m is ModuleDtoApi => m != null,
-        );
-  const modules = moduleDtos
-    .sort((a, b) => a.index - b.index)
-    .map((m) => mapApiModuleToModuleModel(m, lessonsRecord, c.id));
+  const structure = dto.structure;
+  const moduleIds = structure.moduleIds ?? [];
+  const moduleLessonIds = structure.moduleLessonIds ?? {};
+  const modules = moduleIds
+    .map((moduleId) => modulesRecord[moduleId])
+    .filter((m): m is ModuleWithAnalyticsDtoApi => m != null)
+    .map((m, index) =>
+      mapApiModuleToModuleModel(
+        m,
+        lessonsRecord,
+        c.id,
+        moduleLessonIds[m.module.id] ?? [],
+        index,
+      ),
+    );
 
   return {
     id: c.id,
@@ -133,9 +139,9 @@ export function mapCoursePageDtoToModel(dto: CoursePageDto): CourseModel {
       currency: c.price.currency ?? "",
     },
     modules,
-    lessonCount: c.lessonsCount,
-    enrollmentCount: c.enrollmentCount,
-    totalDuration: c.totalDuration,
+    lessonCount: a.lessonsCount,
+    enrollmentCount: a.enrollmentCount,
+    totalDuration: a.totalDuration,
     updatedAtUtc: c.updatedAtUtc,
     categoryName,
     categoryId: c.categoryId,
@@ -192,9 +198,14 @@ export function mapCourseDetailsToModel(dto: CourseDetailsDto): CourseModel {
 }
 
 /**
- * Maps a course summary DTO to a CourseModel
+ * Maps a course summary DTO (with analytics) to a CourseModel
  */
-export function mapCourseSummaryToModel(dto: CourseSummaryDto): CourseModel {
+export function mapCourseSummaryToModel(
+  dto: CourseSummaryWithAnalyticsDto,
+): CourseModel {
+  const c = dto.course;
+  const a = dto.analytics;
+
   // Convert difficulty from string to enum if needed
   const getDifficultyEnum = (difficulty: unknown): DifficultyLevel | undefined => {
     if (typeof difficulty === "number") {
@@ -213,31 +224,31 @@ export function mapCourseSummaryToModel(dto: CourseSummaryDto): CourseModel {
   };
 
   return {
-    id: dto.id,
-    title: dto.title,
-    description: dto.shortDescription || "",
-    shortDescription: dto.shortDescription,
-    slug: dto.slug,
-    imageUrl: dto.thumbnailUrl,
-    instructorId: dto.instructor.id,
-    instructorName: dto.instructor.fullName,
-    instructorAvatarUrl: dto.instructor.avatarUrl,
-    isPublished: dto.status === "Published",
-    status: dto.status,
-    price: dto.price,
-    originalPrice: dto.originalPrice,
-    badges: dto.badges,
-    averageRating: dto.averageRating,
-    reviewsCount: dto.reviewsCount,
-    difficulty: getDifficultyEnum(dto.difficulty),
-    courseViews: dto.courseViews,
-    lessonCount: dto.lessonsCount,
-    enrollmentCount: dto.enrollmentCount,
-    totalDuration: dto.duration,
-    updatedAtUtc: dto.updatedAtUtc,
-    categoryName: dto.category.name || undefined,
-    categoryId: dto.category.id,
-    categorySlug: dto.category.slug || undefined,
-    links: dto.links,
+    id: c.id,
+    title: c.title,
+    description: c.shortDescription || "",
+    shortDescription: c.shortDescription,
+    slug: c.slug,
+    imageUrl: c.thumbnailUrl,
+    instructorId: c.instructor.id,
+    instructorName: c.instructor.fullName,
+    instructorAvatarUrl: c.instructor.avatarUrl,
+    isPublished: c.status === "Published",
+    status: c.status,
+    price: c.price,
+    originalPrice: undefined,
+    badges: [],
+    averageRating: a.averageRating,
+    reviewsCount: a.reviewsCount,
+    difficulty: getDifficultyEnum(c.difficulty),
+    courseViews: a.courseViews,
+    lessonCount: a.lessonsCount,
+    enrollmentCount: a.enrollmentCount,
+    totalDuration: a.duration,
+    updatedAtUtc: c.updatedAtUtc,
+    categoryName: c.category.name || undefined,
+    categoryId: c.category.id,
+    categorySlug: c.category.slug || undefined,
+    links: c.links,
   };
 }

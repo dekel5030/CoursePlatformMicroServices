@@ -19,8 +19,5 @@ public record CourseDto
     public required Guid InstructorId { get; init; }
     public required Guid CategoryId { get; init; }
 
-    // Ordered list of module IDs for display order
-    public required IReadOnlyList<Guid> ModuleIds { get; init; }
-
     public required List<LinkDto> Links { get; init; }
 }

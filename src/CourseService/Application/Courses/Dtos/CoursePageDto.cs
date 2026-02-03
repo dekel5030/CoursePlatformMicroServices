@@ -7,6 +7,7 @@ public record CoursePageDto
 {
     public required CourseDto Course { get; init; }
     public required CourseAnalyticsDto Analytics { get; init; }
+    public required CourseStructureDto Structure { get; init; }
 
     public required IReadOnlyDictionary<Guid, ModuleWithAnalyticsDto> Modules { get; init; }
     public required IReadOnlyDictionary<Guid, LessonDto> Lessons { get; init; }

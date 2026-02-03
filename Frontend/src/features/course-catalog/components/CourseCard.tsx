@@ -22,16 +22,18 @@ export default function CourseCard({ course }: Props) {
     maximumFractionDigits: 0,
   }).format(safeAmount);
 
-  const formattedOriginalPrice = course.originalPrice
-    ? new Intl.NumberFormat(i18n.language || "he-IL", {
-        style: "currency",
-        currency: course.originalPrice.currency,
-        maximumFractionDigits: 0,
-      }).format(course.originalPrice.amount)
-    : null;
+  const formattedOriginalPrice =
+    course.originalPrice?.currency && course.originalPrice?.amount != null
+      ? new Intl.NumberFormat(i18n.language || "he-IL", {
+          style: "currency",
+          currency: course.originalPrice.currency,
+          maximumFractionDigits: 0,
+        }).format(course.originalPrice.amount)
+      : null;
 
   const hasDiscount =
-    course.originalPrice && course.originalPrice.amount > safeAmount;
+    course.originalPrice?.amount != null &&
+    course.originalPrice.amount > safeAmount;
 
   const durationText = formatDuration(course.totalDuration);
 
@@ -218,15 +220,15 @@ export default function CourseCard({ course }: Props) {
               </div>
 
               {/* Show badges if available */}
-              {course.badges && course.badges.length > 0 && (
+              {(course.badges?.length ?? 0) > 0 && (
                 <div className="flex gap-1">
-                  {course.badges.slice(0, 2).map((badge, index) => (
+                  {(course.badges ?? []).slice(0, 2).map((badgeLabel, index) => (
                     <Badge
                       key={index}
                       variant="outline"
                       className="text-xs font-medium"
                     >
-                      {badge}
+                      {badgeLabel}
                     </Badge>
                   ))}
                 </div>

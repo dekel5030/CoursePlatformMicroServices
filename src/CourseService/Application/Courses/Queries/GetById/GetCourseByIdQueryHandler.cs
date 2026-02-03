@@ -49,12 +49,6 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             .Where(l => l.CourseId == request.Id)
             .SumAsync(l => l.Duration.TotalSeconds, cancellationToken);
 
-        List<Guid> moduleIds = await _readDbContext.Modules
-            .Where(m => m.CourseId == request.Id)
-            .OrderBy(m => m.Index)
-            .Select(m => m.Id.Value)
-            .ToListAsync(cancellationToken);
-
         var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
         var resolvedImageUrls = course.Images
             .Select(img => _urlResolver.Resolve(StorageCategory.Public, img.Path).Value)
@@ -72,7 +66,6 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             UpdatedAtUtc = course.UpdatedAtUtc,
             ImageUrls = resolvedImageUrls.AsReadOnly(),
             Tags = course.Tags.Select(t => t.Value).ToList().AsReadOnly(),
-            ModuleIds = moduleIds,
             Links = _linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext).ToList()
         };
 

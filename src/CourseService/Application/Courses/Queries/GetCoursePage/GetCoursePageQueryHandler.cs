@@ -68,16 +68,19 @@ internal sealed class GetCoursePageQueryHandler
 
         CourseContext courseContext = new(courseData.Course.Id, courseData.Course.InstructorId, courseData.Course.Status);
 
-        CourseDto courseDto = MapToCourseDto(courseData.Course, courseContext, courseData.Modules);
+        CourseDto courseDto = MapToCourseDto(courseData.Course, courseContext);
         CourseAnalyticsDto analyticsDto = new(
             courseData.EnrollmentCount,
             courseData.TotalLessonsCount,
             TimeSpan.FromSeconds(courseData.TotalDurationSeconds));
 
+        CourseStructureDto structure = BuildStructure(courseData.Modules, courseData.Lessons);
+
         return Result.Success(new CoursePageDto
         {
             Course = courseDto,
             Analytics = analyticsDto,
+            Structure = structure,
 
             Modules = courseData.Modules.ToDictionary(
                 m => m.Id.Value,
@@ -97,9 +100,8 @@ internal sealed class GetCoursePageQueryHandler
         });
     }
 
-    private CourseDto MapToCourseDto(Course course, CourseContext context, IReadOnlyList<Module> modules)
+    private CourseDto MapToCourseDto(Course course, CourseContext context)
     {
-        var moduleIds = modules.OrderBy(m => m.Index).Select(m => m.Id.Value).ToList();
         return new CourseDto
         {
             Id = course.Id.Value,
@@ -111,23 +113,39 @@ internal sealed class GetCoursePageQueryHandler
             Tags = course.Tags.Select(t => t.Value).ToList(),
             CategoryId = course.CategoryId.Value,
             InstructorId = course.InstructorId.Value,
-            ModuleIds = moduleIds,
             UpdatedAtUtc = course.UpdatedAtUtc,
             Links = _linkBuilderService.BuildLinks(LinkResourceKey.Course, context).ToList()
+        };
+    }
+
+    private static CourseStructureDto BuildStructure(
+        IReadOnlyList<Module> modules,
+        IReadOnlyList<Lesson> lessons)
+    {
+        var orderedModules = modules.OrderBy(m => m.Index).ToList();
+        var moduleIds = orderedModules.Select(m => m.Id.Value).ToList();
+        var moduleLessonIds = orderedModules.ToDictionary(
+            m => m.Id.Value,
+            m => (IReadOnlyList<Guid>)lessons
+                .Where(l => l.ModuleId == m.Id)
+                .OrderBy(l => l.Index)
+                .Select(l => l.Id.Value)
+                .ToList());
+        return new CourseStructureDto
+        {
+            ModuleIds = moduleIds,
+            ModuleLessonIds = moduleLessonIds
         };
     }
 
     private ModuleWithAnalyticsDto MapToModuleDto(Module module, CourseContext courseContext, List<Lesson> moduleLessons)
     {
         var moduleContext = new ModuleContext(courseContext, module.Id);
-        var lessonIds = moduleLessons.OrderBy(l => l.Index).Select(l => l.Id.Value).ToList();
 
         var moduleDto = new ModuleDto
         {
             Id = module.Id.Value,
             Title = module.Title.Value,
-            Index = module.Index,
-            LessonIds = lessonIds,
             Links = _linkBuilderService.BuildLinks(LinkResourceKey.Module, moduleContext).ToList()
         };
 

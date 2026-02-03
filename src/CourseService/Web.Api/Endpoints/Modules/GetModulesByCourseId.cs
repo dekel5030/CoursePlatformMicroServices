@@ -20,13 +20,13 @@ internal sealed class GetModulesByCourseId : IEndpoint
         {
             var query = new GetModulesQuery(new ModuleFilter(CourseId: new CourseId(courseId)));
 
-            Result<IReadOnlyList<ModuleWithAnalyticsDto>> result = await mediator.Send(query, cancellationToken);
+            Result<IReadOnlyList<ModuleWithAnalyticsAndStructureDto>> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
                 dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
-        .WithMetadata<IReadOnlyList<ModuleWithAnalyticsDto>>(
+        .WithMetadata<IReadOnlyList<ModuleWithAnalyticsAndStructureDto>>(
             nameof(GetModulesByCourseId),
             tag: Tags.Modules,
             summary: "Gets all modules for a course by course ID.");

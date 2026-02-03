@@ -31,7 +31,7 @@ export const CourseStatus = {
 export type CourseStatus = typeof CourseStatus[keyof typeof CourseStatus];
 
 /**
- * Backend DTO: Matches CourseSummaryDto from CourseService
+ * Backend DTO: Matches CourseSummaryDto from CourseService (pure aggregate)
  * Used for network layer communication
  */
 export interface CourseSummaryDto {
@@ -42,17 +42,30 @@ export interface CourseSummaryDto {
   instructor: InstructorDto;
   category: CategoryDto;
   price: Money;
-  originalPrice: Money | null;
-  badges: string[];
-  averageRating: number;
-  reviewsCount: number;
-  thumbnailUrl: string | null;
-  lessonsCount: number;
-  duration: string;
   difficulty: DifficultyLevel | string; // API returns string, but we convert to enum
-  enrollmentCount: number;
-  courseViews: number;
+  thumbnailUrl: string | null;
   updatedAtUtc: string;
   status: CourseStatus;
   links: LinkDto[];
+}
+
+/**
+ * Backend DTO: Matches CourseSummaryAnalyticsDto from CourseService
+ * Computed/derived fields only
+ */
+export interface CourseSummaryAnalyticsDto {
+  lessonsCount: number;
+  duration: string;
+  enrollmentCount: number;
+  averageRating: number;
+  reviewsCount: number;
+  courseViews: number;
+}
+
+/**
+ * Backend DTO: Matches CourseSummaryWithAnalyticsDto from CourseService
+ */
+export interface CourseSummaryWithAnalyticsDto {
+  course: CourseSummaryDto;
+  analytics: CourseSummaryAnalyticsDto;
 }

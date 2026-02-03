@@ -1,7 +1,7 @@
 import { axiosClient } from "@/app/axios";
 import axios from "axios";
 import type {
-  CourseSummaryDto,
+  CourseSummaryWithAnalyticsDto,
   CreateCourseRequestDto,
   UpdateCourseRequestDto,
 } from "../types";
@@ -48,7 +48,7 @@ export interface CreateModuleResponse {
  */
 export async function fetchFeaturedCourses(): Promise<CourseModel[]> {
   const response = await axiosClient.get<
-    CourseSummaryDto[] | PagedResponse<CourseSummaryDto>
+    CourseSummaryWithAnalyticsDto[] | PagedResponse<CourseSummaryWithAnalyticsDto>
   >("/courses/featured");
   const data = response.data;
   const dtos = Array.isArray(data) ? data : data.items || [];
@@ -101,7 +101,7 @@ export async function fetchAllCourses(
 ): Promise<FetchAllCoursesResult> {
   const endpoint = url || "/courses";
   const response = await axiosClient.get<
-    CourseSummaryDto[] | PagedResponse<CourseSummaryDto>
+    CourseSummaryWithAnalyticsDto[] | PagedResponse<CourseSummaryWithAnalyticsDto>
   >(endpoint);
   const data = response.data;
 

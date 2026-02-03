@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Modules.Queries.GetModules;
 
-internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IReadOnlyList<ModuleWithAnalyticsDto>>
+internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IReadOnlyList<ModuleWithAnalyticsAndStructureDto>>
 {
     private readonly IReadDbContext _readDbContext;
     private readonly ILinkBuilderService _linkBuilder;
@@ -25,7 +25,7 @@ internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IR
         _linkBuilder = linkBuilder;
     }
 
-    public async Task<Result<IReadOnlyList<ModuleWithAnalyticsDto>>> Handle(
+    public async Task<Result<IReadOnlyList<ModuleWithAnalyticsAndStructureDto>>> Handle(
         GetModulesQuery request,
         CancellationToken cancellationToken = default)
     {
@@ -51,7 +51,7 @@ internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IR
 
         if (modules.Count == 0)
         {
-            return Result.Success<IReadOnlyList<ModuleWithAnalyticsDto>>([]);
+            return Result.Success<IReadOnlyList<ModuleWithAnalyticsAndStructureDto>>([]);
         }
 
         var moduleIds = modules.Select(m => m.Id).ToList();
@@ -94,8 +94,6 @@ internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IR
             {
                 Id = module.Id.Value,
                 Title = module.Title.Value,
-                Index = module.Index,
-                LessonIds = lessonDtos.Select(l => l.LessonId).ToList(),
                 Links = course is not null
                     ? _linkBuilder.BuildLinks(LinkResourceKey.Module, new ModuleContext(
                         new CourseContext(course.Id, course.InstructorId, course.Status), module.Id)).ToList()
@@ -106,9 +104,11 @@ internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IR
                 lessonDtos.Count,
                 TimeSpan.FromTicks(lessonDtos.Sum(l => l.Duration.Ticks)));
 
-            return new ModuleWithAnalyticsDto(moduleDto, analyticsDto);
+            var lessonIds = lessonDtos.Select(l => l.LessonId).ToList();
+
+            return new ModuleWithAnalyticsAndStructureDto(moduleDto, analyticsDto, lessonIds);
         }).ToList();
 
-        return Result.Success<IReadOnlyList<ModuleWithAnalyticsDto>>(moduleDetailsDtos);
+        return Result.Success<IReadOnlyList<ModuleWithAnalyticsAndStructureDto>>(moduleDetailsDtos);
     }
 }
