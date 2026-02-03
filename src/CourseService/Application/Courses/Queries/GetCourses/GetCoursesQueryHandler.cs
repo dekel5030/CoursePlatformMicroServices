@@ -52,7 +52,7 @@ internal static class CourseCollectionDtoEnrichmentExtensions
             var courseContext = courseDto.ToCourseContext();
             IReadOnlyList<LinkDto> links = linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext);
 
-            return courseDto with { Links = links };
+            return courseDto with { Course = courseDto.Course with { Links = links } };
         }).ToList();
 
         var collectionContext = (pagedQuery with

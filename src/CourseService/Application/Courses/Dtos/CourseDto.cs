@@ -11,9 +11,6 @@ public record CourseDto
     public required string Description { get; init; }
     public required CourseStatus Status { get; init; }
     public required Money Price { get; init; }
-    public required int EnrollmentCount { get; init; }
-    public required int LessonsCount { get; init; }
-    public required TimeSpan TotalDuration { get; init; }
     public required DateTimeOffset UpdatedAtUtc { get; init; }
     public required IReadOnlyList<string> ImageUrls { get; init; }
     public required IReadOnlyList<string> Tags { get; init; }

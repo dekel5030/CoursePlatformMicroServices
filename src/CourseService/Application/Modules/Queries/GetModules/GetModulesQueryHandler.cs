@@ -1,6 +1,7 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Lessons.Dtos;
+using Courses.Application.Modules.Dtos;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses;
@@ -13,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Modules.Queries.GetModules;
 
-internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IReadOnlyList<ModuleDto>>
+internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IReadOnlyList<ModuleWithAnalyticsDto>>
 {
     private readonly IReadDbContext _readDbContext;
     private readonly ILinkBuilderService _linkBuilder;
@@ -24,7 +25,7 @@ internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IR
         _linkBuilder = linkBuilder;
     }
 
-    public async Task<Result<IReadOnlyList<ModuleDto>>> Handle(
+    public async Task<Result<IReadOnlyList<ModuleWithAnalyticsDto>>> Handle(
         GetModulesQuery request,
         CancellationToken cancellationToken = default)
     {
@@ -50,7 +51,7 @@ internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IR
 
         if (modules.Count == 0)
         {
-            return Result.Success<IReadOnlyList<ModuleDto>>([]);
+            return Result.Success<IReadOnlyList<ModuleWithAnalyticsDto>>([]);
         }
 
         var moduleIds = modules.Select(m => m.Id).ToList();
@@ -89,35 +90,25 @@ internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IR
                 )).ToList();
 
             Course? course = coursesById.GetValueOrDefault(module.CourseId);
-            if (course is null)
-            {
-                return new ModuleDto
-                {
-                    Id = module.Id.Value,
-                    Title = module.Title.Value,
-                    Index = module.Index,
-                    LessonCount = lessonDtos.Count,
-                    Duration = TimeSpan.FromTicks(lessonDtos.Sum(l => l.Duration.Ticks)),
-                    LessonIds = lessonDtos.Select(l => l.LessonId).ToList(),
-                    Links = []
-                };
-            }
-
-            var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
-            var moduleContext = new ModuleContext(courseContext, module.Id);
-
-            return new ModuleDto
+            var moduleDto = new ModuleDto
             {
                 Id = module.Id.Value,
                 Title = module.Title.Value,
                 Index = module.Index,
-                LessonCount = lessonDtos.Count,
-                Duration = TimeSpan.FromTicks(lessonDtos.Sum(l => l.Duration.Ticks)),
                 LessonIds = lessonDtos.Select(l => l.LessonId).ToList(),
-                Links = _linkBuilder.BuildLinks(LinkResourceKey.Module, moduleContext).ToList()
+                Links = course is not null
+                    ? _linkBuilder.BuildLinks(LinkResourceKey.Module, new ModuleContext(
+                        new CourseContext(course.Id, course.InstructorId, course.Status), module.Id)).ToList()
+                    : []
             };
+
+            var analyticsDto = new ModuleAnalyticsDto(
+                lessonDtos.Count,
+                TimeSpan.FromTicks(lessonDtos.Sum(l => l.Duration.Ticks)));
+
+            return new ModuleWithAnalyticsDto(moduleDto, analyticsDto);
         }).ToList();
 
-        return Result.Success<IReadOnlyList<ModuleDto>>(moduleDetailsDtos);
+        return Result.Success<IReadOnlyList<ModuleWithAnalyticsDto>>(moduleDetailsDtos);
     }
 }

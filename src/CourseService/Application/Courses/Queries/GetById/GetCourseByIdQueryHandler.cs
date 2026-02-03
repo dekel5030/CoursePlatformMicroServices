@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Courses.Queries.GetById;
 
-internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CourseDto>
+internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQuery, CourseWithAnalyticsDto>
 {
     private readonly IReadDbContext _readDbContext;
     private readonly IStorageUrlResolver _urlResolver;
@@ -27,7 +27,7 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
         _linkBuilder = linkBuilder;
     }
 
-    public async Task<Result<CourseDto>> Handle(
+    public async Task<Result<CourseWithAnalyticsDto>> Handle(
         GetCourseByIdQuery request,
         CancellationToken cancellationToken = default)
     {
@@ -36,11 +36,24 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
 
         if (course is null)
         {
-            return Result.Failure<CourseDto>(CourseErrors.NotFound);
+            return Result.Failure<CourseWithAnalyticsDto>(CourseErrors.NotFound);
         }
 
         int enrollmentCount = await _readDbContext.Enrollments
             .CountAsync(e => e.CourseId == request.Id, cancellationToken);
+
+        int lessonsCount = await _readDbContext.Lessons
+            .CountAsync(l => l.CourseId == request.Id, cancellationToken);
+
+        double totalDurationSeconds = await _readDbContext.Lessons
+            .Where(l => l.CourseId == request.Id)
+            .SumAsync(l => l.Duration.TotalSeconds, cancellationToken);
+
+        List<Guid> moduleIds = await _readDbContext.Modules
+            .Where(m => m.CourseId == request.Id)
+            .OrderBy(m => m.Index)
+            .Select(m => m.Id.Value)
+            .ToListAsync(cancellationToken);
 
         var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
         var resolvedImageUrls = course.Images
@@ -56,16 +69,18 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             CategoryId = course.CategoryId.Value,
             Status = course.Status,
             Price = course.Price,
-            EnrollmentCount = enrollmentCount,
-            LessonsCount = 0,
-            TotalDuration = TimeSpan.Zero,
             UpdatedAtUtc = course.UpdatedAtUtc,
             ImageUrls = resolvedImageUrls.AsReadOnly(),
             Tags = course.Tags.Select(t => t.Value).ToList().AsReadOnly(),
-            ModuleIds = [],
+            ModuleIds = moduleIds,
             Links = _linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext).ToList()
         };
 
-        return Result.Success(courseDto);
+        var analyticsDto = new CourseAnalyticsDto(
+            enrollmentCount,
+            lessonsCount,
+            TimeSpan.FromSeconds(totalDurationSeconds));
+
+        return Result.Success(new CourseWithAnalyticsDto(courseDto, analyticsDto));
     }
 }

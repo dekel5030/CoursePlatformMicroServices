@@ -9,7 +9,6 @@ public sealed record EnrolledCourseDto
     public required string CourseTitle { get; init; }
     public required string? CourseImageUrl { get; set; }
     public required string CourseSlug { get; init; }
-    public required double ProgressPercentage { get; init; }
     public required DateTimeOffset? LastAccessedAt { get; init; }
     public required DateTimeOffset EnrolledAt { get; init; }
     public required string Status { get; init; }

@@ -87,19 +87,22 @@ internal sealed class GetEnrolledCoursesQueryHandler
                 ? _storageUrlResolver.Resolve(StorageCategory.Public, courseImage.Path).Value
                 : null;
 
-            return new EnrolledCourseDto
+            var enrolledCourseDto = new EnrolledCourseDto
             {
                 EnrollmentId = enrollment.Id.Value,
                 CourseId = enrollment.CourseId.Value,
                 CourseTitle = item.CourseInfo?.Title.Value ?? string.Empty,
                 CourseImageUrl = courseImageUrl,
                 CourseSlug = item.CourseInfo?.Slug.Value ?? string.Empty,
-                ProgressPercentage = progress,
                 LastAccessedAt = enrollment.LastAccessedAt,
                 EnrolledAt = enrollment.EnrolledAt,
                 Status = enrollment.Status.ToString(),
                 Links = _linkBuilder.BuildLinks(LinkResourceKey.EnrolledCourse, linkContext)
             };
+
+            var analyticsDto = new EnrolledCourseAnalyticsDto(progress);
+
+            return new EnrolledCourseWithAnalyticsDto(enrolledCourseDto, analyticsDto);
         }).ToList();
 
         return Result.Success(new EnrolledCourseCollectionDto
@@ -118,7 +121,7 @@ internal sealed class GetEnrolledCoursesQueryHandler
     {
         return Result.Success(new EnrolledCourseCollectionDto
         {
-            Items = new List<EnrolledCourseDto>(),
+            Items = new List<EnrolledCourseWithAnalyticsDto>(),
             PageNumber = request.PageNumber,
             PageSize = request.PageSize,
             TotalItems = 0,

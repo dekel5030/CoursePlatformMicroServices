@@ -1,4 +1,4 @@
-using Courses.Application.Courses.Dtos;
+using Courses.Application.Modules.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Kernel.Messaging.Abstractions;
 
@@ -8,4 +8,4 @@ public sealed record ModuleFilter(
     CourseId? CourseId = null,
     IEnumerable<Guid>? Ids = null);
 
-public sealed record GetModulesQuery(ModuleFilter Filter) : IQuery<IReadOnlyList<ModuleDto>>;
+public sealed record GetModulesQuery(ModuleFilter Filter) : IQuery<IReadOnlyList<ModuleWithAnalyticsDto>>;
