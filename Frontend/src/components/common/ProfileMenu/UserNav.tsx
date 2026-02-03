@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { User, LogOut, Settings } from "lucide-react";
+import { User, LogOut, Settings, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 // ייבוא של useAuth מהמיקום החדש (feature/auth)
 import { useAuth } from "@/features/auth";
@@ -34,6 +34,10 @@ export default function UserNav() {
     } else {
       navigate(`/profile`);
     }
+  };
+
+  const handleMyCoursesClick = () => {
+    navigate("/my-courses");
   };
 
   const handleManagementClick = () => {
@@ -78,6 +82,11 @@ export default function UserNav() {
         <DropdownMenuItem onClick={handleProfileClick}>
           <User className="mr-2 h-4 w-4" />
           <span>{t("profileMenu.profile")}</span>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem onClick={handleMyCoursesClick}>
+          <BookOpen className="mr-2 h-4 w-4" />
+          <span>{t("profileMenu.myCourses")}</span>
         </DropdownMenuItem>
 
         {isStaff && (

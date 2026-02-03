@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Layout, ManagementLayout } from "@/components/layout";
 import { ProtectedRoute } from "@/shared/common";
 import { CourseCatalogPage, AllCoursesPage } from "@/features/course-catalog";
+import { MyCoursesPage } from "@/features/my-courses";
 import { CoursePage } from "@/features/course-management";
 import { LessonPage } from "@/features/lesson-viewer";
 import { UserProfilePage } from "@/features/user-profile";
@@ -23,6 +24,14 @@ export default function AppRoutes() {
 
       <Route element={<Layout />}>
         <Route path="/catalog" element={<CourseCatalogPage />} />
+        <Route
+          path="/my-courses"
+          element={
+            <ProtectedRoute>
+              <MyCoursesPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/courses" element={<AllCoursesPage />} />
         <Route path="/courses/:id" element={<CoursePage />} />
         <Route
