@@ -46,7 +46,8 @@
     "users": "משתמשים",
     "admin": "לוח בקרה למנהל",
     "catalog": "קטלוג",
-    "myCourses": "הקורסים שלי"
+    "myCourses": "הקורסים שלי",
+    "managedCourses": "קורסים שבניהולי"
   },
   "navbar": {
     "login": "התחבר",
@@ -186,6 +187,11 @@
       "analytics": "ניתוח נתונים",
       "enrollments": "רישומים"
     }
+  },
+  "managedCourses": {
+    "title": "קורסים שבניהולי",
+    "subtitle": "צפה ונהל את הקורסים שאתה מלמד",
+    "noCourses": "אינך מנהל קורסים עדיין"
   },
   "myCourses": {
     "title": "הקורסים שלי",

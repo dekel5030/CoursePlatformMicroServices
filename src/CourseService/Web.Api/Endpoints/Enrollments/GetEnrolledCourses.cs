@@ -12,7 +12,7 @@ internal sealed class GetEnrolledCourses : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("users/me/enrollments", async (
+        app.MapGet("users/me/courses/enrolled", async (
             IMediator mediator,
             CancellationToken cancellationToken,
             int pageNumber = 1,

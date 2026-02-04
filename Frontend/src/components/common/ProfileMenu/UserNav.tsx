@@ -37,7 +37,7 @@ export default function UserNav() {
   };
 
   const handleMyCoursesClick = () => {
-    navigate("/my-courses");
+    navigate("/users/me/courses/enrolled");
   };
 
   const handleManagementClick = () => {

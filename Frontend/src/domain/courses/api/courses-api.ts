@@ -175,3 +175,26 @@ export async function patchModule(
 export async function deleteModule(url: string): Promise<void> {
   await axiosClient.delete(url);
 }
+
+export interface ManagedCoursesResponse {
+  items: CourseSummaryWithAnalyticsDto[];
+  pageNumber: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages?: number;
+  links: import("@/shared/types/LinkDto").LinkDto[];
+}
+
+/**
+ * Fetch courses managed by the current user (instructor)
+ */
+export async function fetchMyManagedCourses(
+  pageNumber = 1,
+  pageSize = 10
+): Promise<ManagedCoursesResponse> {
+  const response = await axiosClient.get<ManagedCoursesResponse>(
+    "/users/me/courses/managed",
+    { params: { pageNumber, pageSize } }
+  );
+  return response.data;
+}

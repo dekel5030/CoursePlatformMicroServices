@@ -51,7 +51,7 @@ export default function ManagementLayout() {
     {
       label: t("management.nav.courses"),
       icon: BookOpen,
-      href: "/admin/courses",
+      href: "/users/me/courses/managed",
       roles: ["Admin", "Instructor"],
     },
     {

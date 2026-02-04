@@ -16,7 +16,7 @@ export async function fetchMyEnrollments(
   pageSize = 10
 ): Promise<EnrolledCourseCollectionViewDto> {
   const response = await axiosClient.get<EnrolledCourseCollectionDto>(
-    "/users/me/enrollments",
+    "/users/me/courses/enrolled",
     { params: { pageNumber, pageSize } }
   );
   const data = response.data;
