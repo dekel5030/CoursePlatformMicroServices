@@ -41,13 +41,18 @@ public sealed class GetCourseRatingQueryHandler
             request,
             cancellationToken);
 
-        if (totalCount == 0)
-        {
-            return EmptyResult(request);
-        }
-
         bool userHasExistingRating = await _dbContext.CourseRatings
                 .AnyAsync(rating => rating.CourseId == courseId && rating.UserId == currentUserId, cancellationToken);
+
+        var links = _linkBuilder.BuildLinks(LinkResourceKey.CourseRatingCollection, new CourseRatingCollectionContext(
+                courseId,
+                currentUserId,
+                userHasExistingRating)).ToList();
+
+        if (totalCount == 0)
+        {
+            return EmptyResult(request, links);
+        }
 
         Dictionary<UserId, User> userMap = await GetUserMapAsync(ratings, cancellationToken);
 
@@ -66,21 +71,18 @@ public sealed class GetCourseRatingQueryHandler
             TotalItems = totalCount,
             PageNumber = request.PageNumber,
             PageSize = request.PageSize,
-            Links = _linkBuilder.BuildLinks(LinkResourceKey.CourseRatingCollection, new CourseRatingCollectionContext(
-                courseId,
-                currentUserId,
-                userHasExistingRating)).ToList()
+            Links = links
         };
 
         return Result.Success(result);
     }
 
-    private static Result<CourseRatingCollection> EmptyResult(GetCourseRatingsQuery request)
+    private static Result<CourseRatingCollection> EmptyResult(GetCourseRatingsQuery request, List<LinkDto> links)
     {
         return Result.Success(new CourseRatingCollection
         {
             Items = [],
-            Links = [],
+            Links = links,
             PageNumber = request.PageNumber,
             PageSize = request.PageSize,
             TotalItems = 0

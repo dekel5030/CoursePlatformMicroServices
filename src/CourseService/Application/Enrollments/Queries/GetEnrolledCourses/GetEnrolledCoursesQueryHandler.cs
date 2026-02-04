@@ -3,7 +3,6 @@ using Courses.Application.Abstractions.Storage;
 using Courses.Application.Enrollments.Dtos;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
-using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Enrollments.Errors;

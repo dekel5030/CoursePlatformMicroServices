@@ -12,14 +12,14 @@ using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.Courses.Queries.GetCourseSummaries;
+namespace Courses.Application.Courses.Queries.GetCourseCacheable;
 
-internal sealed class GetCourseSummariesQueryHandler : IQueryHandler<GetCourseSummariesQuery, CourseCollectionDto>
+internal sealed class GetCourseCacheableQueryHandler : IQueryHandler<GetCourseCacheableQuery, CourseCollectionDto>
 {
     private readonly IReadDbContext _dbContext;
     private readonly IStorageUrlResolver _urlResolver;
 
-    public GetCourseSummariesQueryHandler(
+    public GetCourseCacheableQueryHandler(
         IStorageUrlResolver urlResolver,
         IReadDbContext dbContext)
     {
@@ -28,7 +28,7 @@ internal sealed class GetCourseSummariesQueryHandler : IQueryHandler<GetCourseSu
     }
 
     public async Task<Result<CourseCollectionDto>> Handle(
-        GetCourseSummariesQuery request,
+        GetCourseCacheableQuery request,
         CancellationToken cancellationToken = default)
     {
         int pageNumber = Math.Max(1, request.PagedQuery.Page ?? 1);
@@ -96,12 +96,24 @@ internal sealed class GetCourseSummariesQueryHandler : IQueryHandler<GetCourseSu
             .Select(g => new { CourseId = g.Key, Count = g.Count() })
             .ToDictionaryAsync(x => x.CourseId, cancellationToken);
 
+        var ratingStats = await _dbContext.CourseRatings
+            .Where(r => courseIds.Contains(r.CourseId))
+            .GroupBy(r => r.CourseId)
+            .Select(g => new
+            {
+                CourseId = g.Key,
+                AverageRating = g.Average(r => r.Score),
+                ReviewsCount = g.Count()
+            })
+            .ToDictionaryAsync(x => x.CourseId, cancellationToken);
+
         var courseDtos = courses.Select(course =>
         {
             instructors.TryGetValue(course.InstructorId, out User? instructor);
             categories.TryGetValue(course.CategoryId, out Category? category);
             courseStats.TryGetValue(course.Id, out var stats);
             enrollmentCounts.TryGetValue(course.Id, out var enrollmentCount);
+            ratingStats.TryGetValue(course.Id, out var ratingStat);
 
             string? thumbnailUrl = course.Images.Count > 0
                 ? _urlResolver.Resolve(StorageCategory.Public, course.Images.First().Path).Value
@@ -137,8 +149,8 @@ internal sealed class GetCourseSummariesQueryHandler : IQueryHandler<GetCourseSu
                 LessonsCount: stats?.LessonCount ?? 0,
                 Duration: stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero,
                 EnrollmentCount: enrollmentCount?.Count ?? 0,
-                AverageRating: 4.5,
-                ReviewsCount: 2157,
+                AverageRating: ratingStat?.AverageRating ?? 0,
+                ReviewsCount: ratingStat?.ReviewsCount ?? 0,
                 CourseViews: 0);
 
             return new CourseSummaryWithAnalyticsDto(summary, analytics);
