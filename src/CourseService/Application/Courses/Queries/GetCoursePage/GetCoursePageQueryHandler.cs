@@ -53,6 +53,10 @@ internal sealed class GetCoursePageQueryHandler
                 TotalDurationSeconds = _readDbContext.Lessons
                     .Where(l => l.CourseId == course.Id)
                     .Sum(l => l.Duration.TotalSeconds),
+                AverageRating = _readDbContext.CourseRatings
+                    .Where(r => r.CourseId == course.Id)
+                    .Average(r => (double?)r.Score) ?? 0,
+                ReviewsCount = _readDbContext.CourseRatings.Count(r => r.CourseId == course.Id),
 
                 Modules = _readDbContext.Modules
                     .Where(m => m.CourseId == course.Id)
@@ -78,7 +82,9 @@ internal sealed class GetCoursePageQueryHandler
         CourseAnalyticsDto analyticsDto = new(
             courseData.EnrollmentCount,
             courseData.TotalLessonsCount,
-            TimeSpan.FromSeconds(courseData.TotalDurationSeconds));
+            TimeSpan.FromSeconds(courseData.TotalDurationSeconds),
+            courseData.AverageRating,
+            courseData.ReviewsCount);
 
         CourseStructureDto structure = BuildStructure(courseData.Modules, courseData.Lessons);
 

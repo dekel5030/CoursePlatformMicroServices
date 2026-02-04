@@ -3,5 +3,7 @@ namespace Courses.Application.Courses.Dtos;
 public sealed record CourseAnalyticsDto(
     int EnrollmentCount,
     int LessonsCount,
-    TimeSpan TotalDuration
+    TimeSpan TotalDuration,
+    double AverageRating,
+    int ReviewsCount
 );

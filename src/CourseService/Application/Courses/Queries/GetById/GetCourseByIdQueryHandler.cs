@@ -49,6 +49,13 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             .Where(l => l.CourseId == request.Id)
             .SumAsync(l => l.Duration.TotalSeconds, cancellationToken);
 
+        double averageRating = await _readDbContext.CourseRatings
+            .Where(r => r.CourseId == request.Id)
+            .AverageAsync(r => (double?)r.Score, cancellationToken) ?? 0;
+
+        int reviewsCount = await _readDbContext.CourseRatings
+            .CountAsync(r => r.CourseId == request.Id, cancellationToken);
+
         var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
         var resolvedImageUrls = course.Images
             .Select(img => _urlResolver.Resolve(StorageCategory.Public, img.Path).Value)
@@ -72,7 +79,9 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
         var analyticsDto = new CourseAnalyticsDto(
             enrollmentCount,
             lessonsCount,
-            TimeSpan.FromSeconds(totalDurationSeconds));
+            TimeSpan.FromSeconds(totalDurationSeconds),
+            averageRating,
+            reviewsCount);
 
         return Result.Success(new CourseWithAnalyticsDto(courseDto, analyticsDto));
     }

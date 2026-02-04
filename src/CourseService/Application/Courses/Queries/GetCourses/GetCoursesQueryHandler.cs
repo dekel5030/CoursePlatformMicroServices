@@ -1,5 +1,5 @@
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Courses.Queries.GetCourseSummaries;
+using Courses.Application.Courses.Queries.GetCourseCacheable;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Shared.Dtos;
@@ -25,7 +25,7 @@ internal sealed class GetCoursesQueryHandler : IQueryHandler<GetCoursesQuery, Co
         GetCoursesQuery request,
         CancellationToken cancellationToken = default)
     {
-        var innerQuery = new GetCourseSummariesQuery(request.PagedQuery);
+        var innerQuery = new GetCourseCacheableQuery(request.PagedQuery);
         Result<CourseCollectionDto> innerQueryResult = await _mediator.Send(innerQuery, cancellationToken);
 
         if (innerQueryResult.IsFailure)

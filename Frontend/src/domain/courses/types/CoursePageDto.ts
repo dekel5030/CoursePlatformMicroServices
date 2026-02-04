@@ -21,6 +21,8 @@ export interface CourseAnalyticsDtoApi {
   enrollmentCount: number;
   lessonsCount: number;
   totalDuration: string;
+  averageRating?: number;
+  reviewsCount?: number;
 }
 
 /**
