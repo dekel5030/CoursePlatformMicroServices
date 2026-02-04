@@ -1,8 +1,9 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Layout, ManagementLayout } from "@/components/layout";
 import { ProtectedRoute } from "@/shared/common";
 import { CourseCatalogPage, AllCoursesPage } from "@/features/course-catalog";
 import { MyCoursesPage } from "@/features/my-courses";
+import { ManagedCoursesPage } from "@/features/managed-courses";
 import { CoursePage } from "@/features/course-management";
 import { LessonPage } from "@/features/lesson-viewer";
 import { UserProfilePage } from "@/features/user-profile";
@@ -25,13 +26,14 @@ export default function AppRoutes() {
       <Route element={<Layout />}>
         <Route path="/catalog" element={<CourseCatalogPage />} />
         <Route
-          path="/my-courses"
+          path="/users/me/courses/enrolled"
           element={
             <ProtectedRoute>
               <MyCoursesPage />
             </ProtectedRoute>
           }
         />
+        <Route path="/my-courses" element={<Navigate to="/users/me/courses/enrolled" replace />} />
         <Route path="/courses" element={<AllCoursesPage />} />
         <Route path="/courses/:id" element={<CoursePage />} />
         <Route
@@ -53,6 +55,7 @@ export default function AppRoutes() {
         <Route path="/admin/roles/:roleName" element={<RoleDetailPage />} />
         <Route path="/admin/users" element={<UsersListPage />} />
         <Route path="/admin/users/:userId" element={<UserManagementPage />} />
+        <Route path="/users/me/courses/managed" element={<ManagedCoursesPage />} />
       </Route>
     </Routes>
   );

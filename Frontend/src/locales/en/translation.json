@@ -40,7 +40,8 @@
     "users": "Users",
     "admin": "Admin Dashboard",
     "catalog": "Catalog",
-    "myCourses": "My Courses"
+    "myCourses": "My Courses",
+    "managedCourses": "Managed Courses"
   },
   "navbar": {
     "login": "Log in",
@@ -180,6 +181,11 @@
       "analytics": "Analytics",
       "enrollments": "Enrollments"
     }
+  },
+  "managedCourses": {
+    "title": "Managed Courses",
+    "subtitle": "View and manage the courses you teach",
+    "noCourses": "You are not managing any courses yet"
   },
   "myCourses": {
     "title": "My Courses",

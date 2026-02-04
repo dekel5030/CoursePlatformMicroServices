@@ -135,7 +135,7 @@ export default function Navbar() {
             {auth.isAuthenticated && (
               <li>
                 <Link
-                  to="/my-courses"
+                  to="/users/me/courses/enrolled"
                   className="hover:text-foreground transition-colors"
                 >
                   {t("navbar.myCourses")}
