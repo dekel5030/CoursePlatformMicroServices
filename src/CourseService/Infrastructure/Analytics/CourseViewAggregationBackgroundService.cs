@@ -1,6 +1,7 @@
 using Courses.Application.Abstractions.Analytics;
 using Courses.Application.Abstractions.Data;
 using Courses.Domain.Courses.Primitives;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -24,6 +25,8 @@ internal sealed class CourseViewAggregationBackgroundService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Course View Aggregation Background Service started");
+
+        await AggregateViewsAsync(stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -63,22 +66,31 @@ internal sealed class CourseViewAggregationBackgroundService : BackgroundService
 
         _logger.LogInformation("Aggregating views for {Count} courses", pendingViews.Count);
 
+        var courseIds = pendingViews.Keys.ToList();
+        List<Domain.Courses.Course> courses = await writeDbContext.Courses
+            .Where(c => courseIds.Contains(c.Id))
+            .ToListAsync(cancellationToken);
+
+        var courseLookup = courses.ToDictionary(c => c.Id);
+
         foreach ((CourseId courseId, long viewCount) in pendingViews)
         {
-            Domain.Courses.Course? course = await writeDbContext.Courses.FindAsync([courseId], cancellationToken);
-
-            if (course == null)
+            if (!courseLookup.TryGetValue(courseId, out Domain.Courses.Course? course))
             {
                 _logger.LogWarning("Course {CourseId} not found for view aggregation", courseId);
+                await viewTrackingService.ClearPendingViewsAsync(courseId, cancellationToken);
                 continue;
             }
 
             course.IncrementViewCount(viewCount);
-
-            await viewTrackingService.ClearPendingViewsAsync(courseId, cancellationToken);
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        foreach (CourseId courseId in pendingViews.Keys)
+        {
+            await viewTrackingService.ClearPendingViewsAsync(courseId, cancellationToken);
+        }
 
         _logger.LogInformation("Successfully aggregated views for {Count} courses", pendingViews.Count);
     }

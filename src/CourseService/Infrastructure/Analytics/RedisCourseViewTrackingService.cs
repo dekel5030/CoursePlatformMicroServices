@@ -1,21 +1,21 @@
 using Courses.Application.Abstractions.Analytics;
 using Courses.Domain.Courses.Primitives;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 
 namespace Courses.Infrastructure.Analytics;
 
 internal sealed class RedisCourseViewTrackingService : ICourseViewTrackingService
 {
     private const string KeyPrefix = "course:views:";
-    private readonly IDistributedCache _cache;
+    private readonly IConnectionMultiplexer _redis;
     private readonly ILogger<RedisCourseViewTrackingService> _logger;
 
     public RedisCourseViewTrackingService(
-        IDistributedCache cache,
+        IConnectionMultiplexer redis,
         ILogger<RedisCourseViewTrackingService> logger)
     {
-        _cache = cache;
+        _redis = redis;
         _logger = logger;
     }
 
@@ -25,20 +25,10 @@ internal sealed class RedisCourseViewTrackingService : ICourseViewTrackingServic
 
         try
         {
-            string? currentValue = await _cache.GetStringAsync(key, cancellationToken);
-
-            long newValue = (long.TryParse(currentValue, out long parsed) ? parsed : 0) + 1;
-
-            await _cache.SetStringAsync(
-                key,
-                newValue.ToString(),
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24)
-                },
-                cancellationToken);
-
-            _logger.LogDebug("Tracked view for course {CourseId}. New count: {Count}", courseId, newValue);
+            IDatabase db = _redis.GetDatabase();
+            await db.StringIncrementAsync(key);
+            await db.KeyExpireAsync(key, TimeSpan.FromHours(24));
+            _logger.LogDebug("Tracked view for course {CourseId}", courseId);
         }
         catch (Exception ex)
         {
@@ -52,8 +42,9 @@ internal sealed class RedisCourseViewTrackingService : ICourseViewTrackingServic
 
         try
         {
-            string? value = await _cache.GetStringAsync(key, cancellationToken);
-            return long.TryParse(value, out long parsed) ? parsed : 0;
+            IDatabase db = _redis.GetDatabase();
+            RedisValue value = await db.StringGetAsync(key);
+            return (long)(value.HasValue ? value : 0);
         }
         catch (Exception ex)
         {
@@ -62,10 +53,39 @@ internal sealed class RedisCourseViewTrackingService : ICourseViewTrackingServic
         }
     }
 
-    public Task<Dictionary<CourseId, long>> GetAllPendingViewsAsync(CancellationToken cancellationToken = default)
+    public async Task<Dictionary<CourseId, long>> GetAllPendingViewsAsync(CancellationToken cancellationToken = default)
     {
-        _logger.LogWarning("GetAllPendingViewsAsync is not implemented with IDistributedCache. Returning empty dictionary.");
-        return Task.FromResult(new Dictionary<CourseId, long>());
+        var result = new Dictionary<CourseId, long>();
+
+        try
+        {
+            IDatabase db = _redis.GetDatabase();
+            IServer server = _redis.GetServers().FirstOrDefault() ?? throw new InvalidOperationException("No Redis server available");
+
+            await foreach (RedisKey key in server.KeysAsync(pattern: $"{KeyPrefix}*"))
+            {
+                RedisValue value = await db.StringGetAsync(key);
+
+                if (value.HasValue && long.TryParse((string?)value, out long viewCount))
+                {
+                    string keyString = key.ToString();
+                    string courseIdString = keyString.Replace(KeyPrefix, string.Empty, StringComparison.Ordinal);
+
+                    if (Guid.TryParse(courseIdString, out Guid courseGuid))
+                    {
+                        result[new CourseId(courseGuid)] = viewCount;
+                    }
+                }
+            }
+
+            _logger.LogDebug("Retrieved {Count} courses with pending views", result.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get all pending views");
+        }
+
+        return result;
     }
 
     public async Task ClearPendingViewsAsync(CourseId courseId, CancellationToken cancellationToken = default)
@@ -74,7 +94,8 @@ internal sealed class RedisCourseViewTrackingService : ICourseViewTrackingServic
 
         try
         {
-            await _cache.RemoveAsync(key, cancellationToken);
+            IDatabase db = _redis.GetDatabase();
+            await db.KeyDeleteAsync(key);
             _logger.LogDebug("Cleared pending views for course {CourseId}", courseId);
         }
         catch (Exception ex)

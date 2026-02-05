@@ -246,6 +246,11 @@ public class Course : Entity<CourseId>
 
     public void IncrementViewCount(long count = 1)
     {
+        if (count <= 0)
+        {
+            return;
+        }
+
         ViewCount += count;
     }
 

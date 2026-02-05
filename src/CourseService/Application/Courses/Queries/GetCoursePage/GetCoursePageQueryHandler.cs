@@ -46,7 +46,7 @@ internal sealed class GetCoursePageQueryHandler
     {
         var courseId = new CourseId(request.Id);
 
-        _ = Task.Run(() => _viewTrackingService.TrackViewAsync(courseId, CancellationToken.None), CancellationToken.None);
+        _ = _viewTrackingService.TrackViewAsync(courseId, CancellationToken.None);
 
         var courseData = await _readDbContext.Courses
             .AsSplitQuery()
