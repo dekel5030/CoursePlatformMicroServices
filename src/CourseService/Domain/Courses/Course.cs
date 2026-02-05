@@ -248,7 +248,7 @@ public class Course : Entity<CourseId>
     {
         if (count <= 0)
         {
-            return;
+            throw new ArgumentOutOfRangeException(nameof(count), "View count increment must be positive");
         }
 
         ViewCount += count;

@@ -26,8 +26,19 @@ internal sealed class RedisCourseViewTrackingService : ICourseViewTrackingServic
         try
         {
             IDatabase db = _redis.GetDatabase();
-            await db.StringIncrementAsync(key);
-            await db.KeyExpireAsync(key, TimeSpan.FromHours(24));
+            
+            string luaScript = @"
+                local current = redis.call('INCR', KEYS[1])
+                if current == 1 then
+                    redis.call('EXPIRE', KEYS[1], ARGV[1])
+                end
+                return current";
+            
+            await db.ScriptEvaluateAsync(
+                luaScript, 
+                [key], 
+                [86400]);
+            
             _logger.LogDebug("Tracked view for course {CourseId}", courseId);
         }
         catch (Exception ex)
@@ -62,7 +73,7 @@ internal sealed class RedisCourseViewTrackingService : ICourseViewTrackingServic
             IDatabase db = _redis.GetDatabase();
             IServer server = _redis.GetServers().FirstOrDefault() ?? throw new InvalidOperationException("No Redis server available");
 
-            await foreach (RedisKey key in server.KeysAsync(pattern: $"{KeyPrefix}*"))
+            await foreach (RedisKey key in server.KeysAsync(database: db.Database, pattern: $"{KeyPrefix}*", pageSize: 250))
             {
                 RedisValue value = await db.StringGetAsync(key);
 
