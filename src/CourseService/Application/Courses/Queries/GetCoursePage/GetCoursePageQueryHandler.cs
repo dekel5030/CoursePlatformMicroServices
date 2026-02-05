@@ -1,3 +1,4 @@
+using Courses.Application.Abstractions.Analytics;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
@@ -25,15 +26,18 @@ internal sealed class GetCoursePageQueryHandler
     private readonly IReadDbContext _readDbContext;
     private readonly ILinkBuilderService _linkBuilderService;
     private readonly IStorageUrlResolver _storageUrlResolver;
+    private readonly ICourseViewTrackingService _viewTrackingService;
 
     public GetCoursePageQueryHandler(
         IReadDbContext readDbContext,
         ILinkBuilderService linkBuilderService,
-        IStorageUrlResolver storageUrlResolver)
+        IStorageUrlResolver storageUrlResolver,
+        ICourseViewTrackingService viewTrackingService)
     {
         _readDbContext = readDbContext;
         _linkBuilderService = linkBuilderService;
         _storageUrlResolver = storageUrlResolver;
+        _viewTrackingService = viewTrackingService;
     }
 
     public async Task<Result<CoursePageDto>> Handle(
@@ -41,6 +45,8 @@ internal sealed class GetCoursePageQueryHandler
         CancellationToken cancellationToken = default)
     {
         var courseId = new CourseId(request.Id);
+
+        _ = Task.Run(() => _viewTrackingService.TrackViewAsync(courseId, CancellationToken.None), CancellationToken.None);
 
         var courseData = await _readDbContext.Courses
             .AsSplitQuery()

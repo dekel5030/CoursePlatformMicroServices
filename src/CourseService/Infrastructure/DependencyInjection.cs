@@ -1,5 +1,7 @@
 ﻿using CoursePlatform.ServiceDefaults.Auth;
+using Courses.Application.Abstractions.Analytics;
 using Courses.Infrastructure.Ai;
+using Courses.Infrastructure.Analytics;
 using Courses.Infrastructure.Cache;
 using Courses.Infrastructure.Database;
 using Courses.Infrastructure.MassTransit;
@@ -7,6 +9,7 @@ using Courses.Infrastructure.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Courses.Infrastructure;
 
@@ -18,11 +21,14 @@ public static class DependencyInjection
 
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IHostApplicationBuilder builder)
     {
 
         string authUrl = configuration["services:authservice:https:0"]
               ?? configuration["services:authservice:http:0"] ?? string.Empty;
+
+        builder.AddRedisDistributedCache("redis");
 
         return services
             .AddServices()
@@ -46,6 +52,8 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddStorage();
+        services.AddScoped<ICourseViewTrackingService, RedisCourseViewTrackingService>();
+        services.AddHostedService<CourseViewAggregationBackgroundService>();
         return services;
     }
 

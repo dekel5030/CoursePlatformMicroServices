@@ -16,6 +16,7 @@ public class Course : Entity<CourseId>
     public Money Price { get; private set; } = Money.Zero();
     public Language Language { get; private set; } = Language.Hebrew;
     public Slug Slug { get; private set; }
+    public long ViewCount { get; private set; }
 
     public UserId InstructorId { get; private set; }
     public CategoryId CategoryId { get; private set; } = new CategoryId(Guid.Empty);
@@ -241,6 +242,11 @@ public class Course : Entity<CourseId>
         _images.Remove(imageUrl);
         Raise(new CourseImageRemovedDomainEvent(Id, imageUrl));
         return Result.Success();
+    }
+
+    public void IncrementViewCount(long count = 1)
+    {
+        ViewCount += count;
     }
 
     public Result Delete()

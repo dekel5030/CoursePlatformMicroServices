@@ -24,7 +24,7 @@ builder.Services.Configure<JsonOptions>(options =>
 builder.AddInfrastructureDefaults();
 builder.AddDefaultOpenApi();
 
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration, builder);
 builder.Services.AddApplication();
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
 builder.Services.AddHttpContextAccessor();
