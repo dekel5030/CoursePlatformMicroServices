@@ -51,8 +51,12 @@ This project serves as a practical playground for experimenting with:
 |---------|-------------|
 | **User Management** | Register, authenticate, and manage user profiles |
 | **Course Catalog** | Browse, create, and manage course offerings |
-| **Enrollments** | Enroll users in courses with validation |
+| **Enrollments** | Enroll users in courses with validation (part of CourseService) |
 | **Order Processing** | Handle course purchases and payment flows |
+| **File Storage** | S3-compatible object storage for course materials and videos |
+| **Video Transcoding** | Automatic video transcoding for streaming |
+| **API Gateway** | Centralized entry point with Yarp reverse proxy |
+| **Identity Management** | Keycloak integration for OAuth2/OIDC authentication |
 | **Event-Driven Communication** | Services communicate via RabbitMQ integration events |
 | **Outbox Pattern** | Reliable event publishing with transactional guarantees |
 | **Result Pattern** | Consistent error handling across all services |
@@ -68,26 +72,32 @@ This project serves as a practical playground for experimenting with:
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                              Frontend                                    │
-│                         (React + TypeScript)                            │
+│                    (React 19 + TypeScript + Vite 7)                     │
 └─────────────────────────────────┬───────────────────────────────────────┘
                                   │ HTTP/REST
 ┌─────────────────────────────────▼───────────────────────────────────────┐
-│                           API Gateway / Direct                          │
-└───────┬─────────┬─────────┬─────────────┬─────────────┬─────────────────┘
-        │         │         │             │             │
-   ┌────▼───┐ ┌───▼────┐ ┌──▼─────┐ ┌─────▼─────┐ ┌─────▼─────┐
-   │  Auth  │ │  User  │ │ Course │ │Enrollment │ │   Order   │
-   │Service │ │Service │ │Service │ │  Service  │ │  Service  │
-   └────┬───┘ └───┬────┘ └───┬────┘ └─────┬─────┘ └─────┬─────┘
-        │         │          │            │             │
-   ┌────▼───┐ ┌───▼────┐ ┌───▼────┐ ┌─────▼─────┐ ┌─────▼─────┐
-   │ AuthDB │ │UserDB  │ │CourseDB│ │EnrollDB   │ │ OrderDB   │
-   │(Postgres)│(Postgres)│(Postgres)│(Postgres) │ │(Postgres) │
-   └────────┘ └────────┘ └────────┘ └───────────┘ └───────────┘
+│                          API Gateway (Yarp)                             │
+│                    + Redis (Session/Caching)                            │
+└───────┬─────────┬─────────┬──────────────┬─────────────┬───────────────┘
+        │         │         │              │             │
+   ┌────▼───┐ ┌───▼────┐ ┌──▼─────┐  ┌─────▼─────┐  ┌─────▼─────┐
+   │  Auth  │ │  User  │ │ Course │  │  Storage  │  │   Order   │
+   │Service │ │Service │ │Service │  │  Service  │  │  Service  │
+   └────┬───┘ └───┬────┘ └───┬────┘  └─────┬─────┘  └─────┬─────┘
+        │         │          │             │             │
+   ┌────▼───┐ ┌───▼────┐ ┌───▼────┐  ┌─────▼──────┐ ┌─────▼─────┐
+   │ AuthDB │ │UserDB  │ │CourseDB│  │   Garage   │ │ OrderDB   │
+   │(Postgres)│(Postgres)│(Postgres)│ │ (S3 Store) │ │(Postgres) │
+   └────────┘ └────────┘ └────────┘  └────────────┘ └───────────┘
                                   │
                     ┌─────────────▼─────────────┐
                     │        RabbitMQ           │
                     │   (Message Broker)        │
+                    └───────────────────────────┘
+                                  │
+                    ┌─────────────▼─────────────┐
+                    │       Keycloak            │
+                    │   (Identity Provider)     │
                     └───────────────────────────┘
 ```
 
@@ -100,13 +110,18 @@ This project serves as a practical playground for experimenting with:
 | **Event-Driven Architecture (EDA)** | Asynchronous messaging via RabbitMQ with MassTransit |
 | **CQRS** | Separate read/write database connections where applicable |
 | **Outbox Pattern** | Transactional event publishing for reliability |
-| **N-Layer** | Traditional Controllers → Services → Repositories (EnrollmentService) |
+| **API Gateway Pattern** | Yarp reverse proxy for routing and authentication |
+| **Minimal APIs** | Lightweight endpoints for Gateway and StorageService |
+
+> **Note**: Course enrollments are managed within the CourseService domain, not as a separate microservice. This follows the DDD principle of keeping related aggregates within the same bounded context.
 
 ### Inter-Service Communication
 
-- **Synchronous**: REST APIs for direct client-service communication
+- **Synchronous**: REST APIs via API Gateway for client-service communication
 - **Asynchronous**: RabbitMQ message broker for event-driven communication between services
-- **Integration Events**: `UserUpserted`, `EnrollmentCreated`, `OrderCompleted`, etc.
+- **Integration Events**: Events defined in `Contracts/` assemblies (e.g., `UserUpserted`, `EnrollmentCreated`, `OrderCompleted`)
+- **Message Bus**: MassTransit provides abstraction over RabbitMQ with automatic retry and error handling
+- **Outbox Pattern**: Ensures reliable event publishing using transactional outbox table
 
 ---
 
@@ -114,11 +129,12 @@ This project serves as a practical playground for experimenting with:
 
 | Service | Description | Architecture | Port (Default) |
 |---------|-------------|--------------|----------------|
-| **AuthService** | JWT authentication, token refresh, password management | Clean Architecture + DDD | 5433 |
-| **UserService** | User registration, profile management, user queries | Clean Architecture + DDD + CQRS | 5125 |
-| **CourseService** | Course CRUD, catalog management, course queries | Clean Architecture + DDD | 5434 |
-| **EnrollmentService** | Course enrollment, enrollment validation | N-Layer (Traditional) | 5435 |
-| **OrderService** | Order processing, payment workflows | Clean Architecture + DDD | 5436 |
+| **AuthService** | JWT authentication, token refresh, password management, Keycloak integration | Clean Architecture + DDD | Dynamic (Aspire) |
+| **UserService** | User registration, profile management, user queries | Clean Architecture + DDD + CQRS | Dynamic (Aspire) |
+| **CourseService** | Course CRUD, catalog management, enrollment management | Clean Architecture + DDD | Dynamic (Aspire) |
+| **StorageService** | File storage, S3-compatible object storage, video transcoding | Minimal API | Dynamic (Aspire) |
+| **OrderService** | Order processing, payment workflows | Clean Architecture + DDD | Dynamic (Aspire) |
+| **Gateway** | API Gateway with reverse proxy (Yarp), authentication, routing | Minimal API + Yarp | Dynamic (Aspire) |
 
 ### Shared Libraries
 
@@ -146,6 +162,10 @@ This project serves as a practical playground for experimenting with:
 | **PostgreSQL 16** | Relational database (per service) |
 | **RabbitMQ 3.13** | Message broker |
 | **.NET Aspire** | Cloud-native orchestration |
+| **Keycloak 26.4.7** | Identity and Access Management |
+| **Redis** | Caching and session management |
+| **Garage v2.1.0** | S3-compatible object storage |
+| **Yarp** | Reverse proxy for API Gateway |
 
 ### Frontend
 
@@ -154,7 +174,13 @@ This project serves as a practical playground for experimenting with:
 | **React 19** | UI framework |
 | **TypeScript** | Type-safe JavaScript |
 | **Vite 7** | Build tool and dev server |
-| **React Router 7** | Client-side routing |
+| **React Router 7.9** | Client-side routing |
+| **TanStack Query** | Data fetching and caching |
+| **Radix UI** | Accessible component primitives |
+| **Tailwind CSS 4** | Utility-first CSS framework |
+| **i18next** | Internationalization |
+| **OIDC Client** | OpenID Connect authentication |
+| **Vidstack** | Video player components |
 
 ### Infrastructure & DevOps
 
@@ -188,8 +214,8 @@ CoursePlatformMicroServices/
 │   │   ├── Infrastructure/    # EF Core, messaging, external services
 │   │   └── Web.Api/           # API endpoints, middleware
 │   ├── UserService/           # User management microservice
-│   ├── CourseService/         # Course catalog microservice
-│   ├── EnrollmentService/     # Enrollment microservice (N-Layer)
+│   ├── CourseService/         # Course catalog & enrollment microservice
+│   ├── StorageService/        # File storage & video transcoding
 │   ├── OrderService/          # Order processing microservice
 │   └── Shared/
 │       ├── Kernel/            # Domain primitives
@@ -203,9 +229,10 @@ CoursePlatformMicroServices/
 │   └── Products.Contracts/
 ├── Common/                    # Shared utilities
 ├── Common.Web/                # Web-specific utilities
+├── Gateway.Api/               # API Gateway with Yarp
 ├── Frontend/                  # React TypeScript frontend
 ├── Tests/                     # Additional test projects
-├── infra/                     # Docker Compose files
+├── infrastructure/            # Keycloak themes and configuration
 ├── CoursePlatform.AppHost/    # .NET Aspire orchestrator
 └── CoursePlatform.ServiceDefaults/  # Aspire service defaults
 ```
@@ -229,6 +256,12 @@ Before running the project, ensure you have the following installed:
 - **JetBrains Rider** for .NET development
 - **.NET Aspire workload** for orchestration: `dotnet workload install aspire`
 
+### Platform Notes
+
+⚠️ **Windows**: The Aspire configuration uses Windows-specific volume paths (`C:\AspireVolumes\*`).
+
+🐧 **Linux/Mac**: You'll need to modify volume paths in `CoursePlatform.AppHost/AppHost.cs` to use appropriate paths for your OS (e.g., `/var/lib/aspire/*` or `~/aspire-volumes/*`).
+
 ---
 
 ## 🚀 Getting Started
@@ -240,101 +273,46 @@ git clone https://github.com/dekel5030/CoursePlatformMicroServices.git
 cd CoursePlatformMicroServices
 ```
 
-### 2. Start Infrastructure (Databases + RabbitMQ)
-
-#### Option A: Using Docker Compose
+### 2. Install .NET Aspire Workload (Recommended)
 
 ```bash
-# Start all PostgreSQL databases
-cd infra
-docker-compose up -d
-
-# Start RabbitMQ separately
-docker-compose -f docker-compose.rabbitmq.yml up -d
+# Install Aspire workload for orchestration
+dotnet workload install aspire
 ```
 
-#### Option B: Using .NET Aspire (Recommended)
+### 3. Run the Application with .NET Aspire
+
+.NET Aspire orchestrates all services, databases, and infrastructure automatically:
 
 ```bash
-# Install Aspire workload if not already installed
-dotnet workload install aspire
-
 # Run from repository root
 dotnet run --project CoursePlatform.AppHost
 ```
 
-### 3. Configure Environment Variables
+This will start:
+- **All backend services** (Auth, User, Course, Storage, Order)
+- **API Gateway** with Yarp
+- **Frontend** React application
+- **PostgreSQL databases** (separate database per service)
+- **RabbitMQ** message broker
+- **Redis** for caching and sessions
+- **Keycloak** for identity management
+- **Garage** S3-compatible object storage
+- **Aspire Dashboard** at http://localhost:15000
 
-Copy the sample environment file and adjust values if needed:
+### 4. Access the Application
 
-```bash
-cd infra
-cp .env .env.local
-```
+Once started, you can access:
 
-#### Database Connection Strings
+| Resource | URL | Description |
+|----------|-----|-------------|
+| **Aspire Dashboard** | http://localhost:15000 | Service orchestration and monitoring |
+| **Frontend** | Dynamic (check Aspire Dashboard) | React application |
+| **API Gateway** | Dynamic (check Aspire Dashboard) | Gateway endpoints |
+| **Keycloak Admin** | http://localhost:8080 | Identity management (admin/admin) |
+| **RabbitMQ Management** | http://localhost:15672 | Message broker UI (guest/guest) |
 
-Each service requires its own PostgreSQL database. The default configuration in `infra/.env`:
-
-| Service | Database | Default Port |
-|---------|----------|--------------|
-| UserService | usersdb | 5432 |
-| AuthService | authdb | 5433 |
-| CourseService | coursesdb | 5434 |
-| EnrollmentService | enrollmentdb | 5435 |
-| OrderService | ordersdb | 5436 |
-
-### 4. Run Database Migrations
-
-Each service manages its own database schema. Migrations are typically applied on startup via Entity Framework Core.
-
-```bash
-# Example: Apply UserService migrations manually
-cd src/UserService
-dotnet ef database update --project Infrastructure --startup-project Web.Api
-```
-
-### 5. Run Backend Services
-
-#### Run All Services with Aspire
-
-```bash
-dotnet run --project CoursePlatform.AppHost
-```
-
-#### Run Individual Services
-
-```bash
-# UserService
-cd src/UserService/Web.Api
-dotnet run
-
-# AuthService
-cd src/AuthService/Web.Api
-dotnet run
-
-# CourseService
-cd src/CourseService
-dotnet run
-
-# EnrollmentService
-cd src/EnrollmentService
-dotnet run
-
-# OrderService
-cd src/OrderService/Web.Api
-dotnet run
-```
-
-### 6. Run Frontend
-
-```bash
-cd Frontend
-npm install
-npm run dev
-```
-
-The frontend will be available at `http://localhost:5173` (default Vite port).
+> **Note**: Aspire assigns dynamic ports to services. Use the Aspire Dashboard to find the exact URLs.
 
 ---
 
@@ -342,43 +320,35 @@ The frontend will be available at `http://localhost:5173` (default Vite port).
 
 ### Accessing Services
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Frontend** | http://localhost:5173 | React application |
-| **UserService API** | http://localhost:5125/swagger | User management endpoints |
-| **AuthService API** | http://localhost:5433/swagger | Authentication endpoints |
-| **CourseService API** | http://localhost:5434/swagger | Course management endpoints |
-| **RabbitMQ Management** | http://localhost:15672 | Message broker UI (guest/guest) |
-| **Aspire Dashboard** | http://localhost:15000 | Service orchestration dashboard |
+All service URLs are dynamically assigned by .NET Aspire. Access the **Aspire Dashboard** at http://localhost:15000 to view:
+- Service endpoints and health status
+- Logs and traces
+- Metrics and performance data
+- Resource dependencies
+
+### Key Components
+
+| Component | Purpose |
+|-----------|---------|
+| **API Gateway** | Single entry point for all frontend requests, handles routing, authentication |
+| **Keycloak** | Identity provider for OAuth2/OIDC authentication |
+| **Redis** | Session storage and caching layer |
+| **Garage** | S3-compatible storage for course materials and videos |
+| **RabbitMQ** | Event-driven communication between services |
 
 ### API Documentation
 
-Each service exposes Swagger/OpenAPI documentation at the `/swagger` endpoint when running in Development mode.
+Each service exposes Swagger/OpenAPI documentation at the `/swagger` endpoint when running in Development mode. Access them through the Aspire Dashboard.
 
-### Example API Calls
+### Frontend Features
 
-#### Register a New User
-
-```bash
-curl -X POST http://localhost:5125/api/users \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "firstName": "John",
-    "lastName": "Doe"
-  }'
-```
-
-#### Authenticate
-
-```bash
-curl -X POST http://localhost:5433/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "your-password"
-  }'
-```
+The React frontend includes:
+- User authentication with Keycloak (OIDC)
+- Course browsing and enrollment
+- Video player with HLS streaming
+- Multi-language support (i18next)
+- Responsive design with Tailwind CSS
+- Dark/light theme support
 
 ---
 
@@ -428,32 +398,7 @@ npm run build   # Type-check and build
 
 ### Common Issues
 
-#### Docker containers won't start
-
-```bash
-# Check if ports are in use
-netstat -an | grep 5432  # PostgreSQL
-netstat -an | grep 5672  # RabbitMQ
-
-# Reset containers
-cd infra
-docker-compose down -v
-docker-compose up -d
-```
-
-#### Database connection errors
-
-1. Ensure PostgreSQL containers are running: `docker ps`
-2. Verify connection strings in `appsettings.json` match your environment
-3. Check that the database has been created
-
-#### RabbitMQ connection refused
-
-1. Verify RabbitMQ is running: `docker ps | grep rabbitmq`
-2. Check the management UI at http://localhost:15672
-3. Default credentials: `guest` / `guest`
-
-#### .NET Aspire issues
+#### Aspire services won't start
 
 ```bash
 # Update Aspire workload
@@ -462,7 +407,31 @@ dotnet workload update
 # Clean and rebuild
 dotnet clean
 dotnet build
+
+# Check Aspire Dashboard logs at http://localhost:15000
 ```
+
+#### Port conflicts
+
+If you encounter port conflicts:
+1. Stop any services using the required ports
+2. Let Aspire assign dynamic ports automatically
+3. Check the Aspire Dashboard for actual port assignments
+
+#### Volume mount issues (Windows)
+
+The AppHost uses Windows-specific volume paths:
+```
+C:\AspireVolumes\*
+```
+
+If you're on Linux/Mac, you'll need to modify `CoursePlatform.AppHost/AppHost.cs` to use appropriate paths.
+
+#### Keycloak connection issues
+
+1. Verify Keycloak is running via Aspire Dashboard
+2. Default admin credentials: `admin` / `admin`
+3. Keycloak health endpoint should be accessible at `/health/ready`
 
 #### Frontend build errors
 
@@ -473,6 +442,15 @@ npm install
 npm run build
 ```
 
+#### Database migration issues
+
+Migrations are applied automatically on service startup. If issues occur:
+```bash
+# Example: Apply UserService migrations manually
+cd src/UserService
+dotnet ef database update --project Infrastructure --startup-project Web.Api
+```
+
 ### Environment-Specific Configuration
 
 Services support configuration via:
@@ -480,6 +458,7 @@ Services support configuration via:
 - `appsettings.Development.json` – Development overrides
 - `appsettings.Production.json` – Production settings
 - Environment variables – Override any setting at runtime
+- .NET Aspire – Service configuration in `AppHost.cs`
 
 ---
 
@@ -505,13 +484,18 @@ This project is for educational purposes. Feel free to use it as a reference for
 
 Building this project provided hands-on experience with:
 
-- **Architecture comparison** – N-Layer vs Clean vs DDD vs EDA in real codebases
+- **Architecture comparison** – Clean Architecture vs DDD vs Minimal APIs in real codebases
 - **CQRS implementation** – Separate read/write contexts and projections
 - **MassTransit Outbox** – Idempotent message handling and reliable publishing
 - **Integration testing** – Using ephemeral containers with Testcontainers
 - **CI/CD pipelines** – GitHub Actions for automated builds and tests
 - **Monorepo structure** – Managing multiple services in a single repository
-- **.NET Aspire** – Cloud-native service orchestration
+- **.NET Aspire** – Cloud-native service orchestration with dynamic resource allocation
+- **API Gateway Pattern** – Implementing Yarp reverse proxy for unified entry point
+- **Identity Management** – Integrating Keycloak for OAuth2/OIDC authentication
+- **S3-compatible storage** – Using Garage for distributed object storage
+- **Video streaming** – HLS video transcoding and delivery
+- **Event-driven architecture** – Asynchronous inter-service communication with RabbitMQ
 
 ---
 
