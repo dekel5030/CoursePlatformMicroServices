@@ -117,9 +117,11 @@ This project serves as a practical playground for experimenting with:
 
 ### Inter-Service Communication
 
-- **Synchronous**: REST APIs for direct client-service communication
+- **Synchronous**: REST APIs via API Gateway for client-service communication
 - **Asynchronous**: RabbitMQ message broker for event-driven communication between services
-- **Integration Events**: `UserUpserted`, `EnrollmentCreated`, `OrderCompleted`, etc.
+- **Integration Events**: Events defined in `Contracts/` assemblies (e.g., `UserUpserted`, `EnrollmentCreated`, `OrderCompleted`)
+- **Message Bus**: MassTransit provides abstraction over RabbitMQ with automatic retry and error handling
+- **Outbox Pattern**: Ensures reliable event publishing using transactional outbox table
 
 ---
 
@@ -253,6 +255,12 @@ Before running the project, ensure you have the following installed:
 - **Visual Studio 2022** (17.8+) or **VS Code** with C# extension
 - **JetBrains Rider** for .NET development
 - **.NET Aspire workload** for orchestration: `dotnet workload install aspire`
+
+### Platform Notes
+
+⚠️ **Windows**: The Aspire configuration uses Windows-specific volume paths (`C:\AspireVolumes\*`).
+
+🐧 **Linux/Mac**: You'll need to modify volume paths in `CoursePlatform.AppHost/AppHost.cs` to use appropriate paths for your OS (e.g., `/var/lib/aspire/*` or `~/aspire-volumes/*`).
 
 ---
 
@@ -476,13 +484,18 @@ This project is for educational purposes. Feel free to use it as a reference for
 
 Building this project provided hands-on experience with:
 
-- **Architecture comparison** – N-Layer vs Clean vs DDD vs EDA in real codebases
+- **Architecture comparison** – Clean Architecture vs DDD vs Minimal APIs in real codebases
 - **CQRS implementation** – Separate read/write contexts and projections
 - **MassTransit Outbox** – Idempotent message handling and reliable publishing
 - **Integration testing** – Using ephemeral containers with Testcontainers
 - **CI/CD pipelines** – GitHub Actions for automated builds and tests
 - **Monorepo structure** – Managing multiple services in a single repository
-- **.NET Aspire** – Cloud-native service orchestration
+- **.NET Aspire** – Cloud-native service orchestration with dynamic resource allocation
+- **API Gateway Pattern** – Implementing Yarp reverse proxy for unified entry point
+- **Identity Management** – Integrating Keycloak for OAuth2/OIDC authentication
+- **S3-compatible storage** – Using Garage for distributed object storage
+- **Video streaming** – HLS video transcoding and delivery
+- **Event-driven architecture** – Asynchronous inter-service communication with RabbitMQ
 
 ---
 
