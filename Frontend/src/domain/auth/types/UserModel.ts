@@ -9,4 +9,5 @@ export interface UserModel {
   fullName: string;
   roles: RoleDto[];
   permissions: PermissionDto[];
+  avatarUrl?: string;
 }
