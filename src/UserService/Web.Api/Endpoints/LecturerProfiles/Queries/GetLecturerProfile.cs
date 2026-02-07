@@ -21,6 +21,6 @@ internal sealed class GetLecturerProfile : IEndpoint
             Result<LecturerProfileDto> result = await handler.Handle(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
-        });
+        }).RequireAuthorization();
     }
 }
