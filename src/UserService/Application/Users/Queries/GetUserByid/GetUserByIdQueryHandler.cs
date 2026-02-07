@@ -22,7 +22,14 @@ public class GetUserByIdQueryHandler(IReadDbContext dbContext) : IQueryHandler<G
                 u.FullName == null ? null : u.FullName.FirstName,
                 u.FullName == null ? null : u.FullName.LastName,
                 u.DateOfBirth,
-                u.PhoneNumber == null ? null : u.PhoneNumber.ToString()
+                u.PhoneNumber == null ? null : u.PhoneNumber.ToString(),
+                u.AvatarUrl,
+                u.Bio,
+                u.LinkedInUrl,
+                u.GitHubUrl,
+                u.TwitterUrl,
+                u.WebsiteUrl,
+                u.IsLecturer
             ))
             .FirstOrDefaultAsync(cancellationToken);
 

@@ -6,4 +6,10 @@ public sealed record UpdatedUserResponseDto(
     string? FirstName,
     string? LastName,
     DateTime? DateOfBirth,
-    string? PhoneNumber);
+    string? PhoneNumber,
+    string? AvatarUrl,
+    string? Bio,
+    string? LinkedInUrl,
+    string? GitHubUrl,
+    string? TwitterUrl,
+    string? WebsiteUrl);

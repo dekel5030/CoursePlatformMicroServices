@@ -33,7 +33,14 @@ public class GetUsersQueryHandler(IReadDbContext dbContext) : IQueryHandler<GetU
                 u.FullName != null ? u.FullName.FirstName : null,
                 u.FullName != null ? u.FullName.LastName : null,
                 u.DateOfBirth,
-                u.PhoneNumber != null ? u.PhoneNumber.ToString() : null))
+                u.PhoneNumber != null ? u.PhoneNumber.ToString() : null,
+                u.AvatarUrl,
+                u.Bio,
+                u.LinkedInUrl,
+                u.GitHubUrl,
+                u.TwitterUrl,
+                u.WebsiteUrl,
+                u.IsLecturer))
             .ToListAsync(cancellationToken);
 
         var dto = new CollectionDto<UserReadDto>

@@ -12,6 +12,7 @@ public class ReadDbContext : DbContext, IReadDbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<LecturerProfile> LecturerProfiles { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

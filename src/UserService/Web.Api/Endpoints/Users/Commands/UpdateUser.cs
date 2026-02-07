@@ -14,7 +14,13 @@ internal sealed class UpdateUser : IEndpoint
         string? FirstName,
         string? LastName,
         PhoneNumber? PhoneNumber,
-        DateTime? DateOfBirth);
+        DateTime? DateOfBirth,
+        string? AvatarUrl,
+        string? Bio,
+        string? LinkedInUrl,
+        string? GitHubUrl,
+        string? TwitterUrl,
+        string? WebsiteUrl);
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -29,7 +35,13 @@ internal sealed class UpdateUser : IEndpoint
                 request.FirstName,
                 request.LastName,
                 request.PhoneNumber,
-                request.DateOfBirth);
+                request.DateOfBirth,
+                request.AvatarUrl,
+                request.Bio,
+                request.LinkedInUrl,
+                request.GitHubUrl,
+                request.TwitterUrl,
+                request.WebsiteUrl);
 
             Result<UpdatedUserResponseDto> result = await handler.Handle(command, cancellationToken);
 

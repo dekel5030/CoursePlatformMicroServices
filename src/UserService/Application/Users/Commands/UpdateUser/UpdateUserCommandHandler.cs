@@ -40,7 +40,13 @@ public class UpdateUserCommandHandler(IWriteDbContext dbContext, ICurrentUserCon
         Result updateResult = user.UpdateProfile(
             fullName: updatedFullName,
             phoneNumber: request.PhoneNumber,
-            dateOfBirth: request.DateOfBirth);
+            dateOfBirth: request.DateOfBirth,
+            avatarUrl: request.AvatarUrl,
+            bio: request.Bio,
+            linkedInUrl: request.LinkedInUrl,
+            gitHubUrl: request.GitHubUrl,
+            twitterUrl: request.TwitterUrl,
+            websiteUrl: request.WebsiteUrl);
 
         if (updateResult.IsFailure)
         {
@@ -60,6 +66,12 @@ public class UpdateUserCommandHandler(IWriteDbContext dbContext, ICurrentUserCon
             user.FullName?.FirstName,
             user.FullName?.LastName,
             user.DateOfBirth,
-            user.PhoneNumber?.ToString());
+            user.PhoneNumber?.ToString(),
+            user.AvatarUrl,
+            user.Bio,
+            user.LinkedInUrl,
+            user.GitHubUrl,
+            user.TwitterUrl,
+            user.WebsiteUrl);
     }
 }

@@ -37,5 +37,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.DateOfBirth)
             .HasColumnType("timestamp without time zone");
+
+        builder.Property(u => u.AvatarUrl).HasMaxLength(2048);
+        builder.Property(u => u.Bio).HasMaxLength(1000);
+        builder.Property(u => u.LinkedInUrl).HasMaxLength(512);
+        builder.Property(u => u.GitHubUrl).HasMaxLength(512);
+        builder.Property(u => u.TwitterUrl).HasMaxLength(512);
+        builder.Property(u => u.WebsiteUrl).HasMaxLength(512);
+        builder.Property(u => u.IsLecturer).HasDefaultValue(false);
     }
 }

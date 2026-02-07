@@ -6,4 +6,5 @@ namespace Users.Application.Abstractions.Data;
 public interface IReadDbContext
 {
     DbSet<User> Users { get; }
+    DbSet<LecturerProfile> LecturerProfiles { get; }
 }

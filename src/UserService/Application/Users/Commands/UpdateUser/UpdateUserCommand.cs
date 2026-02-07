@@ -8,5 +8,11 @@ public sealed record UpdateUserCommand(
     string? FirstName,
     string? LastName,
     PhoneNumber? PhoneNumber,
-    DateTime? DateOfBirth) : ICommand<UpdatedUserResponseDto>
+    DateTime? DateOfBirth,
+    string? AvatarUrl,
+    string? Bio,
+    string? LinkedInUrl,
+    string? GitHubUrl,
+    string? TwitterUrl,
+    string? WebsiteUrl) : ICommand<UpdatedUserResponseDto>
 { }

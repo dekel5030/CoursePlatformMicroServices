@@ -13,6 +13,7 @@ public sealed class WriteDbContext(
         : DbContext(options), IWriteDbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<LecturerProfile> LecturerProfiles { get; set; }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
