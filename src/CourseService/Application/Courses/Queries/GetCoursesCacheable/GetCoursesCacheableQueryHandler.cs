@@ -107,6 +107,12 @@ internal sealed class GetCoursesCacheableQueryHandler : IQueryHandler<GetCourses
             })
             .ToDictionaryAsync(x => x.CourseId, cancellationToken);
 
+        var courseIdValues = courseIds.Select(id => id.Value).ToList();
+        Dictionary<Guid, int> viewCounts = await _dbContext.CourseAnalytics
+            .Where(ca => courseIdValues.Contains(ca.CourseId))
+            .Select(ca => new { ca.CourseId, ca.ViewCount })
+            .ToDictionaryAsync(x => x.CourseId, x => x.ViewCount, cancellationToken);
+
         var courseDtos = courses.Select(course =>
         {
             instructors.TryGetValue(course.InstructorId, out User? instructor);
@@ -151,7 +157,7 @@ internal sealed class GetCoursesCacheableQueryHandler : IQueryHandler<GetCourses
                 EnrollmentCount: enrollmentCount?.Count ?? 0,
                 AverageRating: ratingStat?.AverageRating ?? 0,
                 ReviewsCount: ratingStat?.ReviewsCount ?? 0,
-                CourseViews: 0);
+                CourseViews: viewCounts.GetValueOrDefault(course.Id.Value, 0));
 
             return new CourseSummaryWithAnalyticsDto(summary, analytics);
         }).ToList();

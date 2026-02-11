@@ -5,5 +5,6 @@ public sealed record CourseAnalyticsDto(
     int LessonsCount,
     TimeSpan TotalDuration,
     double AverageRating,
-    int ReviewsCount
+    int ReviewsCount,
+    int ViewCount
 );
