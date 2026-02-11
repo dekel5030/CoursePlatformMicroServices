@@ -65,6 +65,13 @@ internal sealed class CourseLinkDefinitions : ILinkDefinitionRegistry
                 method: LinkHttpMethod.Post,
                 endpointName: EndpointNames.CreateModule,
                 policyCheck: ctx => _policy.CanEditCourse(ctx),
+                getRouteValues: ctx => new { courseId = ctx.Id.Value }),
+
+            new LinkDefinition<CourseContext>(
+                rel: LinkRels.Course.ReorderModules,
+                method: LinkHttpMethod.Patch,
+                endpointName: EndpointNames.ReorderModules,
+                policyCheck: ctx => _policy.CanEditCourse(ctx),
                 getRouteValues: ctx => new { courseId = ctx.Id.Value })
         }.AsReadOnly();
 

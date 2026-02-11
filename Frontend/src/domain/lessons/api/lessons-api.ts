@@ -105,3 +105,18 @@ export async function generateLessonAi(
   const response = await axiosClient.post<GenerateLessonAiResponse>(url);
   return response.data;
 }
+
+export interface MoveLessonRequest {
+  targetModuleId: string;
+  targetIndex: number;
+}
+
+/**
+ * Move a lesson to a different module
+ */
+export async function moveLesson(
+  lessonId: string,
+  request: MoveLessonRequest,
+): Promise<void> {
+  await axiosClient.patch(`/lessons/${lessonId}/move`, request);
+}

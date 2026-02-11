@@ -176,6 +176,40 @@ export async function deleteModule(url: string): Promise<void> {
   await axiosClient.delete(url);
 }
 
+export interface ReorderModulesRequest {
+  moduleIds: string[];
+}
+
+/**
+ * Reorder modules within a course
+ */
+export async function reorderModules(
+  courseId: string,
+  request: ReorderModulesRequest,
+): Promise<void> {
+  await axiosClient.patch(
+    `/courses/${courseId}/structure/modules`,
+    request,
+  );
+}
+
+export interface ReorderLessonsRequest {
+  lessonIds: string[];
+}
+
+/**
+ * Reorder lessons within a module
+ */
+export async function reorderLessons(
+  moduleId: string,
+  request: ReorderLessonsRequest,
+): Promise<void> {
+  await axiosClient.patch(
+    `/modules/${moduleId}/lessons/reorder`,
+    request,
+  );
+}
+
 export interface ManagedCoursesResponse {
   items: CourseSummaryWithAnalyticsDto[];
   pageNumber: number;

@@ -51,6 +51,13 @@ internal sealed class LessonLinkDefinitions : ILinkDefinitionRegistry
                 method: LinkHttpMethod.Post,
                 endpointName: EndpointNames.GenerateLessonWithAi,
                 policyCheck: ctx => _policy.CanEditLesson(ctx),
+                getRouteValues: ctx => new { lessonId = ctx.Id.Value }),
+
+            new LinkDefinition<LessonContext>(
+                rel: LinkRels.Lesson.Move,
+                method: LinkHttpMethod.Patch,
+                endpointName: EndpointNames.MoveLesson,
+                policyCheck: ctx => _policy.CanEditLesson(ctx),
                 getRouteValues: ctx => new { lessonId = ctx.Id.Value })
         }.AsReadOnly();
 

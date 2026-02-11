@@ -9,8 +9,12 @@ import {
   createModule,
   patchModule,
   deleteModule,
+  reorderModules,
+  reorderLessons,
   type FetchAllCoursesResult,
   type CreateModuleRequest,
+  type ReorderModulesRequest,
+  type ReorderLessonsRequest,
 } from "../api";
 import type {
   CourseModel,
@@ -141,6 +145,45 @@ export function useDeleteModule(courseId: string) {
     },
     onError: () => {
       toast.error("Failed to delete module");
+    },
+  });
+}
+
+export function useReorderModules(courseId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (request: ReorderModulesRequest) =>
+      reorderModules(courseId, request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.detail(courseId),
+      });
+      toast.success("Modules reordered successfully");
+    },
+    onError: () => {
+      toast.error("Failed to reorder modules");
+    },
+  });
+}
+
+export function useReorderLessons(courseId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      moduleId,
+      lessonIds,
+    }: ReorderLessonsRequest & { moduleId: string }) =>
+      reorderLessons(moduleId, { lessonIds }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.detail(courseId),
+      });
+      toast.success("Lessons reordered successfully");
+    },
+    onError: () => {
+      toast.error("Failed to reorder lessons");
     },
   });
 }

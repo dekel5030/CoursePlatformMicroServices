@@ -1,4 +1,4 @@
-﻿using CoursePlatform.Contracts.CourseService;
+using CoursePlatform.Contracts.CourseService;
 using Courses.Domain.Lessons;
 using Kernel.EventBus;
 using Kernel.Messaging.Abstractions;
@@ -12,7 +12,8 @@ internal sealed class LessonDomainEventMapper :
     IDomainEventHandler<LessonAccessChangedDomainEvent>,
     IDomainEventHandler<LessonIndexChangedDomainEvent>,
     IDomainEventHandler<LessonTranscriptChangedDomainEvent>,
-    IDomainEventHandler<LessonDeletedDomainEvent>
+    IDomainEventHandler<LessonDeletedDomainEvent>,
+    IDomainEventHandler<LessonMovedDomainEvent>
 {
     private readonly IEventBus _eventBus;
 
@@ -93,5 +94,15 @@ internal sealed class LessonDomainEventMapper :
             message.Id.Value,
             message.ModuleId.Value,
             message.CourseId.Value), cancellationToken);
+    }
+
+    public Task HandleAsync(LessonMovedDomainEvent message, CancellationToken cancellationToken = default)
+    {
+        return _eventBus.PublishAsync(new LessonMovedIntegrationEvent(
+            message.Id.Value,
+            message.PreviousModuleId.Value,
+            message.NewModuleId.Value,
+            message.CourseId.Value,
+            message.NewIndex), cancellationToken);
     }
 }

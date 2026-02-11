@@ -1,4 +1,4 @@
-﻿using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared.Primitives;
@@ -58,3 +58,10 @@ public record LessonDeletedDomainEvent(
     LessonId Id,
     ModuleId ModuleId,
     CourseId CourseId) : IDomainEvent;
+
+public record LessonMovedDomainEvent(
+    LessonId Id,
+    ModuleId PreviousModuleId,
+    ModuleId NewModuleId,
+    CourseId CourseId,
+    int NewIndex) : IDomainEvent;

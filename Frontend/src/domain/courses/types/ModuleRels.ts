@@ -7,4 +7,5 @@ export const ModuleRels = {
   CREATE_LESSON: "create-lesson",
   PARTIAL_UPDATE: "partial-update",
   DELETE: "delete",
+  REORDER_LESSONS: "reorder-lessons",
 } as const;

@@ -5,13 +5,16 @@ import {
   patchLesson,
   deleteLesson,
   generateLessonAi,
+  moveLesson,
 } from "../api";
+import type { MoveLessonRequest } from "../api";
 import type {
   LessonModel,
   CreateLessonRequestDto,
   UpdateLessonRequestDto,
 } from "../types";
 import { lessonsQueryKeys } from "../query-keys";
+import { coursesQueryKeys } from "@/domain/courses/query-keys";
 import { toast } from "sonner";
 
 export function useLesson(
@@ -93,5 +96,31 @@ export function useDeleteLesson(courseId: string) {
 export function useGenerateLessonAi() {
   return useMutation({
     mutationFn: (url: string) => generateLessonAi(url),
+  });
+}
+
+export function useMoveLesson(courseId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      lessonId,
+      request,
+    }: {
+      lessonId: string;
+      request: MoveLessonRequest;
+    }) => moveLesson(lessonId, request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: lessonsQueryKeys.all(courseId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.detail(courseId),
+      });
+      toast.success("Lesson moved successfully");
+    },
+    onError: () => {
+      toast.error("Failed to move lesson");
+    },
   });
 }

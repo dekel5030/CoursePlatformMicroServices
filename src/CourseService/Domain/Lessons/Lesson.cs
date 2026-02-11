@@ -1,4 +1,4 @@
-﻿using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Primitives;
 using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared;
@@ -130,6 +130,20 @@ public class Lesson : Entity<LessonId>
 
         Index = newIndex;
         Raise(new LessonIndexChangedDomainEvent(Id, ModuleId, CourseId, Index));
+    }
+
+    internal Result MoveToModule(ModuleId newModuleId, int newIndex)
+    {
+        if (ModuleId == newModuleId && Index == newIndex)
+        {
+            return Result.Success();
+        }
+
+        ModuleId previousModuleId = ModuleId;
+        ModuleId = newModuleId;
+        Index = newIndex;
+        Raise(new LessonMovedDomainEvent(Id, previousModuleId, newModuleId, CourseId, Index));
+        return Result.Success();
     }
 
     public Result UpdateMedia(VideoUrl? videoUrl, ImageUrl? thumbnailUrl, TimeSpan duration)
