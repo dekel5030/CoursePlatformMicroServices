@@ -1,4 +1,5 @@
-﻿using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Data;
+using Courses.Application.ReadModels;
 using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Enrollments;
@@ -27,4 +28,5 @@ internal sealed class ReadDbContext : IReadDbContext
     public IQueryable<Category> Categories => _context.Categories.AsNoTracking();
     public IQueryable<Enrollment> Enrollments => _context.Enrollments.AsNoTracking();
     public IQueryable<CourseRating> CourseRatings => _context.CourseRatings.AsNoTracking();
+    public IQueryable<CourseAnalytics> CourseAnalytics => _context.CourseAnalytics.AsNoTracking();
 }

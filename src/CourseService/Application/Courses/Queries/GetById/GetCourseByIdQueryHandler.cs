@@ -1,6 +1,7 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Courses.Dtos;
+using Courses.Application.ReadModels;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses;
@@ -39,24 +40,10 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             return Result.Failure<CourseWithAnalyticsDto>(CourseErrors.NotFound);
         }
 
-        int enrollmentCount = await _readDbContext.Enrollments
-            .CountAsync(e => e.CourseId == request.Id, cancellationToken);
+        CourseAnalytics? analytics = await _readDbContext.CourseAnalytics
+            .FirstOrDefaultAsync(c => c.CourseId == request.Id.Value, cancellationToken);
 
-        int lessonsCount = await _readDbContext.Lessons
-            .CountAsync(l => l.CourseId == request.Id, cancellationToken);
-
-        double totalDurationSeconds = await _readDbContext.Lessons
-            .Where(l => l.CourseId == request.Id)
-            .SumAsync(l => l.Duration.TotalSeconds, cancellationToken);
-
-        double averageRating = await _readDbContext.CourseRatings
-            .Where(r => r.CourseId == request.Id)
-            .AverageAsync(r => (double?)r.Score, cancellationToken) ?? 0;
-
-        int reviewsCount = await _readDbContext.CourseRatings
-            .CountAsync(r => r.CourseId == request.Id, cancellationToken);
-
-        var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
+        CourseContext courseContext = new(course.Id, course.InstructorId, course.Status);
         var resolvedImageUrls = course.Images
             .Select(img => _urlResolver.Resolve(StorageCategory.Public, img.Path).Value)
             .ToList();
@@ -76,12 +63,14 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             Links = _linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext).ToList()
         };
 
-        var analyticsDto = new CourseAnalyticsDto(
-            enrollmentCount,
-            lessonsCount,
-            TimeSpan.FromSeconds(totalDurationSeconds),
-            averageRating,
-            reviewsCount);
+        CourseAnalyticsDto analyticsDto = analytics != null
+            ? new CourseAnalyticsDto(
+                analytics.EnrollmentsCount,
+                analytics.TotalLessonsCount,
+                analytics.TotalCourseDuration,
+                analytics.AverageRating,
+                analytics.ReviewsCount)
+            : new CourseAnalyticsDto(0, 0, TimeSpan.Zero, 0, 0);
 
         return Result.Success(new CourseWithAnalyticsDto(courseDto, analyticsDto));
     }

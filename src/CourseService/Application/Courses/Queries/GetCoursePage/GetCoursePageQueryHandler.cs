@@ -4,6 +4,7 @@ using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Modules.Dtos;
+using Courses.Application.ReadModels;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Categories;
@@ -57,16 +58,6 @@ internal sealed class GetCoursePageQueryHandler
             .Select(course => new
             {
                 Course = course,
-                EnrollmentCount = _readDbContext.Enrollments.Count(e => e.CourseId == course.Id),
-                TotalLessonsCount = _readDbContext.Lessons.Count(l => l.CourseId == course.Id),
-                TotalDurationSeconds = _readDbContext.Lessons
-                    .Where(l => l.CourseId == course.Id)
-                    .Sum(l => l.Duration.TotalSeconds),
-                AverageRating = _readDbContext.CourseRatings
-                    .Where(r => r.CourseId == course.Id)
-                    .Average(r => (double?)r.Score) ?? 0,
-                ReviewsCount = _readDbContext.CourseRatings.Count(r => r.CourseId == course.Id),
-
                 Modules = _readDbContext.Modules
                     .Where(m => m.CourseId == course.Id)
                     .OrderBy(m => m.Index)
@@ -85,21 +76,28 @@ internal sealed class GetCoursePageQueryHandler
             return Result.Failure<CoursePageDto>(CourseErrors.NotFound);
         }
 
+        CourseAnalytics? analytics = await _readDbContext.CourseAnalytics
+            .FirstOrDefaultAsync(c => c.CourseId == courseId.Value, cancellationToken);
+
         CourseContext courseContext = new(courseData.Course.Id, courseData.Course.InstructorId, courseData.Course.Status);
 
         CourseDto courseDto = MapToCourseDto(courseData.Course, courseContext);
-        CourseAnalyticsDto analyticsDto = new(
-            courseData.EnrollmentCount,
-            courseData.TotalLessonsCount,
-            TimeSpan.FromSeconds(courseData.TotalDurationSeconds),
-            courseData.AverageRating,
-            courseData.ReviewsCount);
+        CourseAnalyticsDto analyticsDto = analytics != null
+            ? new CourseAnalyticsDto(
+                analytics.EnrollmentsCount,
+                analytics.TotalLessonsCount,
+                analytics.TotalCourseDuration,
+                analytics.AverageRating,
+                analytics.ReviewsCount)
+            : new CourseAnalyticsDto(0, 0, TimeSpan.Zero, 0, 0);
 
         CourseStructureDto structure = BuildStructure(courseData.Modules, courseData.Lessons);
 
         await _immediateEventBus.PublishAsync(
             new CourseViewedIntegrationEvent(request.Id, _userContext.Id, DateTimeOffset.UtcNow),
             cancellationToken);
+
+        Dictionary<Guid, ReadModels.ModuleAnalytics> moduleAnalyticsByModuleId = analytics?.ModuleAnalytics?.ToDictionary(ma => ma.ModuleId) ?? new Dictionary<Guid, ReadModels.ModuleAnalytics>();
 
         return Result.Success(new CoursePageDto
         {
@@ -109,7 +107,7 @@ internal sealed class GetCoursePageQueryHandler
 
             Modules = courseData.Modules.ToDictionary(
                 m => m.Id.Value,
-                m => MapToModuleDto(m, courseContext, courseData.Lessons.Where(l => l.ModuleId == m.Id).ToList())),
+                m => MapToModuleDto(m, courseContext, moduleAnalyticsByModuleId)),
 
             Lessons = courseData.Lessons.ToDictionary(
                 l => l.Id.Value,
@@ -163,7 +161,10 @@ internal sealed class GetCoursePageQueryHandler
         };
     }
 
-    private ModuleWithAnalyticsDto MapToModuleDto(Module module, CourseContext courseContext, List<Lesson> moduleLessons)
+    private ModuleWithAnalyticsDto MapToModuleDto(
+        Module module,
+        CourseContext courseContext,
+        IReadOnlyDictionary<Guid, ReadModels.ModuleAnalytics> moduleAnalyticsByModuleId)
     {
         var moduleContext = new ModuleContext(courseContext, module.Id);
 
@@ -174,9 +175,10 @@ internal sealed class GetCoursePageQueryHandler
             Links = _linkBuilderService.BuildLinks(LinkResourceKey.Module, moduleContext).ToList()
         };
 
-        var analyticsDto = new ModuleAnalyticsDto(
-            moduleLessons.Count,
-            TimeSpan.FromTicks(moduleLessons.Sum(l => l.Duration.Ticks)));
+        ReadModels.ModuleAnalytics? analytics = moduleAnalyticsByModuleId.GetValueOrDefault(module.Id.Value);
+        ModuleAnalyticsDto analyticsDto = new(
+            analytics?.LessonCount ?? 0,
+            analytics?.TotalModuleDuration ?? TimeSpan.Zero);
 
         return new ModuleWithAnalyticsDto(moduleDto, analyticsDto);
     }

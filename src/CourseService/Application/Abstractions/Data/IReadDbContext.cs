@@ -1,4 +1,5 @@
-﻿using Courses.Domain.Categories;
+using Courses.Application.ReadModels;
+using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
@@ -17,4 +18,5 @@ public interface IReadDbContext
     IQueryable<User> Users { get; }
     IQueryable<Category> Categories { get; }
     IQueryable<Enrollment> Enrollments { get; }
+    IQueryable<CourseAnalytics> CourseAnalytics { get; }
 }

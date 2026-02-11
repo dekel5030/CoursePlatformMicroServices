@@ -1,3 +1,4 @@
+using Courses.Application.ReadModels;
 using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.CourseViews;
@@ -20,6 +21,7 @@ public interface IWriteDbContext
     DbSet<CourseRating> CourseRatings { get; }
     DbSet<User> Users { get; }
     DbSet<CourseView> CourseViews { get; }
+    DbSet<CourseAnalytics> CourseAnalytics { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
