@@ -19,6 +19,7 @@ interface ModuleCardProps {
   courseId: string;
   index: number;
   dragHandleProps?: React.HTMLAttributes<HTMLButtonElement>;
+  isDropTarget?: boolean;
 }
 
 export function ModuleCard({
@@ -26,6 +27,7 @@ export function ModuleCard({
   courseId,
   index,
   dragHandleProps,
+  isDropTarget = false,
 }: ModuleCardProps) {
   const { t } = useTranslation(["course-management", "translation"]);
   const [isExpanded, setIsExpanded] = useState(true);
@@ -77,7 +79,13 @@ export function ModuleCard({
 
   return (
     <>
-      <Card className="overflow-hidden border-s-4 border-s-primary/20 rounded-lg">
+      <Card
+        className={`overflow-hidden border-s-4 rounded-lg transition-colors ${
+          isDropTarget
+            ? "border-s-primary bg-primary/5 ring-2 ring-primary/40"
+            : "border-s-primary/20"
+        }`}
+      >
         <CardHeader
           className="cursor-pointer hover:bg-muted/50 transition-colors py-3 px-4"
           onClick={() => setIsExpanded(!isExpanded)}

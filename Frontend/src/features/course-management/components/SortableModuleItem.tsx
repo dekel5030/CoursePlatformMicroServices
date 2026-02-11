@@ -7,6 +7,7 @@ interface SortableModuleItemProps {
   module: ModuleModel;
   courseId: string;
   index: number;
+  isDropTarget?: boolean;
 }
 
 const MODULE_PREFIX = "module-";
@@ -23,6 +24,7 @@ export function SortableModuleItem({
   module,
   courseId,
   index,
+  isDropTarget = false,
 }: SortableModuleItemProps) {
   const {
     attributes,
@@ -48,6 +50,7 @@ export function SortableModuleItem({
         courseId={courseId}
         index={index}
         dragHandleProps={{ ...attributes, ...listeners }}
+        isDropTarget={isDropTarget}
       />
     </div>
   );
