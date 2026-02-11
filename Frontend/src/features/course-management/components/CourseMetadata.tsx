@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Card, CardHeader, CardTitle, CardContent, Badge } from "@/shared/ui";
 import { Avatar } from "@/shared/ui";
-import { Users, BookOpen, Clock, Tag, FolderTree } from "lucide-react";
+import { Users, BookOpen, Clock, Tag, FolderTree, Eye } from "lucide-react";
 import { formatDuration } from "@/shared/utils";
 import type { CourseModel } from "@/domain/courses";
 
@@ -91,6 +91,18 @@ export function CourseMetadata({ course }: CourseMetadataProps) {
               </div>
             </div>
           )}
+
+          <div
+            className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}
+          >
+            <Eye className="h-4 w-4 text-muted-foreground" />
+            <div className={textAlignClass}>
+              <p className="text-sm text-muted-foreground">
+                {t("course-management:detail.views")}
+              </p>
+              <p className="font-semibold">{course.courseViews ?? 0}</p>
+            </div>
+          </div>
 
           {course.categoryName && (
             <div

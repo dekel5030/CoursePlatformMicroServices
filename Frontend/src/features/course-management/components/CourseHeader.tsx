@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Button, Card, Badge } from "@/shared/ui";
 import { Avatar } from "@/shared/ui";
 import { InlineEditableText } from "@/shared/common";
-import { ShoppingCart, CreditCard, Users, BookOpen, Clock, Tag } from "lucide-react";
+import { ShoppingCart, CreditCard, Users, BookOpen, Clock, Tag, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { CourseActions } from "./CourseActions";
 import { CourseImageUpload } from "./CourseImageUpload";
@@ -118,6 +118,11 @@ export function CourseHeader({ course }: CourseHeaderProps) {
                 <span>{formattedDuration}</span>
               </div>
             )}
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Eye className="h-3.5 w-3.5 shrink-0" />
+              <span>{course.courseViews ?? 0}</span>
+              <span>{t("course-management:detail.views")}</span>
+            </div>
           </div>
 
           {/* Category & Tags */}

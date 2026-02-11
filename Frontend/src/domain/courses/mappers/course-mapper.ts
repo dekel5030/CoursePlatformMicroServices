@@ -144,6 +144,7 @@ export function mapCoursePageDtoToModel(dto: CoursePageDto): CourseModel {
     totalDuration: a.totalDuration,
     averageRating: a.averageRating,
     reviewsCount: a.reviewsCount,
+    courseViews: a.viewCount ?? 0,
     updatedAtUtc: c.updatedAtUtc,
     categoryName,
     categoryId: c.categoryId,
