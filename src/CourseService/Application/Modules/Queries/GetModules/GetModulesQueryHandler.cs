@@ -2,6 +2,7 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
+using Courses.Application.ReadModels;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses;
@@ -65,6 +66,14 @@ internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IR
             .GroupBy(l => l.ModuleId)
             .ToDictionary(g => g.Key, g => g.ToList());
 
+        Dictionary<Guid, ReadModels.ModuleAnalytics>? moduleAnalyticsByModuleId = null;
+        if (request.Filter.CourseId is { } singleCourseId)
+        {
+            CourseAnalytics? courseAnalytics = await _readDbContext.CourseAnalytics
+                .FirstOrDefaultAsync(c => c.CourseId == singleCourseId.Value, cancellationToken);
+            moduleAnalyticsByModuleId = courseAnalytics?.ModuleAnalytics?.ToDictionary(ma => ma.ModuleId);
+        }
+
         var courseIds = modules.Select(m => m.CourseId).Distinct().ToList();
         List<Course> courses = await _readDbContext.Courses
             .AsNoTracking()
@@ -100,9 +109,11 @@ internal sealed class GetModulesQueryHandler : IQueryHandler<GetModulesQuery, IR
                     : []
             };
 
-            var analyticsDto = new ModuleAnalyticsDto(
-                lessonDtos.Count,
-                TimeSpan.FromTicks(lessonDtos.Sum(l => l.Duration.Ticks)));
+            ModuleAnalyticsDto analyticsDto = moduleAnalyticsByModuleId is { } byId && byId.TryGetValue(module.Id.Value, out ReadModels.ModuleAnalytics? ma)
+                ? new ModuleAnalyticsDto(ma.LessonCount, ma.TotalModuleDuration)
+                : new ModuleAnalyticsDto(
+                    lessonDtos.Count,
+                    TimeSpan.FromTicks(lessonDtos.Sum(l => l.Duration.Ticks)));
 
             var lessonIds = lessonDtos.Select(l => l.LessonId).ToList();
 

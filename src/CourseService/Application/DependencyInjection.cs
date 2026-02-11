@@ -1,5 +1,6 @@
 using CoursePlatform.ServiceDefaults.Messaging;
 using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
+using Courses.Application.ReadModels;
 using Courses.Application.Services.Actions;
 using Courses.Application.Services.LinkProvider;
 using Courses.Domain.Lessons;
@@ -15,6 +16,7 @@ public static class DependencyInjection
     {
         services.AddValidatorsFromAssembly(typeof(AssemblyMarker).Assembly);
         services.AddMediator<AssemblyMarker>();
+        services.AddScoped<ICourseAnalyticsProjection, CourseAnalyticsProjectionService>();
         services.AddScoped<LessonManagementService>();
         services.AddScoped<ModuleManagementService>();
 

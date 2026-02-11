@@ -315,6 +315,8 @@ dotnet_style_qualification_for_event = false:warning
 
 #### Suppressions (Safe to Silence) ####
 
+dotnet_diagnostic.CA2227.severity = none
+
 # CA1707: Identifiers should not contain underscores
 # Reason: Commonly used in Unit Tests (e.g., Should_DoSomething_When_Context)
 dotnet_diagnostic.CA1707.severity = none
