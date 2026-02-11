@@ -27,3 +27,18 @@ export type {
   CreateCourseRatingRequest,
   UpdateCourseRatingRequest,
 } from "./CourseRatingDto";
+export type {
+  ManagedCourseSummaryDto,
+  ManagedCourseStatsDto,
+} from "./ManagedCourseSummaryDto";
+export type {
+  ManagedCoursePageDto,
+  ManagedModuleDtoApi,
+  ManagedModuleStatsDto,
+} from "./ManagedCoursePageDto";
+export type {
+  CourseDetailedAnalyticsDto,
+  CourseViewerDto,
+  ModuleAnalyticsSummaryDto,
+  EnrollmentCountByDayDto,
+} from "./CourseDetailedAnalyticsDto";

@@ -4,12 +4,16 @@ import type {
   CourseSummaryWithAnalyticsDto,
   CreateCourseRequestDto,
   UpdateCourseRequestDto,
+  ManagedCourseSummaryDto,
+  CourseDetailedAnalyticsDto,
 } from "../types";
 import type { CoursePageDto } from "../types/CoursePageDto";
+import type { ManagedCoursePageDto } from "../types/ManagedCoursePageDto";
 import type { PagedResponse } from "@/shared/types/LinkDto";
 import {
   mapCoursePageDtoToModel,
   mapCourseSummaryToModel,
+  mapManagedCoursePageDtoToModel,
 } from "../mappers";
 import type { CourseModel } from "../types/CourseModel";
 
@@ -67,10 +71,10 @@ export async function fetchCourseById(id: string): Promise<CourseModel> {
  * Fetch a course for management by instructor
  */
 export async function fetchManagedCourseById(id: string): Promise<CourseModel> {
-  const response = await axiosClient.get<CoursePageDto>(
+  const response = await axiosClient.get<ManagedCoursePageDto>(
     `/manage/courses/${id}`
   );
-  return mapCoursePageDtoToModel(response.data);
+  return mapManagedCoursePageDtoToModel(response.data);
 }
 
 /**
@@ -221,7 +225,7 @@ export async function reorderLessons(
 }
 
 export interface ManagedCoursesResponse {
-  items: CourseSummaryWithAnalyticsDto[];
+  items: ManagedCourseSummaryDto[];
   pageNumber: number;
   pageSize: number;
   totalItems: number;
@@ -241,20 +245,6 @@ export async function fetchMyManagedCourses(
     { params: { pageNumber, pageSize } }
   );
   return response.data;
-}
-
-/**
- * Response from GET manage/courses/{id}/analytics (instructor only)
- */
-export interface CourseDetailedAnalyticsDto {
-  enrollmentsCount: number;
-  averageRating: number;
-  reviewsCount: number;
-  viewCount: number;
-  totalLessonsCount: number;
-  totalCourseDuration: string;
-  moduleAnalytics: { moduleId: string; lessonCount: number; totalDuration: string }[];
-  enrollmentsOverTime: { date: string; count: number }[];
 }
 
 /**

@@ -18,10 +18,24 @@ public sealed record CourseDetailedAnalyticsDto
     public required IReadOnlyList<ModuleAnalyticsSummaryDto> ModuleAnalytics { get; init; }
 
     /// <summary>
-    /// Placeholder for future time-series data (e.g. last 30 days enrollments).
+    /// Time-series enrollment data (e.g. last 30 days).
     /// </summary>
     public required IReadOnlyList<EnrollmentCountByDayDto> EnrollmentsOverTime { get; init; }
+
+    /// <summary>
+    /// Users who viewed the course (name, avatar, last viewed), e.g. last 50.
+    /// </summary>
+    public required IReadOnlyList<CourseViewerDto> CourseViewers { get; init; }
 }
+
+/// <summary>
+/// A user who viewed the course (for analytics viewer list).
+/// </summary>
+public sealed record CourseViewerDto(
+    Guid UserId,
+    string DisplayName,
+    string? AvatarUrl,
+    DateTimeOffset ViewedAt);
 
 /// <summary>
 /// Per-module analytics summary (from CourseAnalytics read model JSONB).

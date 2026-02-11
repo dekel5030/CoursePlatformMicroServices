@@ -1,6 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Shared\Extensions\**" />
+    <EmbeddedResource Remove="Shared\Extensions\**" />
+    <None Remove="Shared\Extensions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="Application.UnitTests" />
   </ItemGroup>
 
@@ -14,10 +20,6 @@
     <ProjectReference Include="..\..\..\Contracts\CoursePlatform.Contracts.csproj" />
     <ProjectReference Include="..\..\..\CoursePlatform.ServiceDefaults\CoursePlatform.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Domain\Courses.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Shared\Extensions\" />
   </ItemGroup>
 
 </Project>

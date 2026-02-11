@@ -13,6 +13,9 @@ namespace Courses.Application.Courses.Queries.GetCourseAnalytics;
 internal sealed class GetCourseAnalyticsQueryHandler
     : IQueryHandler<GetCourseAnalyticsQuery, CourseDetailedAnalyticsDto>
 {
+    private const int EnrollmentsOverTimeDays = 30;
+    private const int CourseViewersLimit = 50;
+
     private readonly IReadDbContext _readDbContext;
     private readonly IUserContext _userContext;
 
@@ -64,7 +67,8 @@ internal sealed class GetCourseAnalyticsQueryHandler
                 TotalLessonsCount = 0,
                 TotalCourseDuration = TimeSpan.Zero,
                 ModuleAnalytics = [],
-                EnrollmentsOverTime = []
+                EnrollmentsOverTime = [],
+                CourseViewers = []
             });
         }
 
@@ -75,6 +79,9 @@ internal sealed class GetCourseAnalyticsQueryHandler
                 ma.TotalModuleDuration))
             .ToList();
 
+        List<EnrollmentCountByDayDto> enrollmentsOverTime = await GetEnrollmentsOverTimeAsync(courseId, cancellationToken);
+        List<CourseViewerDto> courseViewers = await GetCourseViewersAsync(courseId, cancellationToken);
+
         return Result.Success(new CourseDetailedAnalyticsDto
         {
             EnrollmentsCount = analytics.EnrollmentsCount,
@@ -84,7 +91,61 @@ internal sealed class GetCourseAnalyticsQueryHandler
             TotalLessonsCount = analytics.TotalLessonsCount,
             TotalCourseDuration = analytics.TotalCourseDuration,
             ModuleAnalytics = moduleAnalytics,
-            EnrollmentsOverTime = []
+            EnrollmentsOverTime = enrollmentsOverTime,
+            CourseViewers = courseViewers
         });
+    }
+
+    private async Task<List<EnrollmentCountByDayDto>> GetEnrollmentsOverTimeAsync(
+        CourseId courseId,
+        CancellationToken cancellationToken)
+    {
+        DateTimeOffset cutoff = DateTimeOffset.UtcNow.AddDays(-EnrollmentsOverTimeDays);
+        List<DateTimeOffset> enrollmentDates = await _readDbContext.Enrollments
+            .Where(e => e.CourseId == courseId && e.EnrolledAt >= cutoff)
+            .Select(e => e.EnrolledAt)
+            .ToListAsync(cancellationToken);
+
+        return enrollmentDates
+            .GroupBy(d => d.UtcDateTime.Date)
+            .Select(g => new EnrollmentCountByDayDto(new DateTimeOffset(g.Key, TimeSpan.Zero), g.Count()))
+            .OrderBy(x => x.Date)
+            .ToList();
+    }
+
+    private async Task<List<CourseViewerDto>> GetCourseViewersAsync(
+        CourseId courseId,
+        CancellationToken cancellationToken)
+    {
+        var rawViewerRows = await (
+            from v in _readDbContext.CourseViews
+            where v.CourseId == courseId && v.UserId != null
+            join u in _readDbContext.Users on v.UserId equals u.Id
+            select new { v.UserId, v.ViewedAt, u.FirstName, u.LastName, u.AvatarUrl }
+        ).ToListAsync(cancellationToken);
+
+#pragma warning disable IDE0037 // Member name can be simplified
+        var viewerRows = rawViewerRows
+            .Select(x => (UserId: x.UserId!.Value, ViewedAt: x.ViewedAt, FirstName: x.FirstName, LastName: x.LastName, AvatarUrl: (string?)x.AvatarUrl))
+            .ToList();
+#pragma warning restore IDE0037
+
+        return viewerRows
+            .GroupBy(x => x.UserId)
+            .Select(g =>
+            {
+                (Guid UserId, DateTimeOffset ViewedAt, string FirstName, string LastName, string? AvatarUrl) first = g.OrderByDescending(x => x.ViewedAt).First();
+                System.Collections.Generic.IEnumerable<string> parts = new[] { first.FirstName, first.LastName }.Where(s => !string.IsNullOrWhiteSpace(s));
+                string displayName = string.Join(" ", parts).Trim();
+                if (string.IsNullOrEmpty(displayName))
+                {
+                    displayName = "—";
+                }
+
+                return new CourseViewerDto(first.UserId, displayName, first.AvatarUrl, first.ViewedAt);
+            })
+            .OrderByDescending(x => x.ViewedAt)
+            .Take(CourseViewersLimit)
+            .ToList();
     }
 }

@@ -149,7 +149,7 @@ internal sealed class GetManagedCourseQueryHandler
         };
     }
 
-    private ModuleWithAnalyticsDto MapToModuleDto(
+    private ManagedModuleDto MapToModuleDto(
         Module module,
         CourseContext courseContext,
         IReadOnlyDictionary<Guid, (int LessonCount, TimeSpan TotalDuration)> moduleStatsByModuleId)
@@ -164,11 +164,11 @@ internal sealed class GetManagedCourseQueryHandler
         };
 
         (int lessonCount, TimeSpan totalDuration) = moduleStatsByModuleId.GetValueOrDefault(module.Id.Value);
-        ModuleAnalyticsDto analyticsDto = new(
+        ManagedModuleStatsDto statsDto = new(
             lessonCount,
             totalDuration);
 
-        return new ModuleWithAnalyticsDto(moduleDto, analyticsDto);
+        return new ManagedModuleDto(moduleDto, statsDto);
     }
 
     private LessonDto MapToLessonDto(Lesson lesson, Title courseTitle, CourseContext courseContext, bool hasEnrollment)

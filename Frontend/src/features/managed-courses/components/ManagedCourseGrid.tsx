@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/shared/ui";
 import { motion } from "framer-motion";
-import type { CourseSummaryWithAnalyticsDto } from "@/domain/courses";
-import { mapCourseSummaryToModel } from "@/domain/courses";
+import type { ManagedCourseSummaryDto } from "@/domain/courses";
+import { mapManagedCourseSummaryToModel } from "@/domain/courses";
 import CourseCard from "@/features/course-catalog/components/CourseCard";
 
 interface ManagedCourseGridProps {
-  courses: CourseSummaryWithAnalyticsDto[];
+  courses: ManagedCourseSummaryDto[];
   isLoading: boolean;
   error: Error | null;
 }
@@ -84,7 +84,7 @@ export function ManagedCourseGrid({
       animate="show"
     >
       {courses.map((dto) => {
-        const course = mapCourseSummaryToModel(dto);
+        const course = mapManagedCourseSummaryToModel(dto);
         return (
           <motion.div key={course.id} variants={item}>
             <CourseCard course={course} to={`/manage/courses/${course.id}`} />

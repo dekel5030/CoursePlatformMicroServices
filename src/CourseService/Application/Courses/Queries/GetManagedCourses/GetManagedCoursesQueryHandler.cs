@@ -19,7 +19,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Courses.Application.Courses.Queries.GetManagedCourses;
 
 internal sealed class GetManagedCoursesQueryHandler
-    : IQueryHandler<GetManagedCoursesQuery, CourseCollectionDto>
+    : IQueryHandler<GetManagedCoursesQuery, PaginatedCollectionDto<ManagedCourseSummaryDto>>
 {
     private readonly IReadDbContext _dbContext;
     private readonly IStorageUrlResolver _urlResolver;
@@ -38,13 +38,13 @@ internal sealed class GetManagedCoursesQueryHandler
         _linkBuilder = linkBuilder;
     }
 
-    public async Task<Result<CourseCollectionDto>> Handle(
+    public async Task<Result<PaginatedCollectionDto<ManagedCourseSummaryDto>>> Handle(
         GetManagedCoursesQuery request,
         CancellationToken cancellationToken = default)
     {
         if (_userContext.Id is null || !_userContext.IsAuthenticated)
         {
-            return Result.Failure<CourseCollectionDto>(CourseErrors.Unauthorized);
+            return Result.Failure<PaginatedCollectionDto<ManagedCourseSummaryDto>>(CourseErrors.Unauthorized);
         }
 
         var instructorId = new UserId(_userContext.Id.Value);
@@ -55,13 +55,13 @@ internal sealed class GetManagedCoursesQueryHandler
             .Where(c => c.InstructorId == instructorId)
             .CountAsync(cancellationToken);
 
-        List<CourseSummaryWithAnalyticsDto> courseDtos = await GetManagedCourseSummariesAsync(
+        List<ManagedCourseSummaryDto> courseDtos = await GetManagedCourseSummariesAsync(
             instructorId,
             pageNumber,
             pageSize,
             cancellationToken);
 
-        return Result.Success(new CourseCollectionDto
+        return Result.Success(new PaginatedCollectionDto<ManagedCourseSummaryDto>
         {
             Items = courseDtos,
             PageNumber = pageNumber,
@@ -71,7 +71,7 @@ internal sealed class GetManagedCoursesQueryHandler
         });
     }
 
-    private async Task<List<CourseSummaryWithAnalyticsDto>> GetManagedCourseSummariesAsync(
+    private async Task<List<ManagedCourseSummaryDto>> GetManagedCourseSummariesAsync(
         UserId instructorId,
         int pageNumber,
         int pageSize,
@@ -128,7 +128,7 @@ internal sealed class GetManagedCoursesQueryHandler
             var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status, IsManagementView: true);
             var links = _linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext).ToList();
 
-            var summary = new CourseSummaryDto
+            return new ManagedCourseSummaryDto
             {
                 Id = course.Id.Value,
                 Title = course.Title.Value,
@@ -147,18 +147,11 @@ internal sealed class GetManagedCoursesQueryHandler
                 Price = course.Price,
                 UpdatedAtUtc = course.UpdatedAtUtc,
                 Status = course.Status,
+                Stats = new ManagedCourseStatsDto(
+                    LessonsCount: stats?.LessonCount ?? 0,
+                    Duration: stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero),
                 Links = links
             };
-
-            var analytics = new CourseSummaryAnalyticsDto(
-                LessonsCount: stats?.LessonCount ?? 0,
-                Duration: stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero,
-                EnrollmentCount: 0,
-                AverageRating: 0,
-                ReviewsCount: 0,
-                CourseViews: 0);
-
-            return new CourseSummaryWithAnalyticsDto(summary, analytics);
         }).ToList();
 
         return courseDtos;

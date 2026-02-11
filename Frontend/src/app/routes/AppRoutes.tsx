@@ -3,7 +3,7 @@ import { Layout, ManagementLayout } from "@/components/layout";
 import { ProtectedRoute } from "@/shared/common";
 import { CourseCatalogPage, AllCoursesPage } from "@/features/course-catalog";
 import { MyCoursesPage } from "@/features/my-courses";
-import { ManagedCoursesPage } from "@/features/managed-courses";
+import { ManagedCoursesPage, CourseAnalyticsPage } from "@/features/managed-courses";
 import { CoursePage, ManageCoursePage } from "@/features/course-management";
 import { LessonPage } from "@/features/lesson-viewer";
 import { UserProfilePage } from "@/features/user-profile";
@@ -57,6 +57,7 @@ export default function AppRoutes() {
         <Route path="/admin/users/:userId" element={<UserManagementPage />} />
         <Route path="/manage/courses" element={<ManagedCoursesPage />} />
         <Route path="/manage/courses/:id" element={<ManageCoursePage />} />
+        <Route path="/manage/courses/:id/analytics" element={<CourseAnalyticsPage />} />
       </Route>
     </Routes>
   );

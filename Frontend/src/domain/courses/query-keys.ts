@@ -13,4 +13,6 @@ export const coursesQueryKeys = {
     [...coursesQueryKeys.all, courseId, "ratings", pageKey, pageSize] as const,
   managed: (pageNumber: number, pageSize: number) =>
     [...coursesQueryKeys.all, "managed", pageNumber, pageSize] as const,
+  analytics: (courseId: string) =>
+    [...coursesQueryKeys.all, "analytics", courseId] as const,
 } as const;

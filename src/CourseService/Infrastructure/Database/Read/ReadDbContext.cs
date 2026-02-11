@@ -2,6 +2,7 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.ReadModels;
 using Courses.Domain.Categories;
 using Courses.Domain.Courses;
+using Courses.Domain.CourseViews;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
@@ -29,4 +30,5 @@ internal sealed class ReadDbContext : IReadDbContext
     public IQueryable<Enrollment> Enrollments => _context.Enrollments.AsNoTracking();
     public IQueryable<CourseRating> CourseRatings => _context.CourseRatings.AsNoTracking();
     public IQueryable<CourseAnalytics> CourseAnalytics => _context.CourseAnalytics.AsNoTracking();
+    public IQueryable<CourseView> CourseViews => _context.CourseViews.AsNoTracking();
 }
