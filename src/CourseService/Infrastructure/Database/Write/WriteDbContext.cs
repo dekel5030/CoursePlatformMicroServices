@@ -39,8 +39,7 @@ public sealed class WriteDbContext : AppDbContextBase, IWriteDbContext, IUnitOfW
     {
         if (_isSaving)
         {
-            throw new InvalidOperationException(
-                "Nested SaveChanges detected!");
+            throw new InvalidOperationException("Nested SaveChanges detected!");
         }
 
         _isSaving = true;

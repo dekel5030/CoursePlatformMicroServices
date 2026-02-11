@@ -202,5 +202,24 @@
       "goHome": "Go to Home",
       "browseCatalog": "Browse Catalog"
     }
+  },
+  "analytics": {
+    "title": "Course Analytics",
+    "subtitle": "Overview of engagement and performance for this course",
+    "enrollments": "Enrollments",
+    "views": "Views",
+    "rating": "Rating",
+    "reviews": "reviews",
+    "lessons": "Lessons",
+    "moduleBreakdown": "Module breakdown",
+    "module": "Module",
+    "duration": "Duration",
+    "recentViewers": "Recent viewers",
+    "whoViewed": "Users who viewed this course",
+    "lastViewed": "Last viewed",
+    "noViewers": "No viewers yet",
+    "enrollmentsOverTime": "Enrollments over time",
+    "noData": "No data for this period",
+    "overview": "Overview"
   }
 }

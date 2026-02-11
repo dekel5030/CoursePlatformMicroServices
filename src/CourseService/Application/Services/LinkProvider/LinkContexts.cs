@@ -10,7 +10,8 @@ namespace Courses.Application.Services.LinkProvider;
 public sealed record CourseContext(
     CourseId Id,
     UserId InstructorId,
-    CourseStatus Status
+    CourseStatus Status,
+    bool IsManagementView = false
 ) : ILinkEligibilityContext
 {
     public Guid ResourceId => Id.Value;

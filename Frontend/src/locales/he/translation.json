@@ -208,5 +208,24 @@
       "goHome": "חזור לדף הבית",
       "browseCatalog": "עיין בקטלוג"
     }
+  },
+  "analytics": {
+    "title": "ניתוח קורס",
+    "subtitle": "סקירת מעורבות וביצועים לקורס זה",
+    "enrollments": "רישומים",
+    "views": "צפיות",
+    "rating": "דירוג",
+    "reviews": "ביקורות",
+    "lessons": "שיעורים",
+    "moduleBreakdown": "פירוט לפי מודול",
+    "module": "מודול",
+    "duration": "משך",
+    "recentViewers": "צופים אחרונים",
+    "whoViewed": "משתמשים שצפו בקורס זה",
+    "lastViewed": "צפייה אחרונה",
+    "noViewers": "אין עדיין צופים",
+    "enrollmentsOverTime": "רישומים לאורך זמן",
+    "noData": "אין נתונים לתקופה זו",
+    "overview": "סקירה"
   }
 }

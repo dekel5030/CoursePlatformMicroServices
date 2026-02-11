@@ -102,15 +102,17 @@ export interface CourseStructureDtoApi {
 }
 
 /**
- * API CoursePageDto: flat response from GET /courses/{id}
- * Matches Courses.Application.Courses.Dtos.CoursePageDto
+ * API CoursePageDto: flat response from GET /courses/{id} or GET /manage/courses/{id} (ManagedCoursePageDto).
+ * For managed view, analytics and instructors are omitted (instructor is the current user).
  */
 export interface CoursePageDto {
   course: CourseDtoApi;
-  analytics: CourseAnalyticsDtoApi;
+  /** Omitted in ManagedCoursePageDto (GET /manage/courses/{id}) */
+  analytics?: CourseAnalyticsDtoApi;
   structure: CourseStructureDtoApi;
   modules: Record<string, ModuleWithAnalyticsDtoApi> | null;
   lessons: Record<string, LessonDtoApi> | null;
-  instructors: Record<string, UserDtoApi> | null;
+  /** Omitted in ManagedCoursePageDto (GET /manage/courses/{id}) */
+  instructors?: Record<string, UserDtoApi> | null;
   categories: Record<string, CategoryDto> | null;
 }

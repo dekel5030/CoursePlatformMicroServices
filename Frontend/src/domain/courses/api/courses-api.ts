@@ -4,12 +4,16 @@ import type {
   CourseSummaryWithAnalyticsDto,
   CreateCourseRequestDto,
   UpdateCourseRequestDto,
+  ManagedCourseSummaryDto,
+  CourseDetailedAnalyticsDto,
 } from "../types";
 import type { CoursePageDto } from "../types/CoursePageDto";
+import type { ManagedCoursePageDto } from "../types/ManagedCoursePageDto";
 import type { PagedResponse } from "@/shared/types/LinkDto";
 import {
   mapCoursePageDtoToModel,
   mapCourseSummaryToModel,
+  mapManagedCoursePageDtoToModel,
 } from "../mappers";
 import type { CourseModel } from "../types/CourseModel";
 
@@ -56,11 +60,21 @@ export async function fetchFeaturedCourses(): Promise<CourseModel[]> {
 }
 
 /**
- * Fetch a course by ID
+ * Fetch a course by ID (public consumption view)
  */
 export async function fetchCourseById(id: string): Promise<CourseModel> {
   const response = await axiosClient.get<CoursePageDto>(`/courses/${id}`);
   return mapCoursePageDtoToModel(response.data);
+}
+
+/**
+ * Fetch a course for management by instructor
+ */
+export async function fetchManagedCourseById(id: string): Promise<CourseModel> {
+  const response = await axiosClient.get<ManagedCoursePageDto>(
+    `/manage/courses/${id}`
+  );
+  return mapManagedCoursePageDtoToModel(response.data);
 }
 
 /**
@@ -211,7 +225,7 @@ export async function reorderLessons(
 }
 
 export interface ManagedCoursesResponse {
-  items: CourseSummaryWithAnalyticsDto[];
+  items: ManagedCourseSummaryDto[];
   pageNumber: number;
   pageSize: number;
   totalItems: number;
@@ -227,8 +241,20 @@ export async function fetchMyManagedCourses(
   pageSize = 10
 ): Promise<ManagedCoursesResponse> {
   const response = await axiosClient.get<ManagedCoursesResponse>(
-    "/users/me/courses/managed",
+    "/manage/courses",
     { params: { pageNumber, pageSize } }
+  );
+  return response.data;
+}
+
+/**
+ * Fetch detailed analytics for a course (instructor only)
+ */
+export async function fetchCourseAnalytics(
+  courseId: string
+): Promise<CourseDetailedAnalyticsDto> {
+  const response = await axiosClient.get<CourseDetailedAnalyticsDto>(
+    `/manage/courses/${courseId}/analytics`
   );
   return response.data;
 }

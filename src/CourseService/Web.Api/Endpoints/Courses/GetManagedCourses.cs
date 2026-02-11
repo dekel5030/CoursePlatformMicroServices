@@ -3,6 +3,7 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Courses.Queries.GetManagedCourses;
+using Courses.Application.Shared.Dtos;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -12,7 +13,7 @@ internal sealed class GetManagedCourses : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("users/me/courses/managed", async (
+        app.MapGet("manage/courses", async (
             IMediator mediator,
             CancellationToken cancellationToken,
             int pageNumber = 1,
@@ -20,7 +21,7 @@ internal sealed class GetManagedCourses : IEndpoint
         {
             var query = new GetManagedCoursesQuery(pageNumber, pageSize);
 
-            Result<CourseCollectionDto> result = await mediator.Send(query, cancellationToken);
+            Result<PaginatedCollectionDto<ManagedCourseSummaryDto>> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
                 dto => Results.Ok(dto),

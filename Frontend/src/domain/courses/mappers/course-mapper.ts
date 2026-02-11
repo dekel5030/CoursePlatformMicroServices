@@ -1,4 +1,4 @@
-import type { CourseSummaryWithAnalyticsDto } from "../types";
+import type { CourseSummaryWithAnalyticsDto, ManagedCourseSummaryDto } from "../types";
 import type { CourseDetailsDto } from "../types/CourseDetailsDto";
 import type { CourseModel } from "../types/CourseModel";
 import { DifficultyLevel } from "../types/CourseModel";
@@ -9,6 +9,10 @@ import type {
   ModuleWithAnalyticsDtoApi,
   LessonDtoApi,
 } from "../types/CoursePageDto";
+import type {
+  ManagedCoursePageDto,
+  ManagedModuleDtoApi,
+} from "../types/ManagedCoursePageDto";
 import type { LessonSummaryDto, LessonModel } from "@/domain/lessons/types";
 
 /**
@@ -94,10 +98,21 @@ function mapApiModuleToModuleModel(
  */
 export function mapCoursePageDtoToModel(dto: CoursePageDto): CourseModel {
   const c = dto.course;
-  const a = dto.analytics;
+  const modulesRecord = dto.modules ?? {};
+  const a = dto.analytics ?? (() => {
+    const lessonCount = Object.values(modulesRecord).reduce((sum, m) => sum + (m?.analytics?.lessonCount ?? 0), 0);
+    const totalDuration = "PT0S";
+    return {
+      enrollmentCount: 0,
+      lessonsCount: lessonCount,
+      totalDuration,
+      averageRating: 0,
+      reviewsCount: 0,
+      viewCount: 0,
+    };
+  })();
   const instructors = dto.instructors ?? {};
   const categories = dto.categories ?? {};
-  const modulesRecord = dto.modules ?? {};
   const lessonsRecord = dto.lessons ?? {};
 
   const instructor = c.instructorId ? instructors[c.instructorId] : undefined;
@@ -253,5 +268,150 @@ export function mapCourseSummaryToModel(
     categoryId: c.category.id,
     categorySlug: c.category.slug || undefined,
     links: c.links,
+  };
+}
+
+/**
+ * Helper function to convert difficulty from string to enum
+ */
+function getDifficultyEnum(difficulty: unknown): DifficultyLevel | undefined {
+  if (typeof difficulty === "number") {
+    return difficulty as DifficultyLevel;
+  }
+  if (typeof difficulty === "string") {
+    const difficultyMap: Record<string, DifficultyLevel> = {
+      Beginner: DifficultyLevel.Beginner,
+      Intermediate: DifficultyLevel.Intermediate,
+      Advanced: DifficultyLevel.Advanced,
+      Expert: DifficultyLevel.Expert,
+    };
+    return difficultyMap[difficulty];
+  }
+  return undefined;
+}
+
+/**
+ * Maps an API managed module DTO (from ManagedCoursePageDto.modules) to ModuleModel.
+ */
+function mapManagedApiModuleToModuleModel(
+  managedModule: ManagedModuleDtoApi,
+  lessonsRecord: Record<string, LessonDtoApi>,
+  courseId: string,
+  lessonIds: string[],
+  order: number,
+): ModuleModel {
+  const { module, stats } = managedModule;
+  const lessonDtos = lessonIds
+    .map((id) => lessonsRecord[id])
+    .filter((l): l is LessonDtoApi => l != null)
+    .sort((a, b) => a.index - b.index);
+  const lessons = lessonDtos.map((l) => mapApiLessonToLessonModel(l, courseId));
+
+  return {
+    id: module.id,
+    title: module.title ?? "",
+    order,
+    lessonCount: stats.lessonCount,
+    duration: stats.duration,
+    lessons,
+    links: module.links ?? [],
+  };
+}
+
+/**
+ * Maps the flat ManagedCoursePageDto (GET /manage/courses/{id} response) to CourseModel.
+ * No analytics, no instructors (instructor is current user).
+ */
+export function mapManagedCoursePageDtoToModel(dto: ManagedCoursePageDto): CourseModel {
+  const c = dto.course;
+  const modulesRecord = dto.modules ?? {};
+  const categories = dto.categories ?? {};
+  const lessonsRecord = dto.lessons ?? {};
+
+  const category = c.categoryId ? categories[c.categoryId] : undefined;
+  const categoryName = category?.name ?? undefined;
+  const categorySlug = category?.slug ?? undefined;
+
+  const structure = dto.structure;
+  const moduleIds = structure.moduleIds ?? [];
+  const moduleLessonIds = structure.moduleLessonIds ?? {};
+  const modules = moduleIds
+    .map((moduleId) => modulesRecord[moduleId])
+    .filter((m): m is ManagedModuleDtoApi => m != null)
+    .map((m, index) =>
+      mapManagedApiModuleToModuleModel(
+        m,
+        lessonsRecord,
+        c.id,
+        moduleLessonIds[m.module.id] ?? [],
+        index,
+      ),
+    );
+
+  // Compute total lesson count from modules
+  const lessonCount = modules.reduce((sum, m) => sum + m.lessonCount, 0);
+
+  return {
+    id: c.id,
+    title: c.title ?? "",
+    description: c.description ?? "",
+    imageUrl: c.imageUrls?.[0] ?? null,
+    instructorName: null, // No instructor info in managed view
+    instructorAvatarUrl: null,
+    isPublished: c.status === "Published",
+    price: {
+      amount: c.price.amount,
+      currency: c.price.currency ?? "",
+    },
+    modules,
+    lessonCount,
+    enrollmentCount: 0, // No analytics in managed view
+    totalDuration: "PT0S", // Computed from modules if needed
+    averageRating: 0,
+    reviewsCount: 0,
+    courseViews: 0,
+    updatedAtUtc: c.updatedAtUtc,
+    categoryName,
+    categoryId: c.categoryId,
+    categorySlug,
+    tags: c.tags ?? undefined,
+    links: c.links ?? undefined,
+  };
+}
+
+/**
+ * Maps a managed course summary DTO to a CourseModel.
+ * Used for instructor's course list (no analytics from read models).
+ */
+export function mapManagedCourseSummaryToModel(
+  dto: ManagedCourseSummaryDto,
+): CourseModel {
+  return {
+    id: dto.id,
+    title: dto.title,
+    description: dto.shortDescription || "",
+    shortDescription: dto.shortDescription,
+    slug: dto.slug,
+    imageUrl: dto.thumbnailUrl,
+    instructorId: dto.instructor.id,
+    instructorName: dto.instructor.fullName,
+    instructorAvatarUrl: dto.instructor.avatarUrl,
+    isPublished: dto.status === "Published",
+    status: dto.status,
+    price: dto.price,
+    originalPrice: undefined,
+    badges: [],
+    averageRating: 0, // No analytics in managed summary
+    reviewsCount: 0,
+    difficulty: getDifficultyEnum(dto.difficulty),
+    courseViews: 0,
+    lessonCount: dto.stats.lessonsCount,
+    enrollmentCount: 0,
+    totalDuration: dto.stats.duration,
+    updatedAtUtc: dto.updatedAtUtc,
+    categoryName: dto.category.name || undefined,
+    categoryId: dto.category.id,
+    categorySlug: dto.category.slug || undefined,
+    links: dto.links,
   };
 }
