@@ -69,8 +69,9 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
                 analytics.TotalLessonsCount,
                 analytics.TotalCourseDuration,
                 analytics.AverageRating,
-                analytics.ReviewsCount)
-            : new CourseAnalyticsDto(0, 0, TimeSpan.Zero, 0, 0);
+                analytics.ReviewsCount,
+                analytics.ViewCount)
+            : new CourseAnalyticsDto(0, 0, TimeSpan.Zero, 0, 0, 0);
 
         return Result.Success(new CourseWithAnalyticsDto(courseDto, analyticsDto));
     }

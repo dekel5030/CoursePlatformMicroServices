@@ -23,6 +23,7 @@ export interface CourseAnalyticsDtoApi {
   totalDuration: string;
   averageRating?: number;
   reviewsCount?: number;
+  viewCount?: number;
 }
 
 /**

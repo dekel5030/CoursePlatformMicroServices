@@ -8,6 +8,7 @@ public sealed class CourseAnalytics
     public double AverageRating { get; set; }
     public int ReviewsCount { get; set; }
     public int EnrollmentsCount { get; set; }
+    public int ViewCount { get; set; }
 
     public List<ModuleAnalytics> ModuleAnalytics { get; set; } = [];
 }

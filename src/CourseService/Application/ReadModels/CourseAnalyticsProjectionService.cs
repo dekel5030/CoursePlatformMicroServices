@@ -29,6 +29,9 @@ internal sealed class CourseAnalyticsProjectionService : ICourseAnalyticsProject
         int enrollmentCount = await _db.Enrollments
             .CountAsync(e => e.CourseId == courseId, cancellationToken);
 
+        int viewCount = await _db.CourseViews
+            .CountAsync(v => v.CourseId == courseId, cancellationToken);
+
         List<int> ratings = await _db.CourseRatings
             .Where(r => r.CourseId == courseId)
             .Select(r => r.Score)
@@ -61,6 +64,7 @@ internal sealed class CourseAnalyticsProjectionService : ICourseAnalyticsProject
             existing.AverageRating = averageRating;
             existing.ReviewsCount = reviewsCount;
             existing.EnrollmentsCount = enrollmentCount;
+            existing.ViewCount = viewCount;
             existing.ModuleAnalytics.Clear();
             foreach (ModuleAnalytics ma in moduleAnalytics)
             {
@@ -77,6 +81,7 @@ internal sealed class CourseAnalyticsProjectionService : ICourseAnalyticsProject
                 AverageRating = averageRating,
                 ReviewsCount = reviewsCount,
                 EnrollmentsCount = enrollmentCount,
+                ViewCount = viewCount,
                 ModuleAnalytics = moduleAnalytics
             });
         }

@@ -88,8 +88,9 @@ internal sealed class GetCoursePageQueryHandler
                 analytics.TotalLessonsCount,
                 analytics.TotalCourseDuration,
                 analytics.AverageRating,
-                analytics.ReviewsCount)
-            : new CourseAnalyticsDto(0, 0, TimeSpan.Zero, 0, 0);
+                analytics.ReviewsCount,
+                analytics.ViewCount)
+            : new CourseAnalyticsDto(0, 0, TimeSpan.Zero, 0, 0, 0);
 
         CourseStructureDto structure = BuildStructure(courseData.Modules, courseData.Lessons);
 
