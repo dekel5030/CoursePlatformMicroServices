@@ -8,9 +8,11 @@ import { BookOpen, Clock, Users, Eye, Star, TrendingUp } from "lucide-react";
 
 interface Props {
   course: CourseModel;
+  /** Override link destination (e.g. /manage/courses/:id for management view) */
+  to?: string;
 }
 
-export default function CourseCard({ course }: Props) {
+export default function CourseCard({ course, to }: Props) {
   const { t, i18n } = useTranslation(["course-catalog", "translation"]);
 
   const safeCurrency = course.price?.currency || "ILS";
@@ -49,8 +51,10 @@ export default function CourseCard({ course }: Props) {
   // Don't show "Empty" category
   const showCategory = course.categoryName && course.categoryName !== "Empty";
 
+  const linkTo = to ?? `/courses/${course.id}`;
+
   return (
-    <Link to={`/courses/${course.id}`} className="block group">
+    <Link to={linkTo} className="block group">
       <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 h-full flex flex-col border hover:border-primary/40 bg-white">
         {/* Image Section */}
         <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">

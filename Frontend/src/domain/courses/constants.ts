@@ -3,6 +3,8 @@
  */
 export const CourseRels = {
   SELF: "self",
+  MANAGE: "manage",
+  ANALYTICS: "analytics",
   PARTIAL_UPDATE: "partial-update",
   DELETE: "delete",
   CREATE: "create",

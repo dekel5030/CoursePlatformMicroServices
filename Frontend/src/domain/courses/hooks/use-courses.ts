@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchFeaturedCourses,
   fetchCourseById,
+  fetchManagedCourseById,
   createCourse,
   patchCourse,
   deleteCourse,
@@ -47,6 +48,14 @@ export function useCourse(id: string | undefined) {
   });
 }
 
+export function useManagedCourse(id: string | undefined) {
+  return useQuery<CourseModel, Error>({
+    queryKey: id ? coursesQueryKeys.managedDetail(id) : ["courses", "managed", "undefined"],
+    queryFn: () => fetchManagedCourseById(id!),
+    enabled: !!id,
+  });
+}
+
 export function useCreateCourse() {
   const queryClient = useQueryClient();
 
@@ -71,6 +80,7 @@ export function usePatchCourse(id: string) {
     }) => patchCourse(url, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: coursesQueryKeys.managedDetail(id) });
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.featured() });
       queryClient.invalidateQueries({
         queryKey: coursesQueryKeys.allCourses(),
@@ -105,6 +115,9 @@ export function useCreateModule(courseId: string) {
       queryClient.invalidateQueries({
         queryKey: coursesQueryKeys.detail(courseId),
       });
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.managedDetail(courseId),
+      });
       toast.success("Module created successfully");
     },
     onError: () => {
@@ -128,6 +141,9 @@ export function usePatchModule(courseId: string) {
       queryClient.invalidateQueries({
         queryKey: coursesQueryKeys.detail(courseId),
       });
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.managedDetail(courseId),
+      });
     },
   });
 }
@@ -140,6 +156,9 @@ export function useDeleteModule(courseId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: coursesQueryKeys.detail(courseId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.managedDetail(courseId),
       });
       toast.success("Module deleted successfully");
     },
@@ -158,6 +177,9 @@ export function useReorderModules(courseId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: coursesQueryKeys.detail(courseId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.managedDetail(courseId),
       });
       toast.success("Modules reordered successfully");
     },
@@ -179,6 +201,9 @@ export function useReorderLessons(courseId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: coursesQueryKeys.detail(courseId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.managedDetail(courseId),
       });
       toast.success("Lessons reordered successfully");
     },

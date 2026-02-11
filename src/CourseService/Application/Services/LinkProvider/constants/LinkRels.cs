@@ -9,6 +9,8 @@ internal static class LinkRels
 
     internal static class Course
     {
+        public const string Manage = "manage";
+        public const string Analytics = "analytics";
         public const string GenerateImageUploadUrl = "generate-image-upload-url";
         public const string CreateModule = "create-module";
         public const string ReorderModules = "reorder-modules";

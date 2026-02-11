@@ -3,6 +3,8 @@ using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
+using Courses.Application.Services.LinkProvider;
+using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses;
@@ -22,15 +24,18 @@ internal sealed class GetManagedCoursesQueryHandler
     private readonly IReadDbContext _dbContext;
     private readonly IStorageUrlResolver _urlResolver;
     private readonly IUserContext _userContext;
+    private readonly ILinkBuilderService _linkBuilder;
 
     public GetManagedCoursesQueryHandler(
         IReadDbContext dbContext,
         IStorageUrlResolver urlResolver,
-        IUserContext userContext)
+        IUserContext userContext,
+        ILinkBuilderService linkBuilder)
     {
         _dbContext = dbContext;
         _urlResolver = urlResolver;
         _userContext = userContext;
+        _linkBuilder = linkBuilder;
     }
 
     public async Task<Result<CourseCollectionDto>> Handle(
@@ -106,18 +111,11 @@ internal sealed class GetManagedCoursesQueryHandler
             })
             .ToDictionaryAsync(x => x.CourseId, cancellationToken);
 
-        var enrollmentCounts = await _dbContext.Enrollments
-            .Where(e => courseIds.Contains(e.CourseId))
-            .GroupBy(e => e.CourseId)
-            .Select(g => new { CourseId = g.Key, Count = g.Count() })
-            .ToDictionaryAsync(x => x.CourseId, cancellationToken);
-
         var courseDtos = courses.Select(course =>
         {
             instructors.TryGetValue(course.InstructorId, out User? instructor);
             categories.TryGetValue(course.CategoryId, out Category? category);
             courseStats.TryGetValue(course.Id, out var stats);
-            enrollmentCounts.TryGetValue(course.Id, out var enrollmentCount);
 
             string? thumbnailUrl = course.Images.Count > 0
                 ? _urlResolver.Resolve(StorageCategory.Public, course.Images.First().Path).Value
@@ -126,6 +124,9 @@ internal sealed class GetManagedCoursesQueryHandler
             string shortDescription = course.Description.Value.Length > 100
                 ? course.Description.Value[..100] + "..."
                 : course.Description.Value;
+
+            var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status, IsManagementView: true);
+            var links = _linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext).ToList();
 
             var summary = new CourseSummaryDto
             {
@@ -146,15 +147,15 @@ internal sealed class GetManagedCoursesQueryHandler
                 Price = course.Price,
                 UpdatedAtUtc = course.UpdatedAtUtc,
                 Status = course.Status,
-                Links = []
+                Links = links
             };
 
             var analytics = new CourseSummaryAnalyticsDto(
                 LessonsCount: stats?.LessonCount ?? 0,
                 Duration: stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero,
-                EnrollmentCount: enrollmentCount?.Count ?? 0,
-                AverageRating: 4.5,
-                ReviewsCount: 2157,
+                EnrollmentCount: 0,
+                AverageRating: 0,
+                ReviewsCount: 0,
                 CourseViews: 0);
 
             return new CourseSummaryWithAnalyticsDto(summary, analytics);

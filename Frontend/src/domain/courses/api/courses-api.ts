@@ -56,10 +56,20 @@ export async function fetchFeaturedCourses(): Promise<CourseModel[]> {
 }
 
 /**
- * Fetch a course by ID
+ * Fetch a course by ID (public consumption view)
  */
 export async function fetchCourseById(id: string): Promise<CourseModel> {
   const response = await axiosClient.get<CoursePageDto>(`/courses/${id}`);
+  return mapCoursePageDtoToModel(response.data);
+}
+
+/**
+ * Fetch a course for management by instructor
+ */
+export async function fetchManagedCourseById(id: string): Promise<CourseModel> {
+  const response = await axiosClient.get<CoursePageDto>(
+    `/manage/courses/${id}`
+  );
   return mapCoursePageDtoToModel(response.data);
 }
 
@@ -227,8 +237,34 @@ export async function fetchMyManagedCourses(
   pageSize = 10
 ): Promise<ManagedCoursesResponse> {
   const response = await axiosClient.get<ManagedCoursesResponse>(
-    "/users/me/courses/managed",
+    "/manage/courses",
     { params: { pageNumber, pageSize } }
+  );
+  return response.data;
+}
+
+/**
+ * Response from GET manage/courses/{id}/analytics (instructor only)
+ */
+export interface CourseDetailedAnalyticsDto {
+  enrollmentsCount: number;
+  averageRating: number;
+  reviewsCount: number;
+  viewCount: number;
+  totalLessonsCount: number;
+  totalCourseDuration: string;
+  moduleAnalytics: { moduleId: string; lessonCount: number; totalDuration: string }[];
+  enrollmentsOverTime: { date: string; count: number }[];
+}
+
+/**
+ * Fetch detailed analytics for a course (instructor only)
+ */
+export async function fetchCourseAnalytics(
+  courseId: string
+): Promise<CourseDetailedAnalyticsDto> {
+  const response = await axiosClient.get<CourseDetailedAnalyticsDto>(
+    `/manage/courses/${courseId}/analytics`
   );
   return response.data;
 }

@@ -7,6 +7,8 @@ internal static class EndpointNames
 {
     // Courses
     public const string GetCourseById = "GetCourseById";
+    public const string GetManagedCourseById = "GetManagedCourseById";
+    public const string GetCourseAnalytics = "GetCourseAnalytics";
     public const string GetCourses = "GetCourses";
     public const string CreateCourse = "CreateCourse";
     public const string PatchCourse = "PatchCourse";

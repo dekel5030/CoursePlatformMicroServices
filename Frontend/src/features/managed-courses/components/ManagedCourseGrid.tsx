@@ -87,7 +87,7 @@ export function ManagedCourseGrid({
         const course = mapCourseSummaryToModel(dto);
         return (
           <motion.div key={course.id} variants={item}>
-            <CourseCard course={course} />
+            <CourseCard course={course} to={`/manage/courses/${course.id}`} />
           </motion.div>
         );
       })}

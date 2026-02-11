@@ -33,24 +33,38 @@ internal sealed class CourseLinkDefinitions : ILinkDefinitionRegistry
                 getRouteValues: ctx => new { id = ctx.Id.Value }),
 
             new LinkDefinition<CourseContext>(
+                rel: LinkRels.Course.Manage,
+                method: LinkHttpMethod.Get,
+                endpointName: EndpointNames.GetManagedCourseById,
+                policyCheck: ctx => ctx.IsManagementView && _policy.CanEditCourse(ctx),
+                getRouteValues: ctx => new { id = ctx.Id.Value }),
+
+            new LinkDefinition<CourseContext>(
+                rel: LinkRels.Course.Analytics,
+                method: LinkHttpMethod.Get,
+                endpointName: EndpointNames.GetCourseAnalytics,
+                policyCheck: ctx => ctx.IsManagementView && _policy.CanEditCourse(ctx),
+                getRouteValues: ctx => new { id = ctx.Id.Value }),
+
+            new LinkDefinition<CourseContext>(
                 rel: LinkRels.PartialUpdate,
                 method: LinkHttpMethod.Patch,
                 endpointName: EndpointNames.PatchCourse,
-                policyCheck: ctx => _policy.CanEditCourse(ctx),
+                policyCheck: ctx => ctx.IsManagementView && _policy.CanEditCourse(ctx),
                 getRouteValues: ctx => new { id = ctx.Id.Value }),
 
             new LinkDefinition<CourseContext>(
                 rel: LinkRels.Delete,
                 method: LinkHttpMethod.Delete,
                 endpointName: EndpointNames.DeleteCourse,
-                policyCheck: ctx => _policy.CanDeleteCourse(ctx),
+                policyCheck: ctx => ctx.IsManagementView && _policy.CanDeleteCourse(ctx),
                 getRouteValues: ctx => new { id = ctx.Id.Value }),
 
             new LinkDefinition<CourseContext>(
                 rel: LinkRels.Course.GenerateImageUploadUrl,
                 method: LinkHttpMethod.Post,
                 endpointName: EndpointNames.GenerateCourseImageUploadUrl,
-                policyCheck: ctx => _policy.CanEditCourse(ctx),
+                policyCheck: ctx => ctx.IsManagementView && _policy.CanEditCourse(ctx),
                 getRouteValues: ctx => new { Id = ctx.Id.Value }),
 
             new LinkDefinition<CourseContext>(
@@ -64,14 +78,14 @@ internal sealed class CourseLinkDefinitions : ILinkDefinitionRegistry
                 rel: LinkRels.Course.CreateModule,
                 method: LinkHttpMethod.Post,
                 endpointName: EndpointNames.CreateModule,
-                policyCheck: ctx => _policy.CanEditCourse(ctx),
+                policyCheck: ctx => ctx.IsManagementView && _policy.CanEditCourse(ctx),
                 getRouteValues: ctx => new { courseId = ctx.Id.Value }),
 
             new LinkDefinition<CourseContext>(
                 rel: LinkRels.Course.ReorderModules,
                 method: LinkHttpMethod.Patch,
                 endpointName: EndpointNames.ReorderModules,
-                policyCheck: ctx => _policy.CanEditCourse(ctx),
+                policyCheck: ctx => ctx.IsManagementView && _policy.CanEditCourse(ctx),
                 getRouteValues: ctx => new { courseId = ctx.Id.Value })
         }.AsReadOnly();
 

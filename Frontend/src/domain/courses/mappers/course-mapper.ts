@@ -94,10 +94,21 @@ function mapApiModuleToModuleModel(
  */
 export function mapCoursePageDtoToModel(dto: CoursePageDto): CourseModel {
   const c = dto.course;
-  const a = dto.analytics;
+  const modulesRecord = dto.modules ?? {};
+  const a = dto.analytics ?? (() => {
+    const lessonCount = Object.values(modulesRecord).reduce((sum, m) => sum + (m?.analytics?.lessonCount ?? 0), 0);
+    const totalDuration = "PT0S";
+    return {
+      enrollmentCount: 0,
+      lessonsCount: lessonCount,
+      totalDuration,
+      averageRating: 0,
+      reviewsCount: 0,
+      viewCount: 0,
+    };
+  })();
   const instructors = dto.instructors ?? {};
   const categories = dto.categories ?? {};
-  const modulesRecord = dto.modules ?? {};
   const lessonsRecord = dto.lessons ?? {};
 
   const instructor = c.instructorId ? instructors[c.instructorId] : undefined;
