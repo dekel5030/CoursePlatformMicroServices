@@ -24,8 +24,8 @@ builder.Services.Configure<JsonOptions>(options =>
 builder.AddInfrastructureDefaults();
 builder.AddDefaultOpenApi();
 
-builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddEndpoints(typeof(IEndpoint).Assembly);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IHttpLinkResolver, HttpLinkResolver>();

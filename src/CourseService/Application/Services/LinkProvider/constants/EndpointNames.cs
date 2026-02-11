@@ -17,6 +17,8 @@ internal static class EndpointNames
     public const string CreateModule = "CreateModule";
     public const string PatchModule = "PatchModule";
     public const string DeleteModule = "DeleteModule";
+    public const string ReorderModules = "ReorderModules";
+    public const string ReorderLessons = "ReorderLessons";
 
     // Lessons
     public const string GetLessonById = "GetLessonById";
@@ -25,6 +27,7 @@ internal static class EndpointNames
     public const string DeleteLesson = "DeleteLesson";
     public const string GenerateLessonVideoUploadUrl = "GenerateLessonVideoUploadUrl";
     public const string GenerateLessonWithAi = "GenerateLessonWithAi";
+    public const string MoveLesson = "MoveLesson";
 
     // Course ratings
     public const string GetCourseRatings = "GetCourseRatings";

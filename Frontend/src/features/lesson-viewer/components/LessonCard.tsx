@@ -5,7 +5,7 @@ import type { LessonModel } from "@/domain/lessons";
 import { Card, CardContent, Badge, Button } from "@/shared/ui";
 import { InlineEditableText } from "@/shared/common";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import { Clock, Trash2, Play, Lock } from "lucide-react";
+import { Clock, Trash2, Play, Lock, GripVertical } from "lucide-react";
 import { usePatchLesson, useDeleteLesson } from "@/domain/lessons";
 import { toast } from "sonner";
 import { hasLink, getLink, formatDuration } from "@/shared/utils";
@@ -15,9 +15,15 @@ interface LessonProps {
   lesson: LessonModel;
   index: number;
   courseId: string;
+  dragHandleProps?: React.HTMLAttributes<HTMLButtonElement>;
 }
 
-export default function LessonCard({ lesson, index, courseId }: LessonProps) {
+export default function LessonCard({
+  lesson,
+  index,
+  courseId,
+  dragHandleProps,
+}: LessonProps) {
   const navigate = useNavigate();
   const { t } = useTranslation(["lesson-viewer", "translation"]);
 
@@ -83,6 +89,18 @@ export default function LessonCard({ lesson, index, courseId }: LessonProps) {
       >
         <CardContent className="py-2 px-4">
           <div className="flex items-center gap-3">
+            {/* Drag handle */}
+            {dragHandleProps && (
+              <button
+                type="button"
+                {...dragHandleProps}
+                className="shrink-0 flex h-8 w-8 items-center justify-center rounded cursor-grab active:cursor-grabbing text-muted-foreground hover:bg-muted/80 touch-none"
+                onClick={(e) => e.stopPropagation()}
+                aria-label={t("lesson-viewer:card.dragHandle")}
+              >
+                <GripVertical className="h-4 w-4" />
+              </button>
+            )}
             {/* Play / Lock icon */}
             <div className="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-muted">
               {lesson.isPreview ? (

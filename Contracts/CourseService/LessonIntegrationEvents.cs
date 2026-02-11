@@ -1,4 +1,4 @@
-﻿namespace CoursePlatform.Contracts.CourseService;
+namespace CoursePlatform.Contracts.CourseService;
 
 public sealed record LessonCreatedIntegrationEvent(
     Guid LessonId,
@@ -52,3 +52,10 @@ public sealed record LessonDeletedIntegrationEvent(
     Guid Id,
     Guid ModuleId,
     Guid CourseId);
+
+public sealed record LessonMovedIntegrationEvent(
+    Guid LessonId,
+    Guid PreviousModuleId,
+    Guid NewModuleId,
+    Guid CourseId,
+    int NewIndex);

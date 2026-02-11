@@ -15,6 +15,7 @@ public class ModuleConfiguration : IEntityTypeConfiguration<Module>
         builder.ToTable("Modules");
 
         builder.HasKey(m => m.Id);
+        builder.HasIndex(m => new { m.CourseId, m.Index }).IsUnique();
 
         builder.Property(m => m.Id)
             .HasConversion(

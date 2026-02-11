@@ -1,4 +1,4 @@
-﻿using Courses.Domain.Abstractions.Repositories;
+using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
@@ -76,6 +76,130 @@ public sealed class LessonManagementService
 
         _lessonRepository.Remove(lessonToRemove);
         lessonToRemove.Delete();
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ReorderLessonsAsync(
+        ModuleId moduleId,
+        List<LessonId> newOrder,
+        CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<Lesson> lessons = await _lessonRepository
+            .ListAsync(l => l.ModuleId == moduleId, cancellationToken);
+
+        if (lessons.Count != newOrder.Count)
+        {
+            return Result.Failure(Error.Validation(
+                "InvalidOrderCount",
+                "The number of lessons in the new order does not match the existing lessons."));
+        }
+
+        var lessonIdsSet = lessons.Select(l => l.Id).ToHashSet();
+        if (newOrder.Any(id => !lessonIdsSet.Contains(id)))
+        {
+            return Result.Failure(Error.Validation(
+                "InvalidLessonIds",
+                "The new order contains lesson IDs that do not belong to this module."));
+        }
+
+        foreach (Lesson lesson in lessons)
+        {
+            int newIndex = newOrder.IndexOf(lesson.Id);
+            if (newIndex != -1)
+            {
+                lesson.ChangeIndex(newIndex);
+            }
+        }
+
+        return Result.Success();
+    }
+
+    public async Task<Result> MoveLessonAsync(
+        LessonId lessonId,
+        ModuleId targetModuleId,
+        int targetIndex,
+        CancellationToken cancellationToken = default)
+    {
+        Lesson? lesson = await _lessonRepository.GetByIdAsync(lessonId, cancellationToken);
+        if (lesson is null)
+        {
+            return Result.Failure(LessonErrors.NotFound);
+        }
+
+        Module? targetModule = await _moduleRepository.GetByIdAsync(targetModuleId, cancellationToken);
+        if (targetModule is null)
+        {
+            return Result.Failure(ModuleErrors.NotFound);
+        }
+
+        if (targetModule.CourseId != lesson.CourseId)
+        {
+            return Result.Failure(Error.Validation(
+                "InvalidTargetModule",
+                "The target module must belong to the same course as the lesson."));
+        }
+
+        if (lesson.ModuleId == targetModuleId && lesson.Index == targetIndex)
+        {
+            return Result.Success();
+        }
+
+        ModuleId sourceModuleId = lesson.ModuleId;
+        var targetLessons = (await _lessonRepository
+            .ListAsync(l => l.ModuleId == targetModuleId, cancellationToken))
+            .OrderBy(l => l.Index)
+            .ToList();
+
+        if (targetIndex < 0 || targetIndex > targetLessons.Count)
+        {
+            return Result.Failure(Error.Validation(
+                "InvalidTargetIndex",
+                "The target index is out of range."));
+        }
+
+        if (sourceModuleId == targetModuleId)
+        {
+            var sourceLessonsSameModule = (await _lessonRepository
+                .ListAsync(l => l.ModuleId == sourceModuleId, cancellationToken))
+                .OrderBy(l => l.Index)
+                .ToList();
+
+            var reordered = sourceLessonsSameModule
+                .Where(l => l.Id != lessonId)
+                .ToList();
+            reordered.Insert(targetIndex, lesson);
+
+            for (int i = 0; i < reordered.Count; i++)
+            {
+                reordered[i].ChangeIndex(i);
+            }
+
+            return Result.Success();
+        }
+
+        var sourceLessons = (await _lessonRepository
+            .ListAsync(l => l.ModuleId == sourceModuleId, cancellationToken))
+            .OrderBy(l => l.Index)
+            .ToList();
+
+        int oldIndex = lesson.Index;
+
+        for (int i = targetLessons.Count - 1; i >= targetIndex; i--)
+        {
+            targetLessons[i].ChangeIndex(i + 1);
+        }
+
+        lesson.MoveToModule(targetModuleId, targetIndex);
+
+        for (int i = oldIndex + 1; i < sourceLessons.Count; i++)
+        {
+            Lesson l = sourceLessons[i];
+            if (l.Id != lessonId)
+            {
+                l.ChangeIndex(i - 1);
+            }
+        }
 
         return Result.Success();
     }

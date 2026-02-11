@@ -14,6 +14,6 @@ internal static class MigrationExtensions
         await readDb.Database.MigrateAsync();
 
         using WriteDbContext writeDb = services.GetRequiredService<WriteDbContext>();
-        await writeDb.Database.MigrateAsync();
+        await writeDb.Database.MigrateAsync("20260119070353_AvatarUrl_Optional");
     }
 }

@@ -44,6 +44,13 @@ internal sealed class ModuleLinkDefinitions : ILinkDefinitionRegistry
                 method: LinkHttpMethod.Delete,
                 endpointName: EndpointNames.DeleteModule,
                 policyCheck: ctx => _policy.CanEditModule(ctx),
+                getRouteValues: ctx => new { moduleId = ctx.Id.Value }),
+
+            new LinkDefinition<ModuleContext>(
+                rel: LinkRels.Module.ReorderLessons,
+                method: LinkHttpMethod.Patch,
+                endpointName: EndpointNames.ReorderLessons,
+                policyCheck: ctx => _policy.CanEditModule(ctx),
                 getRouteValues: ctx => new { moduleId = ctx.Id.Value })
         }.AsReadOnly();
 

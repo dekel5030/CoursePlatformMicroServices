@@ -13,4 +13,5 @@ export const CourseRels = {
   CREATE_RATING: "create-rating",
   NEXT_PAGE: "next-page",
   PREVIOUS_PAGE: "previous-page",
+  REORDER_MODULES: "reorder-modules",
 } as const;

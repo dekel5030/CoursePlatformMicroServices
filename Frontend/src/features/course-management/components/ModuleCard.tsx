@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ModuleModel } from "@/domain/courses";
 import { Card, CardContent, CardHeader, Button } from "@/shared/ui";
-import { ChevronDown, ChevronUp, Plus, Clock, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Clock, Trash2, GripVertical } from "lucide-react";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { LessonCard } from "@/features/lesson-viewer";
+import { SortableLessonItem, lessonSortableId } from "./SortableLessonItem";
 import { hasLink, getLink, formatDuration } from "@/shared/utils";
 import { InlineEditableText } from "@/shared/common";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
@@ -16,9 +18,17 @@ interface ModuleCardProps {
   module: ModuleModel;
   courseId: string;
   index: number;
+  dragHandleProps?: React.HTMLAttributes<HTMLButtonElement>;
+  isDropTarget?: boolean;
 }
 
-export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
+export function ModuleCard({
+  module,
+  courseId,
+  index,
+  dragHandleProps,
+  isDropTarget = false,
+}: ModuleCardProps) {
   const { t } = useTranslation(["course-management", "translation"]);
   const [isExpanded, setIsExpanded] = useState(true);
   const [isAddLessonOpen, setIsAddLessonOpen] = useState(false);
@@ -30,6 +40,7 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
   const canCreateLesson = hasLink(module.links, ModuleRels.CREATE_LESSON);
   const canUpdate = hasLink(module.links, ModuleRels.PARTIAL_UPDATE);
   const canDelete = hasLink(module.links, ModuleRels.DELETE);
+  const canReorderLessons = hasLink(module.links, ModuleRels.REORDER_LESSONS);
   const updateLink = getLink(module.links, ModuleRels.PARTIAL_UPDATE);
   const deleteLink = getLink(module.links, ModuleRels.DELETE);
 
@@ -68,13 +79,30 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
 
   return (
     <>
-      <Card className="overflow-hidden border-s-4 border-s-primary/20 rounded-lg">
+      <Card
+        className={`overflow-hidden border-s-4 rounded-lg transition-colors ${
+          isDropTarget
+            ? "border-s-primary bg-primary/5 ring-2 ring-primary/40"
+            : "border-s-primary/20"
+        }`}
+      >
         <CardHeader
           className="cursor-pointer hover:bg-muted/50 transition-colors py-3 px-4"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 flex-1 min-w-0 text-start">
+              {dragHandleProps && (
+                <button
+                  type="button"
+                  {...dragHandleProps}
+                  className="shrink-0 flex h-7 w-7 items-center justify-center rounded cursor-grab active:cursor-grabbing text-muted-foreground hover:bg-muted/80 touch-none"
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={t("course-management:detail.dragModule")}
+                >
+                  <GripVertical className="h-4 w-4" />
+                </button>
+              )}
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
                 {index + 1}
               </div>
@@ -149,14 +177,31 @@ export function ModuleCard({ module, courseId, index }: ModuleCardProps) {
         {isExpanded && (
           <CardContent className="ps-4 pe-4 pb-3 pt-0 space-y-1">
             {sortedLessons.length > 0 ? (
+              canReorderLessons ? (
+                <SortableContext
+                  items={sortedLessons.map((l) => lessonSortableId(l.lessonId))}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {sortedLessons.map((lesson, lessonIndex) => (
+                    <SortableLessonItem
+                      key={lesson.lessonId}
+                      lesson={lesson}
+                      index={lessonIndex}
+                      courseId={courseId}
+                      moduleId={module.id}
+                    />
+                  ))}
+                </SortableContext>
+              ) : (
               sortedLessons.map((lesson, lessonIndex) => (
-                <LessonCard
-                  key={lesson.lessonId}
-                  lesson={lesson}
-                  index={lessonIndex}
-                  courseId={courseId}
-                />
-              ))
+                  <LessonCard
+                    key={lesson.lessonId}
+                    lesson={lesson}
+                    index={lessonIndex}
+                    courseId={courseId}
+                  />
+                ))
+              )
             ) : (
               <p className="text-muted-foreground text-sm py-3 text-start">
                 {t("course-management:detail.noLessons")}
