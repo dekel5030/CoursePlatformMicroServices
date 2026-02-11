@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Courses.Infrastructure.Database.Write;
 using Kernel.EventBus;
 using MassTransit;
@@ -59,6 +59,7 @@ internal static class MassTransitExtensions
         });
 
         services.AddScoped<IEventBus, MassTransitEventPublisher>();
+        services.AddScoped<IImmediateEventBus, ImmediateEventBus>();
 
         return services;
     }

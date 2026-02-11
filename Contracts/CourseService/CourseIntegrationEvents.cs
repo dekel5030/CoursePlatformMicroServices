@@ -1,4 +1,4 @@
-﻿namespace CoursePlatform.Contracts.CourseService;
+namespace CoursePlatform.Contracts.CourseService;
 
 public sealed record CourseCreatedIntegrationEvent(
     Guid CourseId,
@@ -34,3 +34,5 @@ public sealed record CourseStatusChangedIntegrationEvent(Guid CourseId, string N
 public sealed record CourseTagsUpdatedIntegrationEvent(Guid CourseId, List<string> NewTags);
 
 public sealed record CourseTitleChangedIntegrationEvent(Guid CourseId, string NewTitle);
+
+public sealed record CourseViewedIntegrationEvent(Guid CourseId, Guid? UserId, DateTimeOffset ViewedAt);

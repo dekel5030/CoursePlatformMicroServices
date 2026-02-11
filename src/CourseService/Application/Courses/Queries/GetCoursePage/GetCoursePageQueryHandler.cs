@@ -1,3 +1,4 @@
+using CoursePlatform.Contracts.CourseService;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
@@ -14,6 +15,8 @@ using Courses.Domain.Modules;
 using Courses.Domain.Shared.Primitives;
 using Courses.Domain.Users;
 using Kernel;
+using Kernel.Auth.Abstractions;
+using Kernel.EventBus;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,15 +28,21 @@ internal sealed class GetCoursePageQueryHandler
     private readonly IReadDbContext _readDbContext;
     private readonly ILinkBuilderService _linkBuilderService;
     private readonly IStorageUrlResolver _storageUrlResolver;
+    private readonly IImmediateEventBus _immediateEventBus;
+    private readonly IUserContext _userContext;
 
     public GetCoursePageQueryHandler(
         IReadDbContext readDbContext,
         ILinkBuilderService linkBuilderService,
-        IStorageUrlResolver storageUrlResolver)
+        IStorageUrlResolver storageUrlResolver,
+        IImmediateEventBus immediateEventBus,
+        IUserContext userContext)
     {
         _readDbContext = readDbContext;
         _linkBuilderService = linkBuilderService;
         _storageUrlResolver = storageUrlResolver;
+        _immediateEventBus = immediateEventBus;
+        _userContext = userContext;
     }
 
     public async Task<Result<CoursePageDto>> Handle(
@@ -87,6 +96,10 @@ internal sealed class GetCoursePageQueryHandler
             courseData.ReviewsCount);
 
         CourseStructureDto structure = BuildStructure(courseData.Modules, courseData.Lessons);
+
+        await _immediateEventBus.PublishAsync(
+            new CourseViewedIntegrationEvent(request.Id, _userContext.Id, DateTimeOffset.UtcNow),
+            cancellationToken);
 
         return Result.Success(new CoursePageDto
         {
