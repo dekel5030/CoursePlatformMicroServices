@@ -1,6 +1,7 @@
 ﻿using CoursePlatform.ServiceDefaults.Auth;
 using CoursePlatform.ServiceDefaults.Messaging;
 using Courses.Application.Lessons.Commands.ReorderLessons;
+using Courses.Application.Modules.Commands.ReorderModules;
 using Courses.Infrastructure.Ai;
 using Courses.Infrastructure.Behaviors;
 using Courses.Infrastructure.Cache;
@@ -53,6 +54,7 @@ public static class DependencyInjection
     {
         services.AddStorage();
         services.AddScoped<IPipelineBehavior<ReorderLessonsCommand, Result>, ReorderLessonsLockBehavior<ReorderLessonsCommand, Result>>();
+        services.AddScoped<IPipelineBehavior<ReorderModulesCommand, Result>, ReorderModulesLockBehavior<ReorderModulesCommand, Result>>();
 
         return services;
     }
