@@ -1,6 +1,7 @@
-﻿using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Data;
 using Courses.Domain.Categories;
 using Courses.Domain.Courses;
+using Courses.Domain.CourseViews;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
@@ -20,6 +21,7 @@ public abstract class AppDbContextBase : DbContext, IUnitOfWork
     public DbSet<Category> Categories { get; set; }
     public DbSet<Module> Modules { get; set; }
     public DbSet<CourseRating> CourseRatings { get; set; }
+    public DbSet<CourseView> CourseViews { get; set; }
 
     protected AppDbContextBase(DbContextOptions options) : base(options)
     {

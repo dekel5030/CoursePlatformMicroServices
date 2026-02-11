@@ -1,5 +1,4 @@
 ﻿using CoursePlatform.ServiceDefaults.Auth;
-using CoursePlatform.ServiceDefaults.Messaging;
 using Courses.Application.Lessons.Commands.ReorderLessons;
 using Courses.Application.Modules.Commands.ReorderModules;
 using Courses.Infrastructure.Ai;
@@ -10,7 +9,6 @@ using Courses.Infrastructure.MassTransit;
 using Courses.Infrastructure.Storage;
 using Kernel;
 using Kernel.Messaging.Abstractions;
-using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

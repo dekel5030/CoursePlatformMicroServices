@@ -1,5 +1,6 @@
-﻿using Courses.Domain.Categories;
+using Courses.Domain.Categories;
 using Courses.Domain.Courses;
+using Courses.Domain.CourseViews;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
@@ -18,6 +19,7 @@ public interface IWriteDbContext
     DbSet<Enrollment> Enrollments { get; }
     DbSet<CourseRating> CourseRatings { get; }
     DbSet<User> Users { get; }
+    DbSet<CourseView> CourseViews { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
