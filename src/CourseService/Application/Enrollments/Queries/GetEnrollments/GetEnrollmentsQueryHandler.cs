@@ -23,17 +23,7 @@ internal sealed class GetEnrollmentsQueryHandler : IQueryHandler<GetEnrollmentsQ
     {
         IQueryable<Enrollment> query = _readDbContext.Enrollments;
 
-        if (request.CourseId.HasValue)
-        {
-            var courseId = new CourseId(request.CourseId.Value);
-            query = query.Where(e => e.CourseId == courseId);
-        }
-
-        if (request.StudentId.HasValue)
-        {
-            var studentId = new UserId(request.StudentId.Value);
-            query = query.Where(e => e.StudentId == studentId);
-        }
+        query = ApplyFilters(query, request);
 
         int totalCount = await query.CountAsync(cancellationToken);
 
@@ -43,14 +33,7 @@ internal sealed class GetEnrollmentsQueryHandler : IQueryHandler<GetEnrollmentsQ
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
-        var dtos = items.Select(e => new EnrollmentDto(
-            e.Id.Value,
-            e.CourseId.Value,
-            e.StudentId.Value,
-            e.EnrolledAt,
-            e.ExpiresAt,
-            e.Status.ToString(),
-            e.CompletedAt)).ToList();
+        List<EnrollmentDto> dtos = MapToDtoCollection(items);
 
         var result = new EnrollmentCollectionDto
         {
@@ -62,5 +45,33 @@ internal sealed class GetEnrollmentsQueryHandler : IQueryHandler<GetEnrollmentsQ
         };
 
         return Result.Success(result);
+    }
+
+    private static List<EnrollmentDto> MapToDtoCollection(List<Enrollment> items)
+    {
+        return items.Select(enrollment => new EnrollmentDto(
+            enrollment.Id.Value,
+            enrollment.CourseId.Value,
+            enrollment.StudentId.Value,
+            enrollment.EnrolledAt,
+            enrollment.ExpiresAt,
+            enrollment.Status.ToString(),
+            enrollment.CompletedAt)).ToList();
+    }
+
+    private static IQueryable<Enrollment> ApplyFilters(IQueryable<Enrollment> baseQuery, GetEnrollmentsQuery request)
+    {
+        if (request.CourseId.HasValue)
+        {
+            var courseId = new CourseId(request.CourseId.Value);
+            baseQuery = baseQuery.Where(e => e.CourseId == courseId);
+        }
+        if (request.StudentId.HasValue)
+        {
+            var studentId = new UserId(request.StudentId.Value);
+            baseQuery = baseQuery.Where(e => e.StudentId == studentId);
+        }
+
+        return baseQuery;
     }
 }
