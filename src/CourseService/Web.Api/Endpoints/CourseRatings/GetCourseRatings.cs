@@ -1,6 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
+using Courses.Application.CourseRatings.Queries.GetCourseRatings;
 using Courses.Application.Courses.Dtos;
 using Kernel;
 using Kernel.Auth.Abstractions;

@@ -1,7 +1,7 @@
 using Courses.Domain.Courses.Primitives;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Application.CourseRating.Commands.CreateCourseRating;
+namespace Courses.Application.CourseRatings.Commands.CreateCourseRating;
 
 public sealed record CreateCourseRatingCommand(
     CourseId CourseId,

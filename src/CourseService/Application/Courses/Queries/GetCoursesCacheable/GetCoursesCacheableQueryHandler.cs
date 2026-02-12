@@ -135,7 +135,7 @@ internal sealed class GetCoursesCacheableQueryHandler : IQueryHandler<GetCourses
                 ShortDescription = shortDescription,
                 Slug = course.Slug.Value,
                 ThumbnailUrl = thumbnailUrl,
-                Instructor = new InstructorDto(
+                Instructor = new Users.InstructorDto(
                     instructor?.Id.Value ?? Guid.Empty,
                     instructor?.FullName ?? "Unknown",
                     instructor?.AvatarUrl),

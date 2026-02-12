@@ -16,7 +16,7 @@ internal sealed class GetCourseById : IEndpoint
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetCoursePageQuery(id);
+            var query = new CoursePageQuery(id);
 
             Result<CoursePageDto> result = await mediator.Send(query, cancellationToken);
 

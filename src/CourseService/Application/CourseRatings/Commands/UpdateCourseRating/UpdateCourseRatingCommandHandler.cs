@@ -1,20 +1,21 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Ratings;
 using Courses.Domain.Ratings.Errors;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Application.CourseRating.Commands.DeleteCourseRating;
+namespace Courses.Application.CourseRatings.Commands.UpdateCourseRating;
 
-internal sealed class DeleteCourseRatingCommandHandler : ICommandHandler<DeleteCourseRatingCommand>
+internal sealed class UpdateCourseRatingCommandHandler : ICommandHandler<UpdateCourseRatingCommand>
 {
     private readonly ICourseRatingRepository _courseRatingRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserContext _userContext;
 
-    public DeleteCourseRatingCommandHandler(
+    public UpdateCourseRatingCommandHandler(
         ICourseRatingRepository courseRatingRepository,
         IUnitOfWork unitOfWork,
         IUserContext userContext)
@@ -25,7 +26,7 @@ internal sealed class DeleteCourseRatingCommandHandler : ICommandHandler<DeleteC
     }
 
     public async Task<Result> Handle(
-        DeleteCourseRatingCommand request,
+        UpdateCourseRatingCommand request,
         CancellationToken cancellationToken = default)
     {
         var userId = new UserId(_userContext.Id ?? Guid.Empty);
@@ -48,7 +49,16 @@ internal sealed class DeleteCourseRatingCommandHandler : ICommandHandler<DeleteC
             return Result.Failure(RatingErrors.Unauthorized);
         }
 
-        _courseRatingRepository.Remove(rating!);
+        int newScore = request.Score ?? rating.Score;
+        string? newComment = request.Comment ?? rating.Comment;
+
+        Result updateResult = rating.Update(newScore, newComment);
+
+        if (updateResult.IsFailure)
+        {
+            return updateResult;
+        }
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

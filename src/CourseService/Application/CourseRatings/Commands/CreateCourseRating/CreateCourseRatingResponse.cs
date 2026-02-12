@@ -1,4 +1,4 @@
-namespace Courses.Application.CourseRating.Commands.CreateCourseRating;
+namespace Courses.Application.CourseRatings.Commands.CreateCourseRating;
 
 public sealed record CreateCourseRatingResponse(
     Guid RatingId,

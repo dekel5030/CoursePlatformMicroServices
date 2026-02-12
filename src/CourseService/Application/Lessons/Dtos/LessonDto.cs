@@ -1,7 +1,7 @@
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Lessons.Primitives;
 
-namespace Courses.Application.Courses.Dtos;
+namespace Courses.Application.Lessons.Dtos;
 
 public record LessonDto
 {

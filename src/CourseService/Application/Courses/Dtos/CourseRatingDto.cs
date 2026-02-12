@@ -1,4 +1,5 @@
 using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Users.Dtos;
 
 namespace Courses.Application.Courses.Dtos;
 

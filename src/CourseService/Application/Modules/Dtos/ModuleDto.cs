@@ -1,6 +1,6 @@
 using Courses.Application.Services.LinkProvider.Abstractions;
 
-namespace Courses.Application.Courses.Dtos;
+namespace Courses.Application.Modules.Dtos;
 
 public record ModuleDto
 {

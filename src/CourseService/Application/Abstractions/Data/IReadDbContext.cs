@@ -6,6 +6,7 @@ using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
 using Courses.Domain.Users;
+using Courses.Domain.Ratings;
 
 namespace Courses.Application.Abstractions.Data;
 

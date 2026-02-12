@@ -1,4 +1,4 @@
-﻿namespace Courses.Application.Courses.Dtos;
+﻿namespace Courses.Application.Users.Dtos;
 
 public sealed record UserDto
 {

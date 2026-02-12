@@ -2,14 +2,16 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Users.Dtos;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Ratings;
 using Courses.Domain.Users;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.CourseRating.Queries.GetCourseRatings;
+namespace Courses.Application.CourseRatings.Queries.GetCourseRatings;
 
 public sealed class GetCourseRatingQueryHandler
     : IQueryHandler<GetCourseRatingsQuery, CourseRatingCollection>

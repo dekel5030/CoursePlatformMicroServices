@@ -3,12 +3,13 @@ using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Ratings;
 using Courses.Domain.Ratings.Errors;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Application.CourseRating.Commands.CreateCourseRating;
+namespace Courses.Application.CourseRatings.Commands.CreateCourseRating;
 
 internal sealed class CreateCourseRatingCommandHandler : ICommandHandler<CreateCourseRatingCommand, CreateCourseRatingResponse>
 {

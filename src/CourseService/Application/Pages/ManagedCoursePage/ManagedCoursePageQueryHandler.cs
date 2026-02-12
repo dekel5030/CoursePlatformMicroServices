@@ -2,6 +2,7 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
+using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
 using Courses.Application.Pages.Dtos;
 using Courses.Application.Services.LinkProvider;
