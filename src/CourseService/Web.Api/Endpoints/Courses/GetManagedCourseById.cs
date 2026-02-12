@@ -1,8 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
-using Courses.Application.Courses.Dtos;
-using Courses.Application.Courses.Queries.GetManagedCourse;
+using Courses.Application.Features.Management.ManagedCoursePage;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -17,7 +16,7 @@ internal sealed class GetManagedCourseById : IEndpoint
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetManagedCourseQuery(id);
+            var query = new ManagedCoursePageQuery(id);
 
             Result<ManagedCoursePageDto> result = await mediator.Send(query, cancellationToken);
 

@@ -1,6 +1,6 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Courses.Dtos;
+using Courses.Application.Lessons.Dtos;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses;
@@ -18,16 +18,13 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
 {
     private readonly IReadDbContext _readDbContext;
     private readonly IStorageUrlResolver _urlResolver;
-    private readonly ILinkBuilderService _linkBuilder;
 
     public GetLessonsQueryHandler(
         IReadDbContext readDbContext,
-        IStorageUrlResolver urlResolver,
-        ILinkBuilderService linkBuilder)
+        IStorageUrlResolver urlResolver)
     {
         _readDbContext = readDbContext;
         _urlResolver = urlResolver;
-        _linkBuilder = linkBuilder;
     }
 
     public async Task<Result<IReadOnlyList<LessonDto>>> Handle(
@@ -48,13 +45,9 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
 
         Dictionary<CourseId, Course> coursesById = await GetRequiredCoursesAsync(lessons, cancellationToken);
 
-        Dictionary<ModuleId, ModuleContext> moduleContexts = BuildModuleContexts(lessons, coursesById);
-
         var response = lessons.Select(lesson => MapToDto(
             lesson,
-            coursesById[lesson.CourseId],
-            moduleContexts,
-            request.Filter.IncludeDetails)).ToList();
+            coursesById[lesson.CourseId])).ToList();
 
         return Result.Success<IReadOnlyList<LessonDto>>(response);
     }
@@ -72,6 +65,7 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
 
         return courses.ToDictionary(c => c.Id);
     }
+
     private static IQueryable<Lesson> ApplyFilters(IQueryable<Lesson> query, LessonFilter filter)
     {
         if (filter.CourseId is { } courseId)
@@ -92,32 +86,10 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
         return query;
     }
 
-    private static Dictionary<ModuleId, ModuleContext> BuildModuleContexts(
-        List<Lesson> lessons,
-        Dictionary<CourseId, Course> courses)
-    {
-        return lessons
-            .GroupBy(l => l.ModuleId)
-            .ToDictionary(
-                g => g.Key,
-                g =>
-                {
-                    Lesson firstLesson = g.First();
-                    Course course = courses[firstLesson.CourseId];
-                    var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status);
-                    return new ModuleContext(courseContext, g.Key);
-                });
-    }
-
     private LessonDto MapToDto(
         Lesson lesson,
-        Course course,
-        Dictionary<ModuleId, ModuleContext> contexts,
-        bool includeDetails)
+        Course course)
     {
-        ModuleContext moduleContext = contexts[lesson.ModuleId];
-        var lessonContext = new LessonContext(moduleContext, lesson.Id, lesson.Access, HasEnrollment: false);
-
         var dto = new LessonDto
         {
             Id = lesson.Id.Value,
@@ -126,21 +98,14 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
             Duration = lesson.Duration,
             Access = lesson.Access,
             ThumbnailUrl = ResolveUrl(lesson.ThumbnailImageUrl?.Path),
-            Links = _linkBuilder.BuildLinks(LinkResourceKey.Lesson, lessonContext).ToList()
+            ModuleId = lesson.ModuleId.Value,
+            CourseId = lesson.CourseId.Value,
+            CourseName = course.Title.Value,
+            Description = lesson.Description.Value,
+            VideoUrl = ResolveUrl(lesson.VideoUrl?.Path),
+            TranscriptUrl = ResolveUrl(lesson.Transcript?.Path),
+            Links = []
         };
-
-        if (includeDetails)
-        {
-            dto = dto with
-            {
-                ModuleId = lesson.ModuleId.Value,
-                CourseId = lesson.CourseId.Value,
-                CourseName = course.Title.Value,
-                Description = lesson.Description.Value,
-                VideoUrl = ResolveUrl(lesson.VideoUrl?.Path),
-                TranscriptUrl = ResolveUrl(lesson.Transcript?.Path)
-            };
-        }
 
         return dto;
     }

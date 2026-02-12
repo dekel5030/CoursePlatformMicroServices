@@ -1,5 +1,5 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Courses.Dtos;
+using Courses.Application.Users.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Users;
 using Kernel;

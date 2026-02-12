@@ -24,6 +24,8 @@ internal static class EndpointNames
 
     // Lessons
     public const string GetLessonById = "GetLessonById";
+    public const string GetLessonPage = "GetLessonPage";
+    public const string GetManagedLessonPage = "GetManagedLessonPage";
     public const string CreateLesson = "CreateLesson";
     public const string PatchLesson = "PatchLesson";
     public const string DeleteLesson = "DeleteLesson";

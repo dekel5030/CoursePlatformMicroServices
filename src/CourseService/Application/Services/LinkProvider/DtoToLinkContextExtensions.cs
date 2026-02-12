@@ -1,4 +1,5 @@
-using Courses.Application.Courses.Dtos;
+using Courses.Application.CourseRatings.Queries.GetCourseRatings;
+using Courses.Application.Features.Dtos;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Ratings.Primitives;

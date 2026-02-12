@@ -1,5 +1,3 @@
-using Courses.Application.Courses.Dtos;
-
 namespace Courses.Application.Modules.Dtos;
 
 /// <summary>
