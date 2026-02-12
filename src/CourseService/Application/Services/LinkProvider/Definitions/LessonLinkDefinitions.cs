@@ -28,7 +28,7 @@ internal sealed class LessonLinkDefinitions : ILinkDefinitionRegistry
             new LinkDefinition<LessonContext>(
                 rel: LinkRels.Self,
                 method: LinkHttpMethod.Get,
-                endpointName: EndpointNames.GetLessonById,
+                endpointName: EndpointNames.GetLessonPage,
                 policyCheck: ctx => _policy.CanReadLesson(ctx),
                 getRouteValues: ctx => new { lessonId = ctx.Id.Value }),
 
