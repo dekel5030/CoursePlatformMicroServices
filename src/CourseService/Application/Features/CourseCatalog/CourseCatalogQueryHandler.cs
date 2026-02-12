@@ -2,12 +2,9 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Features.Dtos;
-using Courses.Application.Users;
-using Courses.Domain.Categories;
-using Courses.Domain.Categories.Primitives;
-using Courses.Domain.Courses;
+using Courses.Application.ReadModels;
+using Courses.Application.Users.Dtos;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Users;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -28,18 +25,88 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
     }
 
     public async Task<Result<CourseCollectionDto>> Handle(
-        CourseCatalogQuery request,
-        CancellationToken cancellationToken = default)
+    CourseCatalogQuery request,
+    CancellationToken cancellationToken = default)
     {
         int pageNumber = Math.Max(1, request.PagedQuery.Page ?? 1);
         int pageSize = Math.Clamp(request.PagedQuery.PageSize ?? 10, 1, 25);
 
-        int totalItems = await _dbContext.Courses.CountAsync(cancellationToken);
+        var query = _dbContext.Courses
+            .OrderByDescending(course => course.UpdatedAtUtc)
+            .Select(course => new
+            {
+                Course = course,
+                Instructor = _dbContext.Users
+                    .Where(user => user.Id == course.InstructorId)
+                    .Select(user => new { user.Id.Value, user.FirstName, user.LastName, user.AvatarUrl })
+                    .FirstOrDefault(),
 
-        List<CourseSummaryWithAnalyticsDto> courseDtos = await GetCourseSummariesAsync(
-            pageNumber,
-            pageSize,
-            cancellationToken);
+                Category = _dbContext.Categories
+                    .Where(category => category.Id == course.CategoryId)
+                    .Select(category => new { category.Id.Value, category.Name, Slug = category.Slug.Value })
+                    .FirstOrDefault(),
+            });
+
+        int totalItems = await query.CountAsync(cancellationToken);
+
+        var rawData = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        var courseIds = rawData.Select(r => r.Course.Id.Value).ToList();
+
+        Dictionary<Guid, CourseAnalytics> analyticsDict = await _dbContext.CourseAnalytics
+            .Where(a => courseIds.Contains(a.CourseId))
+            .ToDictionaryAsync(a => a.CourseId, cancellationToken);
+
+        var courseDtos = rawData.Select(raw =>
+        {
+            analyticsDict.TryGetValue(raw.Course.Id.Value, out CourseAnalytics? stats);
+
+            string? thumbnail = raw.Course.Images != null && raw.Course.Images.Count > 0
+                ? _urlResolver.Resolve(StorageCategory.Public, raw.Course.Images.FirstOrDefault()!.Path).Value
+                : null;
+
+            string shortDesc = raw.Course.Description.Value.Length > 100
+                ? raw.Course.Description.Value[..100] + "..."
+                : raw.Course.Description.Value;
+
+            var summary = new CourseSummaryDto
+            {
+                Id = raw.Course.Id.Value,
+                Title = raw.Course.Title.Value,
+                ShortDescription = shortDesc,
+                Slug = raw.Course.Slug.Value,
+                ThumbnailUrl = thumbnail,
+                Instructor = new UserDto
+                {
+                    Id = raw.Instructor?.Value ?? Guid.Empty,
+                    FirstName = raw.Instructor?.FirstName ?? "Unknown",
+                    LastName = raw.Instructor?.LastName ?? "Instructor",
+                    AvatarUrl = raw.Instructor?.AvatarUrl
+                },
+                Category = new CategoryDto(
+                    raw.Category?.Value ?? Guid.Empty,
+                    raw.Category?.Name ?? "Uncategorized",
+                    raw.Category?.Slug ?? string.Empty),
+                Difficulty = raw.Course.Difficulty,
+                Price = raw.Course.Price,
+                UpdatedAtUtc = raw.Course.UpdatedAtUtc,
+                Status = raw.Course.Status,
+                Links = []
+            };
+
+            var analytics = new CourseSummaryAnalyticsDto(
+                LessonsCount: stats?.TotalLessonsCount ?? 0,
+                Duration: stats?.TotalCourseDuration ?? TimeSpan.Zero,
+                EnrollmentCount: stats?.EnrollmentsCount ?? 0,
+                AverageRating: stats?.AverageRating ?? 0,
+                ReviewsCount: stats?.ReviewsCount ?? 0,
+                CourseViews: stats?.ViewCount ?? 0);
+
+            return new CourseSummaryWithAnalyticsDto(summary, analytics);
+        }).ToList();
 
         return Result.Success(new CourseCollectionDto
         {
@@ -49,119 +116,5 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
             TotalItems = totalItems,
             Links = []
         });
-    }
-
-    private async Task<List<CourseSummaryWithAnalyticsDto>> GetCourseSummariesAsync(
-        int pageNumber,
-        int pageSize,
-        CancellationToken cancellationToken)
-    {
-        List<Course> courses = await _dbContext.Courses
-            .OrderByDescending(c => c.UpdatedAtUtc)
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
-
-        if (courses.Count == 0)
-        {
-            return [];
-        }
-
-        var courseIds = courses.Select(c => c.Id).ToList();
-        var instructorIds = courses.Select(c => c.InstructorId).Distinct().ToList();
-        var categoryIds = courses.Select(c => c.CategoryId).Distinct().ToList();
-
-        Dictionary<UserId, User> instructors = await _dbContext.Users
-            .Where(i => instructorIds.Contains(i.Id))
-            .ToDictionaryAsync(i => i.Id, cancellationToken);
-
-        Dictionary<CategoryId, Category> categories = await _dbContext.Categories
-            .Where(c => categoryIds.Contains(c.Id))
-            .ToDictionaryAsync(c => c.Id, cancellationToken);
-
-        var courseStats = await _dbContext.Lessons
-            .Where(l => courseIds.Contains(l.CourseId))
-            .GroupBy(l => l.CourseId)
-            .Select(g => new
-            {
-                CourseId = g.Key,
-                LessonCount = g.Count(),
-                TotalDurationSeconds = g.Sum(l => l.Duration.TotalSeconds)
-            })
-            .ToDictionaryAsync(x => x.CourseId, cancellationToken);
-
-        var enrollmentCounts = await _dbContext.Enrollments
-            .Where(e => courseIds.Contains(e.CourseId))
-            .GroupBy(e => e.CourseId)
-            .Select(g => new { CourseId = g.Key, Count = g.Count() })
-            .ToDictionaryAsync(x => x.CourseId, cancellationToken);
-
-        var ratingStats = await _dbContext.CourseRatings
-            .Where(r => courseIds.Contains(r.CourseId))
-            .GroupBy(r => r.CourseId)
-            .Select(g => new
-            {
-                CourseId = g.Key,
-                AverageRating = g.Average(r => r.Score),
-                ReviewsCount = g.Count()
-            })
-            .ToDictionaryAsync(x => x.CourseId, cancellationToken);
-
-        var courseIdValues = courseIds.Select(id => id.Value).ToList();
-        Dictionary<Guid, int> viewCounts = await _dbContext.CourseAnalytics
-            .Where(ca => courseIdValues.Contains(ca.CourseId))
-            .Select(ca => new { ca.CourseId, ca.ViewCount })
-            .ToDictionaryAsync(x => x.CourseId, x => x.ViewCount, cancellationToken);
-
-        var courseDtos = courses.Select(course =>
-        {
-            instructors.TryGetValue(course.InstructorId, out User? instructor);
-            categories.TryGetValue(course.CategoryId, out Category? category);
-            courseStats.TryGetValue(course.Id, out var stats);
-            enrollmentCounts.TryGetValue(course.Id, out var enrollmentCount);
-            ratingStats.TryGetValue(course.Id, out var ratingStat);
-
-            string? thumbnailUrl = course.Images.Count > 0
-                ? _urlResolver.Resolve(StorageCategory.Public, course.Images.First().Path).Value
-                : null;
-
-            string shortDescription = course.Description.Value.Length > 100
-                ? course.Description.Value[..100] + "..."
-                : course.Description.Value;
-
-            var summary = new CourseSummaryDto
-            {
-                Id = course.Id.Value,
-                Title = course.Title.Value,
-                ShortDescription = shortDescription,
-                Slug = course.Slug.Value,
-                ThumbnailUrl = thumbnailUrl,
-                Instructor = new InstructorDto(
-                    instructor?.Id.Value ?? Guid.Empty,
-                    instructor?.FullName ?? "Unknown",
-                    instructor?.AvatarUrl),
-                Category = new CategoryDto(
-                    category?.Id.Value ?? Guid.Empty,
-                    category?.Name ?? "Uncategorized",
-                    category?.Slug.Value ?? string.Empty),
-                Difficulty = course.Difficulty,
-                Price = course.Price,
-                UpdatedAtUtc = course.UpdatedAtUtc,
-                Status = course.Status,
-                Links = []
-            };
-
-            var analytics = new CourseSummaryAnalyticsDto(
-                LessonsCount: stats?.LessonCount ?? 0,
-                Duration: stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero,
-                EnrollmentCount: enrollmentCount?.Count ?? 0,
-                AverageRating: ratingStat?.AverageRating ?? 0,
-                ReviewsCount: ratingStat?.ReviewsCount ?? 0,
-                CourseViews: viewCounts.GetValueOrDefault(course.Id.Value, 0));
-
-            return new CourseSummaryWithAnalyticsDto(summary, analytics);
-        }).ToList();
-
-        return courseDtos;
     }
 }

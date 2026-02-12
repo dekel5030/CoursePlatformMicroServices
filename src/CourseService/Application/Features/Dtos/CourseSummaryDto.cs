@@ -1,6 +1,7 @@
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Users;
+using Courses.Application.Users.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 
@@ -13,7 +14,7 @@ public record CourseSummaryDto
     public required string ShortDescription { get; init; }
     public required string Slug { get; init; }
 
-    public required InstructorDto Instructor { get; init; }
+    public required UserDto Instructor { get; init; }
     public required CategoryDto Category { get; init; }
 
     public required Money Price { get; init; }

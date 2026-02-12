@@ -24,19 +24,7 @@ internal sealed class GetModulesQueryHandler
     {
         IQueryable<Module> query = _readDbContext.Modules.AsNoTracking();
 
-        if (request.Filter.CourseId is { } courseId)
-        {
-            query = query.Where(m => m.CourseId == courseId);
-        }
-
-        if (request.Filter.Ids is { } idsEnumerable)
-        {
-            var ids = idsEnumerable.Distinct().Select(id => new ModuleId(id)).ToList();
-            if (ids.Count > 0)
-            {
-                query = query.Where(m => ids.Contains(m.Id));
-            }
-        }
+        query = ApplyFilters(request, query);
 
         List<Module> modules = await query
             .OrderBy(m => m.Index)
@@ -55,5 +43,24 @@ internal sealed class GetModulesQueryHandler
         }).ToList();
 
         return Result.Success<IReadOnlyList<ModuleDto>>(moduleDtos);
+    }
+
+    private static IQueryable<Module> ApplyFilters(GetModulesQuery request, IQueryable<Module> query)
+    {
+        if (request.Filter.CourseId is { } courseId)
+        {
+            query = query.Where(m => m.CourseId == courseId);
+        }
+
+        if (request.Filter.Ids is { } idsEnumerable)
+        {
+            var ids = idsEnumerable.Distinct().Select(id => new ModuleId(id)).ToList();
+            if (ids.Count > 0)
+            {
+                query = query.Where(m => ids.Contains(m.Id));
+            }
+        }
+
+        return query;
     }
 }

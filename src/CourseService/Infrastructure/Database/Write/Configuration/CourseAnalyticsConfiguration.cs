@@ -10,7 +10,7 @@ public sealed class CourseAnalyticsConfiguration : IEntityTypeConfiguration<Cour
     {
         builder.ToTable("CourseAnalytics", SchemaNames.Read);
 
-        builder.HasKey(c => c.CourseId);
+        builder.HasKey(course => course.CourseId);
 
         builder.Property(c => c.TotalCourseDuration)
             .HasConversion(ticks => ticks.Ticks, value => TimeSpan.FromTicks(value));

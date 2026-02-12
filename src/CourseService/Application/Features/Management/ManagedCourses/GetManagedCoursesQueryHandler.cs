@@ -5,6 +5,7 @@ using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Shared.Dtos;
 using Courses.Application.Users;
+using Courses.Application.Users.Dtos;
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses;
@@ -135,10 +136,13 @@ internal sealed class GetManagedCoursesQueryHandler
                 ShortDescription = shortDescription,
                 Slug = course.Slug.Value,
                 ThumbnailUrl = thumbnailUrl,
-                Instructor = new InstructorDto(
-                    instructor?.Id.Value ?? Guid.Empty,
-                    instructor?.FullName ?? "Unknown",
-                    instructor?.AvatarUrl),
+                Instructor = new UserDto
+                {
+                    Id = instructor?.Id.Value ?? Guid.Empty,
+                    FirstName = instructor?.FirstName ?? "Unknown",
+                    LastName = instructor?.LastName ?? "",
+                    AvatarUrl = instructor?.AvatarUrl
+                },
                 Category = new CategoryDto(
                     category?.Id.Value ?? Guid.Empty,
                     category?.Name ?? "Uncategorized",
