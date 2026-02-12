@@ -17,7 +17,7 @@ using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.Features.Management.GetManagedCourses;
+namespace Courses.Application.Features.Management.ManagedCourses;
 
 internal sealed class GetManagedCoursesQueryHandler
     : IQueryHandler<GetManagedCoursesQuery, PaginatedCollectionDto<ManagedCourseSummaryDto>>
