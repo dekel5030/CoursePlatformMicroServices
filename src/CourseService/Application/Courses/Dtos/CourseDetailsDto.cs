@@ -1,5 +1,5 @@
 ﻿using Courses.Application.Lessons.Dtos;
-using Courses.Application.Shared.Dtos;
+using Courses.Application.Users;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 

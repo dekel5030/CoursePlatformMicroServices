@@ -4,6 +4,7 @@ using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Modules.Dtos;
+using Courses.Application.Pages.Dtos;
 using Courses.Application.ReadModels;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
@@ -21,10 +22,10 @@ using Kernel.EventBus;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.Pages.GetCoursePage;
+namespace Courses.Application.Pages.CoursePage;
 
-internal sealed class GetCoursePageQueryHandler
-    : IQueryHandler<GetCoursePageQuery, CoursePageDto>
+internal sealed class CoursePageQueryHandler
+    : IQueryHandler<CoursePageQuery, CoursePageDto>
 {
     private readonly IReadDbContext _readDbContext;
     private readonly ILinkBuilderService _linkBuilderService;
@@ -32,7 +33,7 @@ internal sealed class GetCoursePageQueryHandler
     private readonly IImmediateEventBus _immediateEventBus;
     private readonly IUserContext _userContext;
 
-    public GetCoursePageQueryHandler(
+    public CoursePageQueryHandler(
         IReadDbContext readDbContext,
         ILinkBuilderService linkBuilderService,
         IStorageUrlResolver storageUrlResolver,
@@ -47,7 +48,7 @@ internal sealed class GetCoursePageQueryHandler
     }
 
     public async Task<Result<CoursePageDto>> Handle(
-        GetCoursePageQuery request,
+        CoursePageQuery request,
         CancellationToken cancellationToken = default)
     {
         var courseId = new CourseId(request.Id);

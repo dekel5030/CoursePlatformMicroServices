@@ -2,7 +2,6 @@ using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Courses.Dtos;
-using Courses.Application.Courses.Queries.GetFeatured;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

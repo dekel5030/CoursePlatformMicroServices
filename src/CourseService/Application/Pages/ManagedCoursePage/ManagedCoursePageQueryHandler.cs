@@ -3,6 +3,7 @@ using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Modules.Dtos;
+using Courses.Application.Pages.Dtos;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Categories;
@@ -17,17 +18,17 @@ using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.Pages.GetManagedCoursePage;
+namespace Courses.Application.Pages.ManagedCoursePage;
 
-internal sealed class GetManagedCoursePageQueryHandler
-    : IQueryHandler<GetManagedCoursePageQuery, ManagedCoursePageDto>
+internal sealed class ManagedCoursePageQueryHandler
+    : IQueryHandler<ManagedCoursePageQuery, ManagedCoursePageDto>
 {
     private readonly IWriteDbContext _writeDbContext;
     private readonly ILinkBuilderService _linkBuilderService;
     private readonly IStorageUrlResolver _storageUrlResolver;
     private readonly IUserContext _userContext;
 
-    public GetManagedCoursePageQueryHandler(
+    public ManagedCoursePageQueryHandler(
         IWriteDbContext writeDbContext,
         ILinkBuilderService linkBuilderService,
         IStorageUrlResolver storageUrlResolver,
@@ -40,7 +41,7 @@ internal sealed class GetManagedCoursePageQueryHandler
     }
 
     public async Task<Result<ManagedCoursePageDto>> Handle(
-        GetManagedCoursePageQuery request,
+        ManagedCoursePageQuery request,
         CancellationToken cancellationToken = default)
     {
         if (_userContext.Id is null || !_userContext.IsAuthenticated)

@@ -1,7 +1,9 @@
 using Courses.Application.Categories.Dtos;
+using Courses.Application.Courses.Dtos;
 using Courses.Application.Modules.Dtos;
+using Courses.Application.Pages.Dtos;
 
-namespace Courses.Application.Courses.Dtos;
+namespace Courses.Application.Pages.CoursePage;
 
 public record CoursePageDto
 {

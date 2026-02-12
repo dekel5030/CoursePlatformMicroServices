@@ -1,4 +1,4 @@
-﻿namespace Courses.Application.Shared.Dtos;
+﻿namespace Courses.Application.Users;
 
 public record InstructorDto(
     Guid Id,
