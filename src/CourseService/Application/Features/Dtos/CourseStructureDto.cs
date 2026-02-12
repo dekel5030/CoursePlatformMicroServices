@@ -1,4 +1,4 @@
-namespace Courses.Application.Pages.Dtos;
+namespace Courses.Application.Features.Dtos;
 
 public record CourseStructureDto
 {

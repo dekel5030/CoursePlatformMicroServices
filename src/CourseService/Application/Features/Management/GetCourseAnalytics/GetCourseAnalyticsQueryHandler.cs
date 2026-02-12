@@ -8,7 +8,7 @@ using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.Courses.Queries.GetCourseAnalytics;
+namespace Courses.Application.Features.Management.GetCourseAnalytics;
 
 internal sealed class GetCourseAnalyticsQueryHandler
     : IQueryHandler<GetCourseAnalyticsQuery, CourseDetailedAnalyticsDto>

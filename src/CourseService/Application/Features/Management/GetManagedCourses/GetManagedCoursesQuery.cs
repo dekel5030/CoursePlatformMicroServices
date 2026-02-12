@@ -2,7 +2,7 @@ using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Application.Courses.Queries.GetManagedCourses;
+namespace Courses.Application.Features.Management.GetManagedCourses;
 
 public sealed record GetManagedCoursesQuery(
     int PageNumber = 1,

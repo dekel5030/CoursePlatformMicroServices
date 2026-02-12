@@ -2,45 +2,67 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
+using Courses.Application.Services.LinkProvider;
+using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Shared.Dtos;
+using Courses.Application.Users;
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses;
+using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Users;
 using Kernel;
+using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.Courses.Queries.GetCoursesCacheable;
+namespace Courses.Application.Features.Management.GetManagedCourses;
 
-internal sealed class GetCoursesCacheableQueryHandler : IQueryHandler<GetCoursesCacheableQuery, CourseCollectionDto>
+internal sealed class GetManagedCoursesQueryHandler
+    : IQueryHandler<GetManagedCoursesQuery, PaginatedCollectionDto<ManagedCourseSummaryDto>>
 {
     private readonly IReadDbContext _dbContext;
     private readonly IStorageUrlResolver _urlResolver;
+    private readonly IUserContext _userContext;
+    private readonly ILinkBuilderService _linkBuilder;
 
-    public GetCoursesCacheableQueryHandler(
+    public GetManagedCoursesQueryHandler(
+        IReadDbContext dbContext,
         IStorageUrlResolver urlResolver,
-        IReadDbContext dbContext)
+        IUserContext userContext,
+        ILinkBuilderService linkBuilder)
     {
-        _urlResolver = urlResolver;
         _dbContext = dbContext;
+        _urlResolver = urlResolver;
+        _userContext = userContext;
+        _linkBuilder = linkBuilder;
     }
 
-    public async Task<Result<CourseCollectionDto>> Handle(
-        GetCoursesCacheableQuery request,
+    public async Task<Result<PaginatedCollectionDto<ManagedCourseSummaryDto>>> Handle(
+        GetManagedCoursesQuery request,
         CancellationToken cancellationToken = default)
     {
-        int pageNumber = Math.Max(1, request.PagedQuery.Page ?? 1);
-        int pageSize = Math.Clamp(request.PagedQuery.PageSize ?? 10, 1, 25);
+        if (_userContext.Id is null || !_userContext.IsAuthenticated)
+        {
+            return Result.Failure<PaginatedCollectionDto<ManagedCourseSummaryDto>>(CourseErrors.Unauthorized);
+        }
 
-        int totalItems = await _dbContext.Courses.CountAsync(cancellationToken);
+        var instructorId = new UserId(_userContext.Id.Value);
+        int pageNumber = Math.Max(1, request.PageNumber);
+        int pageSize = Math.Clamp(request.PageSize, 1, 25);
 
-        List<CourseSummaryWithAnalyticsDto> courseDtos = await GetCourseSummariesAsync(
+        int totalItems = await _dbContext.Courses
+            .Where(c => c.InstructorId == instructorId)
+            .CountAsync(cancellationToken);
+
+        List<ManagedCourseSummaryDto> courseDtos = await GetManagedCourseSummariesAsync(
+            instructorId,
             pageNumber,
             pageSize,
             cancellationToken);
 
-        return Result.Success(new CourseCollectionDto
+        return Result.Success(new PaginatedCollectionDto<ManagedCourseSummaryDto>
         {
             Items = courseDtos,
             PageNumber = pageNumber,
@@ -50,12 +72,14 @@ internal sealed class GetCoursesCacheableQueryHandler : IQueryHandler<GetCourses
         });
     }
 
-    private async Task<List<CourseSummaryWithAnalyticsDto>> GetCourseSummariesAsync(
+    private async Task<List<ManagedCourseSummaryDto>> GetManagedCourseSummariesAsync(
+        UserId instructorId,
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken)
     {
         List<Course> courses = await _dbContext.Courses
+            .Where(c => c.InstructorId == instructorId)
             .OrderByDescending(c => c.UpdatedAtUtc)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
@@ -67,11 +91,10 @@ internal sealed class GetCoursesCacheableQueryHandler : IQueryHandler<GetCourses
         }
 
         var courseIds = courses.Select(c => c.Id).ToList();
-        var instructorIds = courses.Select(c => c.InstructorId).Distinct().ToList();
         var categoryIds = courses.Select(c => c.CategoryId).Distinct().ToList();
 
         Dictionary<UserId, User> instructors = await _dbContext.Users
-            .Where(i => instructorIds.Contains(i.Id))
+            .Where(i => i.Id == instructorId)
             .ToDictionaryAsync(i => i.Id, cancellationToken);
 
         Dictionary<CategoryId, Category> categories = await _dbContext.Categories
@@ -89,36 +112,11 @@ internal sealed class GetCoursesCacheableQueryHandler : IQueryHandler<GetCourses
             })
             .ToDictionaryAsync(x => x.CourseId, cancellationToken);
 
-        var enrollmentCounts = await _dbContext.Enrollments
-            .Where(e => courseIds.Contains(e.CourseId))
-            .GroupBy(e => e.CourseId)
-            .Select(g => new { CourseId = g.Key, Count = g.Count() })
-            .ToDictionaryAsync(x => x.CourseId, cancellationToken);
-
-        var ratingStats = await _dbContext.CourseRatings
-            .Where(r => courseIds.Contains(r.CourseId))
-            .GroupBy(r => r.CourseId)
-            .Select(g => new
-            {
-                CourseId = g.Key,
-                AverageRating = g.Average(r => r.Score),
-                ReviewsCount = g.Count()
-            })
-            .ToDictionaryAsync(x => x.CourseId, cancellationToken);
-
-        var courseIdValues = courseIds.Select(id => id.Value).ToList();
-        Dictionary<Guid, int> viewCounts = await _dbContext.CourseAnalytics
-            .Where(ca => courseIdValues.Contains(ca.CourseId))
-            .Select(ca => new { ca.CourseId, ca.ViewCount })
-            .ToDictionaryAsync(x => x.CourseId, x => x.ViewCount, cancellationToken);
-
         var courseDtos = courses.Select(course =>
         {
             instructors.TryGetValue(course.InstructorId, out User? instructor);
             categories.TryGetValue(course.CategoryId, out Category? category);
             courseStats.TryGetValue(course.Id, out var stats);
-            enrollmentCounts.TryGetValue(course.Id, out var enrollmentCount);
-            ratingStats.TryGetValue(course.Id, out var ratingStat);
 
             string? thumbnailUrl = course.Images.Count > 0
                 ? _urlResolver.Resolve(StorageCategory.Public, course.Images.First().Path).Value
@@ -128,14 +126,17 @@ internal sealed class GetCoursesCacheableQueryHandler : IQueryHandler<GetCourses
                 ? course.Description.Value[..100] + "..."
                 : course.Description.Value;
 
-            var summary = new CourseSummaryDto
+            var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status, IsManagementView: true);
+            var links = _linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext).ToList();
+
+            return new ManagedCourseSummaryDto
             {
                 Id = course.Id.Value,
                 Title = course.Title.Value,
                 ShortDescription = shortDescription,
                 Slug = course.Slug.Value,
                 ThumbnailUrl = thumbnailUrl,
-                Instructor = new Users.InstructorDto(
+                Instructor = new InstructorDto(
                     instructor?.Id.Value ?? Guid.Empty,
                     instructor?.FullName ?? "Unknown",
                     instructor?.AvatarUrl),
@@ -147,18 +148,11 @@ internal sealed class GetCoursesCacheableQueryHandler : IQueryHandler<GetCourses
                 Price = course.Price,
                 UpdatedAtUtc = course.UpdatedAtUtc,
                 Status = course.Status,
-                Links = []
+                Stats = new ManagedCourseStatsDto(
+                    LessonsCount: stats?.LessonCount ?? 0,
+                    Duration: stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero),
+                Links = links
             };
-
-            var analytics = new CourseSummaryAnalyticsDto(
-                LessonsCount: stats?.LessonCount ?? 0,
-                Duration: stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero,
-                EnrollmentCount: enrollmentCount?.Count ?? 0,
-                AverageRating: ratingStat?.AverageRating ?? 0,
-                ReviewsCount: ratingStat?.ReviewsCount ?? 0,
-                CourseViews: viewCounts.GetValueOrDefault(course.Id.Value, 0));
-
-            return new CourseSummaryWithAnalyticsDto(summary, analytics);
         }).ToList();
 
         return courseDtos;

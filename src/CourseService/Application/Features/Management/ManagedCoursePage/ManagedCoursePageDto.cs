@@ -1,10 +1,10 @@
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
+using Courses.Application.Features.Dtos;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
-using Courses.Application.Pages.Dtos;
 
-namespace Courses.Application.Pages.ManagedCoursePage;
+namespace Courses.Application.Features.Management.ManagedCoursePage;
 
 public record ManagedCoursePageDto
 {
