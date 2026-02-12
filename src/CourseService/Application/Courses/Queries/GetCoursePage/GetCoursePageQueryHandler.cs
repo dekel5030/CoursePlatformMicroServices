@@ -66,8 +66,8 @@ internal sealed class GetCoursePageQueryHandler
                     .Where(l => l.CourseId == course.Id)
                     .OrderBy(l => l.Index)
                     .ToList(),
-                Instructor = _readDbContext.Users.FirstOrDefault(u => u.Id == course.InstructorId),
-                Category = _readDbContext.Categories.FirstOrDefault(cat => cat.Id == course.CategoryId)
+                Instructor = _readDbContext.Users.FirstOrDefault(user => user.Id == course.InstructorId),
+                Category = _readDbContext.Categories.FirstOrDefault(category => category.Id == course.CategoryId)
             })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -146,15 +146,16 @@ internal sealed class GetCoursePageQueryHandler
         IReadOnlyList<Module> modules,
         IReadOnlyList<Lesson> lessons)
     {
-        var orderedModules = modules.OrderBy(m => m.Index).ToList();
-        var moduleIds = orderedModules.Select(m => m.Id.Value).ToList();
+        var orderedModules = modules.OrderBy(module => module.Index).ToList();
+        var moduleIds = orderedModules.Select(module => module.Id.Value).ToList();
         var moduleLessonIds = orderedModules.ToDictionary(
-            m => m.Id.Value,
-            m => (IReadOnlyList<Guid>)lessons
-                .Where(l => l.ModuleId == m.Id)
-                .OrderBy(l => l.Index)
-                .Select(l => l.Id.Value)
+            module => module.Id.Value,
+            module => (IReadOnlyList<Guid>)lessons
+                .Where(lesson => lesson.ModuleId == module.Id)
+                .OrderBy(lesson => lesson.Index)
+                .Select(lesson => lesson.Id.Value)
                 .ToList());
+
         return new CourseStructureDto
         {
             ModuleIds = moduleIds,

@@ -1,13 +1,12 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Ratings;
 using Courses.Domain.Ratings.Errors;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Application.Courses.Commands.UpdateCourseRating;
+namespace Courses.Application.CourseRating.Commands.UpdateCourseRating;
 
 internal sealed class UpdateCourseRatingCommandHandler : ICommandHandler<UpdateCourseRatingCommand>
 {

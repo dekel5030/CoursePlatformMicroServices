@@ -105,6 +105,9 @@ csharp_style_var_for_built_in_types = false:warning
 csharp_style_var_when_type_is_apparent = true:warning
 csharp_style_var_elsewhere = false:warning
 
+# CA1873: Avoid potentially expensive logging
+dotnet_diagnostic.CA1873.severity = none
+
 [*.{cs,vb}]
 dotnet_style_prefer_simplified_boolean_expressions = true:warning
 dotnet_style_prefer_simplified_interpolation = true:warning
@@ -438,3 +441,5 @@ generated_code = true
 dotnet_diagnostic.S1186.severity = none
 
 dotnet_diagnostic.IDE0161.severity = none
+
+dotnet_diagnostic.CA1873.severity = none

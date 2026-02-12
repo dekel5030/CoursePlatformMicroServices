@@ -1,7 +1,6 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
-using Courses.Application.Courses.Commands.UpdateCourseRating;
 using Courses.Domain.Ratings.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
