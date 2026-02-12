@@ -3,7 +3,6 @@ using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Lessons.Queries.GetLessons;
-using Courses.Domain.Lessons.Errors;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

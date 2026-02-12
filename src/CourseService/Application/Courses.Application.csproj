@@ -22,4 +22,8 @@
     <ProjectReference Include="..\Domain\Courses.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CourseRatings\Queries\" />
+  </ItemGroup>
+
 </Project>

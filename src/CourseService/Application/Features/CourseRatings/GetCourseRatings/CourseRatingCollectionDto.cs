@@ -1,5 +1,5 @@
 using Courses.Application.Shared.Dtos;
 
-namespace Courses.Application.CourseRatings.Queries.GetCourseRatings;
+namespace Courses.Application.Features.CourseRatings.GetCourseRatings;
 
 public sealed record CourseRatingCollectionDto : PaginatedCollectionDto<CourseRatingDto>;

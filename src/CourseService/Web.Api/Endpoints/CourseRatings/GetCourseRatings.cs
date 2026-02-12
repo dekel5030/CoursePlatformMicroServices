@@ -1,7 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
-using Courses.Application.CourseRatings.Queries.GetCourseRatings;
+using Courses.Application.Features.CourseRatings.GetCourseRatings;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;

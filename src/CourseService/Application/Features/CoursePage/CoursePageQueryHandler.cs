@@ -16,7 +16,6 @@ using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
-using Courses.Domain.Shared.Primitives;
 using Courses.Domain.Users;
 using Kernel;
 using Kernel.Auth.Abstractions;
@@ -115,7 +114,7 @@ internal sealed class CoursePageQueryHandler
 
             Lessons = courseData.Lessons.ToDictionary(
                 l => l.Id.Value,
-                l => MapToLessonDto(l, courseData.Course.Title, courseContext, false)),
+                lesson => MapToLessonDto(lesson, courseContext, false)),
 
             Instructors = courseData.Instructor != null
                 ? new Dictionary<Guid, UserDto> { [courseData.Instructor.Id.Value] = MapToUserDto(courseData.Instructor) }
@@ -188,7 +187,7 @@ internal sealed class CoursePageQueryHandler
         return new ModuleWithAnalyticsDto(moduleDto, analyticsDto);
     }
 
-    private LessonDto MapToLessonDto(Lesson lesson, Title courseTitle, CourseContext courseContext, bool hasEnrollment)
+    private LessonDto MapToLessonDto(Lesson lesson, CourseContext courseContext, bool hasEnrollment)
     {
         var moduleContext = new ModuleContext(courseContext, lesson.ModuleId);
         var lessonContext = new LessonContext(moduleContext, lesson.Id, lesson.Access, hasEnrollment);
@@ -205,7 +204,6 @@ internal sealed class CoursePageQueryHandler
             CourseId = lesson.CourseId.Value,
             Description = lesson.Description.Value,
             VideoUrl = lesson.VideoUrl?.Path,
-            CourseName = courseTitle.Value,
             TranscriptUrl = lesson.Transcript?.Path,
             Links = _linkBuilderService.BuildLinks(LinkResourceKey.Lesson, lessonContext).ToList()
         };

@@ -13,7 +13,6 @@ using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
-using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
@@ -105,7 +104,7 @@ internal sealed class ManagedCoursePageQueryHandler
 
             Lessons = courseData.Lessons.ToDictionary(
                 l => l.Id.Value,
-                l => MapToLessonDto(l, courseData.Course.Title, courseContext, false)),
+                l => MapToLessonDto(l, courseContext, false)),
 
             Categories = courseData.Category != null
                 ? new Dictionary<Guid, CategoryDto> { [courseData.Category.Id.Value] = MapToCategoryDto(courseData.Category) }
@@ -173,7 +172,7 @@ internal sealed class ManagedCoursePageQueryHandler
         return new ManagedModuleDto(moduleDto, statsDto);
     }
 
-    private LessonDto MapToLessonDto(Lesson lesson, Title courseTitle, CourseContext courseContext, bool hasEnrollment)
+    private LessonDto MapToLessonDto(Lesson lesson, CourseContext courseContext, bool hasEnrollment)
     {
         var moduleContext = new ModuleContext(courseContext, lesson.ModuleId);
         var lessonContext = new LessonContext(moduleContext, lesson.Id, lesson.Access, hasEnrollment);
@@ -190,7 +189,6 @@ internal sealed class ManagedCoursePageQueryHandler
             CourseId = lesson.CourseId.Value,
             Description = lesson.Description.Value,
             VideoUrl = lesson.VideoUrl?.Path,
-            CourseName = courseTitle.Value,
             TranscriptUrl = lesson.Transcript?.Path,
             Links = _linkBuilderService.BuildLinks(LinkResourceKey.Lesson, lessonContext).ToList()
         };

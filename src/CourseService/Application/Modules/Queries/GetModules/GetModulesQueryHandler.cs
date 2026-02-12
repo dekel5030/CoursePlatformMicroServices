@@ -1,11 +1,5 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
-using Courses.Application.ReadModels;
-using Courses.Application.Services.LinkProvider;
-using Courses.Application.Services.LinkProvider.Abstractions;
-using Courses.Domain.Courses;
-using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
 using Courses.Domain.Modules.Primitives;
 using Kernel;

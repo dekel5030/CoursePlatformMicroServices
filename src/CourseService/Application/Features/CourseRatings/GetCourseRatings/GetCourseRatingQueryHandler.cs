@@ -10,7 +10,7 @@ using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.CourseRatings.Queries.GetCourseRatings;
+namespace Courses.Application.Features.CourseRatings.GetCourseRatings;
 
 public sealed class GetCourseRatingQueryHandler
     : IQueryHandler<GetCourseRatingsQuery, CourseRatingCollectionDto>
