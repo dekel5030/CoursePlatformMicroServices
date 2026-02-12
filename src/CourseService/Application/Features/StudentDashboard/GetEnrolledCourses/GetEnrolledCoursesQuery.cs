@@ -1,7 +1,7 @@
 using Courses.Application.Enrollments.Dtos;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Application.Enrollments.Queries.GetEnrolledCourses;
+namespace Courses.Application.Features.StudentDashboard.GetEnrolledCourses;
 
 public sealed record GetEnrolledCoursesQuery(
     int PageNumber = 1,

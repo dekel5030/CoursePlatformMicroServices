@@ -11,14 +11,14 @@ using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.Courses.Queries.GetCoursesCacheable;
+namespace Courses.Application.Features.CourseCatalog;
 
-internal sealed class GetCourseCatalogQueryHandler : IQueryHandler<GetCoursesCacheableQuery, CourseCollectionDto>
+internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQuery, CourseCollectionDto>
 {
     private readonly IReadDbContext _dbContext;
     private readonly IStorageUrlResolver _urlResolver;
 
-    public GetCourseCatalogQueryHandler(
+    public CourseCatalogQueryHandler(
         IStorageUrlResolver urlResolver,
         IReadDbContext dbContext)
     {
@@ -27,7 +27,7 @@ internal sealed class GetCourseCatalogQueryHandler : IQueryHandler<GetCoursesCac
     }
 
     public async Task<Result<CourseCollectionDto>> Handle(
-        GetCoursesCacheableQuery request,
+        CourseCatalogQuery request,
         CancellationToken cancellationToken = default)
     {
         int pageNumber = Math.Max(1, request.PagedQuery.Page ?? 1);

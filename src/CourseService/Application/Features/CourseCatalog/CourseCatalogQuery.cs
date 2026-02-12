@@ -2,6 +2,6 @@ using Courses.Application.Courses.Dtos;
 using Courses.Application.Shared.Dtos;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Application.Courses.Queries.GetCoursesCacheable;
+namespace Courses.Application.Features.CourseCatalog;
 
-internal sealed record GetCoursesCacheableQuery(PagedQueryDto PagedQuery) : IQuery<CourseCollectionDto>;
+internal sealed record CourseCatalogQuery(PagedQueryDto PagedQuery) : IQuery<CourseCollectionDto>;

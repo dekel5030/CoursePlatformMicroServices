@@ -13,7 +13,7 @@ using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Courses.Application.Enrollments.Queries.GetEnrolledCourses;
+namespace Courses.Application.Features.StudentDashboard.GetEnrolledCourses;
 
 internal sealed class GetEnrolledCoursesQueryHandler
     : IQueryHandler<GetEnrolledCoursesQuery, EnrolledCourseCollectionDto>
