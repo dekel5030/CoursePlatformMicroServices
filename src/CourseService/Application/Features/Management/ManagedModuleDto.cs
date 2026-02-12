@@ -1,4 +1,6 @@
-namespace Courses.Application.Modules.Dtos;
+using Courses.Application.Modules.Dtos;
+
+namespace Courses.Application.Features.Management;
 
 public sealed record ManagedModuleDto(
     ModuleDto Module,

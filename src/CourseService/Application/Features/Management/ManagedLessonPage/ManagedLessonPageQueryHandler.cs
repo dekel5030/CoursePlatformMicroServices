@@ -1,6 +1,6 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Lessons.Dtos;
+using Courses.Application.Features.LessonPage;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses;
@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Courses.Application.Features.Management.ManagedLessonPage;
 
 internal sealed class ManagedLessonPageQueryHandler
-    : IQueryHandler<ManagedLessonPageQuery, LessonDetailsPageDto>
+    : IQueryHandler<ManagedLessonPageQuery, LessonPageDto>
 {
     private readonly IWriteDbContext _writeDbContext;
     private readonly ILinkBuilderService _linkBuilderService;
@@ -36,13 +36,13 @@ internal sealed class ManagedLessonPageQueryHandler
         _userContext = userContext;
     }
 
-    public async Task<Result<LessonDetailsPageDto>> Handle(
+    public async Task<Result<LessonPageDto>> Handle(
         ManagedLessonPageQuery request,
         CancellationToken cancellationToken = default)
     {
         if (_userContext.Id is null || !_userContext.IsAuthenticated)
         {
-            return Result.Failure<LessonDetailsPageDto>(CourseErrors.Unauthorized);
+            return Result.Failure<LessonPageDto>(CourseErrors.Unauthorized);
         }
 
         var lessonId = new LessonId(request.LessonId);
@@ -54,7 +54,7 @@ internal sealed class ManagedLessonPageQueryHandler
 
         if (lesson == null)
         {
-            return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
+            return Result.Failure<LessonPageDto>(LessonErrors.NotFound);
         }
 
         Course? course = await _writeDbContext.Courses
@@ -63,12 +63,12 @@ internal sealed class ManagedLessonPageQueryHandler
 
         if (course == null)
         {
-            return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
+            return Result.Failure<LessonPageDto>(LessonErrors.NotFound);
         }
 
         if (course.InstructorId != instructorId)
         {
-            return Result.Failure<LessonDetailsPageDto>(CourseErrors.Unauthorized);
+            return Result.Failure<LessonPageDto>(CourseErrors.Unauthorized);
         }
 
         CourseContext courseContext = new(
@@ -80,14 +80,14 @@ internal sealed class ManagedLessonPageQueryHandler
         ModuleContext moduleContext = new(courseContext, lesson.ModuleId);
         LessonContext lessonContext = new(moduleContext, lesson.Id, lesson.Access, HasEnrollment: false);
 
-        LessonDetailsPageDto dto = MapToDto(lesson, course.Title.Value, lessonContext);
+        LessonPageDto dto = MapToDto(lesson, course.Title.Value, lessonContext);
 
         return Result.Success(dto);
     }
 
-    private LessonDetailsPageDto MapToDto(Lesson lesson, string courseName, LessonContext lessonContext)
+    private LessonPageDto MapToDto(Lesson lesson, string courseName, LessonContext lessonContext)
     {
-        return new LessonDetailsPageDto
+        return new LessonPageDto
         {
             LessonId = lesson.Id.Value,
             ModuleId = lesson.ModuleId.Value,

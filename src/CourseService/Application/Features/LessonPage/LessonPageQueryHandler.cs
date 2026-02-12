@@ -1,6 +1,5 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Lessons.Dtos;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses;
@@ -13,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Features.LessonPage;
 
-internal sealed class LessonPageQueryHandler : IQueryHandler<LessonPageQuery, LessonDetailsPageDto>
+internal sealed class LessonPageQueryHandler : IQueryHandler<LessonPageQuery, LessonPageDto>
 {
     private readonly IReadDbContext _readDbContext;
     private readonly ILinkBuilderService _linkBuilderService;
@@ -29,7 +28,7 @@ internal sealed class LessonPageQueryHandler : IQueryHandler<LessonPageQuery, Le
         _storageUrlResolver = storageUrlResolver;
     }
 
-    public async Task<Result<LessonDetailsPageDto>> Handle(
+    public async Task<Result<LessonPageDto>> Handle(
         LessonPageQuery request,
         CancellationToken cancellationToken = default)
     {
@@ -41,7 +40,7 @@ internal sealed class LessonPageQueryHandler : IQueryHandler<LessonPageQuery, Le
 
         if (lesson == null)
         {
-            return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
+            return Result.Failure<LessonPageDto>(LessonErrors.NotFound);
         }
 
         Course? course = await _readDbContext.Courses
@@ -50,7 +49,7 @@ internal sealed class LessonPageQueryHandler : IQueryHandler<LessonPageQuery, Le
 
         if (course == null)
         {
-            return Result.Failure<LessonDetailsPageDto>(LessonErrors.NotFound);
+            return Result.Failure<LessonPageDto>(LessonErrors.NotFound);
         }
 
         CourseContext courseContext = new(
@@ -62,14 +61,14 @@ internal sealed class LessonPageQueryHandler : IQueryHandler<LessonPageQuery, Le
         ModuleContext moduleContext = new(courseContext, lesson.ModuleId);
         LessonContext lessonContext = new(moduleContext, lesson.Id, lesson.Access, HasEnrollment: false);
 
-        LessonDetailsPageDto dto = MapToDto(lesson, course.Title.Value, lessonContext);
+        LessonPageDto dto = MapToDto(lesson, course.Title.Value, lessonContext);
 
         return Result.Success(dto);
     }
 
-    private LessonDetailsPageDto MapToDto(Lesson lesson, string courseName, LessonContext lessonContext)
+    private LessonPageDto MapToDto(Lesson lesson, string courseName, LessonContext lessonContext)
     {
-        return new LessonDetailsPageDto
+        return new LessonPageDto
         {
             LessonId = lesson.Id.Value,
             ModuleId = lesson.ModuleId.Value,

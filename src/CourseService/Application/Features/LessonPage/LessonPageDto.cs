@@ -1,9 +1,9 @@
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Lessons.Primitives;
 
-namespace Courses.Application.Lessons.Dtos;
+namespace Courses.Application.Features.LessonPage;
 
-public sealed record LessonDetailsPageDto
+public sealed record LessonPageDto
 {
     public required Guid LessonId { get; init; }
     public required Guid ModuleId { get; init; }
