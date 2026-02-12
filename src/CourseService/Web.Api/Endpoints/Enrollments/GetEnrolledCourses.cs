@@ -2,7 +2,7 @@ using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.Enrollments.Dtos;
-using Courses.Application.Enrollments.Queries.GetEnrolledCourses;
+using Courses.Application.Features.StudentDashboard.GetEnrolledCourses;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 

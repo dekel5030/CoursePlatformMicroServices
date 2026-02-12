@@ -1,7 +1,8 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories.Dtos;
-using Courses.Application.Courses.Dtos;
+using Courses.Application.Features.Dtos;
+using Courses.Application.Users;
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses;
@@ -135,7 +136,7 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
                 ShortDescription = shortDescription,
                 Slug = course.Slug.Value,
                 ThumbnailUrl = thumbnailUrl,
-                Instructor = new Users.InstructorDto(
+                Instructor = new InstructorDto(
                     instructor?.Id.Value ?? Guid.Empty,
                     instructor?.FullName ?? "Unknown",
                     instructor?.AvatarUrl),

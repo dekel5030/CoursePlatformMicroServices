@@ -2,7 +2,6 @@ using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
 using Courses.Application.CourseRatings.Queries.GetCourseRatings;
-using Courses.Application.Courses.Dtos;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
@@ -23,13 +22,13 @@ internal sealed class GetCourseRatings : IEndpoint
         {
             var query = new GetCourseRatingsQuery(courseId, pageNumber, pageSize);
 
-            Result<CourseRatingCollection> result = await mediator.Send(query, cancellationToken);
+            Result<CourseRatingCollectionDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
                 dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
-        .WithMetadata<CourseRatingCollection>(
+        .WithMetadata<CourseRatingCollectionDto>(
             nameof(GetCourseRatings),
             tag: Tags.CourseRatings,
             summary: "Gets all ratings for a course by course ID.");

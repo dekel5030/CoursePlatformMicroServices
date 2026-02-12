@@ -1,12 +1,11 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Courses.Dtos;
-using Courses.Application.ReadModels;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using CourseAnalyticsReadModel = Courses.Application.ReadModels.CourseAnalytics;
 
 namespace Courses.Application.Features.Management.CourseAnalytics;
 
@@ -52,7 +51,7 @@ internal sealed class GetCourseAnalyticsQueryHandler
             return Result.Failure<CourseDetailedAnalyticsDto>(CourseErrors.Unauthorized);
         }
 
-        CourseAnalytics? analytics = await _readDbContext.CourseAnalytics
+        CourseAnalyticsReadModel? analytics = await _readDbContext.CourseAnalytics
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.CourseId == request.CourseId, cancellationToken);
 

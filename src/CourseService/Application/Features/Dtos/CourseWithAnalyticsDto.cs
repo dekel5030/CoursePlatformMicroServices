@@ -1,4 +1,6 @@
-namespace Courses.Application.Courses.Dtos;
+using Courses.Application.Courses.Dtos;
+
+namespace Courses.Application.Features.Dtos;
 
 public sealed record CourseWithAnalyticsDto(
     CourseDto Course,

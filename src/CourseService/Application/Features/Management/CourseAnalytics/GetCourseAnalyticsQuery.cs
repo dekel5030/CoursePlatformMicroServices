@@ -1,4 +1,3 @@
-using Courses.Application.Courses.Dtos;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Features.Management.CourseAnalytics;

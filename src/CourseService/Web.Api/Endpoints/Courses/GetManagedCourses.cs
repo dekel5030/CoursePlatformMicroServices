@@ -1,8 +1,8 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
-using Courses.Application.Courses.Dtos;
-using Courses.Application.Courses.Queries.GetManagedCourses;
+using Courses.Application.Features.Management;
+using Courses.Application.Features.Management.ManagedCourses;
 using Courses.Application.Shared.Dtos;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -28,7 +28,7 @@ internal sealed class GetManagedCourses : IEndpoint
                 CustomResults.Problem);
         })
         .WithName("GetManagedCourses")
-        .WithMetadata<CourseCollectionDto>(
+        .WithMetadata<PaginatedCollectionDto<ManagedCourseSummaryDto>>(
             nameof(GetManagedCourses),
             tag: Tags.Courses,
             summary: "Gets the list of courses managed by the current user (instructor).")

@@ -4,7 +4,7 @@ using Courses.Application.Users;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 
-namespace Courses.Application.Courses.Dtos;
+namespace Courses.Application.Features.Dtos;
 
 public record CourseSummaryDto
 {

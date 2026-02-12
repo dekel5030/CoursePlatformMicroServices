@@ -1,5 +1,4 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Courses.Dtos;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Users.Dtos;
@@ -14,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Courses.Application.CourseRatings.Queries.GetCourseRatings;
 
 public sealed class GetCourseRatingQueryHandler
-    : IQueryHandler<GetCourseRatingsQuery, CourseRatingCollection>
+    : IQueryHandler<GetCourseRatingsQuery, CourseRatingCollectionDto>
 {
     private readonly IReadDbContext _dbContext;
     private readonly ILinkBuilderService _linkBuilder;
@@ -30,7 +29,7 @@ public sealed class GetCourseRatingQueryHandler
         _userContext = userContext;
     }
 
-    public async Task<Result<CourseRatingCollection>> Handle(
+    public async Task<Result<CourseRatingCollectionDto>> Handle(
         GetCourseRatingsQuery request,
         CancellationToken cancellationToken = default)
     {
@@ -66,7 +65,7 @@ public sealed class GetCourseRatingQueryHandler
             return MapToDto(rating, userMap.GetValueOrDefault(rating.UserId), links);
         }).ToList();
 
-        var result = new CourseRatingCollection
+        var result = new CourseRatingCollectionDto
         {
             Items = ratingDtos,
             TotalItems = totalCount,
@@ -78,9 +77,9 @@ public sealed class GetCourseRatingQueryHandler
         return Result.Success(result);
     }
 
-    private static Result<CourseRatingCollection> EmptyResult(GetCourseRatingsQuery request, List<LinkDto> links)
+    private static Result<CourseRatingCollectionDto> EmptyResult(GetCourseRatingsQuery request, List<LinkDto> links)
     {
-        return Result.Success(new CourseRatingCollection
+        return Result.Success(new CourseRatingCollectionDto
         {
             Items = [],
             Links = links,
