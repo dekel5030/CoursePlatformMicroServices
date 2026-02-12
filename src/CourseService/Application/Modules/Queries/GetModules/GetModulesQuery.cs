@@ -8,4 +8,4 @@ public sealed record ModuleFilter(
     CourseId? CourseId = null,
     IEnumerable<Guid>? Ids = null);
 
-public sealed record GetModulesQuery(ModuleFilter Filter) : IQuery<IReadOnlyList<ModuleWithAnalyticsAndStructureDto>>;
+public sealed record GetModulesQuery(ModuleFilter Filter) : IQuery<IReadOnlyList<ModuleDto>>;
