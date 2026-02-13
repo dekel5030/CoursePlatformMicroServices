@@ -22,12 +22,12 @@ internal sealed class GetModulesQueryHandler
         GetModulesQuery request,
         CancellationToken cancellationToken = default)
     {
-        IQueryable<Module> query = _readDbContext.Modules.AsNoTracking();
+        IQueryable<Module> query = _readDbContext.Modules;
 
         query = ApplyFilters(request, query);
 
         List<Module> modules = await query
-            .OrderBy(m => m.Index)
+            .OrderBy(module => module.Index)
             .ToListAsync(cancellationToken);
 
         if (modules.Count == 0)
@@ -35,14 +35,19 @@ internal sealed class GetModulesQueryHandler
             return Result.Success<IReadOnlyList<ModuleDto>>([]);
         }
 
-        var moduleDtos = modules.Select(m => new ModuleDto
+        var moduleDtos = modules.Select(module => MapToDto(module)).ToList();
+
+        return Result.Success<IReadOnlyList<ModuleDto>>(moduleDtos);
+    }
+
+    private static ModuleDto MapToDto(Module m)
+    {
+        return new ModuleDto
         {
             Id = m.Id.Value,
             Title = m.Title.Value,
             Links = []
-        }).ToList();
-
-        return Result.Success<IReadOnlyList<ModuleDto>>(moduleDtos);
+        };
     }
 
     private static IQueryable<Module> ApplyFilters(GetModulesQuery request, IQueryable<Module> query)
