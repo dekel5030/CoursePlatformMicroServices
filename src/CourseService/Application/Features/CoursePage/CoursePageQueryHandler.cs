@@ -4,6 +4,7 @@ using Courses.Application.Categories;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Features.Dtos;
+using Courses.Application.Features.Shared.Loaders;
 using Courses.Application.Features.Shared.Mappers;
 using Courses.Application.Modules.Dtos;
 using Courses.Application.ReadModels;
@@ -24,17 +25,20 @@ internal sealed class CoursePageQueryHandler
     : IQueryHandler<CoursePageQuery, CoursePageDto>
 {
     private readonly IReadDbContext _readDbContext;
+    private readonly ICoursePageDataLoader _coursePageDataLoader;
     private readonly ICoursePageDtoMapper _coursePageDtoMapper;
     private readonly IImmediateEventBus _immediateEventBus;
     private readonly IUserContext _userContext;
 
     public CoursePageQueryHandler(
         IReadDbContext readDbContext,
+        ICoursePageDataLoader coursePageDataLoader,
         ICoursePageDtoMapper coursePageDtoMapper,
         IImmediateEventBus immediateEventBus,
         IUserContext userContext)
     {
         _readDbContext = readDbContext;
+        _coursePageDataLoader = coursePageDataLoader;
         _coursePageDtoMapper = coursePageDtoMapper;
         _immediateEventBus = immediateEventBus;
         _userContext = userContext;
@@ -46,24 +50,7 @@ internal sealed class CoursePageQueryHandler
     {
         var courseId = new CourseId(request.Id);
 
-        var courseData = await _readDbContext.Courses
-            .AsSplitQuery()
-            .Where(c => c.Id == courseId)
-            .Select(course => new
-            {
-                Course = course,
-                Modules = _readDbContext.Modules
-                    .Where(module => module.CourseId == course.Id)
-                    .OrderBy(module => module.Index)
-                    .ToList(),
-                Lessons = _readDbContext.Lessons
-                    .Where(lesson => lesson.CourseId == course.Id)
-                    .OrderBy(lesson => lesson.Index)
-                    .ToList(),
-                Instructor = _readDbContext.Users.FirstOrDefault(user => user.Id == course.InstructorId),
-                Category = _readDbContext.Categories.FirstOrDefault(category => category.Id == course.CategoryId)
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+        CoursePageData? courseData = await _coursePageDataLoader.LoadAsync(courseId, cancellationToken);
 
         if (courseData == null)
         {
@@ -76,7 +63,7 @@ internal sealed class CoursePageQueryHandler
         CourseContext courseContext = new(courseData.Course.Id, courseData.Course.InstructorId, courseData.Course.Status, IsManagementView: false);
 
         CourseDto courseDto = _coursePageDtoMapper.MapCourse(courseData.Course, courseContext);
-        CourseAnalyticsDto analyticsDto = MapAnalytics(analytics);
+        CourseAnalyticsDto analyticsDto = CourseAnalyticsDtoMapper.ToCourseAnalytics(analytics);
 
         CourseStructureDto structure = CourseStructureBuilder.Build(courseData.Modules, courseData.Lessons);
 
@@ -99,10 +86,10 @@ internal sealed class CoursePageQueryHandler
                     var moduleContext = new ModuleContext(courseContext, m.Id);
                     ModuleDto moduleDto = _coursePageDtoMapper.MapModule(m, moduleContext);
                     ModuleAnalytics? ma = moduleAnalyticsByModuleId.GetValueOrDefault(m.Id.Value);
-                    var analyticsDto = new ModuleAnalyticsDto(
+                    var moduleAnalyticsDto = new ModuleAnalyticsDto(
                         ma?.LessonCount ?? 0,
                         ma?.TotalModuleDuration ?? TimeSpan.Zero);
-                    return new ModuleWithAnalyticsDto(moduleDto, analyticsDto);
+                    return new ModuleWithAnalyticsDto(moduleDto, moduleAnalyticsDto);
                 }),
 
             Lessons = courseData.Lessons.ToDictionary(
@@ -117,18 +104,5 @@ internal sealed class CoursePageQueryHandler
                 ? new Dictionary<Guid, CategoryDto> { [courseData.Category.Id.Value] = CategoryDtoMapper.Map(courseData.Category) }
                 : new()
         });
-    }
-
-    private static CourseAnalyticsDto MapAnalytics(CourseAnalytics? analytics)
-    {
-        return analytics != null
-            ? new CourseAnalyticsDto(
-                analytics.EnrollmentsCount,
-                analytics.TotalLessonsCount,
-                analytics.TotalCourseDuration,
-                analytics.AverageRating,
-                analytics.ReviewsCount,
-                analytics.ViewCount)
-            : new CourseAnalyticsDto(0, 0, TimeSpan.Zero, 0, 0, 0);
     }
 }

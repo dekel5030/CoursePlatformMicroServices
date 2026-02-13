@@ -1,5 +1,6 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Categories.Dtos;
+using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
@@ -20,37 +21,28 @@ internal sealed class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQue
         GetCategoriesQuery request,
         CancellationToken cancellationToken = default)
     {
-        IQueryable<Domain.Categories.Category> query = _readDbContext.Categories.AsNoTracking();
+        IQueryable<Category> query = _readDbContext.Categories;
 
-        if (request.Filter.CourseId is { } courseId)
-        {
-            CategoryId? categoryId = await _readDbContext.Courses
-                .AsNoTracking()
-                .Where(c => c.Id == courseId)
-                .Select(c => c.CategoryId)
-                .FirstOrDefaultAsync(cancellationToken);
+        query = ApplyFilters(request, query);
 
-            if (categoryId is null)
-            {
-                return Result.Success<IReadOnlyList<CategoryDto>>([]);
-            }
+        List<CategoryDto> categoryDtos = await query
+            .Select(course => new CategoryDto(course.Id.Value, course.Name, course.Slug.Value))
+            .ToListAsync(cancellationToken);
 
-            query = query.Where(c => c.Id == categoryId);
-        }
+        return Result.Success<IReadOnlyList<CategoryDto>>(categoryDtos);
+    }
 
+    private static IQueryable<Category> ApplyFilters(GetCategoriesQuery request, IQueryable<Category> query)
+    {
         if (request.Filter.Ids is { } idsEnumerable)
         {
             var ids = idsEnumerable.Distinct().Select(id => new CategoryId(id)).ToList();
             if (ids.Count > 0)
             {
-                query = query.Where(c => ids.Contains(c.Id));
+                query = query.Where(course => ids.Contains(course.Id));
             }
         }
 
-        List<CategoryDto> categoryDtos = await query
-            .Select(c => new CategoryDto(c.Id.Value, c.Name, c.Slug.Value))
-            .ToListAsync(cancellationToken);
-
-        return Result.Success<IReadOnlyList<CategoryDto>>(categoryDtos);
+        return query;
     }
 }

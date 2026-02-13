@@ -1,9 +1,9 @@
-using Courses.Application.Abstractions.Data;
 using Courses.Application.Categories;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Features.Dtos;
 using Courses.Application.Features.Shared;
+using Courses.Application.Features.Shared.Loaders;
 using Courses.Application.Features.Shared.Mappers;
 using Courses.Application.Modules.Dtos;
 using Courses.Application.Services.LinkProvider;
@@ -12,23 +12,22 @@ using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Features.Management.ManagedCoursePage;
 
 internal sealed class ManagedCoursePageQueryHandler
     : IQueryHandler<ManagedCoursePageQuery, ManagedCoursePageDto>
 {
-    private readonly IWriteDbContext _writeDbContext;
+    private readonly ICoursePageDataLoader _coursePageDataLoader;
     private readonly ICoursePageDtoMapper _coursePageDtoMapper;
     private readonly IUserContext _userContext;
 
     public ManagedCoursePageQueryHandler(
-        IWriteDbContext writeDbContext,
+        ICoursePageDataLoader coursePageDataLoader,
         ICoursePageDtoMapper coursePageDtoMapper,
         IUserContext userContext)
     {
-        _writeDbContext = writeDbContext;
+        _coursePageDataLoader = coursePageDataLoader;
         _coursePageDtoMapper = coursePageDtoMapper;
         _userContext = userContext;
     }
@@ -39,24 +38,7 @@ internal sealed class ManagedCoursePageQueryHandler
     {
         var courseId = new CourseId(request.Id);
 
-        var courseData = await _writeDbContext.Courses
-            .AsNoTracking()
-            .AsSplitQuery()
-            .Where(c => c.Id == courseId)
-            .Select(course => new
-            {
-                Course = course,
-                Modules = _writeDbContext.Modules
-                    .Where(m => m.CourseId == course.Id)
-                    .OrderBy(m => m.Index)
-                    .ToList(),
-                Lessons = _writeDbContext.Lessons
-                    .Where(l => l.CourseId == course.Id)
-                    .OrderBy(l => l.Index)
-                    .ToList(),
-                Category = _writeDbContext.Categories.FirstOrDefault(cat => cat.Id == course.CategoryId)
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+        CoursePageData? courseData = await _coursePageDataLoader.LoadAsync(courseId, cancellationToken);
 
         if (courseData == null)
         {

@@ -1,5 +1,6 @@
 using CoursePlatform.ServiceDefaults.Messaging;
 using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
+using Courses.Application.Features.Shared.Loaders;
 using Courses.Application.Features.Shared.Mappers;
 using Courses.Application.ReadModels;
 using Courses.Application.Services.Actions;
@@ -29,6 +30,8 @@ public static class DependencyInjection
 
         services.AddScoped<ICoursePageDtoMapper, CoursePageDtoMapper>();
         services.AddScoped<ILessonPageDtoMapper, LessonPageDtoMapper>();
+        services.AddScoped<ICourseSummaryDtoMapper, CourseSummaryDtoMapper>();
+        services.AddScoped<ICoursePageDataLoader, CoursePageDataLoader>();
 
         return services;
     }

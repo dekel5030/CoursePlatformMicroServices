@@ -7,7 +7,7 @@ using Kernel.Messaging.Abstractions;
 namespace Courses.Domain.Courses;
 
 public sealed record CourseCreatedDomainEvent(
-    CourseId Id,
+    CourseId CourseId,
     UserId InstructorId,
     Title Title,
     Description Description,

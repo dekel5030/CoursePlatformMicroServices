@@ -1,11 +1,8 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Storage;
-using Courses.Application.Categories;
+using Courses.Application.Features.Management;
 using Courses.Application.Features.Shared;
-using Courses.Application.Services.LinkProvider;
-using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Features.Shared.Mappers;
 using Courses.Application.Shared.Dtos;
-using Courses.Application.Users;
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses;
@@ -23,20 +20,17 @@ internal sealed class GetManagedCoursesQueryHandler
     : IQueryHandler<GetManagedCoursesQuery, PaginatedCollectionDto<ManagedCourseSummaryDto>>
 {
     private readonly IReadDbContext _dbContext;
-    private readonly IStorageUrlResolver _urlResolver;
+    private readonly ICourseSummaryDtoMapper _courseSummaryDtoMapper;
     private readonly IUserContext _userContext;
-    private readonly ILinkBuilderService _linkBuilder;
 
     public GetManagedCoursesQueryHandler(
         IReadDbContext dbContext,
-        IStorageUrlResolver urlResolver,
-        IUserContext userContext,
-        ILinkBuilderService linkBuilder)
+        ICourseSummaryDtoMapper courseSummaryDtoMapper,
+        IUserContext userContext)
     {
         _dbContext = dbContext;
-        _urlResolver = urlResolver;
+        _courseSummaryDtoMapper = courseSummaryDtoMapper;
         _userContext = userContext;
-        _linkBuilder = linkBuilder;
     }
 
     public async Task<Result<PaginatedCollectionDto<ManagedCourseSummaryDto>>> Handle(
@@ -117,30 +111,11 @@ internal sealed class GetManagedCoursesQueryHandler
             categories.TryGetValue(course.CategoryId, out Category? category);
             courseStats.TryGetValue(course.Id, out var stats);
 
-            string? thumbnailUrl = CourseSummaryHelpers.GetFirstImagePublicUrl(course.Images, _urlResolver);
-            string shortDescription = CourseSummaryHelpers.TruncateShortDescription(course.Description.Value);
+            var statsDto = new ManagedCourseStatsDto(
+                LessonsCount: stats?.LessonCount ?? 0,
+                Duration: stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero);
 
-            var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status, IsManagementView: true);
-            var links = _linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext).ToList();
-
-            return new ManagedCourseSummaryDto
-            {
-                Id = course.Id.Value,
-                Title = course.Title.Value,
-                ShortDescription = shortDescription,
-                Slug = course.Slug.Value,
-                ThumbnailUrl = thumbnailUrl,
-                Instructor = UserDtoMapper.Map(instructor, course.InstructorId.Value),
-                Category = CategoryDtoMapper.Map(category),
-                Difficulty = course.Difficulty,
-                Price = course.Price,
-                UpdatedAtUtc = course.UpdatedAtUtc,
-                Status = course.Status,
-                Stats = new ManagedCourseStatsDto(
-                    LessonsCount: stats?.LessonCount ?? 0,
-                    Duration: stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero),
-                Links = links
-            };
+            return _courseSummaryDtoMapper.MapToManagedSummary(course, instructor, category, statsDto);
         }).ToList();
 
         return courseDtos;
