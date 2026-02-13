@@ -1,13 +1,8 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Lessons.Dtos;
-using Courses.Application.Services.LinkProvider;
-using Courses.Application.Services.LinkProvider.Abstractions;
-using Courses.Domain.Courses;
-using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.Modules.Primitives;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +30,8 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
         query = ApplyFilters(query, request.Filter);
 
         List<Lesson> lessons = await query
-            .OrderBy(l => l.ModuleId).ThenBy(l => l.Index)
+            .OrderBy(lesson => lesson.ModuleId)
+            .ThenBy(lesson => lesson.Index)
             .ToListAsync(cancellationToken);
 
         if (lessons.Count == 0)
@@ -43,27 +39,9 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
             return Result.Success<IReadOnlyList<LessonDto>>([]);
         }
 
-        Dictionary<CourseId, Course> coursesById = await GetRequiredCoursesAsync(lessons, cancellationToken);
-
-        var response = lessons.Select(lesson => MapToDto(
-            lesson,
-            coursesById[lesson.CourseId])).ToList();
+        var response = lessons.Select(lesson => LessonDtoMapper.Map(lesson, ResolveUrl)).ToList();
 
         return Result.Success<IReadOnlyList<LessonDto>>(response);
-    }
-
-    private async Task<Dictionary<CourseId, Course>> GetRequiredCoursesAsync(
-        List<Lesson> lessons,
-        CancellationToken cancellationToken)
-    {
-        var courseIds = lessons.Select(l => l.CourseId).Distinct().ToList();
-
-        List<Course> courses = await _readDbContext.Courses
-            .AsNoTracking()
-            .Where(c => courseIds.Contains(c.Id))
-            .ToListAsync(cancellationToken);
-
-        return courses.ToDictionary(c => c.Id);
     }
 
     private static IQueryable<Lesson> ApplyFilters(IQueryable<Lesson> query, LessonFilter filter)
@@ -86,32 +64,8 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
         return query;
     }
 
-    private LessonDto MapToDto(
-        Lesson lesson,
-        Course course)
+    private string ResolveUrl(string? path)
     {
-        var dto = new LessonDto
-        {
-            Id = lesson.Id.Value,
-            Title = lesson.Title.Value,
-            Index = lesson.Index,
-            Duration = lesson.Duration,
-            Access = lesson.Access,
-            ThumbnailUrl = ResolveUrl(lesson.ThumbnailImageUrl?.Path),
-            ModuleId = lesson.ModuleId.Value,
-            CourseId = lesson.CourseId.Value,
-            CourseName = course.Title.Value,
-            Description = lesson.Description.Value,
-            VideoUrl = ResolveUrl(lesson.VideoUrl?.Path),
-            TranscriptUrl = ResolveUrl(lesson.Transcript?.Path),
-            Links = []
-        };
-
-        return dto;
-    }
-
-    private string? ResolveUrl(string? path)
-    {
-        return path is not null ? _urlResolver.Resolve(StorageCategory.Public, path).Value : null;
+        return path is not null ? _urlResolver.Resolve(StorageCategory.Public, path).Value : "";
     }
 }

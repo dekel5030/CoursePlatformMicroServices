@@ -27,7 +27,7 @@ internal sealed class CourseAnalyticsProjectionHandlers :
     }
 
     public Task HandleAsync(CourseCreatedDomainEvent message, CancellationToken cancellationToken = default)
-        => _projection.RecalculateAsync(message.Id, cancellationToken);
+        => _projection.RecalculateAsync(message.CourseId, cancellationToken);
 
     public Task HandleAsync(LessonCreatedDomainEvent message, CancellationToken cancellationToken = default)
         => _projection.RecalculateAsync(message.CourseId, cancellationToken);

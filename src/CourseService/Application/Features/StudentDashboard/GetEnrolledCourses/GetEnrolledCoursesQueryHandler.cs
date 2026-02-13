@@ -1,13 +1,13 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Enrollments.Dtos;
+using Courses.Application.Features.Shared;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Enrollments.Errors;
 using Courses.Domain.Enrollments.Primitives;
-using Courses.Domain.Shared.Primitives;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
@@ -81,9 +81,8 @@ internal sealed class GetEnrolledCoursesQueryHandler
                 : 0;
 
             var linkContext = new EnrolledCourseContext(enrollment.CourseId, enrollment.LastAccessedLessonId);
-            ImageUrl? courseImage = item.CourseInfo?.Images.FirstOrDefault();
-            string? courseImageUrl = courseImage != null
-                ? _storageUrlResolver.Resolve(StorageCategory.Public, courseImage.Path).Value
+            string? courseImageUrl = item.CourseInfo?.Images != null
+                ? CourseSummaryHelpers.GetFirstImagePublicUrl(item.CourseInfo.Images, _storageUrlResolver)
                 : null;
 
             var enrolledCourseDto = new EnrolledCourseDto

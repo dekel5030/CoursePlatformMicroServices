@@ -1,11 +1,5 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
-using Courses.Application.ReadModels;
-using Courses.Application.Services.LinkProvider;
-using Courses.Application.Services.LinkProvider.Abstractions;
-using Courses.Domain.Courses;
-using Courses.Domain.Lessons;
 using Courses.Domain.Modules;
 using Courses.Domain.Modules.Primitives;
 using Kernel;
@@ -28,8 +22,36 @@ internal sealed class GetModulesQueryHandler
         GetModulesQuery request,
         CancellationToken cancellationToken = default)
     {
-        IQueryable<Module> query = _readDbContext.Modules.AsNoTracking();
+        IQueryable<Module> query = _readDbContext.Modules;
 
+        query = ApplyFilters(request, query);
+
+        List<Module> modules = await query
+            .OrderBy(module => module.Index)
+            .ToListAsync(cancellationToken);
+
+        if (modules.Count == 0)
+        {
+            return Result.Success<IReadOnlyList<ModuleDto>>([]);
+        }
+
+        var moduleDtos = modules.Select(module => MapToDto(module)).ToList();
+
+        return Result.Success<IReadOnlyList<ModuleDto>>(moduleDtos);
+    }
+
+    private static ModuleDto MapToDto(Module m)
+    {
+        return new ModuleDto
+        {
+            Id = m.Id.Value,
+            Title = m.Title.Value,
+            Links = []
+        };
+    }
+
+    private static IQueryable<Module> ApplyFilters(GetModulesQuery request, IQueryable<Module> query)
+    {
         if (request.Filter.CourseId is { } courseId)
         {
             query = query.Where(m => m.CourseId == courseId);
@@ -44,22 +66,6 @@ internal sealed class GetModulesQueryHandler
             }
         }
 
-        List<Module> modules = await query
-            .OrderBy(m => m.Index)
-            .ToListAsync(cancellationToken);
-
-        if (modules.Count == 0)
-        {
-            return Result.Success<IReadOnlyList<ModuleDto>>([]);
-        }
-
-        var moduleDtos = modules.Select(m => new ModuleDto
-        {
-            Id = m.Id.Value,
-            Title = m.Title.Value,
-            Links = []
-        }).ToList();
-
-        return Result.Success<IReadOnlyList<ModuleDto>>(moduleDtos);
+        return query;
     }
 }

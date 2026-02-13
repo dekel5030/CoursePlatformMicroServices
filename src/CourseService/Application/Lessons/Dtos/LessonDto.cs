@@ -13,7 +13,6 @@ public record LessonDto
     public required LessonAccess Access { get; init; }
     public Guid? ModuleId { get; init; }
     public Guid? CourseId { get; init; }
-    public string? CourseName { get; init; }
     public string? Description { get; init; }
     public string? VideoUrl { get; init; }
     public string? TranscriptUrl { get; init; }

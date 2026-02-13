@@ -32,7 +32,7 @@ internal sealed class CourseDomainEventMapper :
     {
         return _eventBus.PublishAsync(
             new CourseCreatedIntegrationEvent(
-                message.Id.Value,
+                message.CourseId.Value,
                 message.InstructorId.Value,
                 message.Title.Value,
                 message.Description.Value,

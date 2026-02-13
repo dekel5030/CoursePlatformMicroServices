@@ -1,8 +1,8 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
+using Courses.Application.Features.LessonPage;
 using Courses.Application.Features.Management.ManagedLessonPage;
-using Courses.Application.Lessons.Dtos;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
@@ -19,14 +19,14 @@ internal sealed class GetManagedLessonPage : IEndpoint
         {
             var query = new ManagedLessonPageQuery(lessonId);
 
-            Result<LessonDetailsPageDto> result = await mediator.Send(query, cancellationToken);
+            Result<LessonPageDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
                 dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
         .WithName(nameof(GetManagedLessonPage))
-        .WithMetadata<LessonDetailsPageDto>(
+        .WithMetadata<LessonPageDto>(
             nameof(GetManagedLessonPage),
             tag: Tags.Lessons,
             summary: "Gets a lesson page for management by the instructor.")

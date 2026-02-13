@@ -23,21 +23,17 @@ internal sealed class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, IReadO
     {
         IQueryable<User> query = _readDbContext.Users;
 
-        if (request.Filter.CourseId is { } courseId)
-        {
-            List<UserId> instructorIds = await _readDbContext.Courses
-                .Where(c => c.Id == courseId)
-                .Select(c => c.InstructorId)
-                .ToListAsync(cancellationToken);
+        query = ApplyFilters(request, query);
 
-            if (instructorIds.Count == 0)
-            {
-                return Result.Success<IReadOnlyList<UserDto>>([]);
-            }
+        List<UserDto> userDtos = await query
+            .Select(user => UserDtoMapper.Map(user))
+            .ToListAsync(cancellationToken);
 
-            query = query.Where(u => instructorIds.Contains(u.Id));
-        }
+        return Result.Success<IReadOnlyList<UserDto>>(userDtos);
+    }
 
+    private static IQueryable<User> ApplyFilters(GetUsersQuery request, IQueryable<User> query)
+    {
         if (request.Filter.Ids is { } idsEnumerable)
         {
             var ids = idsEnumerable.Distinct().Select(id => new UserId(id)).ToList();
@@ -47,16 +43,6 @@ internal sealed class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, IReadO
             }
         }
 
-        List<UserDto> userDtos = await query
-            .Select(u => new UserDto
-            {
-                Id = u.Id.Value,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                AvatarUrl = u.AvatarUrl
-            })
-            .ToListAsync(cancellationToken);
-
-        return Result.Success<IReadOnlyList<UserDto>>(userDtos);
+        return query;
     }
 }

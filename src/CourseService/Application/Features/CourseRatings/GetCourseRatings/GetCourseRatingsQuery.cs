@@ -1,6 +1,6 @@
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Application.CourseRatings.Queries.GetCourseRatings;
+namespace Courses.Application.Features.CourseRatings.GetCourseRatings;
 
 public sealed record GetCourseRatingsQuery(
     Guid CourseId,
