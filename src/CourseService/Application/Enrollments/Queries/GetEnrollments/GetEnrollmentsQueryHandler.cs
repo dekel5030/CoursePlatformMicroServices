@@ -1,5 +1,6 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Enrollments.Dtos;
+using Courses.Application.Enrollments.Queries.GetEnrollmentById;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Kernel;
@@ -33,7 +34,7 @@ internal sealed class GetEnrollmentsQueryHandler : IQueryHandler<GetEnrollmentsQ
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
-        List<EnrollmentDto> dtos = MapToDtoCollection(items);
+        var dtos = items.Select(EnrollmentDtoMapping.Map).ToList();
 
         var result = new EnrollmentCollectionDto
         {
@@ -45,18 +46,6 @@ internal sealed class GetEnrollmentsQueryHandler : IQueryHandler<GetEnrollmentsQ
         };
 
         return Result.Success(result);
-    }
-
-    private static List<EnrollmentDto> MapToDtoCollection(List<Enrollment> items)
-    {
-        return items.Select(enrollment => new EnrollmentDto(
-            enrollment.Id.Value,
-            enrollment.CourseId.Value,
-            enrollment.StudentId.Value,
-            enrollment.EnrolledAt,
-            enrollment.ExpiresAt,
-            enrollment.Status.ToString(),
-            enrollment.CompletedAt)).ToList();
     }
 
     private static IQueryable<Enrollment> ApplyFilters(IQueryable<Enrollment> baseQuery, GetEnrollmentsQuery request)

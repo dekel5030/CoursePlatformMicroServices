@@ -27,14 +27,7 @@ internal sealed class GetEnrollmentByIdQueryHandler : IQueryHandler<GetEnrollmen
             return Result.Failure<EnrollmentDto>(EnrollmentErrors.NotFound);
         }
 
-        var dto = new EnrollmentDto(
-            enrollment.Id.Value,
-            enrollment.CourseId.Value,
-            enrollment.StudentId.Value,
-            enrollment.EnrolledAt,
-            enrollment.ExpiresAt,
-            enrollment.Status.ToString(),
-            enrollment.CompletedAt);
+        EnrollmentDto dto = EnrollmentDtoMapping.Map(enrollment);
 
         return Result.Success(dto);
     }

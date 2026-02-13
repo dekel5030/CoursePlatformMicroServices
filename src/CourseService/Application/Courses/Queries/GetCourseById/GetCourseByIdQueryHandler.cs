@@ -40,11 +40,19 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
         }
 
         CourseContext courseContext = new(course.Id, course.InstructorId, course.Status);
+
         var resolvedImageUrls = course.Images
             .Select(img => _urlResolver.Resolve(StorageCategory.Public, img.Path).Value)
             .ToList();
 
-        var courseDto = new CourseDto
+        CourseDto courseDto = MapToCourseDto(course, courseContext, resolvedImageUrls);
+
+        return Result.Success(courseDto);
+    }
+
+    private CourseDto MapToCourseDto(Course course, CourseContext courseContext, List<string> resolvedImageUrls)
+    {
+        return new CourseDto
         {
             Id = course.Id.Value,
             Title = course.Title.Value,
@@ -58,7 +66,5 @@ internal sealed class GetCourseByIdQueryHandler : IQueryHandler<GetCourseByIdQue
             Tags = course.Tags.Select(t => t.Value).ToList().AsReadOnly(),
             Links = _linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext).ToList()
         };
-
-        return Result.Success(courseDto);
     }
 }
