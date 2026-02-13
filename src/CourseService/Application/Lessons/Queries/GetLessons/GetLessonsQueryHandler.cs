@@ -39,7 +39,7 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
             return Result.Success<IReadOnlyList<LessonDto>>([]);
         }
 
-        var response = lessons.Select(MapToDto).ToList();
+        var response = lessons.Select(lesson => LessonDtoMapper.Map(lesson, ResolveUrl)).ToList();
 
         return Result.Success<IReadOnlyList<LessonDto>>(response);
     }
@@ -64,29 +64,8 @@ internal sealed class GetLessonsQueryHandler : IQueryHandler<GetLessonsQuery, IR
         return query;
     }
 
-    private LessonDto MapToDto(Lesson lesson)
+    private string ResolveUrl(string? path)
     {
-        var dto = new LessonDto
-        {
-            Id = lesson.Id.Value,
-            Title = lesson.Title.Value,
-            Index = lesson.Index,
-            Duration = lesson.Duration,
-            Access = lesson.Access,
-            ThumbnailUrl = ResolveUrl(lesson.ThumbnailImageUrl?.Path),
-            ModuleId = lesson.ModuleId.Value,
-            CourseId = lesson.CourseId.Value,
-            Description = lesson.Description.Value,
-            VideoUrl = ResolveUrl(lesson.VideoUrl?.Path),
-            TranscriptUrl = ResolveUrl(lesson.Transcript?.Path),
-            Links = []
-        };
-
-        return dto;
-    }
-
-    private string? ResolveUrl(string? path)
-    {
-        return path is not null ? _urlResolver.Resolve(StorageCategory.Public, path).Value : null;
+        return path is not null ? _urlResolver.Resolve(StorageCategory.Public, path).Value : "";
     }
 }
