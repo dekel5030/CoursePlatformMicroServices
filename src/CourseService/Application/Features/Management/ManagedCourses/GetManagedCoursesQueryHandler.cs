@@ -1,11 +1,11 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Categories.Dtos;
+using Courses.Application.Categories;
+using Courses.Application.Features.Shared;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Shared.Dtos;
 using Courses.Application.Users;
-using Courses.Application.Users.Dtos;
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses;
@@ -49,8 +49,7 @@ internal sealed class GetManagedCoursesQueryHandler
         }
 
         var instructorId = new UserId(_userContext.Id.Value);
-        int pageNumber = Math.Max(1, request.PageNumber);
-        int pageSize = Math.Clamp(request.PageSize, 1, 25);
+        (int pageNumber, int pageSize) = PaginationOptions.Normalize(request.PageNumber, request.PageSize);
 
         int totalItems = await _dbContext.Courses
             .Where(c => c.InstructorId == instructorId)
@@ -118,13 +117,8 @@ internal sealed class GetManagedCoursesQueryHandler
             categories.TryGetValue(course.CategoryId, out Category? category);
             courseStats.TryGetValue(course.Id, out var stats);
 
-            string? thumbnailUrl = course.Images.Count > 0
-                ? _urlResolver.Resolve(StorageCategory.Public, course.Images.First().Path).Value
-                : null;
-
-            string shortDescription = course.Description.Value.Length > 100
-                ? course.Description.Value[..100] + "..."
-                : course.Description.Value;
+            string? thumbnailUrl = CourseSummaryHelpers.GetFirstImagePublicUrl(course.Images, _urlResolver);
+            string shortDescription = CourseSummaryHelpers.TruncateShortDescription(course.Description.Value);
 
             var courseContext = new CourseContext(course.Id, course.InstructorId, course.Status, IsManagementView: true);
             var links = _linkBuilder.BuildLinks(LinkResourceKey.Course, courseContext).ToList();
@@ -136,17 +130,8 @@ internal sealed class GetManagedCoursesQueryHandler
                 ShortDescription = shortDescription,
                 Slug = course.Slug.Value,
                 ThumbnailUrl = thumbnailUrl,
-                Instructor = new UserDto
-                {
-                    Id = instructor?.Id.Value ?? Guid.Empty,
-                    FirstName = instructor?.FirstName ?? "Unknown",
-                    LastName = instructor?.LastName ?? "",
-                    AvatarUrl = instructor?.AvatarUrl
-                },
-                Category = new CategoryDto(
-                    category?.Id.Value ?? Guid.Empty,
-                    category?.Name ?? "Uncategorized",
-                    category?.Slug.Value ?? string.Empty),
+                Instructor = UserDtoMapper.Map(instructor, course.InstructorId.Value),
+                Category = CategoryDtoMapper.Map(category),
                 Difficulty = course.Difficulty,
                 Price = course.Price,
                 UpdatedAtUtc = course.UpdatedAtUtc,

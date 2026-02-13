@@ -1,22 +1,17 @@
 using CoursePlatform.Contracts.CourseService;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Storage;
+using Courses.Application.Categories;
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Courses.Dtos;
 using Courses.Application.Features.Dtos;
-using Courses.Application.Lessons.Dtos;
+using Courses.Application.Features.Shared.Mappers;
 using Courses.Application.Modules.Dtos;
 using Courses.Application.ReadModels;
 using Courses.Application.Services.LinkProvider;
-using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Users;
 using Courses.Application.Users.Dtos;
-using Courses.Domain.Categories;
-using Courses.Domain.Courses;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons;
-using Courses.Domain.Modules;
-using Courses.Domain.Users;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.EventBus;
@@ -29,21 +24,18 @@ internal sealed class CoursePageQueryHandler
     : IQueryHandler<CoursePageQuery, CoursePageDto>
 {
     private readonly IReadDbContext _readDbContext;
-    private readonly ILinkBuilderService _linkBuilderService;
-    private readonly IStorageUrlResolver _storageUrlResolver;
+    private readonly ICoursePageDtoMapper _coursePageDtoMapper;
     private readonly IImmediateEventBus _immediateEventBus;
     private readonly IUserContext _userContext;
 
     public CoursePageQueryHandler(
         IReadDbContext readDbContext,
-        ILinkBuilderService linkBuilderService,
-        IStorageUrlResolver storageUrlResolver,
+        ICoursePageDtoMapper coursePageDtoMapper,
         IImmediateEventBus immediateEventBus,
         IUserContext userContext)
     {
         _readDbContext = readDbContext;
-        _linkBuilderService = linkBuilderService;
-        _storageUrlResolver = storageUrlResolver;
+        _coursePageDtoMapper = coursePageDtoMapper;
         _immediateEventBus = immediateEventBus;
         _userContext = userContext;
     }
@@ -61,12 +53,12 @@ internal sealed class CoursePageQueryHandler
             {
                 Course = course,
                 Modules = _readDbContext.Modules
-                    .Where(m => m.CourseId == course.Id)
-                    .OrderBy(m => m.Index)
+                    .Where(module => module.CourseId == course.Id)
+                    .OrderBy(module => module.Index)
                     .ToList(),
                 Lessons = _readDbContext.Lessons
-                    .Where(l => l.CourseId == course.Id)
-                    .OrderBy(l => l.Index)
+                    .Where(lesson => lesson.CourseId == course.Id)
+                    .OrderBy(lesson => lesson.Index)
                     .ToList(),
                 Instructor = _readDbContext.Users.FirstOrDefault(user => user.Id == course.InstructorId),
                 Category = _readDbContext.Categories.FirstOrDefault(category => category.Id == course.CategoryId)
@@ -83,24 +75,16 @@ internal sealed class CoursePageQueryHandler
 
         CourseContext courseContext = new(courseData.Course.Id, courseData.Course.InstructorId, courseData.Course.Status, IsManagementView: false);
 
-        CourseDto courseDto = MapToCourseDto(courseData.Course, courseContext);
-        CourseAnalyticsDto analyticsDto = analytics != null
-            ? new CourseAnalyticsDto(
-                analytics.EnrollmentsCount,
-                analytics.TotalLessonsCount,
-                analytics.TotalCourseDuration,
-                analytics.AverageRating,
-                analytics.ReviewsCount,
-                analytics.ViewCount)
-            : new CourseAnalyticsDto(0, 0, TimeSpan.Zero, 0, 0, 0);
+        CourseDto courseDto = _coursePageDtoMapper.MapCourse(courseData.Course, courseContext);
+        CourseAnalyticsDto analyticsDto = MapAnalytics(analytics);
 
-        CourseStructureDto structure = BuildStructure(courseData.Modules, courseData.Lessons);
+        CourseStructureDto structure = CourseStructureBuilder.Build(courseData.Modules, courseData.Lessons);
 
         await _immediateEventBus.PublishAsync(
             new CourseViewedIntegrationEvent(request.Id, _userContext.Id, DateTimeOffset.UtcNow),
             cancellationToken);
 
-        Dictionary<Guid, ReadModels.ModuleAnalytics> moduleAnalyticsByModuleId = analytics?.ModuleAnalytics?.ToDictionary(ma => ma.ModuleId) ?? new Dictionary<Guid, ReadModels.ModuleAnalytics>();
+        Dictionary<Guid, ModuleAnalytics> moduleAnalyticsByModuleId = analytics?.ModuleAnalytics?.ToDictionary(ma => ma.ModuleId) ?? new Dictionary<Guid, ModuleAnalytics>();
 
         return Result.Success(new CoursePageDto
         {
@@ -110,118 +94,41 @@ internal sealed class CoursePageQueryHandler
 
             Modules = courseData.Modules.ToDictionary(
                 m => m.Id.Value,
-                m => MapToModuleDto(m, courseContext, moduleAnalyticsByModuleId)),
+                m =>
+                {
+                    var moduleContext = new ModuleContext(courseContext, m.Id);
+                    ModuleDto moduleDto = _coursePageDtoMapper.MapModule(m, moduleContext);
+                    ModuleAnalytics? ma = moduleAnalyticsByModuleId.GetValueOrDefault(m.Id.Value);
+                    var analyticsDto = new ModuleAnalyticsDto(
+                        ma?.LessonCount ?? 0,
+                        ma?.TotalModuleDuration ?? TimeSpan.Zero);
+                    return new ModuleWithAnalyticsDto(moduleDto, analyticsDto);
+                }),
 
             Lessons = courseData.Lessons.ToDictionary(
                 l => l.Id.Value,
-                lesson => MapToLessonDto(lesson, courseContext, false)),
+                lesson => _coursePageDtoMapper.MapLesson(lesson, courseContext, false)),
 
             Instructors = courseData.Instructor != null
-                ? new Dictionary<Guid, UserDto> { [courseData.Instructor.Id.Value] = MapToUserDto(courseData.Instructor) }
+                ? new Dictionary<Guid, UserDto> { [courseData.Instructor.Id.Value] = UserDtoMapper.Map(courseData.Instructor) }
                 : new(),
 
             Categories = courseData.Category != null
-                ? new Dictionary<Guid, CategoryDto> { [courseData.Category.Id.Value] = MapToCategoryDto(courseData.Category) }
+                ? new Dictionary<Guid, CategoryDto> { [courseData.Category.Id.Value] = CategoryDtoMapper.Map(courseData.Category) }
                 : new()
         });
     }
 
-    private CourseDto MapToCourseDto(Course course, CourseContext context)
+    private static CourseAnalyticsDto MapAnalytics(CourseAnalytics? analytics)
     {
-        return new CourseDto
-        {
-            Id = course.Id.Value,
-            Title = course.Title.Value,
-            Description = course.Description.Value,
-            Price = course.Price,
-            Status = course.Status,
-            ImageUrls = course.Images.Select(image => _storageUrlResolver.Resolve(StorageCategory.Public, image.Path).Value).ToList(),
-            Tags = course.Tags.Select(t => t.Value).ToList(),
-            CategoryId = course.CategoryId.Value,
-            InstructorId = course.InstructorId.Value,
-            UpdatedAtUtc = course.UpdatedAtUtc,
-            Links = _linkBuilderService.BuildLinks(LinkResourceKey.Course, context).ToList()
-        };
-    }
-
-    private static CourseStructureDto BuildStructure(
-        IReadOnlyList<Module> modules,
-        IReadOnlyList<Lesson> lessons)
-    {
-        var orderedModules = modules.OrderBy(module => module.Index).ToList();
-        var moduleIds = orderedModules.Select(module => module.Id.Value).ToList();
-        var moduleLessonIds = orderedModules.ToDictionary(
-            module => module.Id.Value,
-            module => (IReadOnlyList<Guid>)lessons
-                .Where(lesson => lesson.ModuleId == module.Id)
-                .OrderBy(lesson => lesson.Index)
-                .Select(lesson => lesson.Id.Value)
-                .ToList());
-
-        return new CourseStructureDto
-        {
-            ModuleIds = moduleIds,
-            ModuleLessonIds = moduleLessonIds
-        };
-    }
-
-    private ModuleWithAnalyticsDto MapToModuleDto(
-        Module module,
-        CourseContext courseContext,
-        IReadOnlyDictionary<Guid, ReadModels.ModuleAnalytics> moduleAnalyticsByModuleId)
-    {
-        var moduleContext = new ModuleContext(courseContext, module.Id);
-
-        var moduleDto = new ModuleDto
-        {
-            Id = module.Id.Value,
-            Title = module.Title.Value,
-            Links = _linkBuilderService.BuildLinks(LinkResourceKey.Module, moduleContext).ToList()
-        };
-
-        ReadModels.ModuleAnalytics? analytics = moduleAnalyticsByModuleId.GetValueOrDefault(module.Id.Value);
-        ModuleAnalyticsDto analyticsDto = new(
-            analytics?.LessonCount ?? 0,
-            analytics?.TotalModuleDuration ?? TimeSpan.Zero);
-
-        return new ModuleWithAnalyticsDto(moduleDto, analyticsDto);
-    }
-
-    private LessonDto MapToLessonDto(Lesson lesson, CourseContext courseContext, bool hasEnrollment)
-    {
-        var moduleContext = new ModuleContext(courseContext, lesson.ModuleId);
-        var lessonContext = new LessonContext(moduleContext, lesson.Id, lesson.Access, hasEnrollment);
-
-        return new()
-        {
-            Id = lesson.Id.Value,
-            Title = lesson.Title.Value,
-            Index = lesson.Index,
-            Duration = lesson.Duration,
-            ThumbnailUrl = lesson.ThumbnailImageUrl?.Path,
-            Access = lesson.Access,
-            ModuleId = lesson.ModuleId.Value,
-            CourseId = lesson.CourseId.Value,
-            Description = lesson.Description.Value,
-            VideoUrl = lesson.VideoUrl?.Path,
-            TranscriptUrl = lesson.Transcript?.Path,
-            Links = _linkBuilderService.BuildLinks(LinkResourceKey.Lesson, lessonContext).ToList()
-        };
-    }
-
-    private static UserDto MapToUserDto(User user)
-    {
-        return new()
-        {
-            Id = user.Id.Value,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            AvatarUrl = user.AvatarUrl
-        };
-    }
-
-    private static CategoryDto MapToCategoryDto(Category category)
-    {
-        return new(category.Id.Value, category.Name, category.Slug.Value);
+        return analytics != null
+            ? new CourseAnalyticsDto(
+                analytics.EnrollmentsCount,
+                analytics.TotalLessonsCount,
+                analytics.TotalCourseDuration,
+                analytics.AverageRating,
+                analytics.ReviewsCount,
+                analytics.ViewCount)
+            : new CourseAnalyticsDto(0, 0, TimeSpan.Zero, 0, 0, 0);
     }
 }

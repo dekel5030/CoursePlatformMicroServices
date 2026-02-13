@@ -1,6 +1,5 @@
 using Courses.Application.Categories.Dtos;
 using Courses.Application.Services.LinkProvider.Abstractions;
-using Courses.Application.Users;
 using Courses.Application.Users.Dtos;
 using Courses.Domain.Courses.Primitives;
 using Kernel;

@@ -1,7 +1,7 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
-using Courses.Application.Users.Dtos;
+using Courses.Application.Users;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Ratings;
 using Courses.Domain.Users;
@@ -125,14 +125,6 @@ public sealed class GetCourseRatingQueryHandler
         User? user,
         IReadOnlyList<LinkDto> links)
     {
-        var emptyUser = new UserDto
-        {
-            Id = Guid.Empty,
-            FirstName = string.Empty,
-            LastName = string.Empty,
-            AvatarUrl = null
-        };
-
         return new CourseRatingDto
         {
             Id = rating.Id.Value,
@@ -141,13 +133,7 @@ public sealed class GetCourseRatingQueryHandler
             Comment = rating.Comment ?? string.Empty,
             CreatedAt = rating.CreatedAtUtc,
             UpdatedAt = rating.UpdatedAtUtc,
-            User = user is null ? emptyUser with { Id = rating.UserId.Value } : new UserDto
-            {
-                Id = user.Id.Value,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                AvatarUrl = user.AvatarUrl
-            },
+            User = UserDtoMapper.Map(user, rating.UserId.Value),
             Links = [.. links]
         };
     }

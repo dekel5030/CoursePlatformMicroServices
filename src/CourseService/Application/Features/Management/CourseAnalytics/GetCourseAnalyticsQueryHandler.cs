@@ -1,4 +1,5 @@
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Features.Shared;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
@@ -28,25 +29,24 @@ internal sealed class GetCourseAnalyticsQueryHandler
         GetCourseAnalyticsQuery request,
         CancellationToken cancellationToken = default)
     {
-        if (_userContext.Id is null || !_userContext.IsAuthenticated)
-        {
-            return Result.Failure<CourseDetailedAnalyticsDto>(CourseErrors.Unauthorized);
-        }
-
         var courseId = new CourseId(request.CourseId);
 
-        Guid instructorId = await _readDbContext.Courses
-            .AsNoTracking()
+        Guid instructorIdGuid = await _readDbContext.Courses
             .Where(c => c.Id == courseId)
             .Select(c => c.InstructorId.Value)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (instructorId == Guid.Empty)
+        if (instructorIdGuid == Guid.Empty)
         {
             return Result.Failure<CourseDetailedAnalyticsDto>(CourseErrors.NotFound);
         }
 
-        if (instructorId != _userContext.Id.Value)
+        var courseInstructorId = new UserId(instructorIdGuid);
+        Result<UserId> authResult = InstructorAuthorization.EnsureInstructorAuthorized(
+            _userContext,
+            courseInstructorId);
+
+        if (authResult.IsFailure)
         {
             return Result.Failure<CourseDetailedAnalyticsDto>(CourseErrors.Unauthorized);
         }
@@ -57,18 +57,7 @@ internal sealed class GetCourseAnalyticsQueryHandler
 
         if (analytics == null)
         {
-            return Result.Success(new CourseDetailedAnalyticsDto
-            {
-                EnrollmentsCount = 0,
-                AverageRating = 0,
-                ReviewsCount = 0,
-                ViewCount = 0,
-                TotalLessonsCount = 0,
-                TotalCourseDuration = TimeSpan.Zero,
-                ModuleAnalytics = [],
-                EnrollmentsOverTime = [],
-                CourseViewers = []
-            });
+            return EmpyResult();
         }
 
         var moduleAnalytics = (analytics.ModuleAnalytics ?? [])
@@ -92,6 +81,22 @@ internal sealed class GetCourseAnalyticsQueryHandler
             ModuleAnalytics = moduleAnalytics,
             EnrollmentsOverTime = enrollmentsOverTime,
             CourseViewers = courseViewers
+        });
+    }
+
+    private static Result<CourseDetailedAnalyticsDto> EmpyResult()
+    {
+        return Result.Success(new CourseDetailedAnalyticsDto
+        {
+            EnrollmentsCount = 0,
+            AverageRating = 0,
+            ReviewsCount = 0,
+            ViewCount = 0,
+            TotalLessonsCount = 0,
+            TotalCourseDuration = TimeSpan.Zero,
+            ModuleAnalytics = [],
+            EnrollmentsOverTime = [],
+            CourseViewers = []
         });
     }
 
