@@ -26,7 +26,7 @@ internal sealed class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQue
         query = ApplyFilters(request, query);
 
         List<CategoryDto> categoryDtos = await query
-            .Select(course => new CategoryDto(course.Id.Value, course.Name, course.Slug.Value))
+            .Select(category => CategoryDtoMapper.Map(category))
             .ToListAsync(cancellationToken);
 
         return Result.Success<IReadOnlyList<CategoryDto>>(categoryDtos);
