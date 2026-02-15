@@ -6,6 +6,7 @@ import {
   createCourse,
   patchCourse,
   deleteCourse,
+  publishCourse,
   fetchAllCourses,
   createModule,
   patchModule,
@@ -96,6 +97,26 @@ export function useDeleteCourse() {
     mutationFn: (url: string) => deleteCourse(url),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.all });
+    },
+  });
+}
+
+export function usePublishCourse(courseId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (url: string) => publishCourse(url),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.detail(courseId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.managedDetail(courseId),
+      });
+      toast.success("Course published successfully");
+    },
+    onError: () => {
+      toast.error("Failed to publish course");
     },
   });
 }

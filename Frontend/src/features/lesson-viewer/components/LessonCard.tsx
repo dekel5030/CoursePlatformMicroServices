@@ -8,7 +8,7 @@ import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { Clock, Trash2, Play, Lock, GripVertical } from "lucide-react";
 import { usePatchLesson, useDeleteLesson } from "@/domain/lessons";
 import { toast } from "sonner";
-import { getLinkFromRecord, formatDuration } from "@/shared/utils";
+import { getLinkFromRecord, formatDuration, apiHrefToAppRoute } from "@/shared/utils";
 
 interface LessonProps {
   lesson: LessonModel;
@@ -40,18 +40,28 @@ export default function LessonCard({
 
   const durationText = formatDuration(lesson.duration);
 
+  const lessonRoute = `/courses/${courseId}/lessons/${lesson.lessonId}`;
+  const manageRoute = manageLink?.href
+    ? apiHrefToAppRoute(manageLink.href, { courseId }) ?? null
+    : null;
+
   const handleLessonClick = () => {
-    if (manageLink?.href) {
-      if (manageLink.href.startsWith("http")) {
-        window.location.href = manageLink.href;
-      } else {
-        navigate(manageLink.href);
-      }
+    if (manageRoute) {
+      navigate(manageRoute, { state: { lessonSelfLink: manageLink?.href } });
       return;
     }
-    navigate(`/courses/${courseId}/lessons/${lesson.lessonId}`, {
+    navigate(lessonRoute, {
       state: { lessonSelfLink: selfLink?.href },
     });
+  };
+
+  const handleManageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (manageRoute) {
+      navigate(manageRoute, { state: { lessonSelfLink: manageLink?.href } });
+    } else {
+      handleLessonClick();
+    }
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -141,7 +151,6 @@ export default function LessonCard({
               </div>
             </div>
 
-            {/* Duration & actions */}
             <div className="flex items-center gap-2 shrink-0">
               {lesson.isPreview && (
                 <Badge variant="secondary" className="text-xs h-5 font-normal">
@@ -153,6 +162,18 @@ export default function LessonCard({
                   <Clock className="h-3 w-3 shrink-0" />
                   {durationText}
                 </span>
+              )}
+              {(manageLink?.href || selfLink?.href) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs shrink-0"
+                  onClick={handleManageClick}
+                >
+                  {manageLink?.href
+                    ? t("lesson-viewer:card.manage", { defaultValue: "Open" })
+                    : t("lesson-viewer:card.view", { defaultValue: "View" })}
+                </Button>
               )}
               {canDelete && (
                 <Button

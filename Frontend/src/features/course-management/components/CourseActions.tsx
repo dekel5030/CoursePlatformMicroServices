@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LinkButtons } from "@/shared/components";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import { useDeleteCourse } from "@/domain/courses";
+import { useDeleteCourse, usePublishCourse } from "@/domain/courses";
 import { toast } from "sonner";
-import { getLinkFromRecord } from "@/shared/utils";
+import { getLinkFromRecord, apiHrefToAppRoute, LINK_LABELS } from "@/shared/utils";
 import type { LinksRecord } from "@/shared/types/LinkRecord";
 
 interface CourseActionsProps {
@@ -13,57 +13,71 @@ interface CourseActionsProps {
   links?: LinksRecord;
 }
 
-export function CourseActions({ links }: CourseActionsProps) {
+export function CourseActions({ courseId, links }: CourseActionsProps) {
   const { t } = useTranslation(["course-management", "translation"]);
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const deleteCourse = useDeleteCourse();
+  const publishCourse = usePublishCourse(courseId);
 
   const deleteLink = getLinkFromRecord(links, "delete");
 
   const handleAction = useCallback(
-    async (rel: string, _link: { href?: string | null; method?: string | null }) => {
+    async (rel: string, link: { href?: string | null; method?: string | null }) => {
       if (rel === "delete") {
         setIsDeleteDialogOpen(true);
+        return;
+      }
+      if (rel === "publish" && link?.href) {
+        try {
+          await publishCourse.mutateAsync(link.href);
+        } catch {
+          // toast handled in hook
+        }
         return;
       }
       if (rel === "partialUpdate") {
         toast.info(t("course-management:actions.editNotImplemented"));
       }
     },
-    [t]
+    [t, publishCourse]
   );
 
   const handleConfirmDelete = async () => {
-    if (!deleteLink?.href) {
-      console.error("No delete link found for this course");
-      return;
-    }
+    if (!deleteLink?.href) return;
     try {
       await deleteCourse.mutateAsync(deleteLink.href);
       toast.success(t("course-management:actions.deleteSuccess"));
-      navigate("/courses");
+      navigate("/manage/courses");
     } catch (error) {
       toast.error(t("course-management:actions.deleteFailed"));
-      console.error("Failed to delete course:", error);
     } finally {
       setIsDeleteDialogOpen(false);
     }
   };
 
-  const hasAnyAction = links && (links.partialUpdate?.href || links.delete?.href);
-  if (!hasAnyAction) return null;
+  const labelByRel: Record<string, string> = {
+    coursePage: t("course-management:detail.viewCourse", { defaultValue: LINK_LABELS.coursePage }),
+    analytics: t("course-management:detail.analytics", { defaultValue: LINK_LABELS.analytics }),
+    partialUpdate: t("common.edit"),
+    delete: t("course-management:detail.delete"),
+    publish: t("course-management:detail.publish", { defaultValue: LINK_LABELS.publish }),
+    generateImageUploadUrl: t("course-management:detail.uploadImage", { defaultValue: LINK_LABELS.generateImageUploadUrl }),
+    manage: t("course-management:detail.manageCourse", { defaultValue: LINK_LABELS.manage }),
+    ratings: t("course-management:ratings.sectionTitle", { defaultValue: LINK_LABELS.ratings }),
+  };
+
+  const hasAnyLink = links && Object.values(links).some((l) => l?.href);
+  if (!hasAnyLink) return null;
 
   return (
     <>
       <LinkButtons
         links={links}
-        labelByRel={{
-          partialUpdate: t("common.edit"),
-          delete: t("course-management:detail.delete"),
-        }}
+        labelByRel={labelByRel}
         onAction={handleAction}
-        excludeRels={["self", "coursePage", "analytics", "publish", "generateImageUploadUrl", "createModule", "changePosition"]}
+        excludeRels={["self", "createModule", "changePosition"]}
+        getRouteForHref={apiHrefToAppRoute}
         variant="outline"
         size="sm"
       />

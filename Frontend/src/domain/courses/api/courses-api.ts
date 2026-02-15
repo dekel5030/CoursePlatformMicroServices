@@ -111,6 +111,13 @@ export async function deleteCourse(url: string): Promise<void> {
   await axiosClient.delete(url);
 }
 
+/**
+ * Publish a course (POST via HATEOAS link)
+ */
+export async function publishCourse(url: string): Promise<void> {
+  await axiosClient.post(url);
+}
+
 /** Raw catalog item from GET /courses when backend returns data+links per item */
 interface CourseCatalogItemDtoApi {
   data: {
@@ -372,14 +379,22 @@ export async function fetchMyManagedCourses(
   };
 }
 
+type CourseAnalyticsResponse =
+  | CourseDetailedAnalyticsDto
+  | { data: Omit<CourseDetailedAnalyticsDto, "links">; links?: CourseDetailedAnalyticsDto["links"] };
+
 /**
  * Fetch detailed analytics for a course (instructor only)
  */
 export async function fetchCourseAnalytics(
   courseId: string
 ): Promise<CourseDetailedAnalyticsDto> {
-  const response = await axiosClient.get<CourseDetailedAnalyticsDto>(
+  const response = await axiosClient.get<CourseAnalyticsResponse>(
     `/manage/courses/${courseId}/analytics`
   );
-  return response.data;
+  const raw = response.data;
+  if (raw != null && "data" in raw && typeof raw.data === "object") {
+    return { ...raw.data, links: raw.links };
+  }
+  return raw as CourseDetailedAnalyticsDto;
 }

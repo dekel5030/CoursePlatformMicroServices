@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   AreaChart,
@@ -9,13 +9,14 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Users, Eye, Star, BookOpen, ExternalLink, Settings } from "lucide-react";
+import { Users, Eye, Star, BookOpen } from "lucide-react";
 import { useCourseAnalytics } from "@/domain/courses";
 import { BreadcrumbNav } from "@/components/layout";
-import { Button, Skeleton } from "@/shared/ui";
+import { LinkButtons } from "@/shared/components";
+import { Skeleton } from "@/shared/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
 import { formatDuration } from "@/shared/utils/format-duration";
-import { getLinkFromRecord } from "@/shared/utils";
+import { apiHrefToAppRoute, LINK_LABELS } from "@/shared/utils";
 import type { LinksRecord } from "@/shared/types/LinkRecord";
 import type { CourseViewerDto } from "@/domain/courses/types";
 
@@ -83,26 +84,32 @@ export default function CourseAnalyticsPage() {
     return null;
   }
 
+  const enrollmentsCount = analytics.enrollmentsCount ?? 0;
+  const viewCount = analytics.viewCount ?? 0;
+  const averageRating = analytics.averageRating ?? 0;
+  const reviewsCount = analytics.reviewsCount ?? 0;
+  const totalLessonsCount = analytics.totalLessonsCount ?? 0;
+
   const stats = [
     {
       label: t("analytics.enrollments"),
-      value: analytics.enrollmentsCount.toLocaleString(),
+      value: enrollmentsCount.toLocaleString(),
       icon: Users,
     },
     {
       label: t("analytics.views"),
-      value: analytics.viewCount.toLocaleString(),
+      value: viewCount.toLocaleString(),
       icon: Eye,
     },
     {
       label: t("analytics.rating"),
-      value: analytics.averageRating.toFixed(1),
-      subtitle: `${analytics.reviewsCount} ${t("analytics.reviews")}`,
+      value: Number(averageRating).toFixed(1),
+      subtitle: `${reviewsCount} ${t("analytics.reviews")}`,
       icon: Star,
     },
     {
       label: t("analytics.lessons"),
-      value: analytics.totalLessonsCount.toLocaleString(),
+      value: totalLessonsCount.toLocaleString(),
       icon: BookOpen,
     },
   ];
@@ -121,8 +128,10 @@ export default function CourseAnalyticsPage() {
 
   const courseViewers: CourseViewerDto[] = analytics.courseViewers ?? [];
   const links = analytics.links as LinksRecord | undefined;
-  const courseLink = links ? getLinkFromRecord(links, "course") : undefined;
-  const managedCourseLink = links ? getLinkFromRecord(links, "managedCourse") : undefined;
+  const analyticsLabelByRel: Record<string, string> = {
+    course: t("analytics.viewCourse", { defaultValue: LINK_LABELS.coursePage }),
+    managedCourse: t("analytics.manageCourse", { defaultValue: LINK_LABELS.managedCourse }),
+  };
 
   return (
     <div className="flex flex-col">
@@ -137,41 +146,15 @@ export default function CourseAnalyticsPage() {
               {t("analytics.subtitle")}
             </p>
           </div>
-          {(courseLink?.href || managedCourseLink?.href) && (
-            <div className="flex flex-wrap gap-2">
-              {courseLink?.href &&
-                (courseLink.href.startsWith("http") ? (
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={courseLink.href} target="_blank" rel="noopener noreferrer" className="gap-2 inline-flex items-center">
-                      <ExternalLink className="h-4 w-4" />
-                      {t("analytics.viewCourse", { defaultValue: "View course" })}
-                    </a>
-                  </Button>
-                ) : (
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to={courseLink.href} className="gap-2">
-                      <ExternalLink className="h-4 w-4" />
-                      {t("analytics.viewCourse", { defaultValue: "View course" })}
-                    </Link>
-                  </Button>
-                ))}
-              {managedCourseLink?.href &&
-                (managedCourseLink.href.startsWith("http") ? (
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={managedCourseLink.href} target="_blank" rel="noopener noreferrer" className="gap-2 inline-flex items-center">
-                      <Settings className="h-4 w-4" />
-                      {t("analytics.manageCourse", { defaultValue: "Manage course" })}
-                    </a>
-                  </Button>
-                ) : (
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to={managedCourseLink.href} className="gap-2">
-                      <Settings className="h-4 w-4" />
-                      {t("analytics.manageCourse", { defaultValue: "Manage course" })}
-                    </Link>
-                  </Button>
-                ))}
-            </div>
+          {links && (
+            <LinkButtons
+              links={links}
+              labelByRel={analyticsLabelByRel}
+              excludeRels={["self"]}
+              getRouteForHref={apiHrefToAppRoute}
+              variant="outline"
+              size="sm"
+            />
           )}
         </div>
 

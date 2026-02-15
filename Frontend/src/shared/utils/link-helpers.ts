@@ -78,3 +78,79 @@ export function linkDtoArrayToRecord(
     return acc;
   }, {});
 }
+
+function getPathFromHref(href: string): string {
+  if (href.startsWith("http://") || href.startsWith("https://")) {
+    try {
+      return new URL(href).pathname;
+    } catch {
+      return href;
+    }
+  }
+  return href.split("?")[0];
+}
+
+export interface ApiHrefContext {
+  courseId?: string;
+}
+
+export function apiHrefToAppRoute(
+  href: string,
+  context?: ApiHrefContext,
+): string | null {
+  const path = getPathFromHref(href);
+  const coursesIdMatch = path.match(/^\/api\/courses\/([^/]+)$/);
+  if (coursesIdMatch) return `/courses/${coursesIdMatch[1]}`;
+  const manageCoursesIdMatch = path.match(/^\/api\/manage\/courses\/([^/]+)$/);
+  if (manageCoursesIdMatch)
+    return `/manage/courses/${manageCoursesIdMatch[1]}`;
+  const manageCoursesAnalyticsMatch = path.match(
+    /^\/api\/manage\/courses\/([^/]+)\/analytics$/,
+  );
+  if (manageCoursesAnalyticsMatch)
+    return `/manage/courses/${manageCoursesAnalyticsMatch[1]}/analytics`;
+  const lessonsIdMatch = path.match(/^\/api\/lessons\/([^/]+)$/);
+  if (lessonsIdMatch && context?.courseId)
+    return `/courses/${context.courseId}/lessons/${lessonsIdMatch[1]}`;
+  const manageLessonsIdMatch = path.match(/^\/api\/manage\/lessons\/([^/]+)$/);
+  if (manageLessonsIdMatch && context?.courseId)
+    return `/courses/${context.courseId}/lessons/${manageLessonsIdMatch[1]}`;
+  const catalogMatch = path.match(/^\/api\/courses$/);
+  if (catalogMatch) return "/catalog";
+  const enrolledMatch = path.match(/^\/api\/users\/me\/courses\/enrolled/);
+  if (enrolledMatch) return "/users/me/courses/enrolled";
+  const courseRatingsMatch = path.match(/^\/api\/courses\/([^/]+)\/ratings/);
+  if (courseRatingsMatch) return `/courses/${courseRatingsMatch[1]}#ratings`;
+  return null;
+}
+
+export const LINK_LABELS: Record<string, string> = {
+  self: "Self",
+  coursePage: "View course",
+  analytics: "Analytics",
+  partialUpdate: "Edit",
+  delete: "Delete",
+  publish: "Publish",
+  generateImageUploadUrl: "Upload image",
+  createModule: "Add module",
+  changePosition: "Reorder",
+  manage: "Manage",
+  ratings: "Reviews",
+  viewCourse: "View course",
+  continueLearning: "Continue",
+  create: "Add rating",
+  update: "Edit",
+  managedCourse: "Back to course",
+  publicPreview: "Preview course",
+  generateVideoUploadUrl: "Upload video",
+  aiGenerate: "Generate with AI",
+  nextLesson: "Next lesson",
+  previousLesson: "Previous lesson",
+  course: "Back to course",
+  markAsComplete: "Mark complete",
+  unmarkAsComplete: "Unmark complete",
+  createLesson: "Add lesson",
+  browseCatalog: "Browse catalog",
+  next: "Next",
+  prev: "Previous",
+};

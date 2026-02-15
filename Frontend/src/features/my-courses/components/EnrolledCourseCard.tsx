@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, Button } from "@/shared/ui";
 import type { EnrolledCourseDto } from "@/domain/enrollments";
-import { getLinkFromRecord, linkDtoArrayToRecord } from "@/shared/utils";
+import { getLinkFromRecord, linkDtoArrayToRecord, apiHrefToAppRoute } from "@/shared/utils";
 import { BookOpen, Play } from "lucide-react";
 
 interface EnrolledCourseCardProps {
@@ -36,11 +36,16 @@ function getContinueLearningHref(links: EnrolledCourseDto["links"]): string | nu
 
 export function EnrolledCourseCard({ course }: EnrolledCourseCardProps) {
   const { t } = useTranslation("translation");
+  if (!course) return null;
   const viewHref = getViewCourseHref(course.links);
   const continueHref = getContinueLearningHref(course.links);
-  const courseUrl = viewHref ?? `/courses/${course.courseId}`;
+  const viewAppRoute = viewHref ? apiHrefToAppRoute(viewHref) : null;
+  const continueAppRoute = continueHref ? apiHrefToAppRoute(continueHref) : null;
+  const courseUrl = viewAppRoute ?? viewHref ?? `/courses/${course.courseId}`;
   const progress = Math.min(100, Math.max(0, course.progressPercentage ?? 0));
   const lastAccessed = formatLastAccessed(course.lastAccessedAt);
+  const continueTarget = continueAppRoute ?? continueHref;
+  const isContinueExternal = !!continueHref && !continueAppRoute && (continueHref.startsWith("http://") || continueHref.startsWith("https://"));
 
   return (
     <div className="block group h-full flex flex-col">
@@ -92,15 +97,15 @@ export function EnrolledCourseCard({ course }: EnrolledCourseCardProps) {
         </CardContent>
       </Card>
     </Link>
-      {continueHref && (
+      {continueTarget && (
         <Button variant="default" size="sm" className="mt-3 w-full gap-2" asChild>
-          {continueHref.startsWith("http") ? (
-            <a href={continueHref} className="gap-2 flex items-center justify-center">
+          {isContinueExternal ? (
+            <a href={continueTarget} className="gap-2 flex items-center justify-center">
               <Play className="h-4 w-4" />
               {t("myCourses.continueLearning", { defaultValue: "Continue" })}
             </a>
           ) : (
-            <Link to={continueHref} className="gap-2 flex items-center justify-center">
+            <Link to={continueTarget} className="gap-2 flex items-center justify-center">
               <Play className="h-4 w-4" />
               {t("myCourses.continueLearning", { defaultValue: "Continue" })}
             </Link>

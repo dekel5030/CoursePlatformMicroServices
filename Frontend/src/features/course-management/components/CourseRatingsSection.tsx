@@ -42,7 +42,8 @@ export function CourseRatingsSection({ course }: CourseRatingsSectionProps) {
       ? linkDtoArrayToRecord(ratingsData.links)
       : (ratingsData as unknown as { links?: Record<string, { href?: string; method?: string }> })?.links;
   const createRatingLink = ratingsCollectionLinks
-    ? getLinkFromRecord(ratingsCollectionLinks, "createRating")
+    ? getLinkFromRecord(ratingsCollectionLinks, "create") ??
+      getLinkFromRecord(ratingsCollectionLinks, "createRating")
     : null;
   const canAddRating = !!createRatingLink?.href;
 
@@ -110,7 +111,7 @@ export function CourseRatingsSection({ course }: CourseRatingsSectionProps) {
     !!ratingsCollectionLinks?.next?.href || !!ratingsCollectionLinks?.prev?.href;
 
   return (
-    <Card dir={i18n.dir()}>
+    <Card id="ratings" dir={i18n.dir()}>
       <CardHeader>
         <CardTitle className="text-start">
           {t("course-management:ratings.sectionTitle")}

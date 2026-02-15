@@ -98,6 +98,17 @@ export interface ManagedLessonPageLinks {
   previousLesson?: LinkRecord;
 }
 
+/** Public lesson page (GET /lessons/{id}): page.links */
+export interface LessonPageLinks {
+  self?: LinkRecord;
+  course?: LinkRecord;
+  nextLesson?: LinkRecord;
+  previousLesson?: LinkRecord;
+  markAsComplete?: LinkRecord;
+  unmarkAsComplete?: LinkRecord;
+  manage?: LinkRecord;
+}
+
 /** Enrolled course: item.links */
 export interface EnrolledCourseLinks {
   viewCourse?: LinkRecord;

@@ -10,6 +10,6 @@ export function mapEnrolledCourseWithAnalyticsToDto(
   const { enrolledCourse, analytics } = dto;
   return {
     ...enrolledCourse,
-    progressPercentage: analytics.progressPercentage,
+    progressPercentage: analytics?.progressPercentage ?? 0,
   };
 }

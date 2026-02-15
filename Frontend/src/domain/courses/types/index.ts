@@ -61,6 +61,7 @@ export type {
   CoursePageLessonLinks,
   ManagedLessonLinks,
   ManagedLessonPageLinks,
+  LessonPageLinks,
   EnrolledCourseLinks,
   GetEnrolledCoursesCollectionLinks,
   GetCourseAnalyticsLinks,
