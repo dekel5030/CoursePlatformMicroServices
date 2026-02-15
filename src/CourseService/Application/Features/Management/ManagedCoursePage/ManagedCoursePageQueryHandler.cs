@@ -5,10 +5,14 @@ using Courses.Application.Features.Dtos;
 using Courses.Application.Features.Shared;
 using Courses.Application.Features.Shared.Loaders;
 using Courses.Application.Features.Shared.Mappers;
+using Courses.Application.Lessons.Dtos;
 using Courses.Application.Modules.Dtos;
 using Courses.Application.Services.LinkProvider;
+using Courses.Domain.Categories;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.Lessons;
+using Courses.Domain.Modules;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
@@ -39,55 +43,84 @@ internal sealed class ManagedCoursePageQueryHandler
         var courseId = new CourseId(request.Id);
 
         CoursePageData? courseData = await _coursePageDataLoader.LoadAsync(courseId, cancellationToken);
-
         if (courseData == null)
         {
             return Result.Failure<ManagedCoursePageDto>(CourseErrors.NotFound);
         }
 
-        Result<UserId> authResult = InstructorAuthorization.EnsureInstructorAuthorized(
-            _userContext,
-            courseData.Course.InstructorId);
-
+        Result<UserId> authResult = InstructorAuthorization
+            .EnsureInstructorAuthorized(_userContext, courseData.Course.InstructorId);
         if (authResult.IsFailure)
         {
             return Result.Failure<ManagedCoursePageDto>(CourseErrors.Unauthorized);
         }
 
-        CourseContext courseContext = new(courseData.Course.Id, courseData.Course.InstructorId, courseData.Course.Status, IsManagementView: true);
+        var courseContext = new CourseContext(
+            courseData.Course.Id, 
+            courseData.Course.InstructorId, 
+            courseData.Course.Status, 
+            IsManagementView: true);
 
-        CourseDto courseDto = _coursePageDtoMapper.MapCourse(courseData.Course, courseContext);
-        CourseStructureDto structure = CourseStructureBuilder.Build(courseData.Modules, courseData.Lessons);
-
-        IReadOnlyDictionary<Guid, (int LessonCount, TimeSpan TotalDuration)> moduleStatsByModuleId = courseData.Lessons
-            .GroupBy(l => l.ModuleId.Value)
-            .ToDictionary(g => g.Key, g => (
-                LessonCount: g.Count(),
-                TotalDuration: TimeSpan.FromSeconds(g.Sum(l => l.Duration.TotalSeconds))
-            ));
+        Dictionary<Guid, (int LessonCount, TimeSpan TotalDuration)> moduleStats = 
+            CalculateModuleStats(courseData.Lessons);
 
         return Result.Success(new ManagedCoursePageDto
         {
-            Course = courseDto,
-            Structure = structure,
+            Course = _coursePageDtoMapper.MapCourse(courseData.Course, courseContext),
+            Structure = CourseStructureBuilder.Build(courseData.Modules, courseData.Lessons),
 
-            Modules = courseData.Modules.ToDictionary(
-                m => m.Id.Value,
-                m =>
-                {
-                    var moduleContext = new ModuleContext(courseContext, m.Id);
-                    ModuleDto moduleDto = _coursePageDtoMapper.MapModule(m, moduleContext);
-                    (int lessonCount, TimeSpan totalDuration) = moduleStatsByModuleId.GetValueOrDefault(m.Id.Value);
-                    return new ManagedModuleDto(moduleDto, new ManagedModuleStatsDto(lessonCount, totalDuration));
-                }),
-
-            Lessons = courseData.Lessons.ToDictionary(
-                l => l.Id.Value,
-                l => _coursePageDtoMapper.MapLesson(l, courseContext, false)),
-
-            Categories = courseData.Category != null
-                ? new Dictionary<Guid, CategoryDto> { [courseData.Category.Id.Value] = CategoryDtoMapper.Map(courseData.Category) }
-                : new()
+            Modules = MapManagedModules(courseData.Modules, moduleStats, courseContext),
+            Lessons = MapLessons(courseData.Lessons, courseContext),
+            Categories = MapCategories(courseData.Category)
         });
+    }
+
+    private static Dictionary<Guid, (int LessonCount, TimeSpan TotalDuration)> CalculateModuleStats(
+        IReadOnlyList<Lesson> lessons)
+    {
+        return lessons
+            .GroupBy(lesson => lesson.ModuleId.Value)
+            .ToDictionary(
+                g => g.Key,
+                g => (
+                    LessonCount: g.Count(),
+                    TotalDuration: TimeSpan.FromSeconds(g.Sum(l => l.Duration.TotalSeconds))
+                ));
+    }
+
+    private Dictionary<Guid, ManagedModuleDto> MapManagedModules(
+        IReadOnlyList<Module> modules,
+        Dictionary<Guid, (int LessonCount, TimeSpan TotalDuration)> stats,
+        CourseContext courseContext)
+    {
+        return modules.ToDictionary(
+            module => module.Id.Value,
+            module =>
+            {
+                var moduleContext = new ModuleContext(courseContext, module.Id);
+                ModuleDto moduleDto = _coursePageDtoMapper.MapModule(module, moduleContext);
+
+                (int lessonCount, TimeSpan totalDuration) = stats.GetValueOrDefault(module.Id.Value);
+                var statsDto = new ManagedModuleStatsDto(lessonCount, totalDuration);
+
+                return new ManagedModuleDto(moduleDto, statsDto);
+            });
+    }
+
+    private Dictionary<Guid, LessonDto> MapLessons(IReadOnlyList<Lesson> lessons, CourseContext context)
+    {
+        return lessons.ToDictionary(
+            l => l.Id.Value,
+            l => _coursePageDtoMapper.MapLesson(l, context, false));
+    }
+
+    private static Dictionary<Guid, CategoryDto> MapCategories(Category? category)
+    {
+        if (category == null)
+        {
+            return new();
+        }
+
+        return new Dictionary<Guid, CategoryDto> { [category.Id.Value] = CategoryDtoMapper.Map(category) };
     }
 }

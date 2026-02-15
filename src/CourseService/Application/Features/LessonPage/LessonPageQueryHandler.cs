@@ -39,7 +39,7 @@ internal sealed class LessonPageQueryHandler : IQueryHandler<LessonPageQuery, Le
         }
 
         Course? course = await _readDbContext.Courses
-            .FirstOrDefaultAsync(c => c.Id == lesson.CourseId, cancellationToken);
+            .FirstOrDefaultAsync(course => course.Id == lesson.CourseId, cancellationToken);
 
         if (course == null)
         {
