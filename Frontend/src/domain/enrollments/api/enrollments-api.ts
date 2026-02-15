@@ -33,7 +33,9 @@ function normalizeEnrolledItem(item: unknown): EnrolledCourseDto | null {
     };
   }
   if ("enrolledCourse" in obj && "analytics" in obj) {
-    return mapEnrolledCourseWithAnalyticsToDto(obj as Parameters<typeof mapEnrolledCourseWithAnalyticsToDto>[0]);
+    return mapEnrolledCourseWithAnalyticsToDto(
+      obj as unknown as Parameters<typeof mapEnrolledCourseWithAnalyticsToDto>[0]
+    );
   }
   return null;
 }

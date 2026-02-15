@@ -30,7 +30,6 @@ export function useCourseImageUpload(courseId: string) {
       uploadImageToStorage(uploadUrl, file),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(courseId) });
-      queryClient.invalidateQueries({ queryKey: coursesQueryKeys.featured() });
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.allCourses() });
     },
   });

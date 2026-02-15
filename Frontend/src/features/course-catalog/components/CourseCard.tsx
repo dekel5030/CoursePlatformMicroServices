@@ -8,8 +8,11 @@ import { BookOpen, Clock, Users, Eye, Star, TrendingUp } from "lucide-react";
 
 interface Props {
   course: CourseModel;
-  /** Override link destination (e.g. /manage/courses/:id for management view) */
-  to?: string;
+  /**
+   * Override link destination (e.g. /manage/courses/:id for management view).
+   * Pass null to render without a link (HATEOAS: when no self link is available).
+   */
+  to?: string | null;
 }
 
 export default function CourseCard({ course, to }: Props) {
@@ -51,10 +54,8 @@ export default function CourseCard({ course, to }: Props) {
   // Don't show "Empty" category
   const showCategory = course.categoryName && course.categoryName !== "Empty";
 
-  const linkTo = to ?? `/courses/${course.id}`;
-
-  return (
-    <Link to={linkTo} className="block group">
+  const linkTo = to === undefined ? `/courses/${course.id}` : to;
+  const cardContent = (
       <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 h-full flex flex-col border hover:border-primary/40 bg-white">
         {/* Image Section */}
         <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
@@ -241,6 +242,10 @@ export default function CourseCard({ course, to }: Props) {
           </div>
         </CardContent>
       </Card>
-    </Link>
   );
+
+  if (linkTo != null) {
+    return <Link to={linkTo} className="block group">{cardContent}</Link>;
+  }
+  return <div className="block group">{cardContent}</div>;
 }

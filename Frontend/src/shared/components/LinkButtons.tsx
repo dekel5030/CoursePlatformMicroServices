@@ -13,6 +13,8 @@ export interface LinkButtonsProps {
   excludeRels?: string[];
   /** Optional: resolve API href to app route for GET links (client-side nav) */
   getRouteForHref?: (href: string) => string | null;
+  /** Optional: state to pass when navigating (e.g. lessonSelfLink for lesson manage/self) */
+  getStateForHref?: (href: string, rel: string) => object | undefined;
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
@@ -27,6 +29,7 @@ export function LinkButtons({
   onAction,
   excludeRels = ["self"],
   getRouteForHref,
+  getStateForHref,
   variant = "outline",
   size = "sm",
   className,
@@ -49,7 +52,8 @@ export function LinkButtons({
     if (method === "GET" && link.href) {
       const route = getRouteForHref?.(link.href);
       if (route != null) {
-        navigate(route);
+        const state = getStateForHref?.(link.href, rel);
+        navigate(route, state ? { state } : undefined);
         return;
       }
     }
@@ -71,7 +75,10 @@ export function LinkButtons({
               key={rel}
               variant={variant}
               size={size}
-              onClick={() => navigate(route)}
+              onClick={() => {
+                const state = getStateForHref?.(link!.href!, rel);
+                navigate(route, state ? { state } : undefined);
+              }}
               className="gap-2"
             >
               {label}

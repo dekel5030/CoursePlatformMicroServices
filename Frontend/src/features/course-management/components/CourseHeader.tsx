@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { Button, Card, Badge } from "@/shared/ui";
+import { Card, Badge } from "@/shared/ui";
 import { Avatar } from "@/shared/ui";
 import { InlineEditableText } from "@/shared/common";
-import { ShoppingCart, CreditCard, Users, BookOpen, Clock, Tag, Eye } from "lucide-react";
+import { Users, BookOpen, Clock, Tag, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { CourseActions } from "./CourseActions";
 import { CourseImageUpload } from "./CourseImageUpload";
@@ -158,17 +158,6 @@ export function CourseHeader({ course }: CourseHeaderProps) {
             </div>
           </div>
 
-          {/* Primary actions */}
-          <div className="flex gap-2 pt-1">
-            <Button className="flex-1 gap-2 min-w-0" size="default">
-              <CreditCard className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t("course-management:detail.buyNow")}</span>
-            </Button>
-            <Button variant="outline" className="flex-1 gap-2 min-w-0" size="default">
-              <ShoppingCart className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t("course-management:detail.addToCart")}</span>
-            </Button>
-          </div>
         </div>
       </div>
     </Card>

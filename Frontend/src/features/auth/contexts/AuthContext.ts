@@ -10,6 +10,7 @@ export interface AuthContextValue {
   error: Error | null;
 
   signoutRedirect: () => Promise<void>;
+  signinRedirect: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(
