@@ -8,6 +8,7 @@ public static class EndpointNames
     // Courses
     public const string GetCoursePage = "GetCoursePage";
     public const string GetManagedCourseById = "GetManagedCourseById";
+    public const string GetManagedCourses = "GetManagedCourses";
     public const string GetCourseAnalytics = "GetCourseAnalytics";
     public const string GetCourses = "GetCourses";
     public const string CreateCourse = "CreateCourse";

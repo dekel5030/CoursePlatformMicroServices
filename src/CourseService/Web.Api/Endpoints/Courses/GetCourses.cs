@@ -19,13 +19,13 @@ internal sealed class GetCourses : IEndpoint
             CancellationToken cancellationToken) =>
         {
             var query = new CourseCatalogQuery(pagedQuery);
-            Result<CourseCollectionDto> result = await mediator.Send(query, cancellationToken);
+            Result<CourseCatalogDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
                 dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
-        .WithMetadata<CourseCollectionDto>(
+        .WithMetadata<CourseCatalogDto>(
             nameof(GetCourses),
             tag: Tags.Courses,
             summary: "Gets a paginated list of courses.");

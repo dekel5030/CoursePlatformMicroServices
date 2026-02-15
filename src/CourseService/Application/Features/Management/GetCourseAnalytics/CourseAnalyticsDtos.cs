@@ -1,5 +1,15 @@
+using Courses.Application.Services.LinkProvider.Abstractions.Links;
+
 namespace Courses.Application.Features.Management.GetCourseAnalytics;
 
+public sealed record GetCourseAnalyticsDto(
+    CourseDetailedAnalyticsDto Data,
+    GetCourseAnalyticsLinks Links);
+
+public sealed record GetCourseAnalyticsLinks(
+    LinkRecord Self,
+    LinkRecord Course,
+    LinkRecord? ManagedCourse);
 
 public sealed record CourseDetailedAnalyticsDto
 {

@@ -1,6 +1,8 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Features.Shared.Mappers;
-using Courses.Application.Services.LinkProvider;
+using Courses.Application.Abstractions.Storage;
+using Courses.Application.Features.LessonPage;
+using Courses.Application.Features.Shared;
+using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
@@ -14,14 +16,17 @@ namespace Courses.Application.Features.LessonPage;
 internal sealed class LessonPageQueryHandler : IQueryHandler<LessonPageQuery, LessonPageDto>
 {
     private readonly IReadDbContext _readDbContext;
-    private readonly ILessonPageDtoMapper _lessonPageDtoMapper;
+    private readonly ILinkProvider _linkProvider;
+    private readonly IStorageUrlResolver _storageUrlResolver;
 
     public LessonPageQueryHandler(
         IReadDbContext readDbContext,
-        ILessonPageDtoMapper lessonPageDtoMapper)
+        ILinkProvider linkProvider,
+        IStorageUrlResolver storageUrlResolver)
     {
         _readDbContext = readDbContext;
-        _lessonPageDtoMapper = lessonPageDtoMapper;
+        _linkProvider = linkProvider;
+        _storageUrlResolver = storageUrlResolver;
     }
 
     public async Task<Result<LessonPageDto>> Handle(
@@ -39,24 +44,35 @@ internal sealed class LessonPageQueryHandler : IQueryHandler<LessonPageQuery, Le
         }
 
         Course? course = await _readDbContext.Courses
-            .FirstOrDefaultAsync(course => course.Id == lesson.CourseId, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id == lesson.CourseId, cancellationToken);
 
         if (course == null)
         {
             return Result.Failure<LessonPageDto>(LessonErrors.NotFound);
         }
 
-        CourseContext courseContext = new(
-            course.Id,
-            course.InstructorId,
-            course.Status,
-            IsManagementView: false);
+        LessonPageData data = MapData(lesson, course.Title.Value);
+        LessonPageLinks links = new(
+            Self: _linkProvider.GetLessonPageLink(lesson.Id.Value),
+            Course: _linkProvider.GetCoursePageLink(lesson.CourseId.Value));
 
-        ModuleContext moduleContext = new(courseContext, lesson.ModuleId);
-        LessonContext lessonContext = new(moduleContext, lesson.Id, lesson.Access, HasEnrollment: false);
+        return Result.Success(new LessonPageDto(Data: data, Links: links));
+    }
 
-        LessonPageDto dto = _lessonPageDtoMapper.Map(lesson, course.Title.Value, lessonContext);
-
-        return Result.Success(dto);
+    private LessonPageData MapData(Lesson lesson, string courseName)
+    {
+        return new LessonPageData(
+            LessonId: lesson.Id.Value,
+            ModuleId: lesson.ModuleId.Value,
+            CourseId: lesson.CourseId.Value,
+            CourseName: courseName,
+            Title: lesson.Title.Value,
+            Description: lesson.Description.Value,
+            Index: lesson.Index,
+            Duration: lesson.Duration,
+            Access: lesson.Access,
+            ThumbnailUrl: _storageUrlResolver.ResolvePublicUrl(lesson.ThumbnailImageUrl?.Path),
+            VideoUrl: _storageUrlResolver.ResolvePublicUrl(lesson.VideoUrl?.Path),
+            TranscriptUrl: _storageUrlResolver.ResolvePublicUrl(lesson.Transcript?.Path));
     }
 }

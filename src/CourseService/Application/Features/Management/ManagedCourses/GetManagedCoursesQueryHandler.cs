@@ -1,9 +1,12 @@
 using Courses.Application.Abstractions.Data;
+using Courses.Application.Abstractions.Storage;
+using Courses.Application.Categories;
 using Courses.Application.Features.Management;
+using Courses.Application.Features.Management.ManagedCourses;
 using Courses.Application.Features.Shared;
-using Courses.Application.Features.Shared.Mappers;
 using Courses.Application.ReadModels;
-using Courses.Application.Shared.Dtos;
+using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Users;
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses;
@@ -18,28 +21,32 @@ using Microsoft.EntityFrameworkCore;
 namespace Courses.Application.Features.Management.ManagedCourses;
 
 internal sealed class GetManagedCoursesQueryHandler
-    : IQueryHandler<GetManagedCoursesQuery, PaginatedCollectionDto<ManagedCourseSummaryDto>>
+    : IQueryHandler<GetManagedCoursesQuery, GetManagedCoursesDto>
 {
     private readonly IReadDbContext _dbContext;
-    private readonly ICourseSummaryDtoMapper _courseSummaryDtoMapper;
     private readonly IUserContext _userContext;
+    private readonly ILinkProvider _linkProvider;
+    private readonly IStorageUrlResolver _storageUrlResolver;
 
     public GetManagedCoursesQueryHandler(
         IReadDbContext dbContext,
-        ICourseSummaryDtoMapper courseSummaryDtoMapper,
-        IUserContext userContext)
+        IUserContext userContext,
+        ILinkProvider linkProvider,
+        IStorageUrlResolver storageUrlResolver)
     {
         _dbContext = dbContext;
-        _courseSummaryDtoMapper = courseSummaryDtoMapper;
         _userContext = userContext;
+        _linkProvider = linkProvider;
+        _storageUrlResolver = storageUrlResolver;
     }
-    public async Task<Result<PaginatedCollectionDto<ManagedCourseSummaryDto>>> Handle(
+
+    public async Task<Result<GetManagedCoursesDto>> Handle(
         GetManagedCoursesQuery request,
         CancellationToken cancellationToken = default)
     {
         if (!_userContext.IsAuthenticated || _userContext.Id is null)
         {
-            return Result.Failure<PaginatedCollectionDto<ManagedCourseSummaryDto>>(CourseErrors.Unauthorized);
+            return Result.Failure<GetManagedCoursesDto>(CourseErrors.Unauthorized);
         }
 
         var instructorId = new UserId(_userContext.Id.Value);
@@ -48,10 +55,17 @@ internal sealed class GetManagedCoursesQueryHandler
         int totalItems = await GetTotalCoursesCountAsync(instructorId, cancellationToken);
         if (totalItems == 0)
         {
-            return Result.Success(CreateEmptyResponse(pageNumber, pageSize));
+            var emptyLinks = new GetManagedCoursesCollectionLinks(
+                Self: _linkProvider.GetManagedCoursesLink(pageNumber, pageSize));
+            return Result.Success(new GetManagedCoursesDto(
+                Items: [],
+                PageNumber: pageNumber,
+                PageSize: pageSize,
+                TotalItems: 0,
+                Links: emptyLinks));
         }
 
-        List<Course> courses = 
+        List<Course> courses =
             await FetchPagedCoursesAsync(instructorId, pageNumber, pageSize, cancellationToken);
 
         Dictionary<CategoryId, Category> categories = await GetCategoryMapAsync(courses, cancellationToken);
@@ -59,17 +73,18 @@ internal sealed class GetManagedCoursesQueryHandler
         User? instructor = await _dbContext.Users
             .FirstOrDefaultAsync(user => user.Id == instructorId, cancellationToken);
 
-        List<ManagedCourseSummaryDto> dtos = 
-            MapToManagedSummaryDtos(courses, instructor, categories, analytics);
+        List<ManagedCourseSummaryItemDto> items =
+            MapToItemDtos(courses, instructor, categories, analytics);
 
-        return Result.Success(new PaginatedCollectionDto<ManagedCourseSummaryDto>
-        {
-            Items = dtos,
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            TotalItems = totalItems,
-            Links = []
-        });
+        var collectionLinks = new GetManagedCoursesCollectionLinks(
+            Self: _linkProvider.GetManagedCoursesLink(pageNumber, pageSize));
+
+        return Result.Success(new GetManagedCoursesDto(
+            Items: items,
+            PageNumber: pageNumber,
+            PageSize: pageSize,
+            TotalItems: totalItems,
+            Links: collectionLinks));
     }
 
     private async Task<int> GetTotalCoursesCountAsync(
@@ -95,13 +110,13 @@ internal sealed class GetManagedCoursesQueryHandler
     }
 
     private async Task<Dictionary<CategoryId, Category>> GetCategoryMapAsync(
-        List<Course> courses, 
+        List<Course> courses,
         CancellationToken cancellationToken = default)
     {
         var categoryIds = courses.Select(course => course.CategoryId).Distinct().ToList();
         return await _dbContext.Categories
-            .Where(course => categoryIds.Contains(course.Id))
-            .ToDictionaryAsync(course => course.Id, cancellationToken);
+            .Where(c => categoryIds.Contains(c.Id))
+            .ToDictionaryAsync(c => c.Id, cancellationToken);
     }
 
     private async Task<Dictionary<Guid, CourseAnalytics>> GetAnalyticsMapAsync(
@@ -110,11 +125,11 @@ internal sealed class GetManagedCoursesQueryHandler
     {
         var courseIds = courses.Select(c => c.Id.Value).ToList();
         return await _dbContext.CourseAnalytics
-            .Where(analytics => courseIds.Contains(analytics.CourseId))
-            .ToDictionaryAsync(analytics => analytics.CourseId, cancellationToken);
+            .Where(a => courseIds.Contains(a.CourseId))
+            .ToDictionaryAsync(a => a.CourseId, cancellationToken);
     }
 
-    private List<ManagedCourseSummaryDto> MapToManagedSummaryDtos(
+    private List<ManagedCourseSummaryItemDto> MapToItemDtos(
         List<Course> courses,
         User? instructor,
         Dictionary<CategoryId, Category> categories,
@@ -129,21 +144,36 @@ internal sealed class GetManagedCoursesQueryHandler
                 LessonsCount: stats?.TotalLessonsCount ?? 0,
                 Duration: stats?.TotalCourseDuration ?? TimeSpan.Zero);
 
-            return _courseSummaryDtoMapper.MapToManagedSummary(course, instructor, category, statsDto);
+            ManagedCourseSummaryData data = MapSummaryData(course, instructor, category, statsDto);
+            var links = new ManagedCourseSummaryLinks(
+                Self: _linkProvider.GetManagedCourseLink(course.Id.Value),
+                CoursePage: _linkProvider.GetCoursePageLink(course.Id.Value));
+
+            return new ManagedCourseSummaryItemDto(Data: data, Links: links);
         }).ToList();
     }
 
-    private static PaginatedCollectionDto<ManagedCourseSummaryDto> CreateEmptyResponse(
-        int page, 
-        int size)
+    private ManagedCourseSummaryData MapSummaryData(
+        Course course,
+        User? instructor,
+        Category? category,
+        ManagedCourseStatsDto stats)
     {
-        return new()
-        {
-            Items = [],
-            PageNumber = page,
-            PageSize = size,
-            TotalItems = 0,
-            Links = []
-        };
+        string? thumbnailUrl = CourseSummaryHelpers.GetFirstImagePublicUrl(course.Images, _storageUrlResolver);
+        string shortDescription = CourseSummaryHelpers.TruncateShortDescription(course.Description.Value);
+
+        return new ManagedCourseSummaryData(
+            Id: course.Id.Value,
+            Title: course.Title.Value,
+            ShortDescription: shortDescription,
+            Slug: course.Slug.Value,
+            Instructor: UserDtoMapper.Map(instructor, course.InstructorId.Value),
+            Category: CategoryDtoMapper.Map(category),
+            Price: course.Price,
+            Difficulty: course.Difficulty,
+            ThumbnailUrl: thumbnailUrl,
+            UpdatedAtUtc: course.UpdatedAtUtc,
+            Status: course.Status,
+            Stats: stats);
     }
 }

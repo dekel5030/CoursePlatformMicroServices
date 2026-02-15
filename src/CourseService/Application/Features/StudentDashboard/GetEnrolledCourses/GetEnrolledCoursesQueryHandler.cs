@@ -1,9 +1,9 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Enrollments.Dtos;
 using Courses.Application.Features.Shared;
-using Courses.Application.Services.LinkProvider;
+using Courses.Application.Features.StudentDashboard.GetEnrolledCourses;
 using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Services.LinkProvider.Abstractions.Links;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Enrollments.Errors;
@@ -17,47 +17,46 @@ using Microsoft.EntityFrameworkCore;
 namespace Courses.Application.Features.StudentDashboard.GetEnrolledCourses;
 
 internal sealed class GetEnrolledCoursesQueryHandler
-    : IQueryHandler<GetEnrolledCoursesQuery, EnrolledCourseCollectionDto>
+    : IQueryHandler<GetEnrolledCoursesQuery, GetEnrolledCoursesDto>
 {
-    private readonly ILinkBuilderService _linkBuilder;
+    private readonly ILinkProvider _linkProvider;
     private readonly IReadDbContext _readDbContext;
     private readonly IUserContext _userContext;
     private readonly IStorageUrlResolver _storageUrlResolver;
 
     public GetEnrolledCoursesQueryHandler(
-        ILinkBuilderService linkBuilder,
+        ILinkProvider linkProvider,
         IReadDbContext readDbContext,
         IUserContext userContext,
         IStorageUrlResolver storageUrlResolver)
     {
-        _linkBuilder = linkBuilder;
+        _linkProvider = linkProvider;
         _readDbContext = readDbContext;
         _userContext = userContext;
         _storageUrlResolver = storageUrlResolver;
     }
 
-    public async Task<Result<EnrolledCourseCollectionDto>> Handle(
+    public async Task<Result<GetEnrolledCoursesDto>> Handle(
         GetEnrolledCoursesQuery request,
         CancellationToken cancellationToken = default)
     {
         if (!_userContext.IsAuthenticated || _userContext.Id is null)
         {
-            return Result.Failure<EnrolledCourseCollectionDto>(EnrollmentErrors.Unauthenticated);
+            return Result.Failure<GetEnrolledCoursesDto>(EnrollmentErrors.Unauthenticated);
         }
 
         var studentId = new UserId(_userContext.Id.Value);
 
-        (List<EnrolledCourseRawData>? rawData, int totalCount) = 
+        (List<EnrolledCourseRawData> rawData, int totalCount) =
             await FetchEnrolledCoursesDataAsync(studentId, request, cancellationToken);
 
         if (totalCount == 0)
         {
-            return Result.Success(CreateCollectionResponse(new(), totalCount, request));
+            return Result.Success(CreateCollectionResponse([], totalCount, request));
         }
 
-        List<EnrolledCourseWithAnalyticsDto> dtos = MapToEnrolledCourseDtos(rawData);
-
-        return Result.Success(CreateCollectionResponse(dtos, totalCount, request));
+        List<EnrolledCourseItemDto> items = MapToItemDtos(rawData);
+        return Result.Success(CreateCollectionResponse(items, totalCount, request));
     }
 
     private async Task<(List<EnrolledCourseRawData> Items, int TotalCount)> FetchEnrolledCoursesDataAsync(
@@ -66,8 +65,8 @@ internal sealed class GetEnrolledCoursesQueryHandler
         CancellationToken cancellationToken = default)
     {
         IQueryable<Enrollment> query = _readDbContext.Enrollments
-            .Where(enrollment => 
-                enrollment.StudentId == studentId && 
+            .Where(enrollment =>
+                enrollment.StudentId == studentId &&
                 enrollment.Status == EnrollmentStatus.Active);
 
         int totalCount = await query.CountAsync(cancellationToken);
@@ -96,44 +95,54 @@ internal sealed class GetEnrolledCoursesQueryHandler
         return (items, totalCount);
     }
 
-    private List<EnrolledCourseWithAnalyticsDto> MapToEnrolledCourseDtos(List<EnrolledCourseRawData> rawData)
+    private List<EnrolledCourseItemDto> MapToItemDtos(List<EnrolledCourseRawData> rawData)
     {
         return rawData.Select(item =>
         {
             Enrollment enrollment = item.Enrollment;
-
+            Guid courseId = enrollment.CourseId.Value;
             double progress = CalculateProgress(enrollment.CompletedLessons.Count, item.TotalLessons);
 
-            var enrolledCourseDto = new EnrolledCourseDto
-            {
-                EnrollmentId = enrollment.Id.Value,
-                CourseId = enrollment.CourseId.Value,
-                CourseTitle = item.CourseInfo?.Title.Value ?? string.Empty,
-                CourseImageUrl = GetImageUrl(item.CourseInfo?.Images),
-                CourseSlug = item.CourseInfo?.Slug.Value ?? string.Empty,
-                LastAccessedAt = enrollment.LastAccessedAt,
-                EnrolledAt = enrollment.EnrolledAt,
-                Status = enrollment.Status.ToString(),
-                Links = BuildItemLinks(enrollment)
-            };
+            EnrolledCourseLinks links = BuildItemLinks(enrollment);
+            EnrolledCourseItemData data = new(
+                EnrollmentId: enrollment.Id.Value,
+                CourseId: courseId,
+                CourseTitle: item.CourseInfo?.Title.Value ?? string.Empty,
+                CourseImageUrl: GetImageUrl(item.CourseInfo?.Images),
+                CourseSlug: item.CourseInfo?.Slug.Value ?? string.Empty,
+                LastAccessedAt: enrollment.LastAccessedAt,
+                EnrolledAt: enrollment.EnrolledAt,
+                Status: enrollment.Status.ToString(),
+                ProgressPercentage: progress);
 
-            return new EnrolledCourseWithAnalyticsDto(enrolledCourseDto, new EnrolledCourseAnalyticsDto(progress));
+            return new EnrolledCourseItemDto(Data: data, Links: links);
         }).ToList();
     }
 
-    private EnrolledCourseCollectionDto CreateCollectionResponse(
-        List<EnrolledCourseWithAnalyticsDto> items, int total, GetEnrolledCoursesQuery request)
+    private EnrolledCourseLinks BuildItemLinks(Enrollment enrollment)
     {
-        var context = new EnrolledCourseCollectionContext(request.PageNumber, request.PageSize, total);
+        Guid courseId = enrollment.CourseId.Value;
+        LinkRecord viewCourse = _linkProvider.GetCoursePageLink(courseId);
+        LinkRecord? continueLearning = enrollment.LastAccessedLessonId is not null
+            ? _linkProvider.GetLessonPageLink(enrollment.LastAccessedLessonId!.Value)
+            : _linkProvider.GetCoursePageLink(courseId);
+        return new EnrolledCourseLinks(ViewCourse: viewCourse, ContinueLearning: continueLearning);
+    }
 
-        return new EnrolledCourseCollectionDto
-        {
-            Items = items,
-            PageNumber = request.PageNumber,
-            PageSize = request.PageSize,
-            TotalItems = total,
-            Links = _linkBuilder.BuildLinks(LinkResourceKey.EnrolledCourseCollection, context)
-        };
+    private GetEnrolledCoursesDto CreateCollectionResponse(
+        List<EnrolledCourseItemDto> items,
+        int total,
+        GetEnrolledCoursesQuery request)
+    {
+        var collectionLinks = new GetEnrolledCoursesCollectionLinks(
+            Self: _linkProvider.GetEnrolledCoursesLink(request.PageNumber, request.PageSize));
+
+        return new GetEnrolledCoursesDto(
+            Items: items,
+            PageNumber: request.PageNumber,
+            PageSize: request.PageSize,
+            TotalItems: total,
+            Links: collectionLinks);
     }
 
     private static double CalculateProgress(int completedCount, int totalCount)
@@ -152,13 +161,6 @@ internal sealed class GetEnrolledCoursesQueryHandler
             ? CourseSummaryHelpers.GetFirstImagePublicUrl(images, _storageUrlResolver)
             : null;
     }
-
-    private IReadOnlyList<LinkDto> BuildItemLinks(Enrollment enrollment)
-    {
-        var context = new EnrolledCourseContext(enrollment.CourseId, enrollment.LastAccessedLessonId);
-        return _linkBuilder.BuildLinks(LinkResourceKey.EnrolledCourse, context);
-    }
-
 
     private sealed class EnrolledCourseRawData
     {

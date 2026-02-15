@@ -18,14 +18,14 @@ internal sealed class GetCourseAnalytics : IEndpoint
         {
             var query = new GetCourseAnalyticsQuery(id);
 
-            Result<CourseDetailedAnalyticsDto> result = await mediator.Send(query, cancellationToken);
+            Result<GetCourseAnalyticsDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
                 dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
         .WithName("GetCourseAnalytics")
-        .WithMetadata<CourseDetailedAnalyticsDto>(
+        .WithMetadata<GetCourseAnalyticsDto>(
             nameof(GetCourseAnalytics),
             tag: Tags.Courses,
             summary: "Gets detailed analytics for a course (instructor only).")

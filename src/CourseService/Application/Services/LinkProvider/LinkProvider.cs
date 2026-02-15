@@ -18,6 +18,9 @@ internal sealed class LinkProvider : ILinkProvider
     public LinkRecord GetManagedCourseLink(Guid courseId) =>
         Link(_resolver.GetHref(EndpointNames.GetManagedCourseById, new { id = courseId }), LinkHttpMethod.Get);
 
+    public LinkRecord GetManagedCoursesLink(int pageNumber, int pageSize) =>
+        Link(_resolver.GetHref(EndpointNames.GetManagedCourses, new { pageNumber, pageSize }), LinkHttpMethod.Get);
+
     public LinkRecord GetCoursePageLink(Guid courseId) =>
         Link(_resolver.GetHref(EndpointNames.GetCoursePage, new { id = courseId }), LinkHttpMethod.Get);
 
@@ -45,6 +48,9 @@ internal sealed class LinkProvider : ILinkProvider
     public LinkRecord GetCourseRatingsLink(Guid courseId) =>
         Link(_resolver.GetHref(EndpointNames.GetCourseRatings, new { courseId }), LinkHttpMethod.Get);
 
+    public LinkRecord GetCoursesLink(int pageNumber, int pageSize) =>
+        Link(_resolver.GetHref(EndpointNames.GetCourses, new { page = pageNumber, pageSize }), LinkHttpMethod.Get);
+
     public LinkRecord GetCreateLessonLink(Guid moduleId) =>
         Link(_resolver.GetHref(EndpointNames.CreateLesson, new { moduleId }), LinkHttpMethod.Post);
 
@@ -71,4 +77,16 @@ internal sealed class LinkProvider : ILinkProvider
 
     public LinkRecord GetMoveLessonLink(Guid lessonId) =>
         Link(_resolver.GetHref(EndpointNames.MoveLesson, new { lessonId }), LinkHttpMethod.Patch);
+
+    public LinkRecord GetEnrolledCoursesLink(int pageNumber, int pageSize) =>
+        Link(_resolver.GetHref(EndpointNames.GetEnrolledCourses, new { pageNumber, pageSize }), LinkHttpMethod.Get);
+
+    public LinkRecord GetCreateCourseRatingLink(Guid courseId) =>
+        Link(_resolver.GetHref(EndpointNames.CreateCourseRating, new { courseId }), LinkHttpMethod.Post);
+
+    public LinkRecord GetUpdateCourseRatingLink(Guid ratingId) =>
+        Link(_resolver.GetHref(EndpointNames.UpdateCourseRating, new { ratingId }), LinkHttpMethod.Patch);
+
+    public LinkRecord GetDeleteCourseRatingLink(Guid ratingId) =>
+        Link(_resolver.GetHref(EndpointNames.DeleteCourseRating, new { ratingId }), LinkHttpMethod.Delete);
 }
