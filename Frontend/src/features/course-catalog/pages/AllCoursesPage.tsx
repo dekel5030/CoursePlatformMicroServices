@@ -37,7 +37,8 @@ export default function AllCoursesPage() {
             error={error}
           />
           <Pagination
-            links={links}
+            links={Array.isArray(links) ? links : undefined}
+            collectionLinks={!Array.isArray(links) && links ? links : undefined}
             onNavigate={handleNavigate}
             isLoading={isLoading}
           />

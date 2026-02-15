@@ -5,4 +5,4 @@ namespace Courses.Application.Features.CourseRatings.GetCourseRatings;
 public sealed record GetCourseRatingsQuery(
     Guid CourseId,
     int PageNumber = 1,
-    int PageSize = 10) : IQuery<CourseRatingCollectionDto>;
+    int PageSize = 10) : IQuery<GetCourseRatingsDto>;

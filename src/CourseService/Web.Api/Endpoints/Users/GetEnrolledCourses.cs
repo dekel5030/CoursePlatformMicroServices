@@ -1,12 +1,11 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
-using Courses.Application.Enrollments.Dtos;
 using Courses.Application.Features.StudentDashboard.GetEnrolledCourses;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Api.Endpoints.Enrollments;
+namespace Courses.Api.Endpoints.Users;
 
 internal sealed class GetEnrolledCourses : IEndpoint
 {
@@ -20,14 +19,14 @@ internal sealed class GetEnrolledCourses : IEndpoint
         {
             var query = new GetEnrolledCoursesQuery(pageNumber, pageSize);
 
-            Result<EnrolledCourseCollectionDto> result = await mediator.Send(query, cancellationToken);
+            Result<GetEnrolledCoursesDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
                 dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
         .WithName("GetEnrolledCourses")
-        .WithMetadata<EnrolledCourseCollectionDto>(
+        .WithMetadata<GetEnrolledCoursesDto>(
             nameof(GetEnrolledCourses),
             tag: Tags.Enrollments,
             summary: "Gets the list of courses the current user is enrolled in, with progress and last-accessed metadata.")

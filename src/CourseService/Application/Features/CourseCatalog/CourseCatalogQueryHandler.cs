@@ -1,8 +1,12 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Features.Dtos;
+using Courses.Application.Abstractions.Storage;
+using Courses.Application.Categories;
+using Courses.Application.Features.CourseCatalog;
 using Courses.Application.Features.Shared;
 using Courses.Application.Features.Shared.Mappers;
 using Courses.Application.ReadModels;
+using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.Users;
 using Courses.Domain.Categories;
 using Courses.Domain.Courses;
 using Courses.Domain.Users;
@@ -12,20 +16,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Features.CourseCatalog;
 
-internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQuery, CourseCollectionDto>
+internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQuery, CourseCatalogDto>
 {
     private readonly IReadDbContext _dbContext;
-    private readonly ICourseSummaryDtoMapper _courseSummaryDtoMapper;
+    private readonly ILinkProvider _linkProvider;
+    private readonly IStorageUrlResolver _storageUrlResolver;
 
     public CourseCatalogQueryHandler(
         IReadDbContext dbContext,
-        ICourseSummaryDtoMapper courseSummaryDtoMapper)
+        ILinkProvider linkProvider,
+        IStorageUrlResolver storageUrlResolver)
     {
         _dbContext = dbContext;
-        _courseSummaryDtoMapper = courseSummaryDtoMapper;
+        _linkProvider = linkProvider;
+        _storageUrlResolver = storageUrlResolver;
     }
 
-    public async Task<Result<CourseCollectionDto>> Handle(
+    public async Task<Result<CourseCatalogDto>> Handle(
         CourseCatalogQuery request,
         CancellationToken cancellationToken = default)
     {
@@ -40,9 +47,23 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
         IEnumerable<Guid> courseIds = rawData.Select(data => data.Course.Id.Value);
         Dictionary<Guid, CourseAnalytics> analyticsDict = await GetAnalyticsLookupAsync(courseIds, cancellationToken);
 
-        List<CourseSummaryWithAnalyticsDto> courseDtos = MapToCourseDtos(rawData, analyticsDict);
+        List<CourseCatalogItemDto> items = MapToItemDtos(rawData, analyticsDict);
 
-        return Result.Success(CreateCollectionDto(courseDtos, pageNumber, pageSize, totalItems));
+        bool hasNext = pageNumber * pageSize < totalItems;
+        bool hasPrev = pageNumber > 1;
+        var collectionLinks = new CourseCatalogCollectionLinks(
+            Self: _linkProvider.GetCoursesLink(pageNumber, pageSize),
+            Next: hasNext ? _linkProvider.GetCoursesLink(pageNumber + 1, pageSize) : null,
+            Prev: hasPrev ? _linkProvider.GetCoursesLink(pageNumber - 1, pageSize) : null);
+
+        var dto = new CourseCatalogDto(
+            Items: items,
+            PageNumber: pageNumber,
+            PageSize: pageSize,
+            TotalItems: totalItems,
+            Links: collectionLinks);
+
+        return Result.Success(dto);
     }
 
     private IQueryable<CatalogRawData> BuildCatalogQuery()
@@ -58,9 +79,9 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
     }
 
     private static async Task<List<CatalogRawData>> FetchPagedDataAsync(
-        IQueryable<CatalogRawData> query, 
-        int page, 
-        int size, 
+        IQueryable<CatalogRawData> query,
+        int page,
+        int size,
         CancellationToken cancellationToken)
     {
         return await query
@@ -70,7 +91,7 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
     }
 
     private async Task<Dictionary<Guid, CourseAnalytics>> GetAnalyticsLookupAsync(
-        IEnumerable<Guid> courseIds, 
+        IEnumerable<Guid> courseIds,
         CancellationToken cancellationToken)
     {
         return await _dbContext.CourseAnalytics
@@ -78,36 +99,45 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
             .ToDictionaryAsync(analytics => analytics.CourseId, cancellationToken);
     }
 
-    private List<CourseSummaryWithAnalyticsDto> MapToCourseDtos(
-        List<CatalogRawData> rawData, Dictionary<Guid, CourseAnalytics> analyticsDict)
+    private List<CourseCatalogItemDto> MapToItemDtos(
+        List<CatalogRawData> rawData,
+        Dictionary<Guid, CourseAnalytics> analyticsDict)
     {
         return rawData.Select(raw =>
         {
             analyticsDict.TryGetValue(raw.Course.Id.Value, out CourseAnalytics? stats);
-
-            CourseSummaryDto summary = _courseSummaryDtoMapper
-                .MapToCatalogSummary(raw.Course, raw.Instructor, raw.Category);
-
-            CourseSummaryAnalyticsDto analytics = CourseAnalyticsDtoMapper.ToSummaryAnalytics(stats);
-
-            return new CourseSummaryWithAnalyticsDto(summary, analytics);
+            CourseCatalogItemData data = MapItemData(raw, stats);
+            Guid courseId = raw.Course.Id.Value;
+            var links = new CourseCatalogItemLinks(
+                Self: _linkProvider.GetCoursePageLink(courseId),
+                Watch: _linkProvider.GetCoursePageLink(courseId));
+            return new CourseCatalogItemDto(Data: data, Links: links);
         }).ToList();
     }
 
-    private static CourseCollectionDto CreateCollectionDto(
-        List<CourseSummaryWithAnalyticsDto> items, 
-        int page, 
-        int size, 
-        int total)
+    private CourseCatalogItemData MapItemData(CatalogRawData raw, CourseAnalytics? stats)
     {
-        return new CourseCollectionDto
-        {
-            Items = items,
-            PageNumber = page,
-            PageSize = size,
-            TotalItems = total,
-            Links = []
-        };
+        string? thumbnailUrl = CourseSummaryHelpers.GetFirstImagePublicUrl(raw.Course.Images, _storageUrlResolver);
+        string shortDescription = CourseSummaryHelpers.TruncateShortDescription(raw.Course.Description.Value);
+
+        return new CourseCatalogItemData(
+            Id: raw.Course.Id.Value,
+            Title: raw.Course.Title.Value,
+            ShortDescription: shortDescription,
+            Slug: raw.Course.Slug.Value,
+            Instructor: UserDtoMapper.Map(raw.Instructor, raw.Course.InstructorId.Value),
+            Category: CategoryDtoMapper.Map(raw.Category),
+            Price: raw.Course.Price,
+            Difficulty: raw.Course.Difficulty,
+            ThumbnailUrl: thumbnailUrl,
+            UpdatedAtUtc: raw.Course.UpdatedAtUtc,
+            Status: raw.Course.Status,
+            LessonsCount: stats?.TotalLessonsCount ?? 0,
+            Duration: stats?.TotalCourseDuration ?? TimeSpan.Zero,
+            EnrollmentCount: stats?.EnrollmentsCount ?? 0,
+            AverageRating: stats?.AverageRating ?? 0,
+            ReviewsCount: stats?.ReviewsCount ?? 0,
+            CourseViews: stats?.ViewCount ?? 0);
     }
 
     private sealed class CatalogRawData

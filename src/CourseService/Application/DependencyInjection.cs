@@ -1,7 +1,8 @@
 using CoursePlatform.ServiceDefaults.Messaging;
 using CoursePlatform.ServiceDefaults.Messaging.Behaviors;
+using Courses.Application.Features.CoursePage;
+using Courses.Application.Features.Management.ManagedCoursePage;
 using Courses.Application.Features.Shared.Loaders;
-using Courses.Application.Features.Shared.Mappers;
 using Courses.Application.ReadModels;
 using Courses.Application.Services.Actions;
 using Courses.Application.Services.LinkProvider;
@@ -28,10 +29,9 @@ public static class DependencyInjection
 
         services.AddLinkBuilder();
 
-        services.AddScoped<ICoursePageDtoMapper, CoursePageDtoMapper>();
-        services.AddScoped<ILessonPageDtoMapper, LessonPageDtoMapper>();
-        services.AddScoped<ICourseSummaryDtoMapper, CourseSummaryDtoMapper>();
         services.AddScoped<ICoursePageDataLoader, CoursePageDataLoader>();
+        services.AddScoped<ICoursePageComposer, CoursePageComposer>();
+        services.AddScoped<IManagedCoursePageComposer, ManagedCoursePageComposer>();
 
         return services;
     }

@@ -1,57 +1,74 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Features.Shared;
+using Courses.Application.Services.LinkProvider.Abstractions;
+using Courses.Application.ReadModels;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Courses.Application.ReadModels;
 
 namespace Courses.Application.Features.Management.GetCourseAnalytics;
 
 internal sealed class GetCourseAnalyticsQueryHandler
-    : IQueryHandler<GetCourseAnalyticsQuery, CourseDetailedAnalyticsDto>
+    : IQueryHandler<GetCourseAnalyticsQuery, GetCourseAnalyticsDto>
 {
     private const int EnrollmentsOverTimeDays = 30;
     private const int CourseViewersLimit = 50;
 
     private readonly IReadDbContext _readDbContext;
     private readonly IUserContext _userContext;
+    private readonly ILinkProvider _linkProvider;
 
-    public GetCourseAnalyticsQueryHandler(IReadDbContext readDbContext, IUserContext userContext)
+    public GetCourseAnalyticsQueryHandler(
+        IReadDbContext readDbContext,
+        IUserContext userContext,
+        ILinkProvider linkProvider)
     {
         _readDbContext = readDbContext;
         _userContext = userContext;
+        _linkProvider = linkProvider;
     }
 
-    public async Task<Result<CourseDetailedAnalyticsDto>> Handle(
+    public async Task<Result<GetCourseAnalyticsDto>> Handle(
         GetCourseAnalyticsQuery request,
         CancellationToken cancellationToken = default)
     {
         var courseId = new CourseId(request.CourseId);
 
         Result authResult = await AuthorizeInstructorAsync(courseId, cancellationToken);
-        
+
         if (authResult.IsFailure)
         {
-            return Result.Failure<CourseDetailedAnalyticsDto>(authResult.Error);
+            return Result.Failure<GetCourseAnalyticsDto>(authResult.Error);
         }
+
+        GetCourseAnalyticsLinks links = BuildLinks(request.CourseId, isInstructor: true);
 
         CourseAnalytics? analytics = await _readDbContext.CourseAnalytics
             .FirstOrDefaultAsync(c => c.CourseId == request.CourseId, cancellationToken);
 
         if (analytics == null)
         {
-            return EmptyResult();
+            return Result.Success(new GetCourseAnalyticsDto(Data: EmptyData(), Links: links));
         }
 
-        List<EnrollmentCountByDayDto> enrollmentsOverTime = 
+        List<EnrollmentCountByDayDto> enrollmentsOverTime =
             await GetEnrollmentsOverTimeAsync(courseId, cancellationToken);
 
         List<CourseViewerDto> courseViewers = await GetRecentUniqueViewersAsync(courseId, cancellationToken);
 
-        return Result.Success(MapToDetailedDto(analytics, enrollmentsOverTime, courseViewers));
+        CourseDetailedAnalyticsDto data = MapToDetailedDto(analytics, enrollmentsOverTime, courseViewers);
+        return Result.Success(new GetCourseAnalyticsDto(Data: data, Links: links));
+    }
+
+    private GetCourseAnalyticsLinks BuildLinks(Guid courseId, bool isInstructor)
+    {
+        return new GetCourseAnalyticsLinks(
+            Self: _linkProvider.GetCourseAnalyticsLink(courseId),
+            Course: _linkProvider.GetCoursePageLink(courseId),
+            ManagedCourse: isInstructor ? _linkProvider.GetManagedCourseLink(courseId) : null);
     }
 
 
@@ -149,9 +166,9 @@ internal sealed class GetCourseAnalyticsQueryHandler
         return new CourseViewerDto(row.UserId, displayName, row.AvatarUrl, row.ViewedAt);
     }
 
-    private static Result<CourseDetailedAnalyticsDto> EmptyResult()
+    private static CourseDetailedAnalyticsDto EmptyData()
     {
-        return Result.Success(new CourseDetailedAnalyticsDto
+        return new CourseDetailedAnalyticsDto
         {
             AverageRating = 0,
             CourseViewers = [],
@@ -162,7 +179,7 @@ internal sealed class GetCourseAnalyticsQueryHandler
             TotalLessonsCount = 0,
             ViewCount = 0,
             TotalCourseDuration = TimeSpan.Zero
-        });
+        };
     }
 
     private sealed class ViewerRawRow

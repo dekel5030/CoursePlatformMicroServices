@@ -11,6 +11,33 @@ export interface EnrolledCourseCollectionViewDto {
   links: import("@/shared/types/LinkDto").LinkDto[] | null;
 }
 
+function normalizeEnrolledItem(item: unknown): EnrolledCourseDto | null {
+  if (item == null || typeof item !== "object") return null;
+  const obj = item as Record<string, unknown>;
+  if ("data" in obj && obj.data != null && typeof obj.data === "object") {
+    const data = obj.data as Record<string, unknown>;
+    const links = "links" in obj ? obj.links : undefined;
+    const progressPercentage =
+      typeof data.progressPercentage === "number" ? data.progressPercentage : 0;
+    return {
+      enrollmentId: String(data.enrollmentId ?? ""),
+      courseId: String(data.courseId ?? ""),
+      courseTitle: data.courseTitle != null ? String(data.courseTitle) : null,
+      courseImageUrl: data.courseImageUrl != null ? String(data.courseImageUrl) : null,
+      courseSlug: data.courseSlug != null ? String(data.courseSlug) : null,
+      progressPercentage,
+      lastAccessedAt: data.lastAccessedAt != null ? String(data.lastAccessedAt) : null,
+      enrolledAt: String(data.enrolledAt ?? ""),
+      status: data.status != null ? String(data.status) : null,
+      links: (links as EnrolledCourseDto["links"]) ?? null,
+    };
+  }
+  if ("enrolledCourse" in obj && "analytics" in obj) {
+    return mapEnrolledCourseWithAnalyticsToDto(obj as Parameters<typeof mapEnrolledCourseWithAnalyticsToDto>[0]);
+  }
+  return null;
+}
+
 export async function fetchMyEnrollments(
   pageNumber = 1,
   pageSize = 10
@@ -20,8 +47,12 @@ export async function fetchMyEnrollments(
     { params: { pageNumber, pageSize } }
   );
   const data = response.data;
+  const rawItems = data.items ?? [];
+  const items = rawItems
+    .map(normalizeEnrolledItem)
+    .filter((d): d is EnrolledCourseDto => d != null);
   return {
     ...data,
-    items: data.items?.map(mapEnrolledCourseWithAnalyticsToDto) ?? null,
+    items,
   };
 }

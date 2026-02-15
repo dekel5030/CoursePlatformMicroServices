@@ -1,6 +1,6 @@
 using Courses.Application.Abstractions.Storage;
 using Courses.Application.Categories;
-using Courses.Application.Features.Dtos;
+using Courses.Application.Features.CourseCatalog;
 using Courses.Application.Features.Management;
 using Courses.Application.Features.Shared;
 using Courses.Application.Services.LinkProvider;

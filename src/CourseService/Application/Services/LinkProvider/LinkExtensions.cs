@@ -17,6 +17,7 @@ internal static class LinkExtensions
         services.AddScoped<ILinkDefinitionRegistry, EnrolledCourseLinkDefinitions>();
         services.AddScoped<ILinkDefinitionRegistry, EnrolledCourseCollectionLinkDefinitions>();
         services.AddScoped<ILinkBuilderService, LinkBuilderService>();
+        services.AddScoped<ILinkProvider, LinkProvider>();
 
         return services;
     }

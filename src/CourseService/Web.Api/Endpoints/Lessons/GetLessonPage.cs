@@ -1,6 +1,7 @@
 using CoursePlatform.ServiceDefaults.CustomResults;
 using CoursePlatform.ServiceDefaults.Swagger;
 using Courses.Api.Extensions;
+using Courses.Application.Features.LessonPage;
 using Courses.Application.Lessons.Dtos;
 using Courses.Application.Lessons.Queries.GetLessons;
 using Kernel;
@@ -17,12 +18,12 @@ internal sealed class GetLessonPage : IEndpoint
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetLessonsQuery(new LessonFilter(Ids: [lessonId]));
-            Result<IReadOnlyList<LessonDto>> result = await mediator.Send(query, cancellationToken);
+            var query = new LessonPageQuery(lessonId);
+            Result<LessonPageDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithMetadata<LessonDto>(
+        .WithMetadata<LessonPageDto>(
             nameof(GetLessonPage),
             tag: Tags.Lessons,
             summary: "Gets a lesson by its ID.");

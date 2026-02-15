@@ -1,10 +1,12 @@
-import type { LinkDto } from "@/shared/types/LinkDto";
 import type { Money } from "./money";
 import type { CategoryDto } from "./CourseSummaryDto";
+import type {
+  CoursePageCourseLinks,
+  CoursePageLessonLinks,
+} from "./links";
 
 /**
  * API UserDto: instructor record in CoursePageDto
- * Matches Courses.Application.Courses.Dtos.UserDto
  */
 export interface UserDtoApi {
   id: string;
@@ -13,10 +15,6 @@ export interface UserDtoApi {
   avatarUrl: string | null;
 }
 
-/**
- * API CourseAnalyticsDto: analytics for course in CoursePageDto
- * Matches Courses.Application.Courses.Dtos.CourseAnalyticsDto
- */
 export interface CourseAnalyticsDtoApi {
   enrollmentCount: number;
   lessonsCount: number;
@@ -26,11 +24,8 @@ export interface CourseAnalyticsDtoApi {
   viewCount?: number;
 }
 
-/**
- * API CourseDto: the course object in CoursePageDto
- * Matches Courses.Application.Courses.Dtos.CourseDto
- */
-export interface CourseDtoApi {
+/** Course page: course.data */
+export interface CoursePageCourseData {
   id: string;
   title: string | null;
   description: string | null;
@@ -41,78 +36,65 @@ export interface CourseDtoApi {
   tags: string[] | null;
   instructorId: string;
   categoryId: string;
-  links: LinkDto[] | null;
 }
 
-/**
- * API ModuleDto: module in CoursePageDto (pure aggregate, no structure)
- * Matches Courses.Application.Courses.Dtos.ModuleDto
- */
-export interface ModuleDtoApi {
+/** Course page: course (data + links) */
+export interface CoursePageCourseDto {
+  data: CoursePageCourseData;
+  links: CoursePageCourseLinks;
+}
+
+/** Course page: module (data + links); links may be empty object */
+export interface CoursePageModuleData {
   id: string;
   title: string | null;
-  links: LinkDto[] | null;
-}
-
-/**
- * API ModuleAnalyticsDto: analytics for module
- * Matches Courses.Application.Modules.Dtos.ModuleAnalyticsDto
- */
-export interface ModuleAnalyticsDtoApi {
   lessonCount: number;
-  duration: string;
+  totalDuration: string;
 }
 
-/**
- * API ModuleWithAnalyticsDto: module with analytics in CoursePageDto
- * Matches Courses.Application.Modules.Dtos.ModuleWithAnalyticsDto
- */
-export interface ModuleWithAnalyticsDtoApi {
-  module: ModuleDtoApi;
-  analytics: ModuleAnalyticsDtoApi;
+export interface CoursePageModuleLinks {
+  // empty in API
 }
 
-/**
- * API LessonDto: lesson in CoursePageDto
- * Matches Courses.Application.Courses.Dtos.LessonDto
- */
-export interface LessonDtoApi {
+export interface CoursePageModuleDto {
+  data: CoursePageModuleData;
+  links?: CoursePageModuleLinks;
+}
+
+/** Course page: lesson (data + links) */
+export interface CoursePageLessonData {
   id: string;
   title: string | null;
   index: number;
   duration: string;
   thumbnailUrl: string | null;
   access: "Private" | "Public";
-  moduleId: string | null;
-  courseId: string | null;
-  courseName: string | null;
+  moduleId: string;
+  courseId: string;
   description: string | null;
   videoUrl: string | null;
   transcriptUrl: string | null;
-  links: LinkDto[] | null;
 }
 
-/**
- * API CourseStructureDto: structure (order) of modules and lessons
- * Matches Courses.Application.Courses.Dtos.CourseStructureDto
- */
+export interface CoursePageLessonDto {
+  data: CoursePageLessonData;
+  links: CoursePageLessonLinks;
+}
+
 export interface CourseStructureDtoApi {
   moduleIds: string[];
   moduleLessonIds: Record<string, string[]>;
 }
 
 /**
- * API CoursePageDto: flat response from GET /courses/{id} or GET /manage/courses/{id} (ManagedCoursePageDto).
- * For managed view, analytics and instructors are omitted (instructor is the current user).
+ * API CoursePageDto: GET /courses/{id} response (strongly-typed links).
  */
 export interface CoursePageDto {
-  course: CourseDtoApi;
-  /** Omitted in ManagedCoursePageDto (GET /manage/courses/{id}) */
+  course: CoursePageCourseDto;
   analytics?: CourseAnalyticsDtoApi;
   structure: CourseStructureDtoApi;
-  modules: Record<string, ModuleWithAnalyticsDtoApi> | null;
-  lessons: Record<string, LessonDtoApi> | null;
-  /** Omitted in ManagedCoursePageDto (GET /manage/courses/{id}) */
+  modules: Record<string, CoursePageModuleDto> | null;
+  lessons: Record<string, CoursePageLessonDto> | null;
   instructors?: Record<string, UserDtoApi> | null;
   categories: Record<string, CategoryDto> | null;
 }

@@ -8,8 +8,7 @@ import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { Clock, Trash2, Play, Lock, GripVertical } from "lucide-react";
 import { usePatchLesson, useDeleteLesson } from "@/domain/lessons";
 import { toast } from "sonner";
-import { hasLink, getLink, formatDuration } from "@/shared/utils";
-import { LessonRels } from "@/domain/lessons";
+import { getLinkFromRecord, formatDuration, apiHrefToAppRoute } from "@/shared/utils";
 
 interface LessonProps {
   lesson: LessonModel;
@@ -32,18 +31,37 @@ export default function LessonCard({
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const canUpdate = hasLink(lesson.links, LessonRels.PARTIAL_UPDATE);
-  const canDelete = hasLink(lesson.links, LessonRels.DELETE);
-  const updateLink = getLink(lesson.links, LessonRels.PARTIAL_UPDATE);
-  const deleteLink = getLink(lesson.links, LessonRels.DELETE);
+  const updateLink = getLinkFromRecord(lesson.links, "partialUpdate");
+  const deleteLink = getLinkFromRecord(lesson.links, "delete");
+  const selfLink = getLinkFromRecord(lesson.links, "self");
+  const manageLink = getLinkFromRecord(lesson.links, "manage");
+  const canUpdate = !!updateLink?.href;
+  const canDelete = !!deleteLink?.href;
 
   const durationText = formatDuration(lesson.duration);
 
+  const lessonRoute = `/courses/${courseId}/lessons/${lesson.lessonId}`;
+  const manageRoute = manageLink?.href
+    ? apiHrefToAppRoute(manageLink.href, { courseId }) ?? null
+    : null;
+
   const handleLessonClick = () => {
-    const selfLink = getLink(lesson.links, LessonRels.SELF);
-    navigate(`/courses/${courseId}/lessons/${lesson.lessonId}`, {
+    if (manageRoute) {
+      navigate(manageRoute, { state: { lessonSelfLink: manageLink?.href } });
+      return;
+    }
+    navigate(lessonRoute, {
       state: { lessonSelfLink: selfLink?.href },
     });
+  };
+
+  const handleManageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (manageRoute) {
+      navigate(manageRoute, { state: { lessonSelfLink: manageLink?.href } });
+    } else {
+      handleLessonClick();
+    }
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -52,7 +70,7 @@ export default function LessonCard({
   };
 
   const handleConfirmDelete = async () => {
-    if (!deleteLink) return;
+    if (!deleteLink?.href) return;
     try {
       await deleteLesson.mutateAsync(deleteLink.href);
     } finally {
@@ -61,7 +79,7 @@ export default function LessonCard({
   };
 
   const handleTitleUpdate = async (newTitle: string) => {
-    if (!updateLink) return;
+    if (!updateLink?.href) return;
     try {
       await patchLesson.mutateAsync({
         url: updateLink.href,
@@ -133,7 +151,6 @@ export default function LessonCard({
               </div>
             </div>
 
-            {/* Duration & actions */}
             <div className="flex items-center gap-2 shrink-0">
               {lesson.isPreview && (
                 <Badge variant="secondary" className="text-xs h-5 font-normal">
@@ -145,6 +162,18 @@ export default function LessonCard({
                   <Clock className="h-3 w-3 shrink-0" />
                   {durationText}
                 </span>
+              )}
+              {(manageLink?.href || selfLink?.href) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs shrink-0"
+                  onClick={handleManageClick}
+                >
+                  {manageLink?.href
+                    ? t("lesson-viewer:card.manage", { defaultValue: "Open" })
+                    : t("lesson-viewer:card.view", { defaultValue: "View" })}
+                </Button>
               )}
               {canDelete && (
                 <Button

@@ -47,7 +47,7 @@ internal sealed class ModuleLinkDefinitions : ILinkDefinitionRegistry
                 getRouteValues: ctx => new { moduleId = ctx.Id.Value }),
 
             new LinkDefinition<ModuleContext>(
-                rel: LinkRels.Module.ReorderLessons,
+                rel: LinkRels.ChangePosition,
                 method: LinkHttpMethod.Patch,
                 endpointName: EndpointNames.ReorderLessons,
                 policyCheck: ctx => ctx.Course.IsManagementView && _policy.CanEditModule(ctx),

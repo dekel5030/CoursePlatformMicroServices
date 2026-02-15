@@ -1,4 +1,5 @@
 import type { LinkDto } from "@/shared/types/LinkDto";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 
 /**
  * Backend DTO: Matches EnrolledCourseDto from CourseService (pure, no analytics)
@@ -12,7 +13,7 @@ export interface EnrolledCourseDtoApi {
   lastAccessedAt: string | null;
   enrolledAt: string;
   status: string | null;
-  links: LinkDto[] | null;
+  links: LinkDto[] | LinksRecord | null;
 }
 
 /**
@@ -28,5 +29,6 @@ export interface EnrolledCourseDto {
   lastAccessedAt: string | null;
   enrolledAt: string;
   status: string | null;
-  links: LinkDto[] | null;
+  /** Legacy array or strongly-typed (viewCourse, continueLearning) */
+  links: LinkDto[] | LinksRecord | null;
 }

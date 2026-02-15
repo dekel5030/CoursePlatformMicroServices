@@ -1,8 +1,10 @@
-import { useParams, useLocation } from "react-router-dom";
+import { useState, useCallback } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import {
   useLesson,
   usePatchLesson,
   useGenerateLessonAi,
+  useDeleteLesson,
 } from "@/domain/lessons";
 import { useCourse } from "@/domain/courses";
 import {
@@ -14,17 +16,18 @@ import {
   Button,
 } from "@/shared/ui";
 import { BreadcrumbNav } from "@/components/layout";
+import { LinkButtons } from "@/shared/components";
 import { InlineEditableText, InlineEditableTextarea, RichTextViewer } from "@/shared/common";
 import { Clock, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { getLink, hasLink, formatDuration } from "@/shared/utils";
-import { LessonRels } from "@/domain/lessons";
+import { getLinkFromRecord, formatDuration, apiHrefToAppRoute, LINK_LABELS } from "@/shared/utils";
 import { LessonVideoUpload } from "../components/LessonVideoUpload";
 import { AiSuggestionField } from "../components/AiSuggestionField";
 import { HlsVideoPlayer } from "@/components/HlsVideoPlayer";
-import { useState } from "react";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import { axiosClient } from "@/app/axios";
 
 export default function LessonPage() {
   const { courseId, lessonId } = useParams<{
@@ -42,17 +45,21 @@ export default function LessonPage() {
   } = useLesson(courseId!, lessonId, lessonSelfLink);
   const { data: course } = useCourse(courseId!);
 
+  const navigate = useNavigate();
   const patchLesson = usePatchLesson(courseId!, lessonId!);
   const generateAi = useGenerateLessonAi();
+  const deleteLesson = useDeleteLesson(courseId!);
 
   const { t } = useTranslation(["lesson-viewer", "translation"]);
 
   const [aiTitle, setAiTitle] = useState<string | null>(null);
   const [aiDescription, setAiDescription] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteLinkHref, setDeleteLinkHref] = useState<string | null>(null);
 
   const handleAcceptTitle = async (newTitle: string) => {
-    const updateLink = getLink(lesson?.links, LessonRels.PARTIAL_UPDATE);
-    if (!updateLink) {
+    const updateLink = getLinkFromRecord(lesson?.links, "partialUpdate");
+    if (!updateLink?.href) {
       console.error("No update link found for this lesson");
       return;
     }
@@ -71,8 +78,8 @@ export default function LessonPage() {
   };
 
   const handleAcceptDescription = async (newDescription: string) => {
-    const updateLink = getLink(lesson?.links, LessonRels.PARTIAL_UPDATE);
-    if (!updateLink) {
+    const updateLink = getLinkFromRecord(lesson?.links, "partialUpdate");
+    if (!updateLink?.href) {
       console.error("No update link found for this lesson");
       return;
     }
@@ -91,8 +98,8 @@ export default function LessonPage() {
   };
 
   const handleGenerateWithAi = async () => {
-    const aiGenerateLink = getLink(lesson?.links, LessonRels.AI_GENERATE);
-    if (!aiGenerateLink) {
+    const aiGenerateLink = getLinkFromRecord(lesson?.links, "aiGenerate");
+    if (!aiGenerateLink?.href) {
       console.error("No AI generate link found for this lesson");
       return;
     }
@@ -114,6 +121,64 @@ export default function LessonPage() {
       console.error("Failed to generate with AI:", error);
     }
   };
+
+  const getRouteForHref = useCallback(
+    (href: string) => apiHrefToAppRoute(href, { courseId: courseId ?? undefined }),
+    [courseId]
+  );
+
+  const lessonLabelByRel: Record<string, string> = {
+    managedCourse: t("lesson-viewer:toolbar.backToCourse", { defaultValue: LINK_LABELS.managedCourse }),
+    publicPreview: t("lesson-viewer:toolbar.previewCourse", { defaultValue: LINK_LABELS.publicPreview }),
+    partialUpdate: t("common.edit"),
+    delete: t("common.delete"),
+    generateVideoUploadUrl: t("lesson-viewer:toolbar.uploadVideo", { defaultValue: LINK_LABELS.generateVideoUploadUrl }),
+    aiGenerate: t("lesson-viewer:actions.generateWithAi"),
+    nextLesson: t("lesson-viewer:toolbar.nextLesson", { defaultValue: LINK_LABELS.nextLesson }),
+    previousLesson: t("lesson-viewer:toolbar.previousLesson", { defaultValue: LINK_LABELS.previousLesson }),
+    course: t("lesson-viewer:toolbar.backToCourse", { defaultValue: LINK_LABELS.course }),
+    markAsComplete: t("lesson-viewer:toolbar.markComplete", { defaultValue: LINK_LABELS.markAsComplete }),
+    unmarkAsComplete: t("lesson-viewer:toolbar.unmarkComplete", { defaultValue: LINK_LABELS.unmarkAsComplete }),
+    manage: t("lesson-viewer:toolbar.manage", { defaultValue: LINK_LABELS.manage }),
+  };
+
+  const handleLessonAction = useCallback(
+    async (rel: string, link: { href?: string | null; method?: string | null }) => {
+      if (rel === "delete" && link?.href) {
+        setDeleteLinkHref(link.href);
+        setIsDeleteDialogOpen(true);
+        return;
+      }
+      if ((rel === "markAsComplete" || rel === "unmarkAsComplete") && link?.href) {
+        try {
+          if (rel === "markAsComplete") {
+            await axiosClient.post(link.href);
+            toast.success(t("lesson-viewer:toolbar.markedComplete"));
+          } else {
+            await axiosClient.delete(link.href);
+            toast.success(t("lesson-viewer:toolbar.unmarkedComplete"));
+          }
+        } catch (err) {
+          toast.error(t("common.error", { message: String(err) }));
+        }
+      }
+    },
+    [t]
+  );
+
+  const handleConfirmDeleteLesson = useCallback(async () => {
+    if (!deleteLinkHref) return;
+    try {
+      await deleteLesson.mutateAsync(deleteLinkHref);
+      toast.success(t("lesson-viewer:actions.deleteSuccess"));
+      navigate(courseId ? `/courses/${courseId}` : "/catalog");
+    } catch {
+      toast.error(t("lesson-viewer:actions.deleteFailed"));
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setDeleteLinkHref(null);
+    }
+  }, [deleteLinkHref, deleteLesson, navigate, courseId, t]);
 
   if (isLoading) {
     return (
@@ -193,9 +258,40 @@ export default function LessonPage() {
     show: { opacity: 1, y: 0 },
   };
 
+  const hasLessonLinks = lesson.links && Object.keys(lesson.links).length > 0;
+
   return (
     <div className="space-y-6">
       <BreadcrumbNav items={breadcrumbItems} />
+      {hasLessonLinks && (
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center gap-2 py-2 border-b border-border">
+            <LinkButtons
+              links={lesson.links}
+              labelByRel={lessonLabelByRel}
+              onAction={handleLessonAction}
+              excludeRels={["self", "partialUpdate", "generateVideoUploadUrl", "aiGenerate"]}
+              getRouteForHref={getRouteForHref}
+              variant="outline"
+              size="sm"
+              className="flex-wrap"
+            />
+          </div>
+        </div>
+      )}
+      <ConfirmationModal
+        open={isDeleteDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) setDeleteLinkHref(null);
+          setIsDeleteDialogOpen(open);
+        }}
+        onConfirm={handleConfirmDeleteLesson}
+        title={t("lesson-viewer:actions.deleteConfirmTitle")}
+        message={t("lesson-viewer:actions.deleteConfirmMessage")}
+        confirmText={t("common.delete")}
+        cancelText={t("common.cancel")}
+        isLoading={deleteLesson.isPending}
+      />
       <motion.div
         className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6"
         variants={container}
@@ -246,8 +342,8 @@ export default function LessonPage() {
           <Card>
             <CardHeader className="space-y-4">
               {/* AI Generation Button */}
-              {hasLink(lesson.links, LessonRels.AI_GENERATE) &&
-                hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) && (
+              {!!getLinkFromRecord(lesson.links, "aiGenerate")?.href &&
+                !!lesson.links?.partialUpdate?.href && (
                   <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
@@ -316,7 +412,7 @@ export default function LessonPage() {
               {/* Title Section */}
               {!aiTitle && (
                 <div className="flex items-start justify-between gap-4 flex-wrap">
-                  {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
+                  {!!lesson.links?.partialUpdate?.href ? (
                     <div className="flex-1">
                       <InlineEditableText
                         value={lesson.title}
@@ -356,7 +452,7 @@ export default function LessonPage() {
                   <h2 className="text-lg font-semibold">
                     {t("lesson-viewer:pages.lesson.description")}
                   </h2>
-                  {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
+                  {!!lesson.links?.partialUpdate?.href ? (
                     <InlineEditableTextarea
                       value={lesson.description || ""}
                       onSave={handleAcceptDescription}

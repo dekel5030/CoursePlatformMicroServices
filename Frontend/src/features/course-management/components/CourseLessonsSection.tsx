@@ -19,8 +19,7 @@ import { SortableModuleItem, moduleSortableId, getModuleId } from "./SortableMod
 import { getLessonId } from "./SortableLessonItem";
 import { motion } from "framer-motion";
 import { Plus, FolderPlus } from "lucide-react";
-import { hasLink, getLink } from "@/shared/utils";
-import { CourseRels } from "@/domain/courses";
+import { getLinkFromRecord } from "@/shared/utils";
 import { useCreateModule, useReorderModules, useReorderLessons } from "@/domain/courses";
 import { useMoveLesson } from "@/domain/lessons";
 import { LessonCard } from "@/features/lesson-viewer";
@@ -56,9 +55,9 @@ export function CourseLessonsSection({ course }: CourseLessonsSectionProps) {
     })
   );
 
-  const canCreateModule = hasLink(course.links, CourseRels.CREATE_MODULE);
-  const canReorderModules = hasLink(course.links, CourseRels.REORDER_MODULES);
-  const createModuleLink = getLink(course.links, CourseRels.CREATE_MODULE);
+  const createModuleLink = getLinkFromRecord(course.links, "createModule");
+  const canCreateModule = !!createModuleLink?.href;
+  const canReorderModules = !!course.links?.changePosition?.href;
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveDragId(String(event.active.id));
@@ -183,11 +182,11 @@ export function CourseLessonsSection({ course }: CourseLessonsSectionProps) {
   );
 
   const handleCreateModule = async () => {
-    if (!createModuleLink) return;
+    if (!createModuleLink?.href) return;
     const moduleNumber = sortedModules.length + 1;
     const title = `${t("course-management:detail.module")} ${moduleNumber}`;
     await createModule.mutateAsync({
-      url: createModuleLink.href,
+      url: createModuleLink.href!,
       request: { title },
     });
   };

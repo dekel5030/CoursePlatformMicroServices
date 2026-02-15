@@ -1,4 +1,5 @@
 import type { LinkDto } from "@/shared/types/LinkDto";
+import type { CourseRatingItemLinks } from "./links";
 
 export interface CourseRatingUserDto {
   id: string;
@@ -15,7 +16,8 @@ export interface CourseRatingDto {
   comment: string;
   createdAt: string;
   updatedAt: string | null;
-  links: LinkDto[];
+  /** Legacy array or strongly-typed record (update, delete) */
+  links: LinkDto[] | CourseRatingItemLinks;
 }
 
 export interface CourseRatingCollectionDto {
@@ -24,7 +26,7 @@ export interface CourseRatingCollectionDto {
   pageSize: number;
   totalItems: number;
   totalPages?: number;
-  links: LinkDto[];
+  links: LinkDto[] | import("./links").GetCourseRatingsCollectionLinks;
 }
 
 export interface CreateCourseRatingRequest {

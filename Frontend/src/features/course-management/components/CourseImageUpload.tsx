@@ -4,13 +4,12 @@ import { Button } from "@/shared/ui";
 import { Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCourseImageUpload } from "../hooks/useCourseImageUpload";
-import { getLink } from "@/shared/utils";
-import { CourseRels } from "@/domain/courses";
-import type { LinkDto } from "@/shared/types";
+import { getLinkFromRecord } from "@/shared/utils";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 
 interface CourseImageUploadProps {
   courseId: string;
-  links?: LinkDto[];
+  links?: LinksRecord;
 }
 
 const ALLOWED_IMAGE_TYPES = [
@@ -25,13 +24,8 @@ export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadImage, isUploading, reset } = useCourseImageUpload(courseId);
 
-  // Check if user has permission to upload image
-  const uploadLink = getLink(links, CourseRels.GENERATE_IMAGE_UPLOAD_URL);
-
-  // If no permission, don't render the component
-  if (!uploadLink) {
-    return null;
-  }
+  const uploadLink = getLinkFromRecord(links, "generateImageUploadUrl");
+  if (!uploadLink?.href) return null;
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
@@ -58,7 +52,7 @@ export function CourseImageUpload({ courseId, links }: CourseImageUploadProps) {
 
     try {
       reset();
-      await uploadImage(file, uploadLink.href);
+      await uploadImage(file, uploadLink.href!);
       toast.success(t("course-management:detail.uploadSuccess"));
       resetFileInput();
     } catch (err) {

@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardHeader, CardTitle, CardContent, Skeleton } from "@/shared/ui";
-import { hasLink, getLink } from "@/shared/utils";
-import { CourseRels, CourseRatingRels } from "@/domain/courses";
+import { getLinkFromRecord, linkDtoArrayToRecord } from "@/shared/utils";
 import {
   useCourseRatings,
   useCreateRating,
@@ -25,8 +24,8 @@ export function CourseRatingsSection({ course }: CourseRatingsSectionProps) {
   const [pageUrl, setPageUrl] = useState<string | undefined>(undefined);
   const pageSize = 10;
 
-  const ratingsLink = getLink(course.links, CourseRels.RATINGS);
-  const ratingsUrl = ratingsLink?.href;
+  const ratingsLink = getLinkFromRecord(course.links, "ratings");
+  const ratingsUrl = ratingsLink?.href ?? undefined;
 
   const {
     data: ratingsData,
@@ -38,12 +37,15 @@ export function CourseRatingsSection({ course }: CourseRatingsSectionProps) {
     pageUrl,
   });
 
-  const createRatingLink = ratingsData
-    ? getLink(ratingsData.links, CourseRatingRels.CREATE_RATING)
+  const ratingsCollectionLinks =
+    ratingsData?.links && Array.isArray(ratingsData.links)
+      ? linkDtoArrayToRecord(ratingsData.links)
+      : (ratingsData as unknown as { links?: Record<string, { href?: string; method?: string }> })?.links;
+  const createRatingLink = ratingsCollectionLinks
+    ? getLinkFromRecord(ratingsCollectionLinks, "create") ??
+      getLinkFromRecord(ratingsCollectionLinks, "createRating")
     : null;
-  const canAddRating = ratingsData
-    ? hasLink(ratingsData.links, CourseRatingRels.CREATE_RATING)
-    : false;
+  const canAddRating = !!createRatingLink?.href;
 
   const createRating = useCreateRating(course.id);
   const patchRating = usePatchRating(course.id);
@@ -54,7 +56,7 @@ export function CourseRatingsSection({ course }: CourseRatingsSectionProps) {
   };
 
   const handleCreateRating = async (request: { score: number; comment?: string }) => {
-    if (!createRatingLink) return;
+    if (!createRatingLink?.href) return;
     try {
       await createRating.mutateAsync({
         url: createRatingLink.href,
@@ -106,12 +108,10 @@ export function CourseRatingsSection({ course }: CourseRatingsSectionProps) {
   }
 
   const useLinkPagination =
-    ratingsData?.links &&
-    (hasLink(ratingsData.links, CourseRatingRels.NEXT_PAGE) ||
-      hasLink(ratingsData.links, CourseRatingRels.PREVIOUS_PAGE));
+    !!ratingsCollectionLinks?.next?.href || !!ratingsCollectionLinks?.prev?.href;
 
   return (
-    <Card dir={i18n.dir()}>
+    <Card id="ratings" dir={i18n.dir()}>
       <CardHeader>
         <CardTitle className="text-start">
           {t("course-management:ratings.sectionTitle")}
@@ -137,9 +137,9 @@ export function CourseRatingsSection({ course }: CourseRatingsSectionProps) {
           </p>
         ) : (
           <div className="space-y-4">
-            {ratingsData.items.map((rating) => (
+            {ratingsData.items.map((rating, index) => (
               <RatingCard
-                key={rating.id}
+                key={rating.id ?? `rating-${index}`}
                 rating={rating}
                 onPatch={handlePatchRating}
                 onDelete={handleDeleteRating}
@@ -148,9 +148,9 @@ export function CourseRatingsSection({ course }: CourseRatingsSectionProps) {
               />
             ))}
 
-            {useLinkPagination ? (
+            {useLinkPagination && ratingsCollectionLinks ? (
               <Pagination
-                links={ratingsData.links}
+                collectionLinks={ratingsCollectionLinks}
                 onNavigate={handleNavigate}
                 isLoading={isFetching}
               />

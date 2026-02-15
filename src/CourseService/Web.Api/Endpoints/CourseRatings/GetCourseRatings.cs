@@ -22,13 +22,13 @@ internal sealed class GetCourseRatings : IEndpoint
         {
             var query = new GetCourseRatingsQuery(courseId, pageNumber, pageSize);
 
-            Result<CourseRatingCollectionDto> result = await mediator.Send(query, cancellationToken);
+            Result<GetCourseRatingsDto> result = await mediator.Send(query, cancellationToken);
 
             return result.Match(
                 dto => Results.Ok(dto),
                 CustomResults.Problem);
         })
-        .WithMetadata<CourseRatingCollectionDto>(
+        .WithMetadata<GetCourseRatingsDto>(
             nameof(GetCourseRatings),
             tag: Tags.CourseRatings,
             summary: "Gets all ratings for a course by course ID.");

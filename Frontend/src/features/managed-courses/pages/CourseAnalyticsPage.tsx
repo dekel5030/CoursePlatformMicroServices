@@ -12,9 +12,12 @@ import {
 import { Users, Eye, Star, BookOpen } from "lucide-react";
 import { useCourseAnalytics } from "@/domain/courses";
 import { BreadcrumbNav } from "@/components/layout";
+import { LinkButtons } from "@/shared/components";
 import { Skeleton } from "@/shared/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
 import { formatDuration } from "@/shared/utils/format-duration";
+import { apiHrefToAppRoute, LINK_LABELS } from "@/shared/utils";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 import type { CourseViewerDto } from "@/domain/courses/types";
 
 function getInitials(displayName: string): string {
@@ -81,26 +84,32 @@ export default function CourseAnalyticsPage() {
     return null;
   }
 
+  const enrollmentsCount = analytics.enrollmentsCount ?? 0;
+  const viewCount = analytics.viewCount ?? 0;
+  const averageRating = analytics.averageRating ?? 0;
+  const reviewsCount = analytics.reviewsCount ?? 0;
+  const totalLessonsCount = analytics.totalLessonsCount ?? 0;
+
   const stats = [
     {
       label: t("analytics.enrollments"),
-      value: analytics.enrollmentsCount.toLocaleString(),
+      value: enrollmentsCount.toLocaleString(),
       icon: Users,
     },
     {
       label: t("analytics.views"),
-      value: analytics.viewCount.toLocaleString(),
+      value: viewCount.toLocaleString(),
       icon: Eye,
     },
     {
       label: t("analytics.rating"),
-      value: analytics.averageRating.toFixed(1),
-      subtitle: `${analytics.reviewsCount} ${t("analytics.reviews")}`,
+      value: Number(averageRating).toFixed(1),
+      subtitle: `${reviewsCount} ${t("analytics.reviews")}`,
       icon: Star,
     },
     {
       label: t("analytics.lessons"),
-      value: analytics.totalLessonsCount.toLocaleString(),
+      value: totalLessonsCount.toLocaleString(),
       icon: BookOpen,
     },
   ];
@@ -118,18 +127,35 @@ export default function CourseAnalyticsPage() {
       : [];
 
   const courseViewers: CourseViewerDto[] = analytics.courseViewers ?? [];
+  const links = analytics.links as LinksRecord | undefined;
+  const analyticsLabelByRel: Record<string, string> = {
+    course: t("analytics.viewCourse", { defaultValue: LINK_LABELS.coursePage }),
+    managedCourse: t("analytics.manageCourse", { defaultValue: LINK_LABELS.managedCourse }),
+  };
 
   return (
     <div className="flex flex-col">
       <BreadcrumbNav items={breadcrumbItems} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 w-full">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {t("analytics.title")}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {t("analytics.subtitle")}
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {t("analytics.title")}
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              {t("analytics.subtitle")}
+            </p>
+          </div>
+          {links && (
+            <LinkButtons
+              links={links}
+              labelByRel={analyticsLabelByRel}
+              excludeRels={["self"]}
+              getRouteForHref={apiHrefToAppRoute}
+              variant="outline"
+              size="sm"
+            />
+          )}
         </div>
 
         <section aria-label={t("analytics.overview")}>

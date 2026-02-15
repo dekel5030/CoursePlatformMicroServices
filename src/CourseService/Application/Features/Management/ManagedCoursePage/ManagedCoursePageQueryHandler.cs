@@ -1,39 +1,29 @@
-using Courses.Application.Categories;
-using Courses.Application.Categories.Dtos;
-using Courses.Application.Courses.Dtos;
-using Courses.Application.Features.Dtos;
+using Courses.Application.Abstractions.Data;
 using Courses.Application.Features.Shared;
-using Courses.Application.Features.Shared.Loaders;
-using Courses.Application.Features.Shared.Mappers;
-using Courses.Application.Lessons.Dtos;
-using Courses.Application.Modules.Dtos;
-using Courses.Application.Services.LinkProvider;
-using Courses.Domain.Categories;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons;
-using Courses.Domain.Modules;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Application.Features.Management.ManagedCoursePage;
 
 internal sealed class ManagedCoursePageQueryHandler
     : IQueryHandler<ManagedCoursePageQuery, ManagedCoursePageDto>
 {
-    private readonly ICoursePageDataLoader _coursePageDataLoader;
-    private readonly ICoursePageDtoMapper _coursePageDtoMapper;
+    private readonly IReadDbContext _readDbContext;
     private readonly IUserContext _userContext;
+    private readonly IManagedCoursePageComposer _composer;
 
     public ManagedCoursePageQueryHandler(
-        ICoursePageDataLoader coursePageDataLoader,
-        ICoursePageDtoMapper coursePageDtoMapper,
-        IUserContext userContext)
+        IReadDbContext readDbContext,
+        IUserContext userContext,
+        IManagedCoursePageComposer composer)
     {
-        _coursePageDataLoader = coursePageDataLoader;
-        _coursePageDtoMapper = coursePageDtoMapper;
+        _readDbContext = readDbContext;
         _userContext = userContext;
+        _composer = composer;
     }
 
     public async Task<Result<ManagedCoursePageDto>> Handle(
@@ -42,85 +32,50 @@ internal sealed class ManagedCoursePageQueryHandler
     {
         var courseId = new CourseId(request.Id);
 
-        CoursePageData? courseData = await _coursePageDataLoader.LoadAsync(courseId, cancellationToken);
-        if (courseData == null)
+        ManagedCoursePageData? data = await LoadCoursePageDataAsync(courseId, cancellationToken);
+        if (data == null)
         {
             return Result.Failure<ManagedCoursePageDto>(CourseErrors.NotFound);
         }
 
         Result<UserId> authResult = InstructorAuthorization
-            .EnsureInstructorAuthorized(_userContext, courseData.Course.InstructorId);
+            .EnsureInstructorAuthorized(_userContext, data.Course.InstructorId);
         if (authResult.IsFailure)
         {
             return Result.Failure<ManagedCoursePageDto>(CourseErrors.Unauthorized);
         }
 
-        var courseContext = new CourseContext(
-            courseData.Course.Id, 
-            courseData.Course.InstructorId, 
-            courseData.Course.Status, 
-            IsManagementView: true);
-
-        Dictionary<Guid, (int LessonCount, TimeSpan TotalDuration)> moduleStats = 
-            CalculateModuleStats(courseData.Lessons);
-
-        return Result.Success(new ManagedCoursePageDto
-        {
-            Course = _coursePageDtoMapper.MapCourse(courseData.Course, courseContext),
-            Structure = CourseStructureBuilder.Build(courseData.Modules, courseData.Lessons),
-
-            Modules = MapManagedModules(courseData.Modules, moduleStats, courseContext),
-            Lessons = MapLessons(courseData.Lessons, courseContext),
-            Categories = MapCategories(courseData.Category)
-        });
+        ManagedCoursePageDto dto = _composer.Compose(data);
+        return Result.Success(dto);
     }
 
-    private static Dictionary<Guid, (int LessonCount, TimeSpan TotalDuration)> CalculateModuleStats(
-        IReadOnlyList<Lesson> lessons)
+    private async Task<ManagedCoursePageData?> LoadCoursePageDataAsync(
+        CourseId courseId,
+        CancellationToken cancellationToken)
     {
-        return lessons
-            .GroupBy(lesson => lesson.ModuleId.Value)
-            .ToDictionary(
-                g => g.Key,
-                g => (
-                    LessonCount: g.Count(),
-                    TotalDuration: TimeSpan.FromSeconds(g.Sum(l => l.Duration.TotalSeconds))
-                ));
-    }
-
-    private Dictionary<Guid, ManagedModuleDto> MapManagedModules(
-        IReadOnlyList<Module> modules,
-        Dictionary<Guid, (int LessonCount, TimeSpan TotalDuration)> stats,
-        CourseContext courseContext)
-    {
-        return modules.ToDictionary(
-            module => module.Id.Value,
-            module =>
+        var raw = await _readDbContext.Courses
+            .AsSplitQuery()
+            .Where(c => c.Id == courseId)
+            .Select(course => new
             {
-                var moduleContext = new ModuleContext(courseContext, module.Id);
-                ModuleDto moduleDto = _coursePageDtoMapper.MapModule(module, moduleContext);
+                Course = course,
+                Modules = _readDbContext.Modules
+                    .Where(m => m.CourseId == course.Id)
+                    .OrderBy(m => m.Index)
+                    .ToList(),
+                Lessons = _readDbContext.Lessons
+                    .Where(l => l.CourseId == course.Id)
+                    .OrderBy(l => l.Index)
+                    .ToList(),
+                Category = _readDbContext.Categories.FirstOrDefault(cat => cat.Id == course.CategoryId)
+            })
+            .FirstOrDefaultAsync(cancellationToken);
 
-                (int lessonCount, TimeSpan totalDuration) = stats.GetValueOrDefault(module.Id.Value);
-                var statsDto = new ManagedModuleStatsDto(lessonCount, totalDuration);
-
-                return new ManagedModuleDto(moduleDto, statsDto);
-            });
-    }
-
-    private Dictionary<Guid, LessonDto> MapLessons(IReadOnlyList<Lesson> lessons, CourseContext context)
-    {
-        return lessons.ToDictionary(
-            l => l.Id.Value,
-            l => _coursePageDtoMapper.MapLesson(l, context, false));
-    }
-
-    private static Dictionary<Guid, CategoryDto> MapCategories(Category? category)
-    {
-        if (category == null)
+        if (raw == null)
         {
-            return new();
+            return null;
         }
 
-        return new Dictionary<Guid, CategoryDto> { [category.Id.Value] = CategoryDtoMapper.Map(category) };
+        return new ManagedCoursePageData(raw.Course, raw.Modules, raw.Lessons, raw.Category);
     }
 }

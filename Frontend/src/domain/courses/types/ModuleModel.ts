@@ -1,4 +1,4 @@
-import type { LinkDto } from "@/shared/types/LinkDto";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 // Temporary import - will be fixed when lessons domain is migrated
 import type { LessonModel } from "@/domain/lessons/types/LessonModel";
 
@@ -12,5 +12,6 @@ export interface ModuleModel {
   lessonCount: number;
   duration: string;
   lessons: LessonModel[];
-  links: LinkDto[];
+  /** Strongly-typed links (createLesson, partialUpdate, delete, changePosition) */
+  links: LinksRecord;
 }

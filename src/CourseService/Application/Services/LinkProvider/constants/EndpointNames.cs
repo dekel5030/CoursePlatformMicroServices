@@ -8,11 +8,13 @@ public static class EndpointNames
     // Courses
     public const string GetCoursePage = "GetCoursePage";
     public const string GetManagedCourseById = "GetManagedCourseById";
+    public const string GetManagedCourses = "GetManagedCourses";
     public const string GetCourseAnalytics = "GetCourseAnalytics";
     public const string GetCourses = "GetCourses";
     public const string CreateCourse = "CreateCourse";
     public const string PatchCourse = "PatchCourse";
     public const string DeleteCourse = "DeleteCourse";
+    public const string PublishCourse = "PublishCourse";
     public const string GenerateCourseImageUploadUrl = "GenerateCourseImageUploadUrl";
 
     // Modules

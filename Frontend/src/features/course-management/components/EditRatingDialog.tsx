@@ -10,8 +10,7 @@ import {
   DialogFooter,
 } from "@/shared/ui";
 import { Button } from "@/shared/ui";
-import { hasLink, getLink } from "@/shared/utils";
-import { CourseRatingRels } from "@/domain/courses";
+import { getLinkFromRecord, linkDtoArrayToRecord } from "@/shared/utils";
 import type { CourseRatingDto, UpdateCourseRatingRequest } from "@/domain/courses";
 
 interface EditRatingDialogProps {
@@ -34,8 +33,15 @@ export function EditRatingDialog({
   const [hoverScore, setHoverScore] = useState(0);
   const [comment, setComment] = useState("");
 
-  const canUpdate = rating && hasLink(rating.links, CourseRatingRels.PARTIAL_UPDATE);
-  const updateLink = rating ? getLink(rating.links, CourseRatingRels.PARTIAL_UPDATE) : null;
+  const ratingLinks = rating?.links
+    ? Array.isArray(rating.links)
+      ? linkDtoArrayToRecord(rating.links)
+      : (rating as unknown as { links: Record<string, { href?: string; method?: string }> }).links
+    : undefined;
+  const updateLink = ratingLinks
+    ? getLinkFromRecord(ratingLinks, "update") ?? getLinkFromRecord(ratingLinks, "partialUpdate")
+    : null;
+  const canUpdate = !!updateLink?.href;
 
   useEffect(() => {
     if (rating) {
@@ -48,7 +54,7 @@ export function EditRatingDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canUpdate || !updateLink) return;
+    if (!canUpdate || !updateLink?.href) return;
     await onSave({ score, comment: comment.trim() || undefined });
     onOpenChange(false);
   };
