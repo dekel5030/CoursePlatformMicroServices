@@ -2,6 +2,7 @@ using Courses.Application.Abstractions.Data;
 using Courses.Application.Features.Management;
 using Courses.Application.Features.Shared;
 using Courses.Application.Features.Shared.Mappers;
+using Courses.Application.ReadModels;
 using Courses.Application.Shared.Dtos;
 using Courses.Domain.Categories;
 using Courses.Domain.Categories.Primitives;
@@ -32,12 +33,11 @@ internal sealed class GetManagedCoursesQueryHandler
         _courseSummaryDtoMapper = courseSummaryDtoMapper;
         _userContext = userContext;
     }
-
     public async Task<Result<PaginatedCollectionDto<ManagedCourseSummaryDto>>> Handle(
         GetManagedCoursesQuery request,
         CancellationToken cancellationToken = default)
     {
-        if (_userContext.Id is null || !_userContext.IsAuthenticated)
+        if (!_userContext.IsAuthenticated || _userContext.Id is null)
         {
             return Result.Failure<PaginatedCollectionDto<ManagedCourseSummaryDto>>(CourseErrors.Unauthorized);
         }
@@ -45,19 +45,26 @@ internal sealed class GetManagedCoursesQueryHandler
         var instructorId = new UserId(_userContext.Id.Value);
         (int pageNumber, int pageSize) = PaginationOptions.Normalize(request.PageNumber, request.PageSize);
 
-        int totalItems = await _dbContext.Courses
-            .Where(c => c.InstructorId == instructorId)
-            .CountAsync(cancellationToken);
+        int totalItems = await GetTotalCoursesCountAsync(instructorId, cancellationToken);
+        if (totalItems == 0)
+        {
+            return Result.Success(CreateEmptyResponse(pageNumber, pageSize));
+        }
 
-        List<ManagedCourseSummaryDto> courseDtos = await GetManagedCourseSummariesAsync(
-            instructorId,
-            pageNumber,
-            pageSize,
-            cancellationToken);
+        List<Course> courses = 
+            await FetchPagedCoursesAsync(instructorId, pageNumber, pageSize, cancellationToken);
+
+        Dictionary<CategoryId, Category> categories = await GetCategoryMapAsync(courses, cancellationToken);
+        Dictionary<Guid, CourseAnalytics> analytics = await GetAnalyticsMapAsync(courses, cancellationToken);
+        User? instructor = await _dbContext.Users
+            .FirstOrDefaultAsync(user => user.Id == instructorId, cancellationToken);
+
+        List<ManagedCourseSummaryDto> dtos = 
+            MapToManagedSummaryDtos(courses, instructor, categories, analytics);
 
         return Result.Success(new PaginatedCollectionDto<ManagedCourseSummaryDto>
         {
-            Items = courseDtos,
+            Items = dtos,
             PageNumber = pageNumber,
             PageSize = pageSize,
             TotalItems = totalItems,
@@ -65,59 +72,78 @@ internal sealed class GetManagedCoursesQueryHandler
         });
     }
 
-    private async Task<List<ManagedCourseSummaryDto>> GetManagedCourseSummariesAsync(
+    private async Task<int> GetTotalCoursesCountAsync(
         UserId instructorId,
-        int pageNumber,
-        int pageSize,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
-        List<Course> courses = await _dbContext.Courses
-            .Where(c => c.InstructorId == instructorId)
-            .OrderByDescending(c => c.UpdatedAtUtc)
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
+        return await _dbContext.Courses
+            .CountAsync(course => course.InstructorId == instructorId, cancellationToken);
+    }
+
+    private async Task<List<Course>> FetchPagedCoursesAsync(
+        UserId instructorId,
+        int page,
+        int size,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Courses
+            .Where(course => course.InstructorId == instructorId)
+            .OrderByDescending(course => course.UpdatedAtUtc)
+            .Skip((page - 1) * size)
+            .Take(size)
             .ToListAsync(cancellationToken);
+    }
 
-        if (courses.Count == 0)
+    private async Task<Dictionary<CategoryId, Category>> GetCategoryMapAsync(
+        List<Course> courses, 
+        CancellationToken cancellationToken = default)
+    {
+        var categoryIds = courses.Select(course => course.CategoryId).Distinct().ToList();
+        return await _dbContext.Categories
+            .Where(course => categoryIds.Contains(course.Id))
+            .ToDictionaryAsync(course => course.Id, cancellationToken);
+    }
+
+    private async Task<Dictionary<Guid, CourseAnalytics>> GetAnalyticsMapAsync(
+        List<Course> courses,
+        CancellationToken cancellationToken = default)
+    {
+        var courseIds = courses.Select(c => c.Id.Value).ToList();
+        return await _dbContext.CourseAnalytics
+            .Where(analytics => courseIds.Contains(analytics.CourseId))
+            .ToDictionaryAsync(analytics => analytics.CourseId, cancellationToken);
+    }
+
+    private List<ManagedCourseSummaryDto> MapToManagedSummaryDtos(
+        List<Course> courses,
+        User? instructor,
+        Dictionary<CategoryId, Category> categories,
+        Dictionary<Guid, CourseAnalytics> analytics)
+    {
+        return courses.Select(course =>
         {
-            return [];
-        }
-
-        var courseIds = courses.Select(c => c.Id).ToList();
-        var categoryIds = courses.Select(c => c.CategoryId).Distinct().ToList();
-
-        Dictionary<UserId, User> instructors = await _dbContext.Users
-            .Where(i => i.Id == instructorId)
-            .ToDictionaryAsync(i => i.Id, cancellationToken);
-
-        Dictionary<CategoryId, Category> categories = await _dbContext.Categories
-            .Where(c => categoryIds.Contains(c.Id))
-            .ToDictionaryAsync(c => c.Id, cancellationToken);
-
-        var courseStats = await _dbContext.Lessons
-            .Where(l => courseIds.Contains(l.CourseId))
-            .GroupBy(l => l.CourseId)
-            .Select(g => new
-            {
-                CourseId = g.Key,
-                LessonCount = g.Count(),
-                TotalDurationSeconds = g.Sum(l => l.Duration.TotalSeconds)
-            })
-            .ToDictionaryAsync(x => x.CourseId, cancellationToken);
-
-        var courseDtos = courses.Select(course =>
-        {
-            instructors.TryGetValue(course.InstructorId, out User? instructor);
             categories.TryGetValue(course.CategoryId, out Category? category);
-            courseStats.TryGetValue(course.Id, out var stats);
+            analytics.TryGetValue(course.Id.Value, out CourseAnalytics? stats);
 
             var statsDto = new ManagedCourseStatsDto(
-                LessonsCount: stats?.LessonCount ?? 0,
-                Duration: stats != null ? TimeSpan.FromSeconds(stats.TotalDurationSeconds) : TimeSpan.Zero);
+                LessonsCount: stats?.TotalLessonsCount ?? 0,
+                Duration: stats?.TotalCourseDuration ?? TimeSpan.Zero);
 
             return _courseSummaryDtoMapper.MapToManagedSummary(course, instructor, category, statsDto);
         }).ToList();
+    }
 
-        return courseDtos;
+    private static PaginatedCollectionDto<ManagedCourseSummaryDto> CreateEmptyResponse(
+        int page, 
+        int size)
+    {
+        return new()
+        {
+            Items = [],
+            PageNumber = page,
+            PageSize = size,
+            TotalItems = 0,
+            Links = []
+        };
     }
 }

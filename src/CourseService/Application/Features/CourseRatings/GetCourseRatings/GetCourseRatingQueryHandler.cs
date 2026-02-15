@@ -36,57 +36,75 @@ public sealed class GetCourseRatingQueryHandler
         var courseId = new CourseId(request.CourseId);
         var currentUserId = new UserId(_userContext.Id ?? Guid.Empty);
 
-        (List<CourseRating> ratings, int totalCount) = await GetPagedRatingsAsync(
-            courseId,
-            request,
-            cancellationToken);
+        (List<CourseRating>? ratings, int totalCount) = 
+            await GetPagedRatingsAsync(courseId, request, cancellationToken);
 
-        bool userHasExistingRating = await _dbContext.CourseRatings
-                .AnyAsync(rating => rating.CourseId == courseId && rating.UserId == currentUserId, cancellationToken);
+        bool hasRated = await CheckIfUserRatedAsync(courseId, currentUserId, cancellationToken);
 
-        var links = _linkBuilder.BuildLinks(LinkResourceKey.CourseRatingCollection, new CourseRatingCollectionContext(
-                courseId,
-                currentUserId,
-                userHasExistingRating)).ToList();
+        List<LinkDto> collectionLinks = BuildCollectionLinks(courseId, currentUserId, hasRated);
 
         if (totalCount == 0)
         {
-            return EmptyResult(request, links);
+            return Result.Success(CreateEmptyResponse(request, collectionLinks));
         }
 
         Dictionary<UserId, User> userMap = await GetUserMapAsync(ratings, cancellationToken);
+        List<CourseRatingDto> items = MapToRatingDtos(ratings, userMap, currentUserId);
 
-        var ratingDtos = ratings.Select(rating =>
+        return Result.Success(new CourseRatingCollectionDto
         {
-            var ratingLinkContext = new CourseRatingLinkContext(rating.Id, rating.UserId, currentUserId);
-            IReadOnlyList<LinkDto> links = _linkBuilder
-                .BuildLinks(LinkResourceKey.CourseRating, ratingLinkContext);
+            Items = items,
+            TotalItems = totalCount,
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+            Links = collectionLinks
+        });
+    }
+
+    private async Task<bool> CheckIfUserRatedAsync(
+        CourseId courseId,
+        UserId userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.CourseRatings
+            .AnyAsync(rating => 
+                rating.CourseId == courseId && 
+                rating.UserId == userId, 
+                cancellationToken);
+    }
+
+    private List<LinkDto> BuildCollectionLinks(CourseId courseId, UserId userId, bool hasRated)
+    {
+        var context = new CourseRatingCollectionContext(courseId, userId, hasRated);
+        return _linkBuilder.BuildLinks(LinkResourceKey.CourseRatingCollection, context).ToList();
+    }
+
+    private List<CourseRatingDto> MapToRatingDtos(
+        List<CourseRating> ratings,
+        Dictionary<UserId, User> userMap,
+        UserId currentUserId)
+    {
+        return ratings.Select(rating =>
+        {
+            var linkContext = new CourseRatingLinkContext(rating.Id, rating.UserId, currentUserId);
+            IReadOnlyList<LinkDto> links = _linkBuilder.BuildLinks(LinkResourceKey.CourseRating, linkContext);
 
             return MapToDto(rating, userMap.GetValueOrDefault(rating.UserId), links);
         }).ToList();
+    }
 
-        var result = new CourseRatingCollectionDto
+    private static CourseRatingCollectionDto CreateEmptyResponse(
+        GetCourseRatingsQuery request,
+        List<LinkDto> links)
+    {
+        return new CourseRatingCollectionDto
         {
-            Items = ratingDtos,
-            TotalItems = totalCount,
+            Items = [],
+            TotalItems = 0,
             PageNumber = request.PageNumber,
             PageSize = request.PageSize,
             Links = links
         };
-
-        return Result.Success(result);
-    }
-
-    private static Result<CourseRatingCollectionDto> EmptyResult(GetCourseRatingsQuery request, List<LinkDto> links)
-    {
-        return Result.Success(new CourseRatingCollectionDto
-        {
-            Items = [],
-            Links = links,
-            PageNumber = request.PageNumber,
-            PageSize = request.PageSize,
-            TotalItems = 0
-        });
     }
 
     private async Task<(List<CourseRating> Items, int TotalCount)> GetPagedRatingsAsync(
@@ -95,12 +113,12 @@ public sealed class GetCourseRatingQueryHandler
         CancellationToken cancellationToken = default)
     {
         IQueryable<CourseRating> query = _dbContext.CourseRatings
-            .Where(r => r.CourseId == courseId);
+            .Where(rating => rating.CourseId == courseId);
 
         int count = await query.CountAsync(cancellationToken);
 
         List<CourseRating> items = await query
-            .OrderByDescending(r => r.CreatedAtUtc)
+            .OrderByDescending(rating => rating.CreatedAtUtc)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
@@ -115,9 +133,8 @@ public sealed class GetCourseRatingQueryHandler
         var userIds = ratings.Select(r => r.UserId).Distinct().ToList();
 
         return await _dbContext.Users
-            .AsNoTracking()
-            .Where(u => userIds.Contains(u.Id))
-            .ToDictionaryAsync(u => u.Id, cancellationToken);
+            .Where(user => userIds.Contains(user.Id))
+            .ToDictionaryAsync(user => user.Id, cancellationToken);
     }
 
     private static CourseRatingDto MapToDto(

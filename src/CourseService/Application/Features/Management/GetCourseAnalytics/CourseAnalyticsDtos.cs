@@ -1,4 +1,4 @@
-namespace Courses.Application.Features.Management.CourseAnalytics;
+namespace Courses.Application.Features.Management.GetCourseAnalytics;
 
 
 public sealed record CourseDetailedAnalyticsDto
