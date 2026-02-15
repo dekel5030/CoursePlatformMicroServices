@@ -4,6 +4,7 @@ import { BreadcrumbNav } from "@/components/layout";
 import { CatalogHeader } from "./CatalogHeader";
 import { CategoryFilter } from "./CategoryFilter";
 import { CourseGrid } from "./CourseGrid";
+import { Pagination } from "./Pagination";
 import type { CourseModel } from "@/domain/courses";
 import type { LinkDto } from "@/shared/types";
 import type { LinksRecord } from "@/shared/types/LinkRecord";
@@ -14,6 +15,7 @@ interface PaginatedCourseListProps {
   error: Error | null;
   /** Collection links (legacy array or strongly-typed record with create, next, prev) */
   links?: LinkDto[] | LinksRecord;
+  onNavigate?: (url: string) => void;
   showBreadcrumbs?: boolean;
   showHeader?: boolean;
   showCategoryFilter?: boolean;
@@ -29,6 +31,7 @@ export function PaginatedCourseList({
   isLoading,
   error,
   links,
+  onNavigate,
   showBreadcrumbs = true,
   showHeader = true,
   showCategoryFilter = true,
@@ -75,6 +78,16 @@ export function PaginatedCourseList({
               isLoading={isLoading}
               error={error}
             />
+            {onNavigate && links && (
+              <Pagination
+                links={Array.isArray(links) ? links : undefined}
+                collectionLinks={
+                  !Array.isArray(links) && links ? links : undefined
+                }
+                onNavigate={onNavigate}
+                isLoading={isLoading}
+              />
+            )}
           </main>
         </div>
       </div>

@@ -114,7 +114,12 @@ export function apiHrefToAppRoute(
     return `/courses/${context.courseId}/lessons/${lessonsIdMatch[1]}`;
   const manageLessonsIdMatch = path.match(/^\/api\/manage\/lessons\/([^/]+)$/);
   if (manageLessonsIdMatch && context?.courseId)
-    return `/courses/${context.courseId}/lessons/${manageLessonsIdMatch[1]}`;
+    return `/manage/courses/${context.courseId}/lessons/${manageLessonsIdMatch[1]}`;
+  const manageCourseLessonsMatch = path.match(
+    /^\/api\/manage\/courses\/([^/]+)\/lessons\/([^/]+)$/
+  );
+  if (manageCourseLessonsMatch)
+    return `/manage/courses/${manageCourseLessonsMatch[1]}/lessons/${manageCourseLessonsMatch[2]}`;
   const catalogMatch = path.match(/^\/api\/courses$/);
   if (catalogMatch) return "/catalog";
   const enrolledMatch = path.match(/^\/api\/users\/me\/courses\/enrolled/);

@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  fetchFeaturedCourses,
   fetchCourseById,
   fetchManagedCourseById,
   createCourse,
@@ -26,13 +25,6 @@ import type {
 import { coursesQueryKeys } from "../query-keys";
 import { API_ENDPOINTS } from "@/app/axios";
 import { toast } from "sonner";
-
-export function useFeaturedCourses() {
-  return useQuery<CourseModel[], Error>({
-    queryKey: coursesQueryKeys.featured(),
-    queryFn: fetchFeaturedCourses,
-  });
-}
 
 export function useAllCourses(url?: string) {
   return useQuery<FetchAllCoursesResult, Error>({
@@ -82,7 +74,6 @@ export function usePatchCourse(id: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: coursesQueryKeys.managedDetail(id) });
-      queryClient.invalidateQueries({ queryKey: coursesQueryKeys.featured() });
       queryClient.invalidateQueries({
         queryKey: coursesQueryKeys.allCourses(),
       });

@@ -35,8 +35,10 @@ export default function LessonPage() {
     lessonId: string;
   }>();
   const location = useLocation();
-  const lessonSelfLink = (location.state as { lessonSelfLink?: string })
-    ?.lessonSelfLink;
+  const isManageRoute = location.pathname.startsWith("/manage/");
+  const lessonSelfLink =
+    (location.state as { lessonSelfLink?: string })?.lessonSelfLink ??
+    (isManageRoute ? `/api/manage/lessons/${lessonId}` : undefined);
 
   const {
     data: lesson,
@@ -127,6 +129,13 @@ export default function LessonPage() {
     [courseId]
   );
 
+  const getStateForHref = useCallback((href: string, rel: string) => {
+    if (rel === "manage" || rel === "self") {
+      return { lessonSelfLink: href };
+    }
+    return undefined;
+  }, []);
+
   const lessonLabelByRel: Record<string, string> = {
     managedCourse: t("lesson-viewer:toolbar.backToCourse", { defaultValue: LINK_LABELS.managedCourse }),
     publicPreview: t("lesson-viewer:toolbar.previewCourse", { defaultValue: LINK_LABELS.publicPreview }),
@@ -171,14 +180,20 @@ export default function LessonPage() {
     try {
       await deleteLesson.mutateAsync(deleteLinkHref);
       toast.success(t("lesson-viewer:actions.deleteSuccess"));
-      navigate(courseId ? `/courses/${courseId}` : "/catalog");
+      navigate(
+        courseId
+          ? isManageRoute
+            ? `/manage/courses/${courseId}`
+            : `/courses/${courseId}`
+          : "/catalog"
+      );
     } catch {
       toast.error(t("lesson-viewer:actions.deleteFailed"));
     } finally {
       setIsDeleteDialogOpen(false);
       setDeleteLinkHref(null);
     }
-  }, [deleteLinkHref, deleteLesson, navigate, courseId, t]);
+  }, [deleteLinkHref, deleteLesson, navigate, courseId, isManageRoute, t]);
 
   if (isLoading) {
     return (
@@ -272,6 +287,7 @@ export default function LessonPage() {
               onAction={handleLessonAction}
               excludeRels={["self", "partialUpdate", "generateVideoUploadUrl", "aiGenerate"]}
               getRouteForHref={getRouteForHref}
+              getStateForHref={getStateForHref}
               variant="outline"
               size="sm"
               className="flex-wrap"

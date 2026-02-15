@@ -52,18 +52,6 @@ export interface CreateModuleResponse {
 }
 
 /**
- * Fetch featured courses
- */
-export async function fetchFeaturedCourses(): Promise<CourseModel[]> {
-  const response = await axiosClient.get<
-    CourseSummaryWithAnalyticsDto[] | PagedResponse<CourseSummaryWithAnalyticsDto>
-  >("/courses/featured");
-  const data = response.data;
-  const dtos = Array.isArray(data) ? data : data.items || [];
-  return dtos.map(mapCourseSummaryToModel);
-}
-
-/**
  * Fetch a course by ID (public consumption view)
  */
 export async function fetchCourseById(id: string): Promise<CourseModel> {

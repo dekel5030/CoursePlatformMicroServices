@@ -24,7 +24,7 @@ export function useLesson(
 ) {
   return useQuery<LessonModel, Error>({
     queryKey: lessonId
-      ? lessonsQueryKeys.detail(courseId, lessonId)
+      ? lessonsQueryKeys.detail(courseId, lessonId, url)
       : ["lessons", courseId, "undefined"],
     queryFn: () => fetchLessonById(courseId, lessonId!, url),
     enabled: !!courseId && !!lessonId,

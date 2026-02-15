@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Layout, ManagementLayout } from "@/components/layout";
 import { ProtectedRoute } from "@/shared/common";
-import { CourseCatalogPage, AllCoursesPage } from "@/features/course-catalog";
+import { CourseCatalogPage } from "@/features/course-catalog";
 import { MyCoursesPage } from "@/features/my-courses";
 import {
   ManagedCoursesPage,
@@ -28,6 +28,8 @@ export default function AppRoutes() {
 
       <Route element={<Layout />}>
         <Route path="/catalog" element={<CourseCatalogPage />} />
+        <Route path="/courses" element={<Navigate to="/catalog" replace />} />
+        <Route path="/courses/:id" element={<CoursePage />} />
         <Route
           path="/users/me/courses/enrolled"
           element={
@@ -37,8 +39,6 @@ export default function AppRoutes() {
           }
         />
         <Route path="/my-courses" element={<Navigate to="/users/me/courses/enrolled" replace />} />
-        <Route path="/courses" element={<AllCoursesPage />} />
-        <Route path="/courses/:id" element={<CoursePage />} />
         <Route
           path="/courses/:courseId/lessons/:lessonId"
           element={<LessonPage />}
@@ -60,6 +60,7 @@ export default function AppRoutes() {
         <Route path="/admin/users/:userId" element={<UserManagementPage />} />
         <Route path="/manage/courses" element={<ManagedCoursesPage />} />
         <Route path="/manage/courses/:id" element={<ManageCoursePage />} />
+        <Route path="/manage/courses/:courseId/lessons/:lessonId" element={<LessonPage />} />
         <Route path="/manage/courses/:id/analytics" element={<CourseAnalyticsPage />} />
       </Route>
     </Routes>

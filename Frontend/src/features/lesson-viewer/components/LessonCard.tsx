@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { LessonModel } from "@/domain/lessons";
 import { Card, CardContent, Badge, Button } from "@/shared/ui";
@@ -64,19 +64,6 @@ export default function LessonCard({
           manageLink?.href ?? selfLink?.href,
       },
     });
-  };
-
-  const handleManageClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (hasAccessRoute) {
-      navigate(lessonRoute!, {
-        state: {
-          lessonSelfLink: manageLink?.href ?? selfLink?.href,
-        },
-      });
-    } else if (!auth.isAuthenticated) {
-      void auth.signinRedirect();
-    }
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -192,11 +179,19 @@ export default function LessonCard({
                   variant="outline"
                   size="sm"
                   className="h-7 text-xs shrink-0"
-                  onClick={handleManageClick}
+                  asChild
                 >
-                  {manageLink?.href
-                    ? t("lesson-viewer:card.manage", { defaultValue: "Open" })
-                    : t("lesson-viewer:card.view", { defaultValue: "View" })}
+                  <Link
+                    to={lessonRoute!}
+                    state={{
+                      lessonSelfLink: manageLink?.href ?? selfLink?.href,
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {manageLink?.href
+                      ? t("lesson-viewer:card.manage", { defaultValue: "Open" })
+                      : t("lesson-viewer:card.view", { defaultValue: "View" })}
+                  </Link>
                 </Button>
               ) : !auth.isAuthenticated ? (
                 <Button
