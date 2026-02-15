@@ -12,13 +12,12 @@ import {
 import { Button } from "@/shared/ui";
 import { Input } from "@/shared/ui";
 import { useCreateLesson } from "@/domain/lessons";
-import { getLink } from "@/shared/utils";
-import { CourseRels } from "@/domain/courses";
-import type { LinkDto } from "@/shared/types";
+import { getLinkFromRecord } from "@/shared/utils";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 
 interface AddLessonDialogProps {
   courseId: string;
-  links?: LinkDto[];
+  links?: LinksRecord;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -34,7 +33,7 @@ export function AddLessonDialog({
   const { t, i18n } = useTranslation(["lesson-viewer", "translation"]);
 
   const createLessonMutation = useCreateLesson(courseId);
-  const createLessonLink = getLink(links, CourseRels.CREATE_LESSON);
+  const createLessonLink = getLinkFromRecord(links, "createLesson");
 
   const handleClose = () => {
     setTitle("");
@@ -50,8 +49,8 @@ export function AddLessonDialog({
       return;
     }
 
-    if (!createLessonLink) {
-      console.error("No create-lesson link found for this course");
+    if (!createLessonLink?.href) {
+      console.error("No create-lesson link found for this module");
       toast.error(t("lesson-viewer:addDialog.errorMessage", { message: "Missing create link" }));
       return;
     }

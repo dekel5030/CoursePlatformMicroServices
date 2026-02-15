@@ -1,3 +1,5 @@
+import type { GetCourseAnalyticsLinks } from "./links";
+
 /**
  * Backend DTO: Matches CourseDetailedAnalyticsDto from CourseService
  * Detailed analytics for instructor's course analytics view (GET /manage/courses/{id}/analytics)
@@ -12,6 +14,8 @@ export interface CourseDetailedAnalyticsDto {
   moduleAnalytics: ModuleAnalyticsSummaryDto[];
   enrollmentsOverTime: EnrollmentCountByDayDto[];
   courseViewers: CourseViewerDto[];
+  /** Strongly-typed links: self, course, managedCourse */
+  links?: GetCourseAnalyticsLinks;
 }
 
 /**

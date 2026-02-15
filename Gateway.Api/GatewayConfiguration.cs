@@ -8,9 +8,10 @@ internal static class GatewayConfiguration
     {
         return new[]
         {
-            // Courses Route
+            // Courses Routemanage/lessons
             CreateRoute("user-enrollments-route", "courseservice", "/api/users/me/courses/{**catch-all}", "/api"),
             CreateRoute("manage-courses", "courseservice", "/api/manage/courses/{**catch-all}", "/api"),
+            CreateRoute("manage-lessons", "courseservice", "/api/manage/lessons/{**catch-all}", "/api"),
             CreateRoute("courses-route", "courseservice", "/api/courses/{**catch-all}", "/api"),
             CreateRoute("course-ratings", "courseservice", "/api/course-ratings/{**catch-all}", "/api"),
             // Lessons Route

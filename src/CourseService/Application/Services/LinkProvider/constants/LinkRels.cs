@@ -6,6 +6,8 @@ internal static class LinkRels
     public const string Delete = "delete";
     public const string Create = "create";
     public const string PartialUpdate = "partial-update";
+    /// <summary>Unified rel for reordering modules, reordering lessons in a module, or moving a lesson between modules.</summary>
+    public const string ChangePosition = "change-position";
 
     internal static class Course
     {
@@ -13,20 +15,17 @@ internal static class LinkRels
         public const string Analytics = "analytics";
         public const string GenerateImageUploadUrl = "generate-image-upload-url";
         public const string CreateModule = "create-module";
-        public const string ReorderModules = "reorder-modules";
     }
 
     internal static class Lesson
     {
         public const string UploadVideoUrl = "upload-video-url";
         public const string AiGenerate = "ai-generate";
-        public const string Move = "move";
     }
 
     internal static class Module
     {
         public const string CreateLesson = "create-lesson";
-        public const string ReorderLessons = "reorder-lessons";
     }
 
     internal static class CourseRating

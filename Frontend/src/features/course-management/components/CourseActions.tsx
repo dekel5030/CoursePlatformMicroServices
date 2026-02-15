@@ -1,99 +1,81 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/shared/ui";
+import { LinkButtons } from "@/shared/components";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import { Edit, Trash2 } from "lucide-react";
 import { useDeleteCourse } from "@/domain/courses";
 import { toast } from "sonner";
-import { hasLink, getLink } from "@/shared/utils";
-import { CourseRels } from "@/domain/courses";
-import type { LinkDto } from "@/shared/types";
+import { getLinkFromRecord } from "@/shared/utils";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 
 interface CourseActionsProps {
   courseId: string;
-  links?: LinkDto[];
+  links?: LinksRecord;
 }
 
 export function CourseActions({ links }: CourseActionsProps) {
-  const { t } = useTranslation(['course-management', 'translation']);
+  const { t } = useTranslation(["course-management", "translation"]);
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const deleteCourse = useDeleteCourse();
-  
-  // Determine available actions based on HATEOAS links
-  const canUpdate = hasLink(links, CourseRels.PARTIAL_UPDATE);
-  const canDelete = hasLink(links, CourseRels.DELETE);
-  const deleteLink = getLink(links, CourseRels.DELETE);
 
-  const handleEdit = () => {
-    toast.info(t('course-management:actions.editNotImplemented'));
-  };
+  const deleteLink = getLinkFromRecord(links, "delete");
 
-  const handleDeleteClick = () => {
-    setIsDeleteDialogOpen(true);
-  };
+  const handleAction = useCallback(
+    async (rel: string, _link: { href?: string | null; method?: string | null }) => {
+      if (rel === "delete") {
+        setIsDeleteDialogOpen(true);
+        return;
+      }
+      if (rel === "partialUpdate") {
+        toast.info(t("course-management:actions.editNotImplemented"));
+      }
+    },
+    [t]
+  );
 
   const handleConfirmDelete = async () => {
-    if (!deleteLink) {
+    if (!deleteLink?.href) {
       console.error("No delete link found for this course");
       return;
     }
-    
     try {
       await deleteCourse.mutateAsync(deleteLink.href);
-      toast.success(t('course-management:actions.deleteSuccess'));
-      // Navigate back to all courses page after successful deletion
-      navigate('/courses');
+      toast.success(t("course-management:actions.deleteSuccess"));
+      navigate("/courses");
     } catch (error) {
-      toast.error(t('course-management:actions.deleteFailed'));
-      console.error('Failed to delete course:', error);
+      toast.error(t("course-management:actions.deleteFailed"));
+      console.error("Failed to delete course:", error);
     } finally {
       setIsDeleteDialogOpen(false);
     }
   };
 
-  // If no actions available, don't render anything
-  if (!canUpdate && !canDelete) {
-    return null;
-  }
+  const hasAnyAction = links && (links.partialUpdate?.href || links.delete?.href);
+  if (!hasAnyAction) return null;
 
   return (
     <>
-      <div className="flex gap-2">
-        {canUpdate && (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-2"
-            onClick={handleEdit}
-          >
-            <Edit className="h-4 w-4" />
-            {t('common.edit')}
-          </Button>
-        )}
-        {canDelete && (
-          <Button 
-            variant="destructive" 
-            size="sm" 
-            className="gap-2"
-            onClick={handleDeleteClick}
-            disabled={deleteCourse.isPending}
-          >
-            <Trash2 className="h-4 w-4" />
-            {t('course-management:detail.delete')}
-          </Button>
-        )}
-      </div>
+      <LinkButtons
+        links={links}
+        labelByRel={{
+          partialUpdate: t("common.edit"),
+          delete: t("course-management:detail.delete"),
+        }}
+        onAction={handleAction}
+        excludeRels={["self", "coursePage", "analytics", "publish", "generateImageUploadUrl", "createModule", "changePosition"]}
+        variant="outline"
+        size="sm"
+      />
 
       <ConfirmationModal
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleConfirmDelete}
-        title={t('course-management:actions.deleteConfirmTitle')}
-        message={t('course-management:actions.deleteConfirmMessage')}
-        confirmText={t('common.delete')}
-        cancelText={t('common.cancel')}
+        title={t("course-management:actions.deleteConfirmTitle")}
+        message={t("course-management:actions.deleteConfirmMessage")}
+        confirmText={t("common.delete")}
+        cancelText={t("common.cancel")}
         isLoading={deleteCourse.isPending}
       />
     </>

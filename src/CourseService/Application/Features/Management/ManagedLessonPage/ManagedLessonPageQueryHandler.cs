@@ -82,16 +82,25 @@ internal sealed class ManagedLessonPageQueryHandler
         var lessonContext = new LessonContext(moduleContext, lesson.Id, lesson.Access, HasEnrollment: false);
 
         bool canEdit = _policy.CanEditLesson(lessonContext);
+        bool canDelete = canEdit; // Instructor who can edit can delete the lesson
         Guid lid = lesson.Id.Value;
         Guid cid = lesson.CourseId.Value;
 
+        (Guid? nextLessonId, Guid? previousLessonId) = await ResolveAdjacentLessonIdsAsync(
+            lesson.CourseId,
+            lesson.Id.Value,
+            cancellationToken);
+
         ManagedLessonPageLinks links = new(
             Self: _linkProvider.GetLessonPageLink(lid),
-            Course: _linkProvider.GetCoursePageLink(cid),
+            ManagedCourse: _linkProvider.GetManagedCourseLink(cid),
+            PublicPreview: _linkProvider.GetCoursePageLink(cid),
             PartialUpdate: canEdit ? _linkProvider.GetPatchLessonLink(lid) : null,
-            UploadVideoUrl: canEdit ? _linkProvider.GetLessonVideoUploadUrlLink(lid) : null,
+            Delete: canDelete ? _linkProvider.GetDeleteLessonLink(lid) : null,
+            GenerateVideoUploadUrl: canEdit ? _linkProvider.GetLessonVideoUploadUrlLink(lid) : null,
             AiGenerate: canEdit ? _linkProvider.GetGenerateLessonWithAiLink(lid) : null,
-            Move: canEdit ? _linkProvider.GetMoveLessonLink(lid) : null);
+            NextLesson: nextLessonId is { } nid ? _linkProvider.GetLessonPageLink(nid) : null,
+            PreviousLesson: previousLessonId is { } pid ? _linkProvider.GetLessonPageLink(pid) : null);
 
         ManagedLessonPageData data = new(
             LessonId: lesson.Id.Value,
@@ -108,5 +117,43 @@ internal sealed class ManagedLessonPageQueryHandler
             TranscriptUrl: _storageUrlResolver.ResolvePublicUrl(lesson.Transcript?.Path));
 
         return Result.Success(new ManagedLessonPageDto(Data: data, Links: links));
+    }
+
+    /// <summary>
+    /// Resolves the next and previous lesson IDs in course order (by module index, then lesson index).
+    /// </summary>
+    private async Task<(Guid? NextLessonId, Guid? PreviousLessonId)> ResolveAdjacentLessonIdsAsync(
+        CourseId courseId,
+        Guid currentLessonId,
+        CancellationToken cancellationToken)
+    {
+        List<Guid> moduleOrder = await _writeDbContext.Modules
+            .AsNoTracking()
+            .Where(m => m.CourseId == courseId)
+            .OrderBy(m => m.Index)
+            .Select(m => m.Id.Value)
+            .ToListAsync(cancellationToken);
+
+        var lessonOrder = await _writeDbContext.Lessons
+            .AsNoTracking()
+            .Where(l => l.CourseId == courseId)
+            .Select(l => new { l.Id, l.ModuleId, l.Index })
+            .ToListAsync(cancellationToken);
+
+        var ordered = lessonOrder
+            .OrderBy(l => moduleOrder.IndexOf(l.ModuleId.Value))
+            .ThenBy(l => l.Index)
+            .Select(l => l.Id.Value)
+            .ToList();
+
+        int idx = ordered.IndexOf(currentLessonId);
+        if (idx < 0)
+        {
+            return (null, null);
+        }
+
+        Guid? next = idx + 1 < ordered.Count ? ordered[idx + 1] : null;
+        Guid? prev = idx > 0 ? ordered[idx - 1] : null;
+        return (next, prev);
     }
 }

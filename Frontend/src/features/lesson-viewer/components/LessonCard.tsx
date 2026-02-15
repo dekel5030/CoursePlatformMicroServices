@@ -8,8 +8,7 @@ import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { Clock, Trash2, Play, Lock, GripVertical } from "lucide-react";
 import { usePatchLesson, useDeleteLesson } from "@/domain/lessons";
 import { toast } from "sonner";
-import { hasLink, getLink, formatDuration } from "@/shared/utils";
-import { LessonRels } from "@/domain/lessons";
+import { getLinkFromRecord, formatDuration } from "@/shared/utils";
 
 interface LessonProps {
   lesson: LessonModel;
@@ -32,15 +31,24 @@ export default function LessonCard({
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const canUpdate = hasLink(lesson.links, LessonRels.PARTIAL_UPDATE);
-  const canDelete = hasLink(lesson.links, LessonRels.DELETE);
-  const updateLink = getLink(lesson.links, LessonRels.PARTIAL_UPDATE);
-  const deleteLink = getLink(lesson.links, LessonRels.DELETE);
+  const updateLink = getLinkFromRecord(lesson.links, "partialUpdate");
+  const deleteLink = getLinkFromRecord(lesson.links, "delete");
+  const selfLink = getLinkFromRecord(lesson.links, "self");
+  const manageLink = getLinkFromRecord(lesson.links, "manage");
+  const canUpdate = !!updateLink?.href;
+  const canDelete = !!deleteLink?.href;
 
   const durationText = formatDuration(lesson.duration);
 
   const handleLessonClick = () => {
-    const selfLink = getLink(lesson.links, LessonRels.SELF);
+    if (manageLink?.href) {
+      if (manageLink.href.startsWith("http")) {
+        window.location.href = manageLink.href;
+      } else {
+        navigate(manageLink.href);
+      }
+      return;
+    }
     navigate(`/courses/${courseId}/lessons/${lesson.lessonId}`, {
       state: { lessonSelfLink: selfLink?.href },
     });
@@ -52,7 +60,7 @@ export default function LessonCard({
   };
 
   const handleConfirmDelete = async () => {
-    if (!deleteLink) return;
+    if (!deleteLink?.href) return;
     try {
       await deleteLesson.mutateAsync(deleteLink.href);
     } finally {
@@ -61,7 +69,7 @@ export default function LessonCard({
   };
 
   const handleTitleUpdate = async (newTitle: string) => {
-    if (!updateLink) return;
+    if (!updateLink?.href) return;
     try {
       await patchLesson.mutateAsync({
         url: updateLink.href,

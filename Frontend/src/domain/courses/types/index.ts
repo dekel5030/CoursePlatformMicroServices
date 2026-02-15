@@ -29,12 +29,18 @@ export type {
 } from "./CourseRatingDto";
 export type {
   ManagedCourseSummaryDto,
+  ManagedCourseSummaryDataDto,
+  ManagedCourseSummaryItemDtoApi,
   ManagedCourseStatsDto,
 } from "./ManagedCourseSummaryDto";
 export type {
   ManagedCoursePageDto,
-  ManagedModuleDtoApi,
-  ManagedModuleStatsDto,
+  ManagedCoursePageCourseDto,
+  ManagedCoursePageModuleDto,
+  ManagedCoursePageLessonDto,
+  CourseCoreDto,
+  ModuleCoreDto,
+  LessonCoreDto,
 } from "./ManagedCoursePageDto";
 export type {
   CourseDetailedAnalyticsDto,
@@ -42,3 +48,20 @@ export type {
   ModuleAnalyticsSummaryDto,
   EnrollmentCountByDayDto,
 } from "./CourseDetailedAnalyticsDto";
+export type {
+  CoursePageCourseLinks,
+  ManagedCourseLinks,
+  ManagedCourseSummaryLinks,
+  GetManagedCoursesCollectionLinks,
+  CourseCatalogItemLinks,
+  CourseCatalogCollectionLinks,
+  GetCourseRatingsCollectionLinks,
+  CourseRatingItemLinks,
+  ManagedModuleLinks,
+  CoursePageLessonLinks,
+  ManagedLessonLinks,
+  ManagedLessonPageLinks,
+  EnrolledCourseLinks,
+  GetEnrolledCoursesCollectionLinks,
+  GetCourseAnalyticsLinks,
+} from "./links";

@@ -1,4 +1,4 @@
-import type { LinkDto } from "@/shared/types/LinkDto";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 
 /**
  * UI Model: Stable interface for UI components
@@ -15,5 +15,6 @@ export interface LessonModel {
   isPreview: boolean;
   order: number;
   duration: string | null;
-  links?: LinkDto[];
+  /** Strongly-typed links (self, partialUpdate, delete, etc.) */
+  links?: LinksRecord;
 }

@@ -5,6 +5,8 @@ using Courses.Application.Features.Management;
 using Courses.Application.Features.Management.ManagedCourses;
 using Courses.Application.Features.Shared;
 using Courses.Application.ReadModels;
+using Courses.Application.Services.Actions;
+using Courses.Application.Services.LinkProvider;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Application.Users;
 using Courses.Domain.Categories;
@@ -27,17 +29,20 @@ internal sealed class GetManagedCoursesQueryHandler
     private readonly IUserContext _userContext;
     private readonly ILinkProvider _linkProvider;
     private readonly IStorageUrlResolver _storageUrlResolver;
+    private readonly CourseGovernancePolicy _policy;
 
     public GetManagedCoursesQueryHandler(
         IReadDbContext dbContext,
         IUserContext userContext,
         ILinkProvider linkProvider,
-        IStorageUrlResolver storageUrlResolver)
+        IStorageUrlResolver storageUrlResolver,
+        CourseGovernancePolicy policy)
     {
         _dbContext = dbContext;
         _userContext = userContext;
         _linkProvider = linkProvider;
         _storageUrlResolver = storageUrlResolver;
+        _policy = policy;
     }
 
     public async Task<Result<GetManagedCoursesDto>> Handle(
@@ -55,8 +60,7 @@ internal sealed class GetManagedCoursesQueryHandler
         int totalItems = await GetTotalCoursesCountAsync(instructorId, cancellationToken);
         if (totalItems == 0)
         {
-            var emptyLinks = new GetManagedCoursesCollectionLinks(
-                Self: _linkProvider.GetManagedCoursesLink(pageNumber, pageSize));
+            GetManagedCoursesCollectionLinks emptyLinks = BuildCollectionLinks(pageNumber, pageSize, totalItems);
             return Result.Success(new GetManagedCoursesDto(
                 Items: [],
                 PageNumber: pageNumber,
@@ -76,8 +80,7 @@ internal sealed class GetManagedCoursesQueryHandler
         List<ManagedCourseSummaryItemDto> items =
             MapToItemDtos(courses, instructor, categories, analytics);
 
-        var collectionLinks = new GetManagedCoursesCollectionLinks(
-            Self: _linkProvider.GetManagedCoursesLink(pageNumber, pageSize));
+        GetManagedCoursesCollectionLinks collectionLinks = BuildCollectionLinks(pageNumber, pageSize, totalItems);
 
         return Result.Success(new GetManagedCoursesDto(
             Items: items,
@@ -145,12 +148,36 @@ internal sealed class GetManagedCoursesQueryHandler
                 Duration: stats?.TotalCourseDuration ?? TimeSpan.Zero);
 
             ManagedCourseSummaryData data = MapSummaryData(course, instructor, category, statsDto);
+            var courseContext = new CourseContext(
+                course.Id,
+                course.InstructorId,
+                course.Status,
+                IsManagementView: true);
+            bool canEdit = _policy.CanEditCourse(courseContext);
+            bool canDelete = _policy.CanDeleteCourse(courseContext);
+            Guid courseId = course.Id.Value;
+
             var links = new ManagedCourseSummaryLinks(
-                Self: _linkProvider.GetManagedCourseLink(course.Id.Value),
-                CoursePage: _linkProvider.GetCoursePageLink(course.Id.Value));
+                Self: _linkProvider.GetManagedCourseLink(courseId),
+                CoursePage: _linkProvider.GetCoursePageLink(courseId),
+                Analytics: canEdit ? _linkProvider.GetCourseAnalyticsLink(courseId) : null,
+                EditMetadata: canEdit ? _linkProvider.GetPatchCourseLink(courseId) : null,
+                Delete: canDelete ? _linkProvider.GetDeleteCourseLink(courseId) : null);
 
             return new ManagedCourseSummaryItemDto(Data: data, Links: links);
         }).ToList();
+    }
+
+    private GetManagedCoursesCollectionLinks BuildCollectionLinks(int pageNumber, int pageSize, int totalItems)
+    {
+        bool canCreate = _policy.CanCreateCourse();
+        bool hasNext = pageNumber * pageSize < totalItems;
+        bool hasPrev = pageNumber > 1;
+        return new GetManagedCoursesCollectionLinks(
+            Self: _linkProvider.GetManagedCoursesLink(pageNumber, pageSize),
+            Create: canCreate ? _linkProvider.GetCreateCourseLink() : null,
+            Next: hasNext ? _linkProvider.GetManagedCoursesLink(pageNumber + 1, pageSize) : null,
+            Prev: hasPrev ? _linkProvider.GetManagedCoursesLink(pageNumber - 1, pageSize) : null);
     }
 
     private ManagedCourseSummaryData MapSummaryData(

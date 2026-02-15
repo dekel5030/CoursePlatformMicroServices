@@ -6,13 +6,18 @@ import type { ModuleDto, ModuleLessonDto } from "../types/ModuleDto";
 import type { ModuleModel } from "../types/ModuleModel";
 import type {
   CoursePageDto,
-  ModuleWithAnalyticsDtoApi,
-  LessonDtoApi,
+  CoursePageCourseDto,
+  CoursePageModuleDto,
+  CoursePageLessonDto,
 } from "../types/CoursePageDto";
 import type {
   ManagedCoursePageDto,
-  ManagedModuleDtoApi,
+  ManagedCoursePageModuleDto,
+  ManagedCoursePageLessonDto,
 } from "../types/ManagedCoursePageDto";
+import { linkDtoArrayToRecord } from "@/shared/utils/link-helpers";
+import type { LinkDto } from "@/shared/types/LinkDto";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 import type { LessonSummaryDto, LessonModel } from "@/domain/lessons/types";
 
 /**
@@ -22,7 +27,6 @@ function mapLessonSummaryToModel(
   dto: LessonSummaryDto | ModuleLessonDto,
   courseId?: string,
 ): LessonModel {
-  // Handle both LessonSummaryDto and ModuleLessonDto
   const access =
     "access" in dto ? dto.access : dto.isPreview ? "Public" : "Private";
 
@@ -38,74 +42,135 @@ function mapLessonSummaryToModel(
     isPreview: access === "Public",
     order: dto.index,
     duration: dto.duration,
-    links: dto.links,
+    links:
+      "links" in dto && dto.links != null
+        ? Array.isArray(dto.links)
+          ? (linkDtoArrayToRecord(dto.links) as LessonModel["links"])
+          : (dto.links as LessonModel["links"])
+        : undefined,
   };
 }
 
 /**
- * Maps an API lesson DTO (from CoursePageDto.lessons) to LessonModel
+ * Maps CoursePageLessonDto (data + links) to LessonModel
  */
-function mapApiLessonToLessonModel(
-  lesson: LessonDtoApi,
+function mapCoursePageLessonToModel(
+  lesson: CoursePageLessonDto,
   courseId: string,
 ): LessonModel {
+  const d = lesson.data;
   return {
-    courseId: lesson.courseId ?? courseId,
-    lessonId: lesson.id,
-    title: lesson.title ?? "",
-    description: lesson.description ?? "",
-    videoUrl: lesson.videoUrl ?? null,
-    transcriptUrl: lesson.transcriptUrl ?? null,
-    thumbnailImage: lesson.thumbnailUrl ?? null,
-    isPreview: lesson.access === "Public",
-    order: lesson.index,
-    duration: lesson.duration ?? null,
-    links: lesson.links ?? undefined,
+    courseId: d.courseId ?? courseId,
+    lessonId: d.id,
+    title: d.title ?? "",
+    description: d.description ?? "",
+    videoUrl: d.videoUrl ?? null,
+    transcriptUrl: d.transcriptUrl ?? null,
+    thumbnailImage: d.thumbnailUrl ?? null,
+    isPreview: d.access === "Public",
+    order: d.index,
+    duration: d.duration ?? null,
+    links: lesson.links as LessonModel["links"],
   };
 }
 
 /**
- * Maps an API module DTO (from CoursePageDto.modules) to ModuleModel using the lessons record.
- * lessonIds and order come from CourseStructureDto.
+ * Maps ManagedCoursePageLessonDto (data + links) to LessonModel
  */
-function mapApiModuleToModuleModel(
-  moduleWithAnalytics: ModuleWithAnalyticsDtoApi,
-  lessonsRecord: Record<string, LessonDtoApi>,
+function mapManagedLessonToModel(
+  lesson: ManagedCoursePageLessonDto,
+  courseId: string,
+): LessonModel {
+  const d = lesson.data;
+  return {
+    courseId: d.courseId ?? courseId,
+    lessonId: d.id,
+    title: d.title ?? "",
+    description: d.description ?? "",
+    videoUrl: d.videoUrl ?? null,
+    transcriptUrl: d.transcriptUrl ?? null,
+    thumbnailImage: d.thumbnailUrl ?? null,
+    isPreview: d.access === "Public",
+    order: d.index,
+    duration: d.duration ?? null,
+    links: lesson.links as LessonModel["links"],
+  };
+}
+
+/**
+ * Maps CoursePageModuleDto to ModuleModel (public course page)
+ */
+function mapCoursePageModuleToModuleModel(
+  moduleDto: CoursePageModuleDto,
+  lessonsRecord: Record<string, CoursePageLessonDto>,
   courseId: string,
   lessonIds: string[],
   order: number,
 ): ModuleModel {
-  const { module, analytics } = moduleWithAnalytics;
+  const d = moduleDto.data;
   const lessonDtos = lessonIds
     .map((id) => lessonsRecord[id])
-    .filter((l): l is LessonDtoApi => l != null)
-    .sort((a, b) => a.index - b.index);
-  const lessons = lessonDtos.map((l) => mapApiLessonToLessonModel(l, courseId));
+    .filter((l): l is CoursePageLessonDto => l != null)
+    .sort((a, b) => a.data.index - b.data.index);
+  const lessons = lessonDtos.map((l) => mapCoursePageLessonToModel(l, courseId));
 
   return {
-    id: module.id,
-    title: module.title ?? "",
+    id: d.id,
+    title: d.title ?? "",
     order,
-    lessonCount: analytics.lessonCount,
-    duration: analytics.duration,
+    lessonCount: d.lessonCount,
+    duration: d.totalDuration ?? "PT0S",
     lessons,
-    links: module.links ?? [],
+    links: (moduleDto.links ?? {}) as ModuleModel["links"],
   };
 }
 
 /**
- * Maps the flat CoursePageDto (GET /courses/{id} response) to CourseModel
+ * Maps ManagedCoursePageModuleDto to ModuleModel
+ */
+function mapManagedModuleToModuleModel(
+  moduleDto: ManagedCoursePageModuleDto,
+  lessonsRecord: Record<string, ManagedCoursePageLessonDto>,
+  courseId: string,
+  lessonIds: string[],
+  order: number,
+): ModuleModel {
+  const d = moduleDto.data;
+  const lessonDtos = lessonIds
+    .map((id) => lessonsRecord[id])
+    .filter((l): l is ManagedCoursePageLessonDto => l != null)
+    .sort((a, b) => a.data.index - b.data.index);
+  const lessons = lessonDtos.map((l) => mapManagedLessonToModel(l, courseId));
+
+  return {
+    id: d.id,
+    title: d.title ?? "",
+    order,
+    lessonCount: d.lessonCount,
+    duration: d.duration ?? "PT0S",
+    lessons,
+    links: moduleDto.links as ModuleModel["links"],
+  };
+}
+
+/**
+ * Maps CoursePageDto (GET /courses/{id}) to CourseModel
  */
 export function mapCoursePageDtoToModel(dto: CoursePageDto): CourseModel {
-  const c = dto.course;
+  const courseDto = dto.course as CoursePageCourseDto;
+  const c = courseDto.data;
+  const courseLinks = courseDto.links;
   const modulesRecord = dto.modules ?? {};
+  const lessonsRecord = dto.lessons ?? {};
   const a = dto.analytics ?? (() => {
-    const lessonCount = Object.values(modulesRecord).reduce((sum, m) => sum + (m?.analytics?.lessonCount ?? 0), 0);
-    const totalDuration = "PT0S";
+    const lessonCount = Object.values(modulesRecord).reduce(
+      (sum, m) => sum + (m?.data?.lessonCount ?? 0),
+      0
+    );
     return {
       enrollmentCount: 0,
       lessonsCount: lessonCount,
-      totalDuration,
+      totalDuration: "PT0S",
       averageRating: 0,
       reviewsCount: 0,
       viewCount: 0,
@@ -113,30 +178,28 @@ export function mapCoursePageDtoToModel(dto: CoursePageDto): CourseModel {
   })();
   const instructors = dto.instructors ?? {};
   const categories = dto.categories ?? {};
-  const lessonsRecord = dto.lessons ?? {};
+  const structure = dto.structure;
+  const moduleIds = structure.moduleIds ?? [];
+  const moduleLessonIds = structure.moduleLessonIds ?? {};
 
   const instructor = c.instructorId ? instructors[c.instructorId] : undefined;
   const instructorName = instructor
     ? [instructor.firstName, instructor.lastName].filter(Boolean).join(" ") || null
     : null;
   const instructorAvatarUrl = instructor?.avatarUrl ?? null;
-
   const category = c.categoryId ? categories[c.categoryId] : undefined;
   const categoryName = category?.name ?? undefined;
   const categorySlug = category?.slug ?? undefined;
 
-  const structure = dto.structure;
-  const moduleIds = structure.moduleIds ?? [];
-  const moduleLessonIds = structure.moduleLessonIds ?? {};
   const modules = moduleIds
     .map((moduleId) => modulesRecord[moduleId])
-    .filter((m): m is ModuleWithAnalyticsDtoApi => m != null)
+    .filter((m): m is CoursePageModuleDto => m != null)
     .map((m, index) =>
-      mapApiModuleToModuleModel(
+      mapCoursePageModuleToModuleModel(
         m,
         lessonsRecord,
         c.id,
-        moduleLessonIds[m.module.id] ?? [],
+        moduleLessonIds[m.data.id] ?? [],
         index,
       ),
     );
@@ -165,12 +228,12 @@ export function mapCoursePageDtoToModel(dto: CoursePageDto): CourseModel {
     categoryId: c.categoryId,
     categorySlug,
     tags: c.tags ?? undefined,
-    links: c.links ?? undefined,
+    links: courseLinks as CourseModel["links"],
   };
 }
 
 /**
- * Maps a module DTO to a ModuleModel
+ * Maps a module DTO to a ModuleModel (legacy ModuleDto with links array)
  */
 export function mapModuleToModel(dto: ModuleDto, courseId: string): ModuleModel {
   return {
@@ -182,7 +245,9 @@ export function mapModuleToModel(dto: ModuleDto, courseId: string): ModuleModel 
     lessons: dto.lessons.map((lesson) =>
       mapLessonSummaryToModel(lesson, courseId),
     ),
-    links: dto.links,
+    links: Array.isArray(dto.links)
+      ? (linkDtoArrayToRecord(dto.links) as ModuleModel["links"])
+      : (dto.links ?? {}),
   };
 }
 
@@ -211,8 +276,24 @@ export function mapCourseDetailsToModel(dto: CourseDetailsDto): CourseModel {
     categoryName: dto.categoryName,
     categoryId: dto.categoryId,
     tags: dto.tags,
-    links: dto.links,
+    links: linkDtoArrayToRecord((dto as { links?: import("@/shared/types/LinkDto").LinkDto[] }).links) as CourseModel["links"],
   };
+}
+
+function getDifficultyEnum(difficulty: unknown): DifficultyLevel | undefined {
+  if (typeof difficulty === "number") {
+    return difficulty as DifficultyLevel;
+  }
+  if (typeof difficulty === "string") {
+    const difficultyMap: Record<string, DifficultyLevel> = {
+      Beginner: DifficultyLevel.Beginner,
+      Intermediate: DifficultyLevel.Intermediate,
+      Advanced: DifficultyLevel.Advanced,
+      Expert: DifficultyLevel.Expert,
+    };
+    return difficultyMap[difficulty];
+  }
+  return undefined;
 }
 
 /**
@@ -223,23 +304,6 @@ export function mapCourseSummaryToModel(
 ): CourseModel {
   const c = dto.course;
   const a = dto.analytics;
-
-  // Convert difficulty from string to enum if needed
-  const getDifficultyEnum = (difficulty: unknown): DifficultyLevel | undefined => {
-    if (typeof difficulty === "number") {
-      return difficulty as DifficultyLevel;
-    }
-    if (typeof difficulty === "string") {
-      const difficultyMap: Record<string, DifficultyLevel> = {
-        Beginner: DifficultyLevel.Beginner,
-        Intermediate: DifficultyLevel.Intermediate,
-        Advanced: DifficultyLevel.Advanced,
-        Expert: DifficultyLevel.Expert,
-      };
-      return difficultyMap[difficulty];
-    }
-    return undefined;
-  };
 
   return {
     id: c.id,
@@ -267,88 +331,43 @@ export function mapCourseSummaryToModel(
     categoryName: c.category.name || undefined,
     categoryId: c.category.id,
     categorySlug: c.category.slug || undefined,
-    links: c.links,
+    links: linkDtoArrayToRecord((c as { links?: import("@/shared/types/LinkDto").LinkDto[] }).links) as CourseModel["links"],
   };
 }
 
 /**
- * Helper function to convert difficulty from string to enum
+ * Maps ManagedCoursePageDto (GET /manage/courses/{id}) to CourseModel
  */
-function getDifficultyEnum(difficulty: unknown): DifficultyLevel | undefined {
-  if (typeof difficulty === "number") {
-    return difficulty as DifficultyLevel;
-  }
-  if (typeof difficulty === "string") {
-    const difficultyMap: Record<string, DifficultyLevel> = {
-      Beginner: DifficultyLevel.Beginner,
-      Intermediate: DifficultyLevel.Intermediate,
-      Advanced: DifficultyLevel.Advanced,
-      Expert: DifficultyLevel.Expert,
-    };
-    return difficultyMap[difficulty];
-  }
-  return undefined;
-}
-
-/**
- * Maps an API managed module DTO (from ManagedCoursePageDto.modules) to ModuleModel.
- */
-function mapManagedApiModuleToModuleModel(
-  managedModule: ManagedModuleDtoApi,
-  lessonsRecord: Record<string, LessonDtoApi>,
-  courseId: string,
-  lessonIds: string[],
-  order: number,
-): ModuleModel {
-  const { module, stats } = managedModule;
-  const lessonDtos = lessonIds
-    .map((id) => lessonsRecord[id])
-    .filter((l): l is LessonDtoApi => l != null)
-    .sort((a, b) => a.index - b.index);
-  const lessons = lessonDtos.map((l) => mapApiLessonToLessonModel(l, courseId));
-
-  return {
-    id: module.id,
-    title: module.title ?? "",
-    order,
-    lessonCount: stats.lessonCount,
-    duration: stats.duration,
-    lessons,
-    links: module.links ?? [],
-  };
-}
-
-/**
- * Maps the flat ManagedCoursePageDto (GET /manage/courses/{id} response) to CourseModel.
- * No analytics, no instructors (instructor is current user).
- */
-export function mapManagedCoursePageDtoToModel(dto: ManagedCoursePageDto): CourseModel {
-  const c = dto.course;
+export function mapManagedCoursePageDtoToModel(
+  dto: ManagedCoursePageDto,
+): CourseModel {
+  const courseDto = dto.course;
+  const c = courseDto.data;
+  const courseLinks = courseDto.links;
   const modulesRecord = dto.modules ?? {};
-  const categories = dto.categories ?? {};
   const lessonsRecord = dto.lessons ?? {};
+  const categories = dto.categories ?? {};
+  const structure = dto.structure;
+  const moduleIds = structure.moduleIds ?? [];
+  const moduleLessonIds = structure.moduleLessonIds ?? {};
 
   const category = c.categoryId ? categories[c.categoryId] : undefined;
   const categoryName = category?.name ?? undefined;
   const categorySlug = category?.slug ?? undefined;
 
-  const structure = dto.structure;
-  const moduleIds = structure.moduleIds ?? [];
-  const moduleLessonIds = structure.moduleLessonIds ?? {};
   const modules = moduleIds
     .map((moduleId) => modulesRecord[moduleId])
-    .filter((m): m is ManagedModuleDtoApi => m != null)
+    .filter((m): m is ManagedCoursePageModuleDto => m != null)
     .map((m, index) =>
-      mapManagedApiModuleToModuleModel(
+      mapManagedModuleToModuleModel(
         m,
         lessonsRecord,
         c.id,
-        moduleLessonIds[m.module.id] ?? [],
+        moduleLessonIds[m.data.id] ?? [],
         index,
       ),
     );
 
-  // Compute total lesson count from modules
   const lessonCount = modules.reduce((sum, m) => sum + m.lessonCount, 0);
 
   return {
@@ -356,7 +375,7 @@ export function mapManagedCoursePageDtoToModel(dto: ManagedCoursePageDto): Cours
     title: c.title ?? "",
     description: c.description ?? "",
     imageUrl: c.imageUrls?.[0] ?? null,
-    instructorName: null, // No instructor info in managed view
+    instructorName: null,
     instructorAvatarUrl: null,
     isPublished: c.status === "Published",
     price: {
@@ -365,8 +384,8 @@ export function mapManagedCoursePageDtoToModel(dto: ManagedCoursePageDto): Cours
     },
     modules,
     lessonCount,
-    enrollmentCount: 0, // No analytics in managed view
-    totalDuration: "PT0S", // Computed from modules if needed
+    enrollmentCount: 0,
+    totalDuration: "PT0S",
     averageRating: 0,
     reviewsCount: 0,
     courseViews: 0,
@@ -375,17 +394,25 @@ export function mapManagedCoursePageDtoToModel(dto: ManagedCoursePageDto): Cours
     categoryId: c.categoryId,
     categorySlug,
     tags: c.tags ?? undefined,
-    links: c.links ?? undefined,
+    links: courseLinks as CourseModel["links"],
   };
 }
 
 /**
  * Maps a managed course summary DTO to a CourseModel.
- * Used for instructor's course list (no analytics from read models).
+ * Accepts links as either legacy LinkDto[] or strongly-typed record.
  */
 export function mapManagedCourseSummaryToModel(
   dto: ManagedCourseSummaryDto,
 ): CourseModel {
+  const linksRaw = dto.links;
+  const links: LinksRecord =
+    linksRaw == null
+      ? {}
+      : Array.isArray(linksRaw)
+        ? linkDtoArrayToRecord(linksRaw as LinkDto[])
+        : (linksRaw as LinksRecord);
+
   return {
     id: dto.id,
     title: dto.title,
@@ -401,7 +428,7 @@ export function mapManagedCourseSummaryToModel(
     price: dto.price,
     originalPrice: undefined,
     badges: [],
-    averageRating: 0, // No analytics in managed summary
+    averageRating: 0,
     reviewsCount: 0,
     difficulty: getDifficultyEnum(dto.difficulty),
     courseViews: 0,
@@ -412,6 +439,6 @@ export function mapManagedCourseSummaryToModel(
     categoryName: dto.category.name || undefined,
     categoryId: dto.category.id,
     categorySlug: dto.category.slug || undefined,
-    links: dto.links,
+    links,
   };
 }

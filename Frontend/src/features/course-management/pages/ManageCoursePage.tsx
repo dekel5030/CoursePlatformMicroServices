@@ -15,8 +15,7 @@ import { CourseHeader } from "../components/CourseHeader";
 import { CourseLessonsSection } from "../components/CourseLessonsSection";
 import { CourseRatingsSection } from "../components/CourseRatingsSection";
 import { toast } from "sonner";
-import { hasLink, getLink } from "@/shared/utils";
-import { CourseRels } from "@/domain/courses";
+import { getLinkFromRecord } from "@/shared/utils";
 
 export default function ManageCoursePage() {
   const { id } = useParams<{ id: string }>();
@@ -26,15 +25,15 @@ export default function ManageCoursePage() {
   const dir = i18n.dir();
 
   const handleDescriptionUpdate = async (newDescription: string) => {
-    const updateLink = getLink(course?.links, CourseRels.PARTIAL_UPDATE);
-    if (!updateLink) {
+    const updateLink = getLinkFromRecord(course?.links, "partialUpdate");
+    if (!updateLink?.href) {
       console.error("No update link found for this course");
       return;
     }
 
     try {
       await patchCourse.mutateAsync({
-        url: updateLink.href,
+        url: updateLink.href!,
         request: { description: newDescription },
       });
       toast.success(t("course-management:detail.descriptionUpdated"));
@@ -103,7 +102,7 @@ export default function ManageCoursePage() {
     );
   }
 
-  const canUpdate = hasLink(course.links, CourseRels.PARTIAL_UPDATE);
+  const canUpdate = !!course.links?.partialUpdate?.href;
 
   const breadcrumbItems = [
     { label: t("breadcrumbs.home"), path: "/" },

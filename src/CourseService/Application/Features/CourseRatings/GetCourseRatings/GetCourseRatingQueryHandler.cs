@@ -46,7 +46,7 @@ public sealed class GetCourseRatingQueryHandler
         bool hasRated = await CheckIfUserRatedAsync(courseId, currentUserId, cancellationToken);
 
         GetCourseRatingsCollectionLinks collectionLinks = BuildCollectionLinks(
-            request.CourseId, currentUserId, hasRated);
+            request.CourseId, request.PageNumber, request.PageSize, totalCount, currentUserId, hasRated);
 
         if (totalCount == 0)
         {
@@ -88,6 +88,9 @@ public sealed class GetCourseRatingQueryHandler
 
     private GetCourseRatingsCollectionLinks BuildCollectionLinks(
         Guid courseId,
+        int pageNumber,
+        int pageSize,
+        int totalItems,
         UserId? currentUserId,
         bool hasRated)
     {
@@ -96,10 +99,14 @@ public sealed class GetCourseRatingQueryHandler
             currentUserId,
             hasRated);
         bool canCreate = CourseRatingGovernancePolicy.CanCreateRating(context);
+        bool hasNext = pageNumber * pageSize < totalItems;
+        bool hasPrev = pageNumber > 1;
 
         return new GetCourseRatingsCollectionLinks(
-            Self: _linkProvider.GetCourseRatingsLink(courseId),
-            CreateRating: canCreate ? _linkProvider.GetCreateCourseRatingLink(courseId) : null);
+            Self: _linkProvider.GetCourseRatingsLink(courseId, pageNumber, pageSize),
+            Next: hasNext ? _linkProvider.GetCourseRatingsLink(courseId, pageNumber + 1, pageSize) : null,
+            Prev: hasPrev ? _linkProvider.GetCourseRatingsLink(courseId, pageNumber - 1, pageSize) : null,
+            Create: canCreate ? _linkProvider.GetCreateCourseRatingLink(courseId) : null);
     }
 
     private List<CourseRatingItemDto> MapToItemDtos(

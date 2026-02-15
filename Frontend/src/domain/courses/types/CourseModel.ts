@@ -1,5 +1,5 @@
 import type { Money } from "./money";
-import type { LinkDto } from "@/shared/types/LinkDto";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 // Temporary import - will be fixed when lessons domain is migrated
 import type { LessonModel } from "@/domain/lessons/types/LessonModel";
 import type { ModuleModel } from "./ModuleModel";
@@ -54,5 +54,6 @@ export interface CourseModel {
   categoryId?: string;
   categorySlug?: string;
   tags?: string[];
-  links?: LinkDto[];
+  /** Strongly-typed links (camelCase keys: partialUpdate, delete, manage, etc.) */
+  links?: LinksRecord;
 }

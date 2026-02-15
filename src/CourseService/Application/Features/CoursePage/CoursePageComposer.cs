@@ -48,7 +48,7 @@ internal sealed class CoursePageComposer : ICoursePageComposer
             CalculateModuleStats(data.Lessons);
 
         CoursePageCourseLinks courseLinks = ResolveCourseLinks(data.Course.Id.Value, courseContext);
-        Dictionary<Guid, CoursePageModuleLinks> moduleLinksMap = ResolveModuleLinks(data.Modules, courseContext);
+        Dictionary<Guid, CoursePageModuleLinks> moduleLinksMap = ResolveModuleLinks(data.Modules);
         Dictionary<Guid, CoursePageLessonLinks> lessonLinksMap = ResolveLessonLinks(data.Lessons, courseContext);
 
         CoursePageCourseDto courseDto = MapCourse(data.Course, courseLinks);
@@ -85,27 +85,12 @@ internal sealed class CoursePageComposer : ICoursePageComposer
         return new CoursePageCourseLinks(
             Self: _linkProvider.GetCoursePageLink(courseId),
             Manage: canEdit ? _linkProvider.GetManagedCourseLink(courseId) : null,
-            Analytics: canEdit ? _linkProvider.GetCourseAnalyticsLink(courseId) : null,
             Ratings: _linkProvider.GetCourseRatingsLink(courseId));
     }
 
-    private Dictionary<Guid, CoursePageModuleLinks> ResolveModuleLinks(
-        IReadOnlyList<Module> modules,
-        CourseContext courseContext)
+    private static Dictionary<Guid, CoursePageModuleLinks> ResolveModuleLinks(IReadOnlyList<Module> modules)
     {
-        return modules.ToDictionary(
-            module => module.Id.Value,
-            module =>
-            {
-                var moduleContext = new ModuleContext(courseContext, module.Id);
-                bool canEdit = _policy.CanEditModule(moduleContext);
-                Guid moduleId = module.Id.Value;
-                return new CoursePageModuleLinks(
-                    CreateLesson: canEdit ? _linkProvider.GetCreateLessonLink(moduleId) : null,
-                    PartialUpdate: canEdit ? _linkProvider.GetPatchModuleLink(moduleId) : null,
-                    Delete: canEdit ? _linkProvider.GetDeleteModuleLink(moduleId) : null,
-                    ReorderLessons: canEdit ? _linkProvider.GetReorderLessonsLink(moduleId) : null);
-            });
+        return modules.ToDictionary(module => module.Id.Value, _ => new CoursePageModuleLinks());
     }
 
     private Dictionary<Guid, CoursePageLessonLinks> ResolveLessonLinks(
@@ -119,14 +104,9 @@ internal sealed class CoursePageComposer : ICoursePageComposer
                 var moduleContext = new ModuleContext(courseContext, lesson.ModuleId);
                 var lessonContext = new LessonContext(moduleContext, lesson.Id, lesson.Access, HasEnrollment: false);
                 bool canRead = _policy.CanReadLesson(lessonContext);
-                bool canEdit = _policy.CanEditLesson(lessonContext);
                 Guid lessonId = lesson.Id.Value;
                 return new CoursePageLessonLinks(
-                    Self: canRead ? _linkProvider.GetLessonPageLink(lessonId) : null,
-                    PartialUpdate: canEdit ? _linkProvider.GetPatchLessonLink(lessonId) : null,
-                    UploadVideoUrl: canEdit ? _linkProvider.GetLessonVideoUploadUrlLink(lessonId) : null,
-                    AiGenerate: canEdit ? _linkProvider.GetGenerateLessonWithAiLink(lessonId) : null,
-                    Move: canEdit ? _linkProvider.GetMoveLessonLink(lessonId) : null);
+                    Self: canRead ? _linkProvider.GetLessonPageLink(lessonId) : null);
             });
     }
 

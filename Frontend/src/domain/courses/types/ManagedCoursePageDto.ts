@@ -1,31 +1,71 @@
 import type { CategoryDto } from "./CourseSummaryDto";
-import type { CourseDtoApi, CourseStructureDtoApi, LessonDtoApi, ModuleDtoApi } from "./CoursePageDto";
+import type { CourseStructureDtoApi } from "./CoursePageDto";
+import type { Money } from "./money";
+import type {
+  ManagedCourseLinks,
+  ManagedModuleLinks,
+  ManagedLessonLinks,
+} from "./links";
 
-/**
- * Backend DTO: Matches ManagedCoursePageDto from CourseService
- * Course page for instructor management view - no analytics, no instructors
- */
-export interface ManagedCoursePageDto {
-  course: CourseDtoApi;
-  structure: CourseStructureDtoApi;
-  modules: Record<string, ManagedModuleDtoApi> | null;
-  lessons: Record<string, LessonDtoApi> | null;
-  categories: Record<string, CategoryDto> | null;
+/** Managed course page: course.data (CourseCoreDto) */
+export interface CourseCoreDto {
+  id: string;
+  title: string | null;
+  description: string | null;
+  status: "Draft" | "Published" | "Deleted";
+  price: Money;
+  updatedAtUtc: string;
+  imageUrls: string[] | null;
+  tags: string[] | null;
+  instructorId: string;
+  categoryId: string;
 }
 
-/**
- * Backend DTO: Matches ManagedModuleDto from CourseService
- * Module with computed stats (no analytics from read models)
- */
-export interface ManagedModuleDtoApi {
-  module: ModuleDtoApi;
-  stats: ManagedModuleStatsDto;
+export interface ManagedCoursePageCourseDto {
+  data: CourseCoreDto;
+  links: ManagedCourseLinks;
 }
 
-/**
- * Computed statistics for managed modules
- */
-export interface ManagedModuleStatsDto {
+/** Managed module: data */
+export interface ModuleCoreDto {
+  id: string;
+  title: string | null;
   lessonCount: number;
   duration: string;
+}
+
+export interface ManagedCoursePageModuleDto {
+  data: ModuleCoreDto;
+  links: ManagedModuleLinks;
+}
+
+/** Managed lesson: data (LessonCoreDto) */
+export interface LessonCoreDto {
+  id: string;
+  title: string | null;
+  index: number;
+  duration: string;
+  thumbnailUrl: string | null;
+  access: "Private" | "Public";
+  moduleId: string;
+  courseId: string;
+  description: string | null;
+  videoUrl: string | null;
+  transcriptUrl: string | null;
+}
+
+export interface ManagedCoursePageLessonDto {
+  data: LessonCoreDto;
+  links: ManagedLessonLinks;
+}
+
+/**
+ * Backend DTO: GET /manage/courses/{id} (strongly-typed links).
+ */
+export interface ManagedCoursePageDto {
+  course: ManagedCoursePageCourseDto;
+  structure: CourseStructureDtoApi;
+  modules: Record<string, ManagedCoursePageModuleDto> | null;
+  lessons: Record<string, ManagedCoursePageLessonDto> | null;
+  categories: Record<string, CategoryDto> | null;
 }

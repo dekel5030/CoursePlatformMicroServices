@@ -89,7 +89,7 @@ internal sealed class ManagedCoursePageComposer : IManagedCoursePageComposer
             Publish: canEdit ? _linkProvider.GetPublishCourseLink(id) : null,
             GenerateImageUploadUrl: canEdit ? _linkProvider.GetGenerateCourseImageUploadUrlLink(id) : null,
             CreateModule: canEdit ? _linkProvider.GetCreateModuleLink(id) : null,
-            ReorderModules: canEdit ? _linkProvider.GetReorderModulesLink(id) : null);
+            ChangePosition: canEdit ? _linkProvider.GetChangePositionForCourse(id) : null);
     }
 
     private Dictionary<Guid, ManagedModuleLinks> ResolveModuleLinks(
@@ -107,7 +107,7 @@ internal sealed class ManagedCoursePageComposer : IManagedCoursePageComposer
                     CreateLesson: canEdit ? _linkProvider.GetCreateLessonLink(moduleId) : null,
                     PartialUpdate: canEdit ? _linkProvider.GetPatchModuleLink(moduleId) : null,
                     Delete: canEdit ? _linkProvider.GetDeleteModuleLink(moduleId) : null,
-                    ReorderLessons: canEdit ? _linkProvider.GetReorderLessonsLink(moduleId) : null);
+                    ChangePosition: canEdit ? _linkProvider.GetChangePositionForModule(moduleId) : null);
             });
     }
 
@@ -125,10 +125,9 @@ internal sealed class ManagedCoursePageComposer : IManagedCoursePageComposer
                 Guid lessonId = lesson.Id.Value;
                 return new ManagedLessonLinks(
                     Self: _linkProvider.GetLessonPageLink(lessonId),
+                    Manage: canEdit ? _linkProvider.GetManagedLessonPageLink(lessonId) : null,
                     PartialUpdate: canEdit ? _linkProvider.GetPatchLessonLink(lessonId) : null,
-                    UploadVideoUrl: canEdit ? _linkProvider.GetLessonVideoUploadUrlLink(lessonId) : null,
-                    AiGenerate: canEdit ? _linkProvider.GetGenerateLessonWithAiLink(lessonId) : null,
-                    Move: canEdit ? _linkProvider.GetMoveLessonLink(lessonId) : null);
+                    ChangePosition: canEdit ? _linkProvider.GetChangePositionForLesson(lessonId) : null);
             });
     }
 

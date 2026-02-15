@@ -7,6 +7,7 @@ import type {
   ManagedCourseSummaryDto,
   CourseDetailedAnalyticsDto,
 } from "../types";
+import type { ManagedCourseSummaryItemDtoApi } from "../types/ManagedCourseSummaryDto";
 import type { CoursePageDto } from "../types/CoursePageDto";
 import type { ManagedCoursePageDto } from "../types/ManagedCoursePageDto";
 import type { PagedResponse } from "@/shared/types/LinkDto";
@@ -23,7 +24,10 @@ export interface CreateCourseResponse {
 
 export interface FetchAllCoursesResult {
   courses: CourseModel[];
-  links: import("@/shared/types/LinkDto").LinkDto[];
+  /** Legacy array or strongly-typed collection links (create, next, prev) */
+  links:
+    | import("@/shared/types/LinkDto").LinkDto[]
+    | import("@/shared/types/LinkRecord").LinksRecord;
 }
 
 export interface GenerateUploadUrlRequest {
@@ -107,19 +111,103 @@ export async function deleteCourse(url: string): Promise<void> {
   await axiosClient.delete(url);
 }
 
+/** Raw catalog item from GET /courses when backend returns data+links per item */
+interface CourseCatalogItemDtoApi {
+  data: {
+    id: string;
+    title: string;
+    shortDescription: string;
+    slug: string;
+    instructor: { id: string; fullName: string | null; avatarUrl: string | null };
+    category: { id: string; name: string | null; slug: string | null };
+    price: import("../types/money").Money;
+    difficulty: number | string;
+    thumbnailUrl: string | null;
+    updatedAtUtc: string;
+    status: string;
+    lessonsCount: number;
+    duration: string;
+    enrollmentCount: number;
+    averageRating: number;
+    reviewsCount: number;
+    courseViews: number;
+  };
+  links: CourseCatalogItemLinks;
+}
+
+/** Raw GET /courses response when backend returns CourseCatalogDto (items[].data + items[].links) */
+interface CourseCatalogDtoApi {
+  items: CourseCatalogItemDtoApi[];
+  pageNumber: number;
+  pageSize: number;
+  totalItems: number;
+  links: CourseCatalogCollectionLinks;
+}
+
+function isCatalogItemWithData(
+  item: unknown
+): item is CourseCatalogItemDtoApi {
+  return (
+    item != null &&
+    typeof item === "object" &&
+    "data" in item &&
+    "links" in item &&
+    typeof (item as CourseCatalogItemDtoApi).data === "object"
+  );
+}
+
+/** Build CourseSummaryWithAnalyticsDto from catalog item (data + links) for mapCourseSummaryToModel */
+function catalogItemToSummaryWithAnalytics(
+  item: CourseCatalogItemDtoApi
+): CourseSummaryWithAnalyticsDto {
+  const d = item.data;
+  const linkDto = (href: string | null | undefined, rel: string): import("@/shared/types/LinkDto").LinkDto =>
+    ({ href: href ?? "", rel, method: "GET" });
+  const links: import("@/shared/types/LinkDto").LinkDto[] = [
+    linkDto(item.links.self?.href, "self"),
+    ...(item.links.watch?.href ? [linkDto(item.links.watch.href, "watch")] : []),
+  ];
+  return {
+    course: {
+      id: d.id,
+      title: d.title,
+      shortDescription: d.shortDescription,
+      slug: d.slug,
+      instructor: d.instructor,
+      category: d.category,
+      price: d.price,
+      difficulty: (typeof d.difficulty === "number" ? String(d.difficulty) : d.difficulty) as import("../types/CourseSummaryDto").DifficultyLevel | string,
+      thumbnailUrl: d.thumbnailUrl,
+      updatedAtUtc: d.updatedAtUtc,
+      status: d.status as import("../types/CourseSummaryDto").CourseStatus,
+      links,
+    },
+    analytics: {
+      lessonsCount: d.lessonsCount,
+      duration: d.duration,
+      enrollmentCount: d.enrollmentCount,
+      averageRating: d.averageRating,
+      reviewsCount: d.reviewsCount,
+      courseViews: d.courseViews,
+    },
+  };
+}
+
 /**
- * Fetch all courses with pagination support
+ * Fetch all courses with pagination support.
+ * Normalizes backend shape when items are { data, links } (CourseCatalogDto).
  */
 export async function fetchAllCourses(
   url?: string,
 ): Promise<FetchAllCoursesResult> {
   const endpoint = url || "/courses";
   const response = await axiosClient.get<
-    CourseSummaryWithAnalyticsDto[] | PagedResponse<CourseSummaryWithAnalyticsDto>
+    | CourseSummaryWithAnalyticsDto[]
+    | PagedResponse<CourseSummaryWithAnalyticsDto>
+    | CourseCatalogDtoApi
   >(endpoint);
   const data = response.data;
 
-  // Handle both legacy array format and new PagedResponse format
   if (Array.isArray(data)) {
     return {
       courses: data.map(mapCourseSummaryToModel),
@@ -127,9 +215,21 @@ export async function fetchAllCourses(
     };
   }
 
+  const items = data.items ?? [];
+  if (items.length > 0 && isCatalogItemWithData(items[0])) {
+    const catalogData = data as CourseCatalogDtoApi;
+    const normalized = (catalogData.items as CourseCatalogItemDtoApi[]).map(
+      (item) => catalogItemToSummaryWithAnalytics(item)
+    );
+    return {
+      courses: normalized.map(mapCourseSummaryToModel),
+      links: (catalogData.links ?? {}) as import("@/shared/types/LinkRecord").LinksRecord,
+    };
+  }
+
   return {
-    courses: data.items.map(mapCourseSummaryToModel),
-    links: data.links,
+    courses: (items as CourseSummaryWithAnalyticsDto[]).map(mapCourseSummaryToModel),
+    links: (data as PagedResponse<CourseSummaryWithAnalyticsDto>).links ?? [],
   };
 }
 
@@ -224,27 +324,52 @@ export async function reorderLessons(
   );
 }
 
+import type { GetManagedCoursesCollectionLinks } from "../types/links";
+import type { CourseCatalogItemLinks, CourseCatalogCollectionLinks } from "../types/links";
+
+/** Raw API response: items are { data, links } */
+interface GetManagedCoursesDtoApi {
+  items: ManagedCourseSummaryItemDtoApi[];
+  pageNumber: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages?: number;
+  links: GetManagedCoursesCollectionLinks;
+}
+
 export interface ManagedCoursesResponse {
   items: ManagedCourseSummaryDto[];
   pageNumber: number;
   pageSize: number;
   totalItems: number;
   totalPages?: number;
-  links: import("@/shared/types/LinkDto").LinkDto[];
+  links: GetManagedCoursesDtoApi["links"];
 }
 
 /**
- * Fetch courses managed by the current user (instructor)
+ * Fetch courses managed by the current user (instructor).
+ * Normalizes backend shape (items[].data + items[].links) to flat ManagedCourseSummaryDto[].
  */
 export async function fetchMyManagedCourses(
   pageNumber = 1,
   pageSize = 10
 ): Promise<ManagedCoursesResponse> {
-  const response = await axiosClient.get<ManagedCoursesResponse>(
+  const response = await axiosClient.get<GetManagedCoursesDtoApi>(
     "/manage/courses",
     { params: { pageNumber, pageSize } }
   );
-  return response.data;
+  const raw = response.data;
+  return {
+    pageNumber: raw.pageNumber,
+    pageSize: raw.pageSize,
+    totalItems: raw.totalItems,
+    totalPages: raw.totalPages,
+    links: raw.links,
+    items: (raw.items ?? []).map((item) => ({
+      ...item.data,
+      links: item.links,
+    })),
+  };
 }
 
 /**

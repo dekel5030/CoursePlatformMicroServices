@@ -6,11 +6,10 @@ import { ChevronDown, ChevronUp, Plus, Clock, Trash2, GripVertical } from "lucid
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { LessonCard } from "@/features/lesson-viewer";
 import { SortableLessonItem, lessonSortableId } from "./SortableLessonItem";
-import { hasLink, getLink, formatDuration } from "@/shared/utils";
+import { getLinkFromRecord, formatDuration } from "@/shared/utils";
 import { InlineEditableText } from "@/shared/common";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { AddLessonDialog } from "@/features/lesson-viewer/components/AddLessonDialog";
-import { ModuleRels } from "@/domain/courses";
 import { usePatchModule, useDeleteModule } from "@/domain/courses";
 import { toast } from "sonner";
 
@@ -37,12 +36,12 @@ export function ModuleCard({
   const patchModule = usePatchModule(courseId);
   const deleteModule = useDeleteModule(courseId);
 
-  const canCreateLesson = hasLink(module.links, ModuleRels.CREATE_LESSON);
-  const canUpdate = hasLink(module.links, ModuleRels.PARTIAL_UPDATE);
-  const canDelete = hasLink(module.links, ModuleRels.DELETE);
-  const canReorderLessons = hasLink(module.links, ModuleRels.REORDER_LESSONS);
-  const updateLink = getLink(module.links, ModuleRels.PARTIAL_UPDATE);
-  const deleteLink = getLink(module.links, ModuleRels.DELETE);
+  const updateLink = getLinkFromRecord(module.links, "partialUpdate");
+  const deleteLink = getLinkFromRecord(module.links, "delete");
+  const canCreateLesson = !!module.links?.createLesson?.href;
+  const canUpdate = !!updateLink?.href;
+  const canDelete = !!deleteLink?.href;
+  const canReorderLessons = !!module.links?.changePosition?.href;
 
   const sortedLessons = [...module.lessons].sort((a, b) => a.order - b.order);
   const durationText = formatDuration(module.duration);
@@ -50,7 +49,7 @@ export function ModuleCard({
   const ChevronIcon = isExpanded ? ChevronUp : ChevronDown;
 
   const handleTitleUpdate = async (newTitle: string) => {
-    if (!updateLink) return;
+    if (!updateLink?.href) return;
     try {
       await patchModule.mutateAsync({
         url: updateLink.href,
@@ -69,7 +68,7 @@ export function ModuleCard({
   };
 
   const handleConfirmDelete = async () => {
-    if (!deleteLink) return;
+    if (!deleteLink?.href) return;
     try {
       await deleteModule.mutateAsync(deleteLink.href);
     } finally {

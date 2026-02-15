@@ -1,3 +1,4 @@
+import { linkDtoArrayToRecord } from "@/shared/utils/link-helpers";
 import type { LessonDetailsDto } from "../types/LessonDetailsDto";
 import type { LessonModel } from "../types/LessonModel";
 
@@ -5,6 +6,10 @@ import type { LessonModel } from "../types/LessonModel";
  * Maps a lesson details DTO to a LessonModel
  */
 export function mapToLessonModel(dto: LessonDetailsDto): LessonModel {
+  const links =
+    dto.links != null && Array.isArray(dto.links)
+      ? linkDtoArrayToRecord(dto.links)
+      : (dto.links as LessonModel["links"] | undefined);
   return {
     courseId: dto.courseId,
     lessonId: dto.lessonId,
@@ -16,6 +21,6 @@ export function mapToLessonModel(dto: LessonDetailsDto): LessonModel {
     isPreview: dto.isPreview,
     order: dto.index,
     duration: dto.duration,
-    links: dto.links,
+    links,
   };
 }

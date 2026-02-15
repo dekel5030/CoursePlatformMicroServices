@@ -19,8 +19,7 @@ import { Clock, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { getLink, hasLink, formatDuration } from "@/shared/utils";
-import { LessonRels } from "@/domain/lessons";
+import { getLinkFromRecord, formatDuration } from "@/shared/utils";
 import { LessonVideoUpload } from "../components/LessonVideoUpload";
 import { AiSuggestionField } from "../components/AiSuggestionField";
 import { HlsVideoPlayer } from "@/components/HlsVideoPlayer";
@@ -51,8 +50,8 @@ export default function LessonPage() {
   const [aiDescription, setAiDescription] = useState<string | null>(null);
 
   const handleAcceptTitle = async (newTitle: string) => {
-    const updateLink = getLink(lesson?.links, LessonRels.PARTIAL_UPDATE);
-    if (!updateLink) {
+    const updateLink = getLinkFromRecord(lesson?.links, "partialUpdate");
+    if (!updateLink?.href) {
       console.error("No update link found for this lesson");
       return;
     }
@@ -71,8 +70,8 @@ export default function LessonPage() {
   };
 
   const handleAcceptDescription = async (newDescription: string) => {
-    const updateLink = getLink(lesson?.links, LessonRels.PARTIAL_UPDATE);
-    if (!updateLink) {
+    const updateLink = getLinkFromRecord(lesson?.links, "partialUpdate");
+    if (!updateLink?.href) {
       console.error("No update link found for this lesson");
       return;
     }
@@ -91,8 +90,8 @@ export default function LessonPage() {
   };
 
   const handleGenerateWithAi = async () => {
-    const aiGenerateLink = getLink(lesson?.links, LessonRels.AI_GENERATE);
-    if (!aiGenerateLink) {
+    const aiGenerateLink = getLinkFromRecord(lesson?.links, "aiGenerate");
+    if (!aiGenerateLink?.href) {
       console.error("No AI generate link found for this lesson");
       return;
     }
@@ -246,8 +245,8 @@ export default function LessonPage() {
           <Card>
             <CardHeader className="space-y-4">
               {/* AI Generation Button */}
-              {hasLink(lesson.links, LessonRels.AI_GENERATE) &&
-                hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) && (
+              {!!getLinkFromRecord(lesson.links, "aiGenerate")?.href &&
+                !!lesson.links?.partialUpdate?.href && (
                   <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
@@ -316,7 +315,7 @@ export default function LessonPage() {
               {/* Title Section */}
               {!aiTitle && (
                 <div className="flex items-start justify-between gap-4 flex-wrap">
-                  {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
+                  {!!lesson.links?.partialUpdate?.href ? (
                     <div className="flex-1">
                       <InlineEditableText
                         value={lesson.title}
@@ -356,7 +355,7 @@ export default function LessonPage() {
                   <h2 className="text-lg font-semibold">
                     {t("lesson-viewer:pages.lesson.description")}
                   </h2>
-                  {hasLink(lesson.links, LessonRels.PARTIAL_UPDATE) ? (
+                  {!!lesson.links?.partialUpdate?.href ? (
                     <InlineEditableTextarea
                       value={lesson.description || ""}
                       onSave={handleAcceptDescription}

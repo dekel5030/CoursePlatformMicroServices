@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   AreaChart,
@@ -9,12 +9,14 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Users, Eye, Star, BookOpen } from "lucide-react";
+import { Users, Eye, Star, BookOpen, ExternalLink, Settings } from "lucide-react";
 import { useCourseAnalytics } from "@/domain/courses";
 import { BreadcrumbNav } from "@/components/layout";
-import { Skeleton } from "@/shared/ui";
+import { Button, Skeleton } from "@/shared/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
 import { formatDuration } from "@/shared/utils/format-duration";
+import { getLinkFromRecord } from "@/shared/utils";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 import type { CourseViewerDto } from "@/domain/courses/types";
 
 function getInitials(displayName: string): string {
@@ -118,18 +120,59 @@ export default function CourseAnalyticsPage() {
       : [];
 
   const courseViewers: CourseViewerDto[] = analytics.courseViewers ?? [];
+  const links = analytics.links as LinksRecord | undefined;
+  const courseLink = links ? getLinkFromRecord(links, "course") : undefined;
+  const managedCourseLink = links ? getLinkFromRecord(links, "managedCourse") : undefined;
 
   return (
     <div className="flex flex-col">
       <BreadcrumbNav items={breadcrumbItems} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 w-full">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {t("analytics.title")}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {t("analytics.subtitle")}
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {t("analytics.title")}
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              {t("analytics.subtitle")}
+            </p>
+          </div>
+          {(courseLink?.href || managedCourseLink?.href) && (
+            <div className="flex flex-wrap gap-2">
+              {courseLink?.href &&
+                (courseLink.href.startsWith("http") ? (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={courseLink.href} target="_blank" rel="noopener noreferrer" className="gap-2 inline-flex items-center">
+                      <ExternalLink className="h-4 w-4" />
+                      {t("analytics.viewCourse", { defaultValue: "View course" })}
+                    </a>
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to={courseLink.href} className="gap-2">
+                      <ExternalLink className="h-4 w-4" />
+                      {t("analytics.viewCourse", { defaultValue: "View course" })}
+                    </Link>
+                  </Button>
+                ))}
+              {managedCourseLink?.href &&
+                (managedCourseLink.href.startsWith("http") ? (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={managedCourseLink.href} target="_blank" rel="noopener noreferrer" className="gap-2 inline-flex items-center">
+                      <Settings className="h-4 w-4" />
+                      {t("analytics.manageCourse", { defaultValue: "Manage course" })}
+                    </a>
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to={managedCourseLink.href} className="gap-2">
+                      <Settings className="h-4 w-4" />
+                      {t("analytics.manageCourse", { defaultValue: "Manage course" })}
+                    </Link>
+                  </Button>
+                ))}
+            </div>
+          )}
         </div>
 
         <section aria-label={t("analytics.overview")}>

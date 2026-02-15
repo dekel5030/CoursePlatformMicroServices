@@ -49,8 +49,12 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
 
         List<CourseCatalogItemDto> items = MapToItemDtos(rawData, analyticsDict);
 
+        bool hasNext = pageNumber * pageSize < totalItems;
+        bool hasPrev = pageNumber > 1;
         var collectionLinks = new CourseCatalogCollectionLinks(
-            Self: _linkProvider.GetCoursesLink(pageNumber, pageSize));
+            Self: _linkProvider.GetCoursesLink(pageNumber, pageSize),
+            Next: hasNext ? _linkProvider.GetCoursesLink(pageNumber + 1, pageSize) : null,
+            Prev: hasPrev ? _linkProvider.GetCoursesLink(pageNumber - 1, pageSize) : null);
 
         var dto = new CourseCatalogDto(
             Items: items,
@@ -103,8 +107,10 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
         {
             analyticsDict.TryGetValue(raw.Course.Id.Value, out CourseAnalytics? stats);
             CourseCatalogItemData data = MapItemData(raw, stats);
+            Guid courseId = raw.Course.Id.Value;
             var links = new CourseCatalogItemLinks(
-                Self: _linkProvider.GetCoursePageLink(raw.Course.Id.Value));
+                Self: _linkProvider.GetCoursePageLink(courseId),
+                Watch: _linkProvider.GetCoursePageLink(courseId));
             return new CourseCatalogItemDto(Data: data, Links: links);
         }).ToList();
     }

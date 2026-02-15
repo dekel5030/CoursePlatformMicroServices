@@ -3,20 +3,23 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/ui";
 import { SlidersHorizontal, Plus } from "lucide-react";
 import { AddCourseDialog } from "@/features/course-management";
-import { hasLink } from "@/shared/utils";
+import { hasLink, getLinkFromRecord } from "@/shared/utils";
 import { CourseRels } from "@/domain/courses";
 import type { LinkDto } from "@/shared/types";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 
 interface CatalogHeaderProps {
-  collectionLinks?: LinkDto[];
+  /** Legacy array or strongly-typed collection links (create, next, prev) */
+  collectionLinks?: LinkDto[] | LinksRecord;
 }
 
 export function CatalogHeader({ collectionLinks }: CatalogHeaderProps) {
-  const { t } = useTranslation(['course-catalog', 'translation']);
+  const { t } = useTranslation(["course-catalog", "translation"]);
   const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
-  
-  // Show create button only if the "create" link exists in collection-level links
-  const canCreateCourse = hasLink(collectionLinks, CourseRels.CREATE);
+
+  const canCreateCourse = Array.isArray(collectionLinks)
+    ? hasLink(collectionLinks, CourseRels.CREATE)
+    : !!getLinkFromRecord(collectionLinks, "create")?.href;
 
   return (
     <>

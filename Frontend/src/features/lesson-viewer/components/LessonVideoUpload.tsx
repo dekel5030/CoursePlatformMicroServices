@@ -4,14 +4,13 @@ import { Button } from "@/shared/ui";
 import { Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLessonVideoUpload } from "../hooks/useLessonVideoUpload";
-import { getLink } from "@/shared/utils";
-import { LessonRels } from "@/domain/lessons";
-import type { LinkDto } from "@/shared/types";
+import { getLinkFromRecord } from "@/shared/utils";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 
 interface LessonVideoUploadProps {
   courseId: string;
   lessonId: string;
-  links?: LinkDto[];
+  links?: LinksRecord;
 }
 
 const ALLOWED_VIDEO_TYPES = [
@@ -36,13 +35,10 @@ export function LessonVideoUpload({
     lessonId,
   );
 
-  // Check if user has permission to upload video
-  const uploadLink = getLink(links, LessonRels.UPLOAD_VIDEO_URL);
-
-  // If no permission, don't render the component
-  if (!uploadLink) {
-    return null;
-  }
+  const uploadLink =
+    getLinkFromRecord(links, "generateVideoUploadUrl") ??
+    getLinkFromRecord(links, "uploadVideoUrl");
+  if (!uploadLink?.href) return null;
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
@@ -69,7 +65,7 @@ export function LessonVideoUpload({
 
     try {
       reset();
-      await uploadVideo(file, uploadLink.href);
+      await uploadVideo(file, uploadLink.href!);
       toast.success(t("lesson-viewer:detail.videoUploadSuccess"));
       resetFileInput();
     } catch (err) {

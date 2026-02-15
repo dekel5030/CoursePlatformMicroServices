@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Star, Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent, Avatar, Button } from "@/shared/ui";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import { hasLink, getLink } from "@/shared/utils";
-import { CourseRatingRels } from "@/domain/courses";
+import { getLinkFromRecord, linkDtoArrayToRecord } from "@/shared/utils";
 import type { CourseRatingDto } from "@/domain/courses";
 import { EditRatingDialog } from "./EditRatingDialog";
 
@@ -40,13 +39,18 @@ export function RatingCard({
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  const canUpdate = hasLink(rating.links, CourseRatingRels.PARTIAL_UPDATE);
-  const canDelete = hasLink(rating.links, CourseRatingRels.DELETE);
-  const updateLink = getLink(rating.links, CourseRatingRels.PARTIAL_UPDATE);
-  const deleteLink = getLink(rating.links, CourseRatingRels.DELETE);
+  const ratingLinks = Array.isArray(rating.links)
+    ? linkDtoArrayToRecord(rating.links)
+    : (rating as unknown as { links?: Record<string, { href?: string; method?: string }> }).links;
+  const updateLink = ratingLinks
+    ? getLinkFromRecord(ratingLinks, "update") ?? getLinkFromRecord(ratingLinks, "partialUpdate")
+    : undefined;
+  const deleteLink = ratingLinks ? getLinkFromRecord(ratingLinks, "delete") : undefined;
+  const canUpdate = !!updateLink?.href;
+  const canDelete = !!deleteLink?.href;
 
   const userName =
-    [rating.user.firstName, rating.user.lastName].filter(Boolean).join(" ") ||
+    [rating.user?.firstName, rating.user?.lastName].filter(Boolean).join(" ") ||
     t("common.unknown");
 
   const formattedDate = formatDate(
@@ -55,13 +59,13 @@ export function RatingCard({
   );
 
   const handleSave = async (request: { score?: number; comment?: string }) => {
-    if (!updateLink) return;
+    if (!updateLink?.href) return;
     await onPatch(updateLink.href, request);
     setIsEditOpen(false);
   };
 
   const handleConfirmDelete = async () => {
-    if (!deleteLink) return;
+    if (!deleteLink?.href) return;
     await onDelete(deleteLink.href);
     setIsDeleteOpen(false);
   };
@@ -72,9 +76,9 @@ export function RatingCard({
         <CardContent className="pt-6">
           <div className="flex gap-4">
             <Avatar className="h-10 w-10 shrink-0">
-              {rating.user.avatarUrl ? (
+              {rating.user?.avatarUrl ? (
                 <img
-                  src={rating.user.avatarUrl}
+                  src={rating.user?.avatarUrl ?? ""}
                   alt={userName}
                   className="h-full w-full object-cover"
                 />

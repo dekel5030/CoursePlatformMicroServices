@@ -37,7 +37,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
           <BreadcrumbList>
             {breadcrumbItems.map((item, index) => {
               const isLast = index === breadcrumbItems.length - 1;
-              const key = item.path ?? item.label;
+              const key = `breadcrumb-${index}-${item.path ?? item.label}`;
 
               return (
                 <React.Fragment key={key}>

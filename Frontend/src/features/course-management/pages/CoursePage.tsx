@@ -15,8 +15,7 @@ import { CourseHeader } from "../components/CourseHeader";
 import { CourseLessonsSection } from "../components/CourseLessonsSection";
 import { CourseRatingsSection } from "../components/CourseRatingsSection";
 import { toast } from "sonner";
-import { hasLink, getLink } from "@/shared/utils";
-import { CourseRels } from "@/domain/courses";
+import { getLinkFromRecord } from "@/shared/utils";
 
 export default function CoursePage() {
   const { id } = useParams<{ id: string }>();
@@ -26,8 +25,8 @@ export default function CoursePage() {
   const dir = i18n.dir();
 
   const handleDescriptionUpdate = async (newDescription: string) => {
-    const updateLink = getLink(course?.links, CourseRels.PARTIAL_UPDATE);
-    if (!updateLink) {
+    const updateLink = getLinkFromRecord(course?.links, "partialUpdate");
+    if (!updateLink?.href) {
       console.error("No update link found for this course");
       return;
     }
@@ -103,8 +102,7 @@ export default function CoursePage() {
     );
   }
 
-  // Check if user can update course based on HATEOAS links
-  const canUpdate = hasLink(course.links, CourseRels.PARTIAL_UPDATE);
+  const canUpdate = !!course.links?.partialUpdate?.href;
 
   const breadcrumbItems = [
     { label: t("breadcrumbs.home"), path: "/" },

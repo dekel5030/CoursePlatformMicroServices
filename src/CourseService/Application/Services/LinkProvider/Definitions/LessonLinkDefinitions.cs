@@ -54,7 +54,7 @@ internal sealed class LessonLinkDefinitions : ILinkDefinitionRegistry
                 getRouteValues: ctx => new { lessonId = ctx.Id.Value }),
 
             new LinkDefinition<LessonContext>(
-                rel: LinkRels.Lesson.Move,
+                rel: LinkRels.ChangePosition,
                 method: LinkHttpMethod.Patch,
                 endpointName: EndpointNames.MoveLesson,
                 policyCheck: ctx => ctx.Module.Course.IsManagementView && _policy.CanEditLesson(ctx),

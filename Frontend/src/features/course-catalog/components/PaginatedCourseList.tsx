@@ -6,12 +6,14 @@ import { CategoryFilter } from "./CategoryFilter";
 import { CourseGrid } from "./CourseGrid";
 import type { CourseModel } from "@/domain/courses";
 import type { LinkDto } from "@/shared/types";
+import type { LinksRecord } from "@/shared/types/LinkRecord";
 
 interface PaginatedCourseListProps {
   courses: CourseModel[];
   isLoading: boolean;
   error: Error | null;
-  links?: LinkDto[];
+  /** Collection links (legacy array or strongly-typed record with create, next, prev) */
+  links?: LinkDto[] | LinksRecord;
   showBreadcrumbs?: boolean;
   showHeader?: boolean;
   showCategoryFilter?: boolean;
@@ -56,7 +58,7 @@ export function PaginatedCourseList({
         <BreadcrumbNav items={breadcrumbItems || defaultBreadcrumbItems} />
       )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 w-full">
-        {showHeader && <CatalogHeader collectionLinks={links} />}
+        {showHeader && <CatalogHeader collectionLinks={links as LinkDto[] | LinksRecord | undefined} />}
 
         <div className="space-y-8">
           {showCategoryFilter && categories.length > 0 && (

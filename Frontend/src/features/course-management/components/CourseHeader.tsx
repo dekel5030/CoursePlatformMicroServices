@@ -8,8 +8,7 @@ import { CourseActions } from "./CourseActions";
 import { CourseImageUpload } from "./CourseImageUpload";
 import { usePatchCourse } from "@/domain/courses";
 import { toast } from "sonner";
-import { hasLink, getLink, formatDuration } from "@/shared/utils";
-import { CourseRels } from "@/domain/courses";
+import { getLinkFromRecord, formatDuration } from "@/shared/utils";
 import type { CourseModel } from "@/domain/courses";
 
 interface CourseHeaderProps {
@@ -20,16 +19,16 @@ export function CourseHeader({ course }: CourseHeaderProps) {
   const { t } = useTranslation(["course-management", "translation"]);
   const patchCourse = usePatchCourse(course.id);
 
-  const canUpdate = hasLink(course.links, CourseRels.PARTIAL_UPDATE);
-  const updateLink = getLink(course.links, CourseRels.PARTIAL_UPDATE);
+  const updateLink = getLinkFromRecord(course.links, "partialUpdate");
+  const canUpdate = !!updateLink?.href;
 
   const handleTitleUpdate = async (newTitle: string) => {
-    if (!updateLink) {
+    if (!updateLink?.href) {
       console.error("No update link found for this course");
       return;
     }
     try {
-      await patchCourse.mutateAsync({ url: updateLink.href, request: { title: newTitle } });
+      await patchCourse.mutateAsync({ url: updateLink.href!, request: { title: newTitle } });
       toast.success(t("course-management:detail.titleUpdated"));
     } catch (error) {
       toast.error(t("course-management:detail.titleUpdateFailed"));

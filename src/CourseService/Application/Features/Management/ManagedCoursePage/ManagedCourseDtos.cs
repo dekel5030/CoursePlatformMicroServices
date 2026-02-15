@@ -60,10 +60,12 @@ public sealed record ManagedCourseLinks(
     LinkRecord? Delete,
     LinkRecord? Publish,
     LinkRecord? GenerateImageUploadUrl,
-    LinkRecord? CreateModule);
+    LinkRecord? CreateModule,
+    LinkRecord? ChangePosition);
 
 public sealed record ManagedLessonLinks(
     LinkRecord Self,
+    LinkRecord? Manage,
     LinkRecord? PartialUpdate,
     LinkRecord? ChangePosition);
 

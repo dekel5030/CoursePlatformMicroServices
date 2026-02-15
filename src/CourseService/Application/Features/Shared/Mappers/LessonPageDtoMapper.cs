@@ -36,7 +36,12 @@ internal sealed class LessonPageDtoMapper : ILessonPageDtoMapper
             TranscriptUrl: _storageUrlResolver.ResolvePublicUrl(lesson.Transcript?.Path));
         var links = new LessonPageLinks(
             Self: _linkProvider.GetLessonPageLink(lesson.Id.Value),
-            Course: _linkProvider.GetCoursePageLink(lesson.CourseId.Value));
+            Course: _linkProvider.GetCoursePageLink(lesson.CourseId.Value),
+            NextLesson: null,
+            PreviousLesson: null,
+            MarkAsComplete: null,
+            UnmarkAsComplete: null,
+            Manage: _linkProvider.GetManagedLessonPageLink(lesson.Id.Value));
         return new LessonPageDto(Data: data, Links: links);
     }
 }

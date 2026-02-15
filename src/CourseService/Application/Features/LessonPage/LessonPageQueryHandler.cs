@@ -4,6 +4,7 @@ using Courses.Application.Features.LessonPage;
 using Courses.Application.Features.Shared;
 using Courses.Application.Services.LinkProvider.Abstractions;
 using Courses.Domain.Courses;
+using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
@@ -52,11 +53,54 @@ internal sealed class LessonPageQueryHandler : IQueryHandler<LessonPageQuery, Le
         }
 
         LessonPageData data = MapData(lesson, course.Title.Value);
+        (Guid? nextLessonId, Guid? previousLessonId) = await ResolveAdjacentLessonIdsAsync(
+            lesson.CourseId,
+            lesson.Id.Value,
+            cancellationToken);
+
         LessonPageLinks links = new(
             Self: _linkProvider.GetLessonPageLink(lesson.Id.Value),
-            Course: _linkProvider.GetCoursePageLink(lesson.CourseId.Value));
+            Course: _linkProvider.GetCoursePageLink(lesson.CourseId.Value),
+            NextLesson: nextLessonId is { } nid ? _linkProvider.GetLessonPageLink(nid) : null,
+            PreviousLesson: previousLessonId is { } pid ? _linkProvider.GetLessonPageLink(pid) : null,
+            MarkAsComplete: _linkProvider.GetPlaceholderLink("POST"),
+            UnmarkAsComplete: _linkProvider.GetPlaceholderLink("DELETE"),
+            Manage: _linkProvider.GetManagedLessonPageLink(lesson.Id.Value));
 
         return Result.Success(new LessonPageDto(Data: data, Links: links));
+    }
+
+    private async Task<(Guid? NextLessonId, Guid? PreviousLessonId)> ResolveAdjacentLessonIdsAsync(
+        CourseId courseId,
+        Guid currentLessonId,
+        CancellationToken cancellationToken)
+    {
+        List<Guid> moduleOrder = await _readDbContext.Modules
+            .Where(m => m.CourseId == courseId)
+            .OrderBy(m => m.Index)
+            .Select(m => m.Id.Value)
+            .ToListAsync(cancellationToken);
+
+        var lessonOrder = await _readDbContext.Lessons
+            .Where(l => l.CourseId == courseId)
+            .Select(l => new { l.Id, l.ModuleId, l.Index })
+            .ToListAsync(cancellationToken);
+
+        var ordered = lessonOrder
+            .OrderBy(l => moduleOrder.IndexOf(l.ModuleId.Value))
+            .ThenBy(l => l.Index)
+            .Select(l => l.Id.Value)
+            .ToList();
+
+        int idx = ordered.IndexOf(currentLessonId);
+        if (idx < 0)
+        {
+            return (null, null);
+        }
+
+        Guid? next = idx + 1 < ordered.Count ? ordered[idx + 1] : null;
+        Guid? prev = idx > 0 ? ordered[idx - 1] : null;
+        return (next, prev);
     }
 
     private LessonPageData MapData(Lesson lesson, string courseName)

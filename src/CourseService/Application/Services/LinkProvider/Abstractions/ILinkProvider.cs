@@ -10,6 +10,7 @@ public interface ILinkProvider
     // Course
     LinkRecord GetManagedCourseLink(Guid courseId);
     LinkRecord GetManagedCoursesLink(int pageNumber, int pageSize);
+    LinkRecord GetCreateCourseLink();
     LinkRecord GetCoursePageLink(Guid courseId);
     LinkRecord GetCourseAnalyticsLink(Guid courseId);
     LinkRecord GetPatchCourseLink(Guid courseId);
@@ -17,22 +18,30 @@ public interface ILinkProvider
     LinkRecord GetPublishCourseLink(Guid courseId);
     LinkRecord GetGenerateCourseImageUploadUrlLink(Guid courseId);
     LinkRecord GetCreateModuleLink(Guid courseId);
-    LinkRecord GetReorderModulesLink(Guid courseId);
+    LinkRecord GetChangePositionForCourse(Guid courseId);
     LinkRecord GetCourseRatingsLink(Guid courseId);
+    LinkRecord GetCourseRatingsLink(Guid courseId, int pageNumber, int pageSize);
     LinkRecord GetCoursesLink(int pageNumber, int pageSize);
 
     // Module
     LinkRecord GetCreateLessonLink(Guid moduleId);
     LinkRecord GetPatchModuleLink(Guid moduleId);
     LinkRecord GetDeleteModuleLink(Guid moduleId);
-    LinkRecord GetReorderLessonsLink(Guid moduleId);
+    LinkRecord GetChangePositionForModule(Guid moduleId);
 
     // Lesson
     LinkRecord GetLessonPageLink(Guid lessonId);
+    LinkRecord GetManagedLessonPageLink(Guid lessonId);
     LinkRecord GetPatchLessonLink(Guid lessonId);
+    LinkRecord GetDeleteLessonLink(Guid lessonId);
     LinkRecord GetLessonVideoUploadUrlLink(Guid lessonId);
     LinkRecord GetGenerateLessonWithAiLink(Guid lessonId);
-    LinkRecord GetMoveLessonLink(Guid lessonId);
+    LinkRecord GetChangePositionForLesson(Guid lessonId);
+
+    /// <summary>
+    /// Returns a link with placeholder href for unimplemented endpoints. Use when a DTO requires a link but the backend is not ready.
+    /// </summary>
+    LinkRecord GetPlaceholderLink(string method = "GET");
 
     // Enrolled courses (current user)
     LinkRecord GetEnrolledCoursesLink(int pageNumber, int pageSize);

@@ -82,7 +82,7 @@ internal sealed class CourseLinkDefinitions : ILinkDefinitionRegistry
                 getRouteValues: ctx => new { courseId = ctx.Id.Value }),
 
             new LinkDefinition<CourseContext>(
-                rel: LinkRels.Course.ReorderModules,
+                rel: LinkRels.ChangePosition,
                 method: LinkHttpMethod.Patch,
                 endpointName: EndpointNames.ReorderModules,
                 policyCheck: ctx => ctx.IsManagementView && _policy.CanEditCourse(ctx),

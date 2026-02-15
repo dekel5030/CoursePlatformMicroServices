@@ -134,8 +134,15 @@ internal sealed class GetEnrolledCoursesQueryHandler
         int total,
         GetEnrolledCoursesQuery request)
     {
+        int pageNumber = request.PageNumber;
+        int pageSize = request.PageSize;
+        bool hasNext = pageNumber * pageSize < total;
+        bool hasPrev = pageNumber > 1;
         var collectionLinks = new GetEnrolledCoursesCollectionLinks(
-            Self: _linkProvider.GetEnrolledCoursesLink(request.PageNumber, request.PageSize));
+            Self: _linkProvider.GetEnrolledCoursesLink(pageNumber, pageSize),
+            BrowseCatalog: _linkProvider.GetCoursesLink(1, pageSize),
+            Next: hasNext ? _linkProvider.GetEnrolledCoursesLink(pageNumber + 1, pageSize) : null,
+            Prev: hasPrev ? _linkProvider.GetEnrolledCoursesLink(pageNumber - 1, pageSize) : null);
 
         return new GetEnrolledCoursesDto(
             Items: items,
