@@ -5,8 +5,9 @@ import type { LessonModel } from "@/domain/lessons";
 import { Card, CardContent, Badge, Button } from "@/shared/ui";
 import { InlineEditableText } from "@/shared/common";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import { Clock, Trash2, Play, Lock, GripVertical } from "lucide-react";
+import { Clock, Trash2, Play, Lock, GripVertical, LogIn } from "lucide-react";
 import { usePatchLesson, useDeleteLesson } from "@/domain/lessons";
+import { useAuth } from "@/features/auth/hooks";
 import { toast } from "sonner";
 import { getLinkFromRecord, formatDuration, apiHrefToAppRoute } from "@/shared/utils";
 
@@ -24,6 +25,7 @@ export default function LessonCard({
   dragHandleProps,
 }: LessonProps) {
   const navigate = useNavigate();
+  const auth = useAuth();
   const { t } = useTranslation(["lesson-viewer", "translation"]);
 
   const patchLesson = usePatchLesson(courseId, lesson.lessonId);
@@ -40,27 +42,40 @@ export default function LessonCard({
 
   const durationText = formatDuration(lesson.duration);
 
-  const lessonRoute = `/courses/${courseId}/lessons/${lesson.lessonId}`;
   const manageRoute = manageLink?.href
     ? apiHrefToAppRoute(manageLink.href, { courseId }) ?? null
     : null;
+  const selfRoute = selfLink?.href
+    ? apiHrefToAppRoute(selfLink.href, { courseId }) ?? null
+    : null;
+  const lessonRoute = manageRoute ?? selfRoute;
+  const hasAccessRoute = !!lessonRoute;
 
   const handleLessonClick = () => {
-    if (manageRoute) {
-      navigate(manageRoute, { state: { lessonSelfLink: manageLink?.href } });
+    if (!hasAccessRoute) {
+      if (!auth.isAuthenticated) {
+        void auth.signinRedirect();
+      }
       return;
     }
-    navigate(lessonRoute, {
-      state: { lessonSelfLink: selfLink?.href },
+    navigate(lessonRoute!, {
+      state: {
+        lessonSelfLink:
+          manageLink?.href ?? selfLink?.href,
+      },
     });
   };
 
   const handleManageClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (manageRoute) {
-      navigate(manageRoute, { state: { lessonSelfLink: manageLink?.href } });
-    } else {
-      handleLessonClick();
+    if (hasAccessRoute) {
+      navigate(lessonRoute!, {
+        state: {
+          lessonSelfLink: manageLink?.href ?? selfLink?.href,
+        },
+      });
+    } else if (!auth.isAuthenticated) {
+      void auth.signinRedirect();
     }
   };
 
@@ -95,15 +110,24 @@ export default function LessonCard({
   return (
     <>
       <Card
-        className="cursor-pointer hover:bg-muted/50 transition-colors border-s-2 border-s-transparent hover:border-s-primary/30 rounded-md"
-        onClick={handleLessonClick}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          const target = e.target as HTMLElement;
-          if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
-          if (e.key === "Enter" || e.key === " ") handleLessonClick();
-        }}
+        className={`transition-colors border-s-2 rounded-md ${
+          hasAccessRoute
+            ? "cursor-pointer hover:bg-muted/50 border-s-transparent hover:border-s-primary/30"
+            : "border-s-muted opacity-90"
+        }`}
+        onClick={hasAccessRoute ? handleLessonClick : undefined}
+        role={hasAccessRoute ? "button" : undefined}
+        tabIndex={hasAccessRoute ? 0 : undefined}
+        onKeyDown={
+          hasAccessRoute
+            ? (e) => {
+                const target = e.target as HTMLElement;
+                if (target.tagName === "INPUT" || target.tagName === "TEXTAREA")
+                  return;
+                if (e.key === "Enter" || e.key === " ") handleLessonClick();
+              }
+            : undefined
+        }
       >
         <CardContent className="py-2 px-4">
           <div className="flex items-center gap-3">
@@ -163,7 +187,7 @@ export default function LessonCard({
                   {durationText}
                 </span>
               )}
-              {(manageLink?.href || selfLink?.href) && (
+              {hasAccessRoute ? (
                 <Button
                   variant="outline"
                   size="sm"
@@ -173,6 +197,32 @@ export default function LessonCard({
                   {manageLink?.href
                     ? t("lesson-viewer:card.manage", { defaultValue: "Open" })
                     : t("lesson-viewer:card.view", { defaultValue: "View" })}
+                </Button>
+              ) : !auth.isAuthenticated ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs shrink-0 gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void auth.signinRedirect();
+                  }}
+                >
+                  <LogIn className="h-3 w-3" />
+                  {t("lesson-viewer:card.loginToAccess", {
+                    defaultValue: "Log in to access",
+                  })}
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs shrink-0 text-muted-foreground"
+                  disabled
+                >
+                  {t("lesson-viewer:card.purchaseToAccess", {
+                    defaultValue: "Purchase to access",
+                  })}
                 </Button>
               )}
               {canDelete && (

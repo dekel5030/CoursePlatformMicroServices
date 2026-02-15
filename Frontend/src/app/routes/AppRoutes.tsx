@@ -3,7 +3,10 @@ import { Layout, ManagementLayout } from "@/components/layout";
 import { ProtectedRoute } from "@/shared/common";
 import { CourseCatalogPage, AllCoursesPage } from "@/features/course-catalog";
 import { MyCoursesPage } from "@/features/my-courses";
-import { ManagedCoursesPage, CourseAnalyticsPage } from "@/features/managed-courses";
+import {
+  ManagedCoursesPage,
+  CourseAnalyticsPage,
+} from "@/features/course-management";
 import { CoursePage, ManageCoursePage } from "@/features/course-management";
 import { LessonPage } from "@/features/lesson-viewer";
 import { UserProfilePage } from "@/features/user-profile";

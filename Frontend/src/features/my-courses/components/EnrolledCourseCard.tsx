@@ -41,16 +41,14 @@ export function EnrolledCourseCard({ course }: EnrolledCourseCardProps) {
   const continueHref = getContinueLearningHref(course.links);
   const viewAppRoute = viewHref ? apiHrefToAppRoute(viewHref) : null;
   const continueAppRoute = continueHref ? apiHrefToAppRoute(continueHref) : null;
-  const courseUrl = viewAppRoute ?? viewHref ?? `/courses/${course.courseId}`;
+  const hasViewLink = !!viewAppRoute || !!viewHref;
   const progress = Math.min(100, Math.max(0, course.progressPercentage ?? 0));
   const lastAccessed = formatLastAccessed(course.lastAccessedAt);
   const continueTarget = continueAppRoute ?? continueHref;
   const isContinueExternal = !!continueHref && !continueAppRoute && (continueHref.startsWith("http://") || continueHref.startsWith("https://"));
 
-  return (
-    <div className="block group h-full flex flex-col">
-      <Link to={courseUrl} className="flex-1 flex flex-col min-h-0">
-      <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col border hover:border-primary/40">
+  const cardContent = (
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col border hover:border-primary/40">
         <div className="relative h-32 w-full overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10">
           {course.courseImageUrl ? (
             <img
@@ -96,7 +94,23 @@ export function EnrolledCourseCard({ course }: EnrolledCourseCardProps) {
           )}
         </CardContent>
       </Card>
-    </Link>
+  );
+
+  return (
+    <div className="block group h-full flex flex-col">
+      {hasViewLink ? (
+        viewAppRoute ? (
+          <Link to={viewAppRoute} className="flex-1 flex flex-col min-h-0">
+            {cardContent}
+          </Link>
+        ) : (
+          <a href={viewHref!} className="flex-1 flex flex-col min-h-0">
+            {cardContent}
+          </a>
+        )
+      ) : (
+        <div className="flex-1 flex flex-col min-h-0">{cardContent}</div>
+      )}
       {continueTarget && (
         <Button variant="default" size="sm" className="mt-3 w-full gap-2" asChild>
           {isContinueExternal ? (

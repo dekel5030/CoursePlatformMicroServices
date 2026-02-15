@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import type { ManagedCourseSummaryDto } from "@/domain/courses";
 import { mapManagedCourseSummaryToModel } from "@/domain/courses";
 import CourseCard from "@/features/course-catalog/components/CourseCard";
+import { getLinkFromRecord, linkDtoArrayToRecord, apiHrefToAppRoute } from "@/shared/utils";
 
 interface ManagedCourseGridProps {
   courses: ManagedCourseSummaryDto[];
@@ -85,9 +86,15 @@ export function ManagedCourseGrid({
     >
       {courses.map((dto) => {
         const course = mapManagedCourseSummaryToModel(dto);
+        const linksRecord = Array.isArray(dto.links)
+          ? linkDtoArrayToRecord(dto.links)
+          : (dto.links as Record<string, import("@/shared/types/LinkRecord").LinkRecord | undefined>);
+        const selfLink = getLinkFromRecord(linksRecord, "self");
+        const route =
+          selfLink?.href ? apiHrefToAppRoute(selfLink.href) : null;
         return (
           <motion.div key={course.id} variants={item}>
-            <CourseCard course={course} to={`/manage/courses/${course.id}`} />
+            <CourseCard course={course} to={route ?? null} />
           </motion.div>
         );
       })}
