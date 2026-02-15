@@ -1,4 +1,4 @@
-namespace Courses.Application.Features.Dtos;
+namespace Courses.Application.Features.CoursePage;
 
 public sealed record CourseAnalyticsDto(
     int EnrollmentCount,

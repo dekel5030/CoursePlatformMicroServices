@@ -23,8 +23,12 @@ public sealed record ManagedLessonPageData(
 
 public sealed record ManagedLessonPageLinks(
     LinkRecord Self,
-    LinkRecord? Course,
+    LinkRecord? ManagedCourse,
+    LinkRecord? PublicPreview,
     LinkRecord? PartialUpdate,
-    LinkRecord? UploadVideoUrl,
+    LinkRecord? Delete,
+    LinkRecord? GenerateVideoUploadUrl,
     LinkRecord? AiGenerate,
-    LinkRecord? Move);
+    LinkRecord? NextLesson,
+    LinkRecord? PreviousLesson
+);

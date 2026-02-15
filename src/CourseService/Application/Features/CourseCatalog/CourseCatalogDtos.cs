@@ -36,6 +36,10 @@ public sealed record CourseCatalogItemData(
     int ReviewsCount,
     int CourseViews);
 
-public sealed record CourseCatalogItemLinks(LinkRecord Self);
+public sealed record CourseCatalogItemLinks(LinkRecord Self, LinkRecord? Watch);
 
-public sealed record CourseCatalogCollectionLinks(LinkRecord Self);
+public sealed record CourseCatalogCollectionLinks(
+    LinkRecord Self,
+    LinkRecord? Next,
+    LinkRecord? Prev
+);

@@ -21,4 +21,10 @@ public sealed record LessonPageData(
 
 public sealed record LessonPageLinks(
     LinkRecord Self,
-    LinkRecord Course);
+    LinkRecord Course,
+    LinkRecord? NextLesson,
+    LinkRecord? PreviousLesson,
+    LinkRecord? MarkAsComplete,
+    LinkRecord? UnmarkAsComplete,
+    LinkRecord? Manage
+);

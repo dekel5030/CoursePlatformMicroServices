@@ -34,6 +34,15 @@ public sealed record ManagedCourseSummaryData(
 
 public sealed record ManagedCourseSummaryLinks(
     LinkRecord Self,
-    LinkRecord? CoursePage);
+    LinkRecord? CoursePage,
+    LinkRecord? Analytics,
+    LinkRecord? EditMetadata,
+    LinkRecord? Delete
+);
 
-public sealed record GetManagedCoursesCollectionLinks(LinkRecord Self);
+public sealed record GetManagedCoursesCollectionLinks(
+    LinkRecord Self,
+    LinkRecord? Create,
+    LinkRecord? Next,
+    LinkRecord? Prev
+);

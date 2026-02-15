@@ -1,3 +1,4 @@
+using Courses.Application.Features.CourseCatalog;
 using Courses.Application.Features.CourseRatings.GetCourseRatings;
 using Courses.Application.Features.Dtos;
 using Courses.Application.Shared.Dtos;
@@ -14,11 +15,6 @@ internal static class DtoToLinkContextExtensions
             new CourseId(dto.Id),
             new UserId(dto.Instructor.Id),
             dto.Status);
-    }
-
-    public static CourseContext ToCourseContext(this CourseSummaryWithAnalyticsDto dto)
-    {
-        return dto.Course.ToCourseContext();
     }
 
     public static CourseCollectionContext ToCourseCollectionContext(

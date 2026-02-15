@@ -25,8 +25,12 @@ public sealed record CourseRatingItemData(
 
 public sealed record CourseRatingItemLinks(
     LinkRecord? Update,
-    LinkRecord? Delete);
+    LinkRecord? Delete
+);
 
 public sealed record GetCourseRatingsCollectionLinks(
     LinkRecord Self,
-    LinkRecord? CreateRating);
+    LinkRecord? Next,
+    LinkRecord? Prev,
+    LinkRecord? Create
+);

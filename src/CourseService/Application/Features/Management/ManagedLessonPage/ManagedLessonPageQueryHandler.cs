@@ -1,6 +1,5 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Abstractions.Storage;
-using Courses.Application.Features.Management.ManagedLessonPage;
 using Courses.Application.Features.Shared;
 using Courses.Application.Services.Actions;
 using Courses.Application.Services.LinkProvider;

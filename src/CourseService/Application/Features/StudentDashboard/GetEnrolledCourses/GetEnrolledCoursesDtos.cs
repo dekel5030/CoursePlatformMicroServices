@@ -26,6 +26,12 @@ public sealed record EnrolledCourseItemData(
 
 public sealed record EnrolledCourseLinks(
     LinkRecord ViewCourse,
-    LinkRecord? ContinueLearning);
+    LinkRecord? ContinueLearning
+);
 
-public sealed record GetEnrolledCoursesCollectionLinks(LinkRecord Self);
+public sealed record GetEnrolledCoursesCollectionLinks(
+    LinkRecord Self,
+    LinkRecord? BrowseCatalog,
+    LinkRecord? Next,
+    LinkRecord? Prev
+);

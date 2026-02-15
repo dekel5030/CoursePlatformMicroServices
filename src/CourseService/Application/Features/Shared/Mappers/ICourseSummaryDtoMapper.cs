@@ -1,4 +1,4 @@
-using Courses.Application.Features.Dtos;
+using Courses.Application.Features.CourseCatalog;
 using Courses.Application.Features.Management;
 using Courses.Domain.Categories;
 using Courses.Domain.Courses;

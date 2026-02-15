@@ -60,18 +60,15 @@ public sealed record ManagedCourseLinks(
     LinkRecord? Delete,
     LinkRecord? Publish,
     LinkRecord? GenerateImageUploadUrl,
-    LinkRecord? CreateModule,
-    LinkRecord? ReorderModules);
+    LinkRecord? CreateModule);
 
 public sealed record ManagedLessonLinks(
     LinkRecord Self,
     LinkRecord? PartialUpdate,
-    LinkRecord? UploadVideoUrl,
-    LinkRecord? AiGenerate,
-    LinkRecord? Move);
+    LinkRecord? ChangePosition);
 
 public sealed record ManagedModuleLinks(
     LinkRecord? CreateLesson,
     LinkRecord? PartialUpdate,
     LinkRecord? Delete,
-    LinkRecord? ReorderLessons);
+    LinkRecord? ChangePosition);

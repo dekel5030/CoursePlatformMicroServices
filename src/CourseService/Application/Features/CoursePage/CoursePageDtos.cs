@@ -37,7 +37,6 @@ public sealed record CoursePageCourseData(
 public sealed record CoursePageCourseLinks(
     LinkRecord Self,
     LinkRecord? Manage,
-    LinkRecord? Analytics,
     LinkRecord Ratings);
 
 public sealed record CoursePageModuleDto(CoursePageModuleData Data, CoursePageModuleLinks Links);
@@ -48,11 +47,7 @@ public sealed record CoursePageModuleData(
     int LessonCount,
     TimeSpan TotalDuration);
 
-public sealed record CoursePageModuleLinks(
-    LinkRecord? CreateLesson,
-    LinkRecord? PartialUpdate,
-    LinkRecord? Delete,
-    LinkRecord? ReorderLessons);
+public sealed record CoursePageModuleLinks();
 
 public sealed record CoursePageLessonDto(CoursePageLessonData Data, CoursePageLessonLinks Links);
 
@@ -69,9 +64,4 @@ public sealed record CoursePageLessonData(
     string? VideoUrl,
     string? TranscriptUrl);
 
-public sealed record CoursePageLessonLinks(
-    LinkRecord? Self,
-    LinkRecord? PartialUpdate,
-    LinkRecord? UploadVideoUrl,
-    LinkRecord? AiGenerate,
-    LinkRecord? Move);
+public sealed record CoursePageLessonLinks(LinkRecord? Self);
