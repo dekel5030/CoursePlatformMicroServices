@@ -6,7 +6,7 @@ using Courses.Application.Features.Management.ManagedLessonPage;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Api.Endpoints.Lessons;
+namespace Courses.Api.Endpoints.Manage;
 
 internal sealed class GetManagedLessonPage : IEndpoint
 {

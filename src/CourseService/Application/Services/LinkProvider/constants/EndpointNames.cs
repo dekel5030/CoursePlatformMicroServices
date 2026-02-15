@@ -3,10 +3,10 @@ namespace Courses.Application.Services.LinkProvider.constants;
 /// <summary>
 /// Endpoint display names used for link generation. Must match the names used when mapping endpoints in Web.Api (e.g. WithName).
 /// </summary>
-internal static class EndpointNames
+public static class EndpointNames
 {
     // Courses
-    public const string GetCourseById = "GetCourseById";
+    public const string GetCoursePage = "GetCoursePage";
     public const string GetManagedCourseById = "GetManagedCourseById";
     public const string GetCourseAnalytics = "GetCourseAnalytics";
     public const string GetCourses = "GetCourses";
