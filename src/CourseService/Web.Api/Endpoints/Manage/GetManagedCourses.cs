@@ -7,7 +7,7 @@ using Courses.Application.Shared.Dtos;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Api.Endpoints.Courses;
+namespace Courses.Api.Endpoints.Manage;
 
 internal sealed class GetManagedCourses : IEndpoint
 {

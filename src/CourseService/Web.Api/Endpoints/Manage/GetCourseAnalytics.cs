@@ -5,7 +5,7 @@ using Courses.Application.Features.Management.GetCourseAnalytics;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Api.Endpoints.Courses;
+namespace Courses.Api.Endpoints.Manage;
 
 internal sealed class GetCourseAnalytics : IEndpoint
 {

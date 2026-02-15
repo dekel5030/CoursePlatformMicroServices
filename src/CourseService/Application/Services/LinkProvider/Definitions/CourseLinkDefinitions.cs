@@ -28,7 +28,7 @@ internal sealed class CourseLinkDefinitions : ILinkDefinitionRegistry
             new LinkDefinition<CourseContext>(
                 rel: LinkRels.Self,
                 method: LinkHttpMethod.Get,
-                endpointName: EndpointNames.GetCourseById,
+                endpointName: EndpointNames.GetCoursePage,
                 policyCheck: ctx => _policy.CanReadCourse(ctx),
                 getRouteValues: ctx => new { id = ctx.Id.Value }),
 

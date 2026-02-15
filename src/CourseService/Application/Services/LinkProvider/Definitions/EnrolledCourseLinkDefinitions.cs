@@ -21,7 +21,7 @@ internal sealed class EnrolledCourseLinkDefinitions : ILinkDefinitionRegistry
             new LinkDefinition<EnrolledCourseContext>(
                 rel: LinkRels.EnrolledCourse.ViewCourse,
                 method: LinkHttpMethod.Get,
-                endpointName: EndpointNames.GetCourseById,
+                endpointName: EndpointNames.GetCoursePage,
                 policyCheck: _ => true,
                 getRouteValues: ctx => new { id = ctx.CourseId.Value }),
 
@@ -35,7 +35,7 @@ internal sealed class EnrolledCourseLinkDefinitions : ILinkDefinitionRegistry
             new LinkDefinition<EnrolledCourseContext>(
                 rel: LinkRels.EnrolledCourse.ContinueLearning,
                 method: LinkHttpMethod.Get,
-                endpointName: EndpointNames.GetCourseById,
+                endpointName: EndpointNames.GetCoursePage,
                 policyCheck: ctx => ctx.LastAccessedLessonId is null,
                 getRouteValues: ctx => new { id = ctx.CourseId.Value })
         }.AsReadOnly();
