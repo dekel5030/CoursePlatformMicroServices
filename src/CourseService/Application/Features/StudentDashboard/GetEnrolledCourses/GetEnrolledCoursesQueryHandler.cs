@@ -47,7 +47,7 @@ internal sealed class GetEnrolledCoursesQueryHandler
 
         var studentId = new UserId(_userContext.Id.Value);
 
-        (List<EnrolledCourseRawData>? rawData, int totalCount) = 
+        (List<EnrolledCourseRawData>? rawData, int totalCount) =
             await FetchEnrolledCoursesDataAsync(studentId, request, cancellationToken);
 
         if (totalCount == 0)
@@ -66,8 +66,8 @@ internal sealed class GetEnrolledCoursesQueryHandler
         CancellationToken cancellationToken = default)
     {
         IQueryable<Enrollment> query = _readDbContext.Enrollments
-            .Where(enrollment => 
-                enrollment.StudentId == studentId && 
+            .Where(enrollment =>
+                enrollment.StudentId == studentId &&
                 enrollment.Status == EnrollmentStatus.Active);
 
         int totalCount = await query.CountAsync(cancellationToken);

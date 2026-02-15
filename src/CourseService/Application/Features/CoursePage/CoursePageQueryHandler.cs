@@ -2,7 +2,6 @@ using CoursePlatform.Contracts.CourseService;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Categories;
 using Courses.Application.Categories.Dtos;
-using Courses.Application.Courses.Dtos;
 using Courses.Application.Features.Dtos;
 using Courses.Application.Features.Shared.Loaders;
 using Courses.Application.Features.Shared.Mappers;
@@ -50,13 +49,13 @@ internal sealed class CoursePageQueryHandler
     }
 
     public async Task<Result<CoursePageDto>> Handle(
-        CoursePageQuery request, 
+        CoursePageQuery request,
         CancellationToken cancellationToken = default)
     {
         var courseId = new CourseId(request.Id);
 
         CoursePageData? courseData = await _coursePageDataLoader.LoadAsync(courseId, cancellationToken);
-        
+
         if (courseData == null)
         {
             return Result.Failure<CoursePageDto>(CourseErrors.NotFound);
@@ -67,9 +66,9 @@ internal sealed class CoursePageQueryHandler
         await PublishViewedEventAsync(request.Id, cancellationToken);
 
         var courseContext = new CourseContext(
-            courseData.Course.Id, 
-            courseData.Course.InstructorId, 
-            courseData.Course.Status, 
+            courseData.Course.Id,
+            courseData.Course.InstructorId,
+            courseData.Course.Status,
             IsManagementView: false);
 
         return Result.Success(new CoursePageDto

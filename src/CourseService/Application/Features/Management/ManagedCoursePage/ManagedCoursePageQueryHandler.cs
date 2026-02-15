@@ -1,7 +1,5 @@
 using Courses.Application.Categories;
 using Courses.Application.Categories.Dtos;
-using Courses.Application.Courses.Dtos;
-using Courses.Application.Features.Dtos;
 using Courses.Application.Features.Shared;
 using Courses.Application.Features.Shared.Loaders;
 using Courses.Application.Features.Shared.Mappers;
@@ -56,12 +54,12 @@ internal sealed class ManagedCoursePageQueryHandler
         }
 
         var courseContext = new CourseContext(
-            courseData.Course.Id, 
-            courseData.Course.InstructorId, 
-            courseData.Course.Status, 
+            courseData.Course.Id,
+            courseData.Course.InstructorId,
+            courseData.Course.Status,
             IsManagementView: true);
 
-        Dictionary<Guid, (int LessonCount, TimeSpan TotalDuration)> moduleStats = 
+        Dictionary<Guid, (int LessonCount, TimeSpan TotalDuration)> moduleStats =
             CalculateModuleStats(courseData.Lessons);
 
         return Result.Success(new ManagedCoursePageDto

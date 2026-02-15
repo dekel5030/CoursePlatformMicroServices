@@ -1,12 +1,12 @@
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Features.Shared;
+using Courses.Application.ReadModels;
 using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 using Kernel.Auth.Abstractions;
 using Kernel.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Courses.Application.ReadModels;
 
 namespace Courses.Application.Features.Management.GetCourseAnalytics;
 
@@ -32,7 +32,7 @@ internal sealed class GetCourseAnalyticsQueryHandler
         var courseId = new CourseId(request.CourseId);
 
         Result authResult = await AuthorizeInstructorAsync(courseId, cancellationToken);
-        
+
         if (authResult.IsFailure)
         {
             return Result.Failure<CourseDetailedAnalyticsDto>(authResult.Error);
@@ -46,7 +46,7 @@ internal sealed class GetCourseAnalyticsQueryHandler
             return EmptyResult();
         }
 
-        List<EnrollmentCountByDayDto> enrollmentsOverTime = 
+        List<EnrollmentCountByDayDto> enrollmentsOverTime =
             await GetEnrollmentsOverTimeAsync(courseId, cancellationToken);
 
         List<CourseViewerDto> courseViewers = await GetRecentUniqueViewersAsync(courseId, cancellationToken);
@@ -56,7 +56,7 @@ internal sealed class GetCourseAnalyticsQueryHandler
 
 
     private async Task<Result> AuthorizeInstructorAsync(
-        CourseId courseId, 
+        CourseId courseId,
         CancellationToken cancellationToken = default)
     {
         UserId? instructorId = await _readDbContext.Courses
@@ -73,7 +73,7 @@ internal sealed class GetCourseAnalyticsQueryHandler
     }
 
     private async Task<List<EnrollmentCountByDayDto>> GetEnrollmentsOverTimeAsync(
-        CourseId courseId, 
+        CourseId courseId,
         CancellationToken cancellationToken = default)
     {
         DateTimeOffset cutoff = DateTimeOffset.UtcNow.AddDays(-EnrollmentsOverTimeDays);

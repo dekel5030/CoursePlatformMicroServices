@@ -36,7 +36,7 @@ public sealed class GetCourseRatingQueryHandler
         var courseId = new CourseId(request.CourseId);
         var currentUserId = new UserId(_userContext.Id ?? Guid.Empty);
 
-        (List<CourseRating>? ratings, int totalCount) = 
+        (List<CourseRating>? ratings, int totalCount) =
             await GetPagedRatingsAsync(courseId, request, cancellationToken);
 
         bool hasRated = await CheckIfUserRatedAsync(courseId, currentUserId, cancellationToken);
@@ -67,9 +67,9 @@ public sealed class GetCourseRatingQueryHandler
         CancellationToken cancellationToken = default)
     {
         return await _dbContext.CourseRatings
-            .AnyAsync(rating => 
-                rating.CourseId == courseId && 
-                rating.UserId == userId, 
+            .AnyAsync(rating =>
+                rating.CourseId == courseId &&
+                rating.UserId == userId,
                 cancellationToken);
     }
 

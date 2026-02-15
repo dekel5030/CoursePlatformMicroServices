@@ -1,5 +1,4 @@
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Features.Management;
 using Courses.Application.Features.Shared;
 using Courses.Application.Features.Shared.Mappers;
 using Courses.Application.ReadModels;
@@ -51,7 +50,7 @@ internal sealed class GetManagedCoursesQueryHandler
             return Result.Success(CreateEmptyResponse(pageNumber, pageSize));
         }
 
-        List<Course> courses = 
+        List<Course> courses =
             await FetchPagedCoursesAsync(instructorId, pageNumber, pageSize, cancellationToken);
 
         Dictionary<CategoryId, Category> categories = await GetCategoryMapAsync(courses, cancellationToken);
@@ -59,7 +58,7 @@ internal sealed class GetManagedCoursesQueryHandler
         User? instructor = await _dbContext.Users
             .FirstOrDefaultAsync(user => user.Id == instructorId, cancellationToken);
 
-        List<ManagedCourseSummaryDto> dtos = 
+        List<ManagedCourseSummaryDto> dtos =
             MapToManagedSummaryDtos(courses, instructor, categories, analytics);
 
         return Result.Success(new PaginatedCollectionDto<ManagedCourseSummaryDto>
@@ -95,7 +94,7 @@ internal sealed class GetManagedCoursesQueryHandler
     }
 
     private async Task<Dictionary<CategoryId, Category>> GetCategoryMapAsync(
-        List<Course> courses, 
+        List<Course> courses,
         CancellationToken cancellationToken = default)
     {
         var categoryIds = courses.Select(course => course.CategoryId).Distinct().ToList();
@@ -134,7 +133,7 @@ internal sealed class GetManagedCoursesQueryHandler
     }
 
     private static PaginatedCollectionDto<ManagedCourseSummaryDto> CreateEmptyResponse(
-        int page, 
+        int page,
         int size)
     {
         return new()

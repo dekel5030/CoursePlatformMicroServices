@@ -58,9 +58,9 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
     }
 
     private static async Task<List<CatalogRawData>> FetchPagedDataAsync(
-        IQueryable<CatalogRawData> query, 
-        int page, 
-        int size, 
+        IQueryable<CatalogRawData> query,
+        int page,
+        int size,
         CancellationToken cancellationToken)
     {
         return await query
@@ -70,7 +70,7 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
     }
 
     private async Task<Dictionary<Guid, CourseAnalytics>> GetAnalyticsLookupAsync(
-        IEnumerable<Guid> courseIds, 
+        IEnumerable<Guid> courseIds,
         CancellationToken cancellationToken)
     {
         return await _dbContext.CourseAnalytics
@@ -95,9 +95,9 @@ internal sealed class CourseCatalogQueryHandler : IQueryHandler<CourseCatalogQue
     }
 
     private static CourseCollectionDto CreateCollectionDto(
-        List<CourseSummaryWithAnalyticsDto> items, 
-        int page, 
-        int size, 
+        List<CourseSummaryWithAnalyticsDto> items,
+        int page,
+        int size,
         int total)
     {
         return new CourseCollectionDto
