@@ -13,6 +13,7 @@ public static class EndpointNames
     public const string CreateCourse = "CreateCourse";
     public const string PatchCourse = "PatchCourse";
     public const string DeleteCourse = "DeleteCourse";
+    public const string PublishCourse = "PublishCourse";
     public const string GenerateCourseImageUploadUrl = "GenerateCourseImageUploadUrl";
 
     // Modules

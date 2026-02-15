@@ -6,7 +6,7 @@ using Courses.Application.Features.StudentDashboard.GetEnrolledCourses;
 using Kernel;
 using Kernel.Messaging.Abstractions;
 
-namespace Courses.Api.Endpoints.Enrollments;
+namespace Courses.Api.Endpoints.Users;
 
 internal sealed class GetEnrolledCourses : IEndpoint
 {

@@ -2,7 +2,6 @@ using CoursePlatform.Contracts.CourseService;
 using Courses.Application.Abstractions.Data;
 using Courses.Application.Categories;
 using Courses.Application.Categories.Dtos;
-using Courses.Application.Courses.Dtos;
 using Courses.Application.Features.Dtos;
 using Courses.Application.Features.Shared.Loaders;
 using Courses.Application.Features.Shared.Mappers;

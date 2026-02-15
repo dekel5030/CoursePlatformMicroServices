@@ -1,3 +1,4 @@
+using Courses.Application.Features.Management.ManagedCoursePage.Dtos;
 using Kernel.Messaging.Abstractions;
 
 namespace Courses.Application.Features.Management.ManagedCoursePage;
