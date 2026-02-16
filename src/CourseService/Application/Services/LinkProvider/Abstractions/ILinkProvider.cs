@@ -37,6 +37,7 @@ public interface ILinkProvider
     LinkRecord GetLessonVideoUploadUrlLink(Guid lessonId);
     LinkRecord GetGenerateLessonWithAiLink(Guid lessonId);
     LinkRecord GetChangePositionForLesson(Guid lessonId);
+    LinkRecord GetLessonTranscriptLink(Guid lessonId);
 
     /// <summary>
     /// Returns a link with placeholder href for unimplemented endpoints. Use when a DTO requires a link but the backend is not ready.

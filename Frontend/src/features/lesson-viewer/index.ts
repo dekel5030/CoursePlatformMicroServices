@@ -6,3 +6,4 @@ export { LessonVideoUpload } from "./components/LessonVideoUpload";
 
 // Pages
 export { default as LessonPage } from "./pages/LessonPage";
+export { default as TranscriptEditorPage } from "./pages/TranscriptEditorPage";

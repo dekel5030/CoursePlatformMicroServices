@@ -37,7 +37,51 @@ internal sealed class FileProcessingEventConsumer
             return;
         }
 
-        await HandleVideoProcessingAsync(message, cancellationToken);
+        if (IsTranscript(message.ContentType))
+        {
+            await HandleTranscriptAsync(message, cancellationToken);
+            return;
+        }
+
+        if (IsVideo(message.ContentType))
+        {
+            await HandleVideoProcessingAsync(message, cancellationToken);
+        }
+        else
+        {
+            _logger.LogWarning("Received file with unsupported content type: {ContentType}", message.ContentType);
+        }
+    }
+
+    private static bool IsTranscript(string contentType)
+    {
+        return contentType.Equals("text/vtt", StringComparison.OrdinalIgnoreCase) ||
+               contentType.EndsWith("vtt", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsVideo(string contentType)
+    {
+        return contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase) ||
+               contentType.Equals("application/x-mpegURL", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task HandleTranscriptAsync(
+        FileProcessingEvent message,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Transcript file detected, skipping video processing: {Key}", message.FileKey);
+
+        await _bus.PublishAsync(new FileUploadedEvent
+        {
+            FileKey = message.FileKey,
+            Bucket = message.Bucket,
+            ContentType = message.ContentType,
+            FileSize = message.FileSize,
+            OwnerService = message.OwnerService,
+            ReferenceId = message.ReferenceId,
+            ReferenceType = message.ReferenceType,
+            Metadata = new Dictionary<string, string>()
+        }, cancellationToken);
     }
 
     private async Task HandleVideoProcessingAsync(

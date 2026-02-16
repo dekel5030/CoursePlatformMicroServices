@@ -45,7 +45,7 @@ export default function LessonPage() {
   const isManageRoute = location.pathname.startsWith("/manage/");
   const lessonSelfLink =
     (location.state as { lessonSelfLink?: string })?.lessonSelfLink ??
-    (isManageRoute ? `/api/manage/lessons/${lessonId}` : undefined);
+    (isManageRoute ? `/manage/lessons/${lessonId}` : undefined);
 
   const {
     data: lesson,
@@ -174,6 +174,7 @@ export default function LessonPage() {
     delete: t("common.delete"),
     generateVideoUploadUrl: t("lesson-viewer:toolbar.uploadVideo", { defaultValue: LINK_LABELS.generateVideoUploadUrl }),
     aiGenerate: t("lesson-viewer:actions.generateWithAi"),
+    manageTranscript: t("lesson-viewer:toolbar.editTranscript", { defaultValue: LINK_LABELS.manageTranscript }),
     nextLesson: t("lesson-viewer:toolbar.nextLesson", { defaultValue: LINK_LABELS.nextLesson }),
     previousLesson: t("lesson-viewer:toolbar.previousLesson", { defaultValue: LINK_LABELS.previousLesson }),
     course: t("lesson-viewer:toolbar.backToCourse", { defaultValue: LINK_LABELS.course }),

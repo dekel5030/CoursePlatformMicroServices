@@ -9,18 +9,41 @@ import type {
 import { mapToLessonModel } from "../mappers";
 
 /**
+ * Managed lesson page returns { data: ManagedLessonPageData, links: ManagedLessonPageLinks }.
+ * Public lesson page returns a flat LessonDetailsDto.
+ */
+function isManagedLessonPageResponse(
+  raw: unknown,
+): raw is { data: Record<string, unknown>; links?: Record<string, unknown> } {
+  return (
+    typeof raw === "object" &&
+    raw !== null &&
+    "data" in raw &&
+    typeof (raw as { data: unknown }).data === "object" &&
+    (raw as { data: unknown }).data !== null &&
+    "lessonId" in (raw as { data: Record<string, unknown> }).data
+  );
+}
+
+/**
  * Fetch a lesson by ID
+ * When url is provided (e.g. manage lesson), use it as path relative to API base (no leading /api).
+ * Backend manage endpoint returns { data, links }; we unwrap and map so videoUrl etc. come from data.
  */
 export async function fetchLessonById(
   courseId: string,
   lessonId: string,
   url?: string,
 ): Promise<LessonModel> {
-  // Use the provided HATEOAS self link if available
-  // Otherwise fall back to the constructed course-based URL
   const endpoint = url || `/courses/${courseId}/lessons/${lessonId}`;
-  const response = await axiosClient.get<LessonDetailsDto>(endpoint);
-  return mapToLessonModel(response.data);
+  const path = endpoint.startsWith("/api") ? endpoint.slice(4) || "/" : endpoint;
+  const response = await axiosClient.get<LessonDetailsDto | { data: LessonDetailsDto; links?: LessonModel["links"] }>(path);
+  const raw = response.data;
+  if (isManagedLessonPageResponse(raw)) {
+    const dto = { ...raw.data, links: raw.links } as LessonDetailsDto & { links?: LessonModel["links"] };
+    return mapToLessonModel(dto);
+  }
+  return mapToLessonModel(raw as LessonDetailsDto);
 }
 
 /**
@@ -119,4 +142,28 @@ export async function moveLesson(
   request: MoveLessonRequest,
 ): Promise<void> {
   await axiosClient.patch(`/lessons/${lessonId}/move`, request);
+}
+
+import type { TranscriptSegment } from "../types/TranscriptSegment";
+
+/**
+ * Get transcript segments for a lesson (VTT parsed to JSON).
+ * @param transcriptHref - HATEOAS href for the transcript (e.g. from links.manageTranscript.href)
+ */
+export async function getLessonTranscript(
+  transcriptHref: string,
+): Promise<TranscriptSegment[]> {
+  const response = await axiosClient.get<TranscriptSegment[]>(transcriptHref);
+  return response.data;
+}
+
+/**
+ * Update lesson transcript (JSON segments serialized to VTT and stored).
+ * @param transcriptHref - Same HATEOAS href as GET (PUT to same URL)
+ */
+export async function putLessonTranscript(
+  transcriptHref: string,
+  segments: TranscriptSegment[],
+): Promise<void> {
+  await axiosClient.put(transcriptHref, segments);
 }

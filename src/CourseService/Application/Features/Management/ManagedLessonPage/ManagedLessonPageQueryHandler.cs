@@ -99,6 +99,7 @@ internal sealed class ManagedLessonPageQueryHandler
             Delete: canDelete ? _linkProvider.GetDeleteLessonLink(lid) : null,
             GenerateVideoUploadUrl: canEdit ? _linkProvider.GetLessonVideoUploadUrlLink(lid) : null,
             AiGenerate: canEdit ? _linkProvider.GetGenerateLessonWithAiLink(lid) : null,
+            ManageTranscript: canEdit && lesson.Transcript is not null ? _linkProvider.GetLessonTranscriptLink(lid) : null,
             NextLesson: nextLessonId is { } nid ? _linkProvider.GetLessonPageLink(nid) : null,
             PreviousLesson: previousLessonId is { } pid ? _linkProvider.GetLessonPageLink(pid) : null);
 

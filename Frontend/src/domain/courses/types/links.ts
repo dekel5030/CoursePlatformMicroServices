@@ -94,6 +94,7 @@ export interface ManagedLessonPageLinks {
   delete?: LinkRecord;
   generateVideoUploadUrl?: LinkRecord;
   aiGenerate?: LinkRecord;
+  manageTranscript?: LinkRecord;
   nextLesson?: LinkRecord;
   previousLesson?: LinkRecord;
 }

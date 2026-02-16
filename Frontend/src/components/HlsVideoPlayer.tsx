@@ -6,7 +6,7 @@ import {
   defaultLayoutIcons,
   DefaultVideoLayout,
 } from "@vidstack/react/player/layouts/default";
-import { useEffect, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 
 export type TranscriptTrack = {
   src: string;
@@ -18,6 +18,10 @@ export type TranscriptTrack = {
 /** Progress report interval in seconds (throttle PATCH calls) */
 const PROGRESS_INTERVAL_SEC = 15;
 
+export interface HlsVideoPlayerHandle {
+  seekTo: (seconds: number) => void;
+}
+
 type VideoPlayerProps = {
   src: string;
   poster?: string;
@@ -25,25 +29,39 @@ type VideoPlayerProps = {
   transcripts?: TranscriptTrack[];
   /** Called periodically with current playback position in seconds (throttled). */
   onTimeUpdate?: (seconds: number) => void;
+  /** Called frequently with current time (e.g. for transcript sync). Throttled to ~4 FPS. */
+  onCurrentTimeChange?: (seconds: number) => void;
   /** Called when playback reaches the end. */
   onEnded?: () => void;
   /** Optional initial time in seconds (e.g. for resume). */
   initialTime?: number;
 };
 
-export function HlsVideoPlayer({
-  src,
-  poster,
-  title,
-  transcripts = [],
-  onTimeUpdate,
-  onEnded,
-  initialTime,
-}: VideoPlayerProps) {
+export const HlsVideoPlayer = forwardRef<HlsVideoPlayerHandle, VideoPlayerProps>(function HlsVideoPlayer(
+  {
+    src,
+    poster,
+    title,
+    transcripts = [],
+    onTimeUpdate,
+    onCurrentTimeChange,
+    onEnded,
+    initialTime,
+  },
+  ref,
+) {
   const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastReportedSecondsRef = useRef(0);
+  const lastCurrentTimeRef = useRef(0);
   const hasFiredEndedRef = useRef(false);
+
+  useImperativeHandle(ref, () => ({
+    seekTo(seconds: number) {
+      const video = containerRef.current?.querySelector("video");
+      if (video) video.currentTime = seconds;
+    },
+  }), []);
 
   useEffect(() => {
     // Custom styling for subtitles/captions
@@ -91,11 +109,16 @@ export function HlsVideoPlayer({
 
     const onTimeUpdateEvent = () => {
       const video = findVideo();
-      if (!video || !onTimeUpdate) return;
-      const sec = Math.floor(video.currentTime);
-      if (sec - lastReportedSecondsRef.current >= PROGRESS_INTERVAL_SEC) {
+      if (!video) return;
+      const now = video.currentTime;
+      const sec = Math.floor(now);
+      if (onTimeUpdate && sec - lastReportedSecondsRef.current >= PROGRESS_INTERVAL_SEC) {
         lastReportedSecondsRef.current = sec;
         onTimeUpdate(sec);
+      }
+      if (onCurrentTimeChange && now - lastCurrentTimeRef.current >= 0.25) {
+        lastCurrentTimeRef.current = now;
+        onCurrentTimeChange(now);
       }
     };
 
@@ -137,7 +160,7 @@ export function HlsVideoPlayer({
       observer?.disconnect();
       if (video) detach(video);
     };
-  }, [onTimeUpdate, onEnded]);
+  }, [onTimeUpdate, onCurrentTimeChange, onEnded]);
 
   return (
     <div
@@ -174,4 +197,4 @@ export function HlsVideoPlayer({
       </MediaPlayer>
     </div>
   );
-}
+});

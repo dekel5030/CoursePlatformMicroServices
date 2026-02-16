@@ -34,6 +34,7 @@ public static class EndpointNames
     public const string GenerateLessonVideoUploadUrl = "GenerateLessonVideoUploadUrl";
     public const string GenerateLessonWithAi = "GenerateLessonWithAi";
     public const string MoveLesson = "MoveLesson";
+    public const string GetLessonTranscript = "GetLessonTranscript";
 
     // Course ratings
     public const string GetCourseRatings = "GetCourseRatings";

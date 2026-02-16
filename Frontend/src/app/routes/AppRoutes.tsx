@@ -8,7 +8,7 @@ import {
   CourseAnalyticsPage,
 } from "@/features/course-management";
 import { CoursePage, ManageCoursePage } from "@/features/course-management";
-import { LessonPage } from "@/features/lesson-viewer";
+import { LessonPage, TranscriptEditorPage } from "@/features/lesson-viewer";
 import { UserProfilePage } from "@/features/user-profile";
 import { LandingPage } from "@/features/landing";
 import { ForbiddenPage } from "@/features/errors";
@@ -61,6 +61,7 @@ export default function AppRoutes() {
         <Route path="/manage/courses" element={<ManagedCoursesPage />} />
         <Route path="/manage/courses/:id" element={<ManageCoursePage />} />
         <Route path="/manage/courses/:courseId/lessons/:lessonId" element={<LessonPage />} />
+        <Route path="/manage/courses/:courseId/lessons/:lessonId/transcript" element={<TranscriptEditorPage />} />
         <Route path="/manage/courses/:id/analytics" element={<CourseAnalyticsPage />} />
       </Route>
     </Routes>

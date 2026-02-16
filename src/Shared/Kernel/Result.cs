@@ -63,4 +63,10 @@ public sealed class Result<TValue> : Result
 
     public static Result<TValue> ValidationFailure(Error error) =>
         new(default, false, error);
+
+#pragma warning disable CA2225 // Operator overloads have named alternates
+    public static implicit operator Result<TValue>(TValue value) => Success(value);
+
+    public static implicit operator Result<TValue>(Error error) => Failure(error);
+#pragma warning restore CA2225 // Operator overloads have named alternates
 }
