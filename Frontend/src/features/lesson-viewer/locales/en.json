@@ -1,4 +1,28 @@
 {
+  "toolbar": {
+    "backToCourse": "Back to course",
+    "previewCourse": "Preview course",
+    "uploadVideo": "Upload video",
+    "nextLesson": "Next lesson",
+    "previousLesson": "Previous lesson",
+    "editTranscript": "Edit transcript",
+    "markComplete": "Mark complete",
+    "markedComplete": "Marked complete",
+    "unmarkComplete": "Unmark complete",
+    "manage": "Manage"
+  },
+  "transcript": {
+    "saved": "Transcript saved.",
+    "notAvailable": "Transcript is not available for this lesson.",
+    "loadFailed": "Failed to load transcript.",
+    "editor": "Edit transcript",
+    "searchReplace": "Find & replace",
+    "shortcuts": "Space: Play/Pause · Ctrl+S: Save",
+    "find": "Find",
+    "replace": "Replace",
+    "replaceAll": "Replace all",
+    "clickToSeek": "Click to seek · Double-click to edit"
+  },
   "actions": {
     "titleUpdated": "Title updated successfully",
     "titleUpdateFailed": "Failed to update title",

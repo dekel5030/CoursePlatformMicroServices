@@ -120,6 +120,9 @@ export function apiHrefToAppRoute(
   );
   if (manageCourseLessonsMatch)
     return `/manage/courses/${manageCourseLessonsMatch[1]}/lessons/${manageCourseLessonsMatch[2]}`;
+  const transcriptMatch = path.match(/^\/(?:api\/)?lessons\/([^/]+)\/transcript$/);
+  if (transcriptMatch && context?.courseId)
+    return `/manage/courses/${context.courseId}/lessons/${transcriptMatch[1]}/transcript`;
   const catalogMatch = path.match(/^\/api\/courses$/);
   if (catalogMatch) return "/catalog";
   const enrolledMatch = path.match(/^\/api\/users\/me\/courses\/enrolled/);
@@ -151,6 +154,7 @@ export const LINK_LABELS: Record<string, string> = {
   aiGenerate: "Generate with AI",
   nextLesson: "Next lesson",
   previousLesson: "Previous lesson",
+  manageTranscript: "Edit transcript",
   course: "Back to course",
   markAsComplete: "Mark complete",
   unmarkAsComplete: "Unmark complete",

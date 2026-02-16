@@ -29,6 +29,7 @@ public sealed record ManagedLessonPageLinks(
     LinkRecord? Delete,
     LinkRecord? GenerateVideoUploadUrl,
     LinkRecord? AiGenerate,
+    LinkRecord? ManageTranscript,
     LinkRecord? NextLesson,
     LinkRecord? PreviousLesson
 );

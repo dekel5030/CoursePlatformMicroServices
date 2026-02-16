@@ -90,6 +90,9 @@ internal sealed class LinkProvider : ILinkProvider
     public LinkRecord GetChangePositionForLesson(Guid lessonId) =>
         Link(_resolver.GetHref(EndpointNames.MoveLesson, new { lessonId }), LinkHttpMethod.Patch);
 
+    public LinkRecord GetLessonTranscriptLink(Guid lessonId) =>
+        Link(_resolver.GetHref(EndpointNames.GetLessonTranscript, new { lessonId }), LinkHttpMethod.Get);
+
     public LinkRecord GetPlaceholderLink(string method = "GET") =>
         Link(PlaceholderHref, method);
 
