@@ -98,6 +98,12 @@ internal sealed class LinkProvider : ILinkProvider
     public LinkRecord GetEnrolledCoursesLink(int pageNumber, int pageSize) =>
         Link(_resolver.GetHref(EndpointNames.GetEnrolledCourses, new { pageNumber, pageSize }), LinkHttpMethod.Get);
 
+    public LinkRecord GetUpdateEnrollmentProgressLink(Guid enrollmentId) =>
+        Link(_resolver.GetHref(EndpointNames.UpdateEnrollmentProgress, new { id = enrollmentId }), LinkHttpMethod.Patch);
+
+    public LinkRecord GetMarkEnrollmentLessonCompletedLink(Guid enrollmentId, Guid lessonId) =>
+        Link(_resolver.GetHref(EndpointNames.MarkEnrollmentLessonCompleted, new { id = enrollmentId, lessonId }), LinkHttpMethod.Post);
+
     public LinkRecord GetCreateCourseRatingLink(Guid courseId) =>
         Link(_resolver.GetHref(EndpointNames.CreateCourseRating, new { courseId }), LinkHttpMethod.Post);
 

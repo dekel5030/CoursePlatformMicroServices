@@ -8,6 +8,13 @@ import {
 } from "@/domain/lessons";
 import { useCourse } from "@/domain/courses";
 import {
+  useEnrollmentIdByCourseId,
+  updateLessonProgress,
+  markLessonCompleted,
+} from "@/domain/enrollments";
+import { useQueryClient } from "@tanstack/react-query";
+import { enrollmentsQueryKeys } from "@/domain/enrollments/query-keys";
+import {
   Card,
   CardContent,
   CardHeader,
@@ -48,11 +55,35 @@ export default function LessonPage() {
   const { data: course } = useCourse(courseId!);
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const patchLesson = usePatchLesson(courseId!, lessonId!);
   const generateAi = useGenerateLessonAi();
   const deleteLesson = useDeleteLesson(courseId!);
+  const enrollmentId = useEnrollmentIdByCourseId(courseId ?? undefined);
 
   const { t } = useTranslation(["lesson-viewer", "translation"]);
+
+  const handleVideoTimeUpdate = useCallback(
+    (seconds: number) => {
+      if (!enrollmentId || !lessonId) return;
+      updateLessonProgress(enrollmentId, lessonId, seconds).catch(() => {
+        // Fire-and-forget; avoid spamming user on network errors
+      });
+    },
+    [enrollmentId, lessonId]
+  );
+
+  const handleVideoEnded = useCallback(() => {
+    if (!enrollmentId || !lessonId) return;
+    markLessonCompleted(enrollmentId, lessonId)
+      .then(() => {
+        toast.success(t("lesson-viewer:toolbar.markedComplete"));
+        queryClient.invalidateQueries({ queryKey: enrollmentsQueryKeys.all });
+      })
+      .catch(() => {
+        toast.error(t("common.error", { message: "Failed to mark lesson complete" }));
+      });
+  }, [enrollmentId, lessonId, queryClient, t]);
 
   const [aiTitle, setAiTitle] = useState<string | null>(null);
   const [aiDescription, setAiDescription] = useState<string | null>(null);
@@ -321,6 +352,16 @@ export default function LessonPage() {
                 <HlsVideoPlayer
                   src={lesson.videoUrl}
                   poster={lesson.thumbnailImage ?? undefined}
+                  onTimeUpdate={
+                    !isManageRoute && enrollmentId
+                      ? handleVideoTimeUpdate
+                      : undefined
+                  }
+                  onEnded={
+                    !isManageRoute && enrollmentId
+                      ? handleVideoEnded
+                      : undefined
+                  }
                   transcripts={
                     lesson.transcriptUrl
                       ? [

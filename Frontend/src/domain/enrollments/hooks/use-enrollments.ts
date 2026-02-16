@@ -14,3 +14,14 @@ export function useMyEnrollments(
     queryFn: () => fetchMyEnrollments(pageNumber, pageSize),
   });
 }
+
+/**
+ * Returns the enrollment ID for the current user in the given course, or null if not enrolled.
+ * Uses the first page of "my enrollments" to find a match.
+ */
+export function useEnrollmentIdByCourseId(courseId: string | undefined): string | null {
+  const { data } = useMyEnrollments(1, 100);
+  if (!courseId || !data?.items?.length) return null;
+  const enrollment = data.items.find((item) => item.courseId === courseId);
+  return enrollment?.enrollmentId ?? null;
+}

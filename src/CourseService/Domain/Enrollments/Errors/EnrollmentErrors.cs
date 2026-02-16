@@ -19,4 +19,8 @@ public static class EnrollmentErrors
     public static readonly Error Unauthenticated = Error.Unauthorized(
         "Enrollment.Unauthenticated",
         "User must be authenticated to list enrolled courses.");
+
+    public static readonly Error LessonNotInCourse = Error.Validation(
+        "Enrollment.LessonNotInCourse",
+        "The lesson does not belong to the enrollment's course.");
 }
