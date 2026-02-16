@@ -22,6 +22,7 @@ public class Enrollment : Entity<EnrollmentId>
 
     public LessonId? LastAccessedLessonId { get; private set; }
     public DateTimeOffset? LastAccessedAt { get; private set; }
+    public int? LastWatchedSecond { get; private set; }
 
     public IReadOnlySet<LessonId> CompletedLessons => _completedLessons;
     private readonly HashSet<LessonId> _completedLessons = new();
@@ -70,7 +71,7 @@ public class Enrollment : Entity<EnrollmentId>
             return;
         }
 
-        TrackProgress(lessonId);
+        TrackProgress(lessonId, 0);
 
         if (!_completedLessons.Add(lessonId))
         {
@@ -120,7 +121,7 @@ public class Enrollment : Entity<EnrollmentId>
         return Result.Success();
     }
 
-    public void TrackProgress(LessonId lessonId)
+    public void TrackProgress(LessonId lessonId, int seconds)
     {
         if (Status != EnrollmentStatus.Active)
         {
@@ -129,5 +130,6 @@ public class Enrollment : Entity<EnrollmentId>
 
         LastAccessedLessonId = lessonId;
         LastAccessedAt = DateTimeOffset.UtcNow;
+        LastWatchedSecond = seconds;
     }
 }

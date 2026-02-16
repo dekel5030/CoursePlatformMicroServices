@@ -15,11 +15,20 @@ export type TranscriptTrack = {
   isDefault?: boolean;
 };
 
+/** Progress report interval in seconds (throttle PATCH calls) */
+const PROGRESS_INTERVAL_SEC = 15;
+
 type VideoPlayerProps = {
   src: string;
   poster?: string;
   title?: string;
   transcripts?: TranscriptTrack[];
+  /** Called periodically with current playback position in seconds (throttled). */
+  onTimeUpdate?: (seconds: number) => void;
+  /** Called when playback reaches the end. */
+  onEnded?: () => void;
+  /** Optional initial time in seconds (e.g. for resume). */
+  initialTime?: number;
 };
 
 export function HlsVideoPlayer({
@@ -27,8 +36,14 @@ export function HlsVideoPlayer({
   poster,
   title,
   transcripts = [],
+  onTimeUpdate,
+  onEnded,
+  initialTime,
 }: VideoPlayerProps) {
   const playerRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lastReportedSecondsRef = useRef(0);
+  const hasFiredEndedRef = useRef(false);
 
   useEffect(() => {
     // Custom styling for subtitles/captions
@@ -65,8 +80,70 @@ export function HlsVideoPlayer({
     };
   }, []);
 
+  // Attach to native video for timeupdate and ended (throttled progress, one-shot ended)
+  useEffect(() => {
+    if (!onTimeUpdate && !onEnded) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const findVideo = (): HTMLVideoElement | null =>
+      container.querySelector("video");
+
+    const onTimeUpdateEvent = () => {
+      const video = findVideo();
+      if (!video || !onTimeUpdate) return;
+      const sec = Math.floor(video.currentTime);
+      if (sec - lastReportedSecondsRef.current >= PROGRESS_INTERVAL_SEC) {
+        lastReportedSecondsRef.current = sec;
+        onTimeUpdate(sec);
+      }
+    };
+
+    const onEndedEvent = () => {
+      if (!onEnded || hasFiredEndedRef.current) return;
+      hasFiredEndedRef.current = true;
+      onEnded();
+    };
+
+    let video: HTMLVideoElement | null = findVideo();
+    let observer: MutationObserver | null = null;
+
+    const attach = (v: HTMLVideoElement) => {
+      v.addEventListener("timeupdate", onTimeUpdateEvent);
+      v.addEventListener("ended", onEndedEvent);
+    };
+    const detach = (v: HTMLVideoElement) => {
+      v.removeEventListener("timeupdate", onTimeUpdateEvent);
+      v.removeEventListener("ended", onEndedEvent);
+    };
+
+    if (video) {
+      attach(video);
+      return () => detach(video!);
+    }
+
+    observer = new MutationObserver(() => {
+      const v = findVideo();
+      if (v && !video) {
+        video = v;
+        attach(v);
+        observer?.disconnect();
+        observer = null;
+      }
+    });
+    observer.observe(container, { childList: true, subtree: true });
+
+    return () => {
+      observer?.disconnect();
+      if (video) detach(video);
+    };
+  }, [onTimeUpdate, onEnded]);
+
   return (
-    <div className="w-full aspect-video rounded-xl overflow-hidden shadow-lg bg-black">
+    <div
+      ref={containerRef}
+      className="w-full aspect-video rounded-xl overflow-hidden shadow-lg bg-black"
+    >
       <MediaPlayer
         ref={playerRef}
         title={title}
@@ -78,6 +155,7 @@ export function HlsVideoPlayer({
         crossOrigin
         playsInline
         className="w-full h-full"
+        currentTime={initialTime}
       >
         <MediaProvider>
           {transcripts.map((track) => (

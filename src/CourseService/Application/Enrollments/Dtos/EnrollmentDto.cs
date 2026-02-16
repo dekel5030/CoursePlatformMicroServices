@@ -7,4 +7,7 @@ public sealed record EnrollmentDto(
     DateTimeOffset EnrolledAt,
     DateTimeOffset ExpiresAt,
     string Status,
-    DateTimeOffset? CompletedAt);
+    DateTimeOffset? CompletedAt,
+    Guid? LastAccessedLessonId,
+    DateTimeOffset? LastAccessedAt,
+    int? LastWatchedSecond);

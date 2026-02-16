@@ -1,4 +1,4 @@
-﻿using Courses.Domain.Courses;
+using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Enrollments.Primitives;
@@ -28,6 +28,8 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
             .HasConversion(
                 id => id != null ? id.Value : (Guid?)null,
                 v => v.HasValue ? new LessonId(v.Value) : null);
+
+        builder.Property(e => e.LastWatchedSecond);
 
         builder.Property(e => e.Status)
             .HasConversion<string>()

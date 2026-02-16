@@ -46,6 +46,10 @@ public interface ILinkProvider
     // Enrolled courses (current user)
     LinkRecord GetEnrolledCoursesLink(int pageNumber, int pageSize);
 
+    // Enrollment progress and completion
+    LinkRecord GetUpdateEnrollmentProgressLink(Guid enrollmentId);
+    LinkRecord GetMarkEnrollmentLessonCompletedLink(Guid enrollmentId, Guid lessonId);
+
     // Course ratings (create/update/delete)
     LinkRecord GetCreateCourseRatingLink(Guid courseId);
     LinkRecord GetUpdateCourseRatingLink(Guid ratingId);

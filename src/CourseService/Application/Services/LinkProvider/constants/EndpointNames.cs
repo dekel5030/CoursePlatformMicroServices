@@ -43,4 +43,8 @@ public static class EndpointNames
 
     // Enrolled courses (current user)
     public const string GetEnrolledCourses = "GetEnrolledCourses";
+
+    // Enrollment progress and completion
+    public const string UpdateEnrollmentProgress = "UpdateEnrollmentProgress";
+    public const string MarkEnrollmentLessonCompleted = "MarkEnrollmentLessonCompleted";
 }

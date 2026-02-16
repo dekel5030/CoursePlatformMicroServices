@@ -58,3 +58,31 @@ export async function fetchMyEnrollments(
     items,
   };
 }
+
+/**
+ * Update the video offset (seconds) for the current lesson on an enrollment.
+ * Call periodically while the user is watching (e.g. every 15 seconds).
+ */
+export async function updateLessonProgress(
+  enrollmentId: string,
+  lessonId: string,
+  seconds: number
+): Promise<void> {
+  await axiosClient.patch(`/enrollments/${enrollmentId}/progress`, {
+    lessonId,
+    seconds,
+  });
+}
+
+/**
+ * Mark a lesson as completed for an enrollment.
+ * Call when the user finishes the video or explicitly marks the lesson complete.
+ */
+export async function markLessonCompleted(
+  enrollmentId: string,
+  lessonId: string
+): Promise<void> {
+  await axiosClient.post(
+    `/enrollments/${enrollmentId}/lessons/${lessonId}/completed`
+  );
+}

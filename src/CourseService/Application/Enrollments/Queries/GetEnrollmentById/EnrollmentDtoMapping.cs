@@ -1,4 +1,4 @@
-﻿using Courses.Application.Enrollments.Dtos;
+using Courses.Application.Enrollments.Dtos;
 using Courses.Domain.Enrollments;
 
 namespace Courses.Application.Enrollments.Queries.GetEnrollmentById;
@@ -14,6 +14,9 @@ internal static class EnrollmentDtoMapping
             enrollment.EnrolledAt,
             enrollment.ExpiresAt,
             enrollment.Status.ToString(),
-            enrollment.CompletedAt);
+            enrollment.CompletedAt,
+            enrollment.LastAccessedLessonId?.Value,
+            enrollment.LastAccessedAt,
+            enrollment.LastWatchedSecond);
     }
 }

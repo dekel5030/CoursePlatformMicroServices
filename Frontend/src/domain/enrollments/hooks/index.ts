@@ -1,1 +1,4 @@
-export { useMyEnrollments } from "./use-enrollments";
+export {
+  useMyEnrollments,
+  useEnrollmentIdByCourseId,
+} from "./use-enrollments";
