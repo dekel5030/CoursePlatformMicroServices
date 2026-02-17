@@ -8,4 +8,5 @@ export interface UpdateCourseRequestDto {
   instructorId?: string;
   priceAmount?: number;
   priceCurrency?: string;
+  categoryId?: string;
 }

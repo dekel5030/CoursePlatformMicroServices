@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, Badge, Button, Input } from "@/shared/ui";
+import { Card, Badge, Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui";
 import { Avatar } from "@/shared/ui";
 import { InlineEditableText } from "@/shared/common";
 import { Users, BookOpen, Clock, Tag, Eye, Pencil } from "lucide-react";
 import { motion } from "framer-motion";
 import { CourseActions } from "./CourseActions";
 import { CourseImageUpload } from "./CourseImageUpload";
-import { usePatchCourse } from "@/domain/courses";
+import { usePatchCourse, useCategories } from "@/domain/courses";
 import { toast } from "sonner";
 import { getLinkFromRecord, formatDuration } from "@/shared/utils";
 import type { CourseModel } from "@/domain/courses";
@@ -20,6 +20,7 @@ interface CourseHeaderProps {
 export function CourseHeader({ course, onPriceUpdate }: CourseHeaderProps) {
   const { t } = useTranslation(["course-management", "translation"]);
   const patchCourse = usePatchCourse(course.id);
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const [isEditingPrice, setIsEditingPrice] = useState(false);
   const [editAmount, setEditAmount] = useState(String(course.price.amount));
   const [editCurrency, setEditCurrency] = useState(course.price.currency || "ILS");
@@ -69,10 +70,24 @@ export function CourseHeader({ course, onPriceUpdate }: CourseHeaderProps) {
     setIsEditingPrice(false);
   };
 
+  const handleCategoryChange = async (newCategoryId: string) => {
+    if (!updateLink?.href || newCategoryId === course.categoryId) return;
+    try {
+      await patchCourse.mutateAsync({
+        url: updateLink.href,
+        request: { categoryId: newCategoryId },
+      });
+      toast.success(t("course-management:detail.categoryUpdated"));
+    } catch {
+      toast.error(t("course-management:detail.categoryUpdateFailed"));
+    }
+  };
+
   const formattedDuration = formatDuration(course.totalDuration);
 
   const showCategory = course.categoryName && course.categoryName !== "Empty";
   const showTags = course.tags && course.tags.length > 0;
+  const showCategorySection = showCategory || showTags || canUpdate;
 
   return (
     <Card className="overflow-hidden">
@@ -158,14 +173,48 @@ export function CourseHeader({ course, onPriceUpdate }: CourseHeaderProps) {
           </div>
 
           {/* Category & Tags */}
-          {(showCategory || showTags) && (
+          {showCategorySection && (
             <div className="flex flex-wrap items-center gap-2 text-start">
-              {showCategory && (
+              {canUpdate ? (
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Tag className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  <span className="text-sm shrink-0">{t("course-management:detail.category")}:</span>
+                  {categoriesLoading ? (
+                    <span className="text-sm italic">{t("common.loading", { defaultValue: "Loading..." })}</span>
+                  ) : (
+                    <Select
+                      value={course.categoryId ?? ""}
+                      onValueChange={(value) => value && value !== "__none__" && handleCategoryChange(value)}
+                      disabled={patchCourse.isPending}
+                    >
+                      <SelectTrigger
+                        className="w-[180px] h-9"
+                        aria-label={t("course-management:detail.category")}
+                      >
+                        <SelectValue placeholder={t("course-management:detail.selectCategory")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.length > 0 ? (
+                          categories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id}>
+                              {cat.name ?? cat.id}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="__none__" disabled>
+                            {t("course-management:detail.noCategoriesAvailable", { defaultValue: "No categories available" })}
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              ) : showCategory ? (
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <Tag className="h-3.5 w-3.5 shrink-0" />
                   <span className="text-sm">{course.categoryName}</span>
                 </div>
-              )}
+              ) : null}
               {showTags && (
                 <div className="flex flex-wrap gap-1.5">
                   {course.tags!.map((tag, index) => (
