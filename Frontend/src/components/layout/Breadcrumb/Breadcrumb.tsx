@@ -22,7 +22,7 @@ interface BreadcrumbProps {
 
 export default function Breadcrumb({ items }: BreadcrumbProps) {
   const location = useLocation();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // If no items are provided, auto-generate from URL path
   const breadcrumbItems =
@@ -31,7 +31,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
   if (breadcrumbItems.length === 0) return null;
 
   return (
-    <div className="bg-background border-b border-border py-3 px-8">
+    <div className="bg-background border-b border-border py-3 px-8" dir={i18n.dir()}>
       <div className="max-w-7xl mx-auto">
         <BreadcrumbRoot>
           <BreadcrumbList>

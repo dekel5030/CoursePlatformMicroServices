@@ -52,12 +52,12 @@ export function AiSuggestionField({
   };
 
   return (
-    <div className="border-l-4 border-purple-500 bg-purple-50/50 dark:bg-purple-950/20 rounded-r-lg p-4 space-y-3">
+    <div className="border-s-4 border-primary bg-muted/60 rounded-e-lg p-4 space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <Sparkles className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium text-muted-foreground">
             AI suggested {label.toLowerCase()}
           </span>
         </div>
@@ -105,7 +105,7 @@ export function AiSuggestionField({
               placeholder={placeholder}
               rows={rows}
               maxLength={maxLength}
-              className="w-full bg-white dark:bg-gray-900 dark:text-gray-100 border-2 border-purple-300 dark:border-purple-700 focus:border-purple-500 dark:focus:border-purple-500"
+              className="w-full bg-background border-2 border-primary/30 focus:border-primary"
               autoFocus
             />
           ) : (
@@ -114,7 +114,7 @@ export function AiSuggestionField({
               onChange={(e) => setEditedValue(e.target.value)}
               placeholder={placeholder}
               maxLength={maxLength}
-              className="w-full bg-white dark:bg-gray-900 dark:text-gray-100 border-2 border-purple-300 dark:border-purple-700 focus:border-purple-500 dark:focus:border-purple-500 text-lg"
+              className="w-full bg-background border-2 border-primary/30 focus:border-primary text-lg"
               autoFocus
             />
           )}
@@ -142,17 +142,17 @@ export function AiSuggestionField({
         <div className="space-y-3">
           {/* Original value if exists */}
           {originalValue && (
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-muted-foreground">
               <span className="font-medium">Current: </span>
               <span className="line-through">{originalValue}</span>
             </div>
           )}
 
           {/* AI Suggestion */}
-          <div className="bg-white dark:bg-gray-900 rounded-lg border border-purple-200 dark:border-purple-800 p-3">
+          <div className="bg-muted/30 rounded-lg border border-border p-3">
             <p
               className={cn(
-                "text-gray-900 dark:text-gray-100 whitespace-pre-wrap leading-relaxed",
+                "text-foreground whitespace-pre-wrap leading-relaxed",
                 type === "text" && "text-lg font-semibold",
               )}
               dir="auto"

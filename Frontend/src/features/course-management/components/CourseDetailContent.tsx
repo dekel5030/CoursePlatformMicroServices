@@ -32,7 +32,7 @@ function LoadingSkeleton() {
   return (
     <div className="space-y-6">
       <div className="bg-background border-b border-border py-3 px-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <Skeleton className="h-4 w-48" />
         </div>
       </div>
@@ -128,10 +128,10 @@ export function CourseDetailContent({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <BreadcrumbNav items={breadcrumbItems} />
       <motion.div
-        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"
+        className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"
         variants={container}
         initial="hidden"
         animate="show"
@@ -143,18 +143,18 @@ export function CourseDetailContent({
         {/* Course Description */}
         {(course.description || canUpdate) && course.id && (
           <motion.div variants={item}>
-            <Card>
+            <Card className="shadow-sm">
               <CardHeader className="pb-3">
-                <CardTitle className="text-start">
+                <CardTitle className="text-start text-lg font-semibold">
                   {t("course-management:detail.about")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-start" dir={dir}>
+              <CardContent className="text-start leading-relaxed" dir={dir}>
                 {canUpdate ? (
                   <InlineEditableTextarea
                     value={course.description || ""}
                     onSave={onDescriptionUpdate}
-                    displayClassName="text-muted-foreground text-start"
+                    displayClassName="text-muted-foreground text-start leading-relaxed"
                     placeholder={t("course-management:detail.enterDescription")}
                     rows={4}
                     maxLength={2000}

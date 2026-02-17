@@ -90,8 +90,8 @@ export function CourseHeader({ course, onPriceUpdate }: CourseHeaderProps) {
   const showCategorySection = showCategory || showTags || canUpdate;
 
   return (
-    <Card className="overflow-hidden">
-      <div className="grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)] gap-6 p-6">
+    <Card className="overflow-hidden shadow-sm">
+      <div className="grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)] gap-6 p-6 lg:p-8">
         {/* Image */}
         {course.imageUrl && (
           <div className="relative aspect-video lg:aspect-[4/3] overflow-hidden rounded-lg bg-muted">
@@ -148,28 +148,30 @@ export function CourseHeader({ course, onPriceUpdate }: CourseHeaderProps) {
           </div>
 
           {/* Stats: enrolled, lessons, duration */}
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <Users className="h-3.5 w-3.5 shrink-0" />
-              <span>{course.enrollmentCount ?? 0}</span>
-              <span>{t("course-management:detail.enrolled")}</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <BookOpen className="h-3.5 w-3.5 shrink-0" />
-              <span>{course.lessonCount ?? 0}</span>
-              <span>{t("course-management:detail.lessons")}</span>
-            </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <Users className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {course.enrollmentCount ?? 0} {t("course-management:detail.enrolled")}
+            </span>
+            <span aria-hidden className="text-border">·</span>
+            <span className="flex items-center gap-1.5">
+              <BookOpen className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {course.lessonCount ?? 0} {t("course-management:detail.lessons")}
+            </span>
             {formattedDuration && (
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Clock className="h-3.5 w-3.5 shrink-0" />
-                <span>{formattedDuration}</span>
-              </div>
+              <>
+                <span aria-hidden className="text-border">·</span>
+                <span className="flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  {formattedDuration}
+                </span>
+              </>
             )}
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <Eye className="h-3.5 w-3.5 shrink-0" />
-              <span>{course.courseViews ?? 0}</span>
-              <span>{t("course-management:detail.views")}</span>
-            </div>
+            <span aria-hidden className="text-border">·</span>
+            <span className="flex items-center gap-1.5">
+              <Eye className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {course.courseViews ?? 0} {t("course-management:detail.views")}
+            </span>
           </div>
 
           {/* Category & Tags */}

@@ -111,7 +111,7 @@ export function CourseRatingsSection({ course }: CourseRatingsSectionProps) {
     !!ratingsCollectionLinks?.next?.href || !!ratingsCollectionLinks?.prev?.href;
 
   return (
-    <Card id="ratings" dir={i18n.dir()}>
+    <Card id="ratings" dir={i18n.dir()} className="shadow-sm">
       <CardHeader>
         <CardTitle className="text-start">
           {t("course-management:ratings.sectionTitle")}

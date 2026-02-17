@@ -175,7 +175,7 @@ export default function TranscriptEditorPage() {
             navigate(`/manage/courses/${courseId}/lessons/${lessonId}`)
           }
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="me-2 h-4 w-4" />
           {t("common.back", { defaultValue: "Back" })}
         </Button>
       </div>
@@ -218,7 +218,7 @@ export default function TranscriptEditorPage() {
             navigate(`/manage/courses/${courseId}/lessons/${lessonId}`)
           }
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="me-2 h-4 w-4" />
           {t("common.back", { defaultValue: "Back" })}
         </Button>
         <Button
@@ -227,7 +227,7 @@ export default function TranscriptEditorPage() {
           disabled={!dirty || saveMutation.isPending}
           onClick={handleSave}
         >
-          <Save className="mr-2 h-4 w-4" />
+          <Save className="me-2 h-4 w-4" />
           {t("common.save", { defaultValue: "Save" })}
           {dirty && " *"}
         </Button>
@@ -236,12 +236,12 @@ export default function TranscriptEditorPage() {
           size="sm"
           onClick={() => setShowSearch((s) => !s)}
         >
-          <Search className="mr-2 h-4 w-4" />
+          <Search className="me-2 h-4 w-4" />
           {t("lesson-viewer:transcript.searchReplace", {
             defaultValue: "Find & replace",
           })}
         </Button>
-        <span className="text-xs text-muted-foreground ml-2">
+        <span className="text-xs text-muted-foreground ms-2">
           {t("lesson-viewer:transcript.shortcuts", {
             defaultValue: "Space: Play/Pause · Ctrl+S: Save",
           })}

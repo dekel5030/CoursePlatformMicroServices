@@ -33,6 +33,8 @@
     "aiGenerateFailed": "Failed to generate transcript",
     "generatingWithAi": "Generating with AI...",
     "generateWithAi": "Generate with AI",
+    "aiContentGenerator": "AI Content Generator",
+    "aiGenerateHint": "Generate title and description from transcript",
     "enterTitle": "Enter lesson title",
     "enterDescription": "Enter lesson description",
     "noDescription": "No description",
