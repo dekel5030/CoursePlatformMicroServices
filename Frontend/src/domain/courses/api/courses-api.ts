@@ -17,6 +17,37 @@ import {
   mapManagedCoursePageDtoToModel,
 } from "../mappers";
 import type { CourseModel } from "../types/CourseModel";
+import type { CategoryDto } from "../types/CourseSummaryDto";
+
+/** GET /categories response (backend may send items or Items) */
+export interface CategoryCollectionDto {
+  items?: CategoryDto[];
+  Items?: CategoryDto[];
+  pageNumber?: number;
+  pageSize?: number;
+  totalItems?: number;
+  links?: unknown;
+}
+
+/** Normalize category from backend (may send id/name/slug or Id/Name/Slug) */
+function normalizeCategory(raw: Record<string, unknown>): CategoryDto {
+  return {
+    id: String(raw.id ?? raw.Id ?? ""),
+    name: raw.name != null ? String(raw.name) : raw.Name != null ? String(raw.Name) : null,
+    slug: raw.slug != null ? String(raw.slug) : raw.Slug != null ? String(raw.Slug) : null,
+  };
+}
+
+/**
+ * Fetch all categories (for dropdowns, filters, etc.)
+ */
+export async function fetchCategories(): Promise<CategoryDto[]> {
+  const response = await axiosClient.get<CategoryCollectionDto>("/categories");
+  const data = response.data;
+  const list = data?.items ?? data?.Items ?? [];
+  if (!Array.isArray(list)) return [];
+  return list.map((item) => normalizeCategory(item as unknown as Record<string, unknown>));
+}
 
 export interface CreateCourseResponse {
   courseId: string;

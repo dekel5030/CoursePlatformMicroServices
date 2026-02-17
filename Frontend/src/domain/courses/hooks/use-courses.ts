@@ -7,6 +7,7 @@ import {
   deleteCourse,
   publishCourse,
   fetchAllCourses,
+  fetchCategories,
   createModule,
   patchModule,
   deleteModule,
@@ -46,6 +47,13 @@ export function useManagedCourse(id: string | undefined) {
     queryKey: id ? coursesQueryKeys.managedDetail(id) : ["courses", "managed", "undefined"],
     queryFn: () => fetchManagedCourseById(id!),
     enabled: !!id,
+  });
+}
+
+export function useCategories() {
+  return useQuery({
+    queryKey: coursesQueryKeys.categories(),
+    queryFn: () => fetchCategories(),
   });
 }
 
