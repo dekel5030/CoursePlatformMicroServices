@@ -69,6 +69,9 @@ export function usePatchLesson(courseId: string, lessonId: string) {
       queryClient.invalidateQueries({
         queryKey: lessonsQueryKeys.all(courseId),
       });
+      queryClient.invalidateQueries({
+        queryKey: coursesQueryKeys.detail(courseId),
+      });
     },
   });
 }

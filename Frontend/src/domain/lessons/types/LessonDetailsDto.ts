@@ -11,6 +11,7 @@ export interface LessonDetailsDto {
   description: string;
   index: number;
   duration: string | null;
+  access?: "Private" | "Public";
   isPreview: boolean;
   thumbnailUrl: string | null;
   videoUrl: string | null;

@@ -46,7 +46,19 @@
     }
   },
   "card": {
-    "preview": "Preview"
+    "preview": "Preview",
+    "loginToAccess": "Log in to access",
+    "manage": "Open",
+    "view": "View",
+    "purchaseToAccess": "Purchase to access",
+    "dragHandle": "Drag to reorder"
+  },
+  "accessLevel": {
+    "label": "Lesson access level",
+    "freePreview": "Free preview",
+    "private": "Enrolled only",
+    "changeSuccess": "Access level updated successfully",
+    "changeFailed": "Failed to update access level"
   },
   "addDialog": {
     "validationError": "Please fill in all required fields",

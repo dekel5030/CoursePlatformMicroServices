@@ -18,7 +18,7 @@ export function mapToLessonModel(dto: LessonDetailsDto): LessonModel {
     videoUrl: dto.videoUrl,
     transcriptUrl: dto.transcriptUrl ?? null,
     thumbnailImage: dto.thumbnailUrl,
-    isPreview: dto.isPreview,
+    isPreview: dto.access ? dto.access === "Public" : dto.isPreview,
     order: dto.index,
     duration: dto.duration,
     links,

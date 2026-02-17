@@ -21,6 +21,7 @@ import {
   CardTitle,
   Skeleton,
   Button,
+  Switch,
 } from "@/shared/ui";
 import { BreadcrumbNav } from "@/components/layout";
 import { LinkButtons } from "@/shared/components";
@@ -126,6 +127,22 @@ export default function LessonPage() {
       setAiDescription(null);
     } catch (error) {
       toast.error(t("lesson-viewer:actions.descriptionUpdateFailed"));
+      throw error;
+    }
+  };
+
+  const handleAccessChange = async (checked: boolean) => {
+    const updateLink = getLinkFromRecord(lesson?.links, "partialUpdate");
+    if (!updateLink?.href) return;
+    const newAccess = checked ? "Public" : "Private";
+    try {
+      await patchLesson.mutateAsync({
+        url: updateLink.href,
+        request: { access: newAccess },
+      });
+      toast.success(t("lesson-viewer:accessLevel.changeSuccess"));
+    } catch (error) {
+      toast.error(t("lesson-viewer:accessLevel.changeFailed"));
       throw error;
     }
   };
@@ -487,6 +504,21 @@ export default function LessonPage() {
                     </CardTitle>
                   )}
                   <div className="flex items-center gap-2">
+                    {!!lesson.links?.partialUpdate?.href && (
+                      <div className="flex items-center gap-1.5">
+                        <Switch
+                          checked={lesson.isPreview}
+                          onCheckedChange={handleAccessChange}
+                          disabled={patchLesson.isPending}
+                          aria-label={t("lesson-viewer:accessLevel.label")}
+                        />
+                        <span className="text-sm text-muted-foreground">
+                          {lesson.isPreview
+                            ? t("lesson-viewer:accessLevel.freePreview")
+                            : t("lesson-viewer:accessLevel.private")}
+                        </span>
+                      </div>
+                    )}
                     {formattedDuration && (
                       <div className="flex items-center gap-1 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
                         <Clock className="h-4 w-4" />
