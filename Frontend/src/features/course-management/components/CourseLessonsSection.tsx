@@ -18,7 +18,7 @@ import { ModuleCard } from "./ModuleCard";
 import { SortableModuleItem, moduleSortableId, getModuleId } from "./SortableModuleItem";
 import { getLessonId } from "./SortableLessonItem";
 import { motion } from "framer-motion";
-import { Plus, FolderPlus } from "lucide-react";
+import { FolderPlus } from "lucide-react";
 import { getLinkFromRecord } from "@/shared/utils";
 import { useCreateModule, useReorderModules, useReorderLessons } from "@/domain/courses";
 import { useMoveLesson } from "@/domain/lessons";
@@ -192,7 +192,7 @@ export function CourseLessonsSection({ course }: CourseLessonsSectionProps) {
   };
 
   return (
-    <Card>
+    <Card className="shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between gap-4 py-4">
         <CardTitle className="text-start text-lg">
           {t("course-management:detail.courseContent")}
@@ -300,18 +300,18 @@ export function CourseLessonsSection({ course }: CourseLessonsSectionProps) {
             </DragOverlay>
           </DndContext>
         ) : (
-          <div className="py-10 text-center space-y-4">
-            <p className="text-muted-foreground text-start">
+          <div className="py-12 text-center space-y-4">
+            <p className="text-sm text-muted-foreground">
               {t("course-management:detail.noModules")}
             </p>
             {canCreateModule && (
               <Button
-                variant="default"
+                variant="outline"
                 className="gap-2"
                 onClick={handleCreateModule}
                 disabled={createModule.isPending}
               >
-                <Plus className="h-4 w-4" />
+                <FolderPlus className="h-4 w-4" />
                 {t("course-management:detail.createFirstModule")}
               </Button>
             )}

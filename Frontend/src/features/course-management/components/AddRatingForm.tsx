@@ -33,7 +33,7 @@ export function AddRatingForm({ onSubmit, isPending }: AddRatingFormProps) {
           <div className="space-y-2">
             <label className="text-sm font-medium" dir={i18n.dir()}>
               {t("course-management:ratings.scoreLabel")}
-              <span className="text-destructive ml-1">*</span>
+              <span className="text-destructive ms-1">*</span>
             </label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((value) => (

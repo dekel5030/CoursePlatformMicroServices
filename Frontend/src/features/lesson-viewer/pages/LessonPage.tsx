@@ -248,12 +248,12 @@ export default function LessonPage() {
     return (
       <div className="space-y-6">
         <div className="bg-background border-b border-border py-3 px-8">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <Skeleton className="h-4 w-64" />
           </div>
         </div>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-          <Skeleton className="w-full aspect-video rounded-xl shadow-lg" />
+          <Skeleton className="w-full aspect-video rounded-xl shadow-sm" />
           <Card>
             <CardHeader className="space-y-3">
               <div className="flex items-start justify-between">
@@ -325,11 +325,11 @@ export default function LessonPage() {
   const hasLessonLinks = lesson.links && Object.keys(lesson.links).length > 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <BreadcrumbNav items={breadcrumbItems} />
       {hasLessonLinks && (
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center gap-2 py-2 border-b border-border">
+          <div className="flex flex-wrap items-center justify-end gap-2 py-2 border-b border-border">
             <LinkButtons
               links={lesson.links}
               labelByRel={lessonLabelByRel}
@@ -358,14 +358,14 @@ export default function LessonPage() {
         isLoading={deleteLesson.isPending}
       />
       <motion.div
-        className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6"
+        className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"
         variants={container}
         initial="hidden"
         animate="show"
       >
         {lesson.videoUrl ? (
           <motion.div variants={item}>
-            <Card className="overflow-hidden border-0 shadow-lg bg-black">
+            <Card className="overflow-hidden border-0 shadow-sm rounded-xl bg-black">
               <CardContent className="p-0">
                 <HlsVideoPlayer
                   src={lesson.videoUrl}
@@ -398,7 +398,7 @@ export default function LessonPage() {
           </motion.div>
         ) : (
           <motion.div variants={item}>
-            <Card className="overflow-hidden border-0 shadow-lg">
+            <Card className="overflow-hidden border-0 shadow-sm rounded-xl">
               <CardContent className="p-12 text-center space-y-4">
                 <p className="text-muted-foreground">
                   {t("lesson-viewer:pages.lesson.noVideo")}
@@ -414,32 +414,29 @@ export default function LessonPage() {
         )}
 
         <motion.div variants={item}>
-          <Card>
-            <CardHeader className="space-y-4">
+          <Card className="shadow-sm">
+            <CardHeader className="space-y-4 p-6">
               {/* AI Generation Button */}
               {!!getLinkFromRecord(lesson.links, "aiGenerate")?.href &&
                 !!lesson.links?.partialUpdate?.href && (
-                  <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <div className="flex flex-wrap items-center justify-between gap-3 p-3 ps-4 bg-muted/60 rounded-lg border-s-4 border-primary">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
-                        <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                      </div>
+                      <Sparkles className="h-4 w-4 text-primary shrink-0" />
                       <div>
-                        <h3 className="font-semibold text-sm">
-                          AI Content Generator
-                        </h3>
+                        <p className="text-sm font-medium">
+                          {t("lesson-viewer:actions.aiContentGenerator", { defaultValue: "AI Content Generator" })}
+                        </p>
                         <p className="text-xs text-muted-foreground">
-                          Generate optimized title and description from
-                          transcript
+                          {t("lesson-viewer:actions.aiGenerateHint", { defaultValue: "Generate title and description from transcript" })}
                         </p>
                       </div>
                     </div>
                     <Button
                       onClick={handleGenerateWithAi}
                       disabled={generateAi.isPending}
-                      variant="default"
+                      variant="outline"
                       size="sm"
-                      className="gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                      className="gap-2 shrink-0"
                     >
                       {generateAi.isPending ? (
                         <>
@@ -492,20 +489,20 @@ export default function LessonPage() {
                       <InlineEditableText
                         value={lesson.title}
                         onSave={handleAcceptTitle}
-                        displayClassName="text-3xl font-semibold"
-                        inputClassName="text-3xl font-semibold"
+                        displayClassName="text-2xl font-semibold"
+                        inputClassName="text-2xl font-semibold"
                         placeholder={t("lesson-viewer:actions.enterTitle")}
                         maxLength={200}
                       />
                     </div>
                   ) : (
-                    <CardTitle className="text-3xl" dir="auto">
+                    <CardTitle className="text-2xl" dir="auto">
                       {lesson.title}
                     </CardTitle>
                   )}
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {!!lesson.links?.partialUpdate?.href && (
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <Switch
                           checked={lesson.isPreview}
                           onCheckedChange={handleAccessChange}
@@ -537,7 +534,7 @@ export default function LessonPage() {
 
             {/* Description Section */}
             {!aiDescription && (
-              <CardContent>
+              <CardContent className="pt-0 px-6 pb-6">
                 <div className="space-y-2">
                   <h2 className="text-lg font-semibold">
                     {t("lesson-viewer:pages.lesson.description")}

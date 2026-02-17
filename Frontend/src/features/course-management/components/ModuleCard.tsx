@@ -79,10 +79,10 @@ export function ModuleCard({
   return (
     <>
       <Card
-        className={`overflow-hidden border-s-4 rounded-lg transition-colors ${
+        className={`overflow-hidden border-s-2 rounded-lg shadow-sm transition-colors ${
           isDropTarget
-            ? "border-s-primary bg-primary/5 ring-2 ring-primary/40"
-            : "border-s-primary/20"
+            ? "border-s-primary bg-primary/5 ring-1 ring-primary/30"
+            : "border-s-border"
         }`}
       >
         <CardHeader
