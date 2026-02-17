@@ -1,8 +1,9 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, Badge } from "@/shared/ui";
+import { Card, Badge, Button, Input } from "@/shared/ui";
 import { Avatar } from "@/shared/ui";
 import { InlineEditableText } from "@/shared/common";
-import { Users, BookOpen, Clock, Tag, Eye } from "lucide-react";
+import { Users, BookOpen, Clock, Tag, Eye, Pencil } from "lucide-react";
 import { motion } from "framer-motion";
 import { CourseActions } from "./CourseActions";
 import { CourseImageUpload } from "./CourseImageUpload";
@@ -13,14 +14,20 @@ import type { CourseModel } from "@/domain/courses";
 
 interface CourseHeaderProps {
   course: CourseModel;
+  onPriceUpdate?: (amount: number, currency: string) => Promise<void>;
 }
 
-export function CourseHeader({ course }: CourseHeaderProps) {
+export function CourseHeader({ course, onPriceUpdate }: CourseHeaderProps) {
   const { t } = useTranslation(["course-management", "translation"]);
   const patchCourse = usePatchCourse(course.id);
+  const [isEditingPrice, setIsEditingPrice] = useState(false);
+  const [editAmount, setEditAmount] = useState(String(course.price.amount));
+  const [editCurrency, setEditCurrency] = useState(course.price.currency || "ILS");
 
   const updateLink = getLinkFromRecord(course.links, "partialUpdate");
   const canUpdate = !!updateLink?.href;
+  const canChangePrice =
+    course.status === "Draft" && !!updateLink?.href && !!onPriceUpdate;
 
   const handleTitleUpdate = async (newTitle: string) => {
     if (!updateLink?.href) {
@@ -34,6 +41,32 @@ export function CourseHeader({ course }: CourseHeaderProps) {
       toast.error(t("course-management:detail.titleUpdateFailed"));
       throw error;
     }
+  };
+
+  const handlePriceSave = async () => {
+    const amount = Number(editAmount);
+    if (Number.isNaN(amount) || amount < 0) {
+      toast.error(t("course-management:detail.priceInvalid"));
+      return;
+    }
+    const currency = (editCurrency || "").trim();
+    if (!currency) {
+      toast.error(t("course-management:detail.priceInvalid"));
+      return;
+    }
+    if (!onPriceUpdate) return;
+    try {
+      await onPriceUpdate(amount, currency);
+      setIsEditingPrice(false);
+    } catch {
+      // Error toast is shown by ManageCoursePage
+    }
+  };
+
+  const handlePriceCancel = () => {
+    setEditAmount(String(course.price.amount));
+    setEditCurrency(course.price.currency || "ILS");
+    setIsEditingPrice(false);
   };
 
   const formattedDuration = formatDuration(course.totalDuration);
@@ -147,11 +180,68 @@ export function CourseHeader({ course }: CourseHeaderProps) {
 
           {/* Price & actions row */}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border">
-            <p className="text-xl font-semibold text-start">
-              {course.price.amount > 0
-                ? `${course.price.amount} ${course.price.currency}`
-                : t("course-management:detail.free")}
-            </p>
+            <div className="flex flex-wrap items-center gap-2 text-start">
+              {canChangePrice && isEditingPrice ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    step="any"
+                    value={editAmount}
+                    onChange={(e) => setEditAmount(e.target.value)}
+                    className="w-24 h-9"
+                    placeholder="0"
+                  />
+                  <Input
+                    type="text"
+                    value={editCurrency}
+                    onChange={(e) => setEditCurrency(e.target.value)}
+                    className="w-20 h-9"
+                    placeholder="ILS"
+                  />
+                  <Button size="sm" onClick={handlePriceSave}>
+                    {t("common.save")}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handlePriceCancel}>
+                    {t("common.cancel")}
+                  </Button>
+                </div>
+              ) : canChangePrice ? (
+                <div className="flex items-center gap-2">
+                  <p className="text-xl font-semibold">
+                    {course.price.amount > 0
+                      ? `${course.price.amount} ${course.price.currency}`
+                      : t("course-management:detail.free")}
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0"
+                    onClick={() => {
+                      setEditAmount(String(course.price.amount));
+                      setEditCurrency(course.price.currency || "ILS");
+                      setIsEditingPrice(true);
+                    }}
+                    aria-label={t("course-management:detail.editPrice")}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xl font-semibold">
+                    {course.price.amount > 0
+                      ? `${course.price.amount} ${course.price.currency}`
+                      : t("course-management:detail.free")}
+                  </p>
+                  {course.status === "Published" && (
+                    <p className="text-xs text-muted-foreground">
+                      {t("course-management:detail.priceOnlyWhenUnpublished")}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <CourseImageUpload courseId={course.id} links={course.links} />
               <CourseActions courseId={course.id} links={course.links} />

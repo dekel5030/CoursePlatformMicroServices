@@ -378,6 +378,7 @@ export function mapManagedCoursePageDtoToModel(
     instructorName: null,
     instructorAvatarUrl: null,
     isPublished: c.status === "Published",
+    status: c.status,
     price: {
       amount: c.price.amount,
       currency: c.price.currency ?? "",

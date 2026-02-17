@@ -30,6 +30,25 @@ export default function ManageCoursePage() {
     }
   };
 
+  const handlePriceUpdate = async (amount: number, currency: string) => {
+    const updateLink = getLinkFromRecord(course?.links, "partialUpdate");
+    if (!updateLink?.href) {
+      console.error("No update link found for this course");
+      return;
+    }
+
+    try {
+      await patchCourse.mutateAsync({
+        url: updateLink.href!,
+        request: { priceAmount: amount, priceCurrency: currency },
+      });
+      toast.success(t("course-management:detail.priceUpdated"));
+    } catch (err) {
+      toast.error(t("course-management:detail.priceUpdateFailed"));
+      throw err;
+    }
+  };
+
   const breadcrumbItems = [
     { label: t("breadcrumbs.home"), path: "/" },
     {
@@ -47,6 +66,7 @@ export default function ManageCoursePage() {
       isLoading={isLoading}
       error={error}
       onDescriptionUpdate={handleDescriptionUpdate}
+      onPriceUpdate={handlePriceUpdate}
       breadcrumbItems={breadcrumbItems}
     />
   );
