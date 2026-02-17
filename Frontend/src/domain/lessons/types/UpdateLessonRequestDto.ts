@@ -5,5 +5,5 @@
 export interface UpdateLessonRequestDto {
   title?: string;
   description?: string;
-  access?: string;
+  access?: "Private" | "Public";
 }

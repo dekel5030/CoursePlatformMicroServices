@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { LessonModel } from "@/domain/lessons";
-import { Card, CardContent, Badge, Button } from "@/shared/ui";
+import { Card, CardContent, Badge, Button, Switch } from "@/shared/ui";
 import { InlineEditableText } from "@/shared/common";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { Clock, Trash2, Play, Lock, GripVertical, LogIn } from "lucide-react";
@@ -94,6 +94,21 @@ export default function LessonCard({
     }
   };
 
+  const handleAccessChange = async (checked: boolean) => {
+    if (!updateLink?.href) return;
+    const newAccess = checked ? "Public" : "Private";
+    try {
+      await patchLesson.mutateAsync({
+        url: updateLink.href,
+        request: { access: newAccess },
+      });
+      toast.success(t("lesson-viewer:accessLevel.changeSuccess"));
+    } catch (error) {
+      toast.error(t("lesson-viewer:accessLevel.changeFailed"));
+      throw error;
+    }
+  };
+
   return (
     <>
       <Card
@@ -163,11 +178,28 @@ export default function LessonCard({
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              {lesson.isPreview && (
+              {canUpdate ? (
+                <div
+                  className="flex items-center gap-1.5"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Switch
+                    checked={lesson.isPreview}
+                    onCheckedChange={handleAccessChange}
+                    disabled={patchLesson.isPending}
+                    aria-label={t("lesson-viewer:accessLevel.label")}
+                  />
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {lesson.isPreview
+                      ? t("lesson-viewer:accessLevel.freePreview")
+                      : t("lesson-viewer:accessLevel.private")}
+                  </span>
+                </div>
+              ) : lesson.isPreview ? (
                 <Badge variant="secondary" className="text-xs h-5 font-normal">
                   {t("lesson-viewer:card.preview")}
                 </Badge>
-              )}
+              ) : null}
               {durationText && (
                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3 shrink-0" />

@@ -41,6 +41,15 @@ internal sealed class PatchLessonCommandHandler : ICommandHandler<PatchLessonCom
             return updateResult;
         }
 
+        if (request.Access.HasValue)
+        {
+            Result accessResult = lesson.ChangeAccess(request.Access.Value);
+            if (accessResult.IsFailure)
+            {
+                return accessResult;
+            }
+        }
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
