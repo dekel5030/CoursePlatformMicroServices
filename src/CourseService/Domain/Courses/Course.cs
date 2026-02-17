@@ -1,4 +1,4 @@
-﻿using Courses.Domain.Categories.Primitives;
+using Courses.Domain.Categories.Primitives;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
@@ -117,9 +117,10 @@ public class Course : Entity<CourseId>
 
     public Result ChangePrice(Money price)
     {
-        if (CanModify.IsFailure)
+        Result canChangePrice = CoursePolicies.CanChangePrice(Status);
+        if (canChangePrice.IsFailure)
         {
-            return CanModify;
+            return canChangePrice;
         }
 
         if (Price == price)

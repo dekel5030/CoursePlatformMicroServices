@@ -24,6 +24,7 @@ interface CourseDetailContentProps {
   isLoading: boolean;
   error: Error | null;
   onDescriptionUpdate: (newDescription: string) => Promise<void>;
+  onPriceUpdate?: (amount: number, currency: string) => Promise<void>;
   breadcrumbItems: BreadcrumbItem[];
 }
 
@@ -81,6 +82,7 @@ export function CourseDetailContent({
   isLoading,
   error,
   onDescriptionUpdate,
+  onPriceUpdate,
   breadcrumbItems,
 }: CourseDetailContentProps) {
   const { t, i18n } = useTranslation(["course-management", "translation"]);
@@ -135,7 +137,7 @@ export function CourseDetailContent({
         animate="show"
       >
         <motion.div variants={item}>
-          <CourseHeader course={course} />
+          <CourseHeader course={course} onPriceUpdate={onPriceUpdate} />
         </motion.div>
 
         {/* Course Description */}

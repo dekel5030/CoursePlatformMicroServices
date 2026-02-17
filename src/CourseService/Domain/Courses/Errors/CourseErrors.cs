@@ -1,4 +1,4 @@
-﻿using Kernel;
+using Kernel;
 
 namespace Courses.Domain.Courses.Errors;
 
@@ -31,6 +31,10 @@ public static class CourseErrors
     public static readonly Error CannotModifyDeleted = Error.Validation(
         "Course.CannotModifyDeleted",
         "Cannot modify a deleted course.");
+
+    public static readonly Error CannotChangePriceWhenPublished = Error.Validation(
+        "Course.CannotChangePriceWhenPublished",
+        "Cannot change the price of a published course.");
 
     public static readonly Error Unauthorized = Error.Unauthorized(
         "Course.Unauthorized",

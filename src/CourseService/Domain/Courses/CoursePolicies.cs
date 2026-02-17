@@ -1,4 +1,4 @@
-﻿using Courses.Domain.Courses.Errors;
+using Courses.Domain.Courses.Errors;
 using Courses.Domain.Courses.Primitives;
 using Kernel;
 
@@ -40,6 +40,21 @@ public static class CoursePolicies
         if (status == CourseStatus.Published)
         {
             return Result.Failure(CourseErrors.AlreadyPublished);
+        }
+
+        return Result.Success();
+    }
+
+    public static Result CanChangePrice(CourseStatus status)
+    {
+        if (status == CourseStatus.Deleted)
+        {
+            return Result.Failure(CourseErrors.CannotModifyDeleted);
+        }
+
+        if (status == CourseStatus.Published)
+        {
+            return Result.Failure(CourseErrors.CannotChangePriceWhenPublished);
         }
 
         return Result.Success();
