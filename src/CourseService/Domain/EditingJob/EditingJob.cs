@@ -1,6 +1,8 @@
 ﻿using Courses.Domain.Abstractions;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.EditingJob.Errors;
+using Courses.Domain.EditingJob.Events;
+using Courses.Domain.EditingJob.Primitives;
 using Courses.Domain.MediaPackages.Primitives;
 using Courses.Domain.Shared;
 using Kernel;

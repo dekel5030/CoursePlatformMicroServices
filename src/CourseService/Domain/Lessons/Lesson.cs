@@ -1,5 +1,7 @@
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.EditingJob.Primitives;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.MediaPackages.Primitives;
 using Courses.Domain.Modules.Primitives;
 using Courses.Domain.Shared;
 using Courses.Domain.Shared.Primitives;
@@ -25,22 +27,34 @@ public class Lesson : Entity<LessonId>
     public IReadOnlyList<Attachment> Attachments => _attachments.AsReadOnly();
     public IReadOnlyList<TranscriptLine> TranscriptLines => _transcriptLines.AsReadOnly();
 
+    public EditingJobId? SourceJobId { get; private set; }
+    public MediaPackageId? MediaPackageId { get; private set; }
+
+
     private readonly List<Attachment> _attachments = [];
     private readonly List<TranscriptLine> _transcriptLines = [];
 
-#pragma warning disable S1133
-#pragma warning disable CS8618
+    #pragma warning disable S1133
+    #pragma warning disable CS8618
     [Obsolete("This constructor is for EF Core only.", error: true)]
     private Lesson() { }
-#pragma warning restore CS8618
-#pragma warning restore S1133
+    #pragma warning restore CS8618
+    #pragma warning restore S1133
 
-    private Lesson(ModuleId moduleId, CourseId courseId, LessonId id, Slug slug)
+    private Lesson(
+        ModuleId moduleId,
+        CourseId courseId,
+        LessonId id,
+        Slug slug,
+        EditingJobId? sourceJobId = null,
+        MediaPackageId? mediaPackageId = null)
     {
         ModuleId = moduleId;
         CourseId = courseId;
         Id = id;
         Slug = slug;
+        SourceJobId = sourceJobId;
+        MediaPackageId = mediaPackageId;
     }
 
     internal static Result<Lesson> Create(
@@ -48,11 +62,13 @@ public class Lesson : Entity<LessonId>
         ModuleId moduleId,
         Title? title,
         Description? description,
-        int index = 0)
-    {
+        int index = 0,
+        EditingJobId? sourceJobId = null,
+        MediaPackageId? mediaPackageId = null)
+    { 
         var lessonId = LessonId.CreateNew();
         var slug = new Slug(lessonId.ToString());
-        var lesson = new Lesson(moduleId, courseId, lessonId, slug)
+        var lesson = new Lesson(moduleId, courseId, lessonId, slug, sourceJobId, mediaPackageId)
         {
             Title = title ?? Title.Empty,
             Description = description ?? Description.Empty,

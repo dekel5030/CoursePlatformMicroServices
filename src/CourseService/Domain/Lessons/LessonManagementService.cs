@@ -1,7 +1,9 @@
 using Courses.Domain.Abstractions.Repositories;
 using Courses.Domain.Courses.Primitives;
+using Courses.Domain.EditingJob.Primitives;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
+using Courses.Domain.MediaPackages.Primitives;
 using Courses.Domain.Modules;
 using Courses.Domain.Modules.Errors;
 using Courses.Domain.Modules.Primitives;
@@ -28,6 +30,8 @@ public sealed class LessonManagementService
         ModuleId moduleId,
         Title title,
         Description description,
+        EditingJobId? sourceJobId = null,
+        MediaPackageId? mediaPackageId = null,
         CancellationToken cancellationToken = default)
     {
         Module? module = await _moduleRepository.GetByIdAsync(moduleId, cancellationToken);
@@ -37,13 +41,20 @@ public sealed class LessonManagementService
         }
 
         IReadOnlyList<Lesson> existingLessons = await _lessonRepository
-            .ListAsync(l => l.ModuleId == moduleId, cancellationToken);
+            .ListAsync(lesson => lesson.ModuleId == moduleId, cancellationToken);
 
         int nextIndex = existingLessons.Any()
-            ? existingLessons.Max(l => l.Index) + 1
+            ? existingLessons.Max(lesson => lesson.Index) + 1
             : 0;
 
-        Result<Lesson> lessonResult = Lesson.Create(courseId, moduleId, title, description, nextIndex);
+        Result<Lesson> lessonResult = Lesson.Create(
+            courseId,
+            moduleId,
+            title,
+            description,
+            nextIndex,
+            sourceJobId,
+            mediaPackageId);
 
         if (lessonResult.IsSuccess)
         {
