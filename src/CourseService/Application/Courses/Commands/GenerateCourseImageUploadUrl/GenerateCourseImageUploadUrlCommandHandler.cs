@@ -73,7 +73,8 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
         var response = new UploadUrlDto(
             result.Url,
             result.FileKey,
-            result.ExpiresAt
+            result.ExpiresAt,
+            result.Headers
         );
 
         return Result.Success(response);

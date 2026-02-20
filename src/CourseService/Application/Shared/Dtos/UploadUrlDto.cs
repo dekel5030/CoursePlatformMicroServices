@@ -3,5 +3,6 @@
 public record UploadUrlDto(
     string UploadUrl,
     string FileKey,
-    DateTime ExpiresAt
+    DateTime ExpiresAt,
+    IReadOnlyDictionary<string, string> Headers
 );

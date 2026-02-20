@@ -54,6 +54,6 @@ internal sealed class GenerateLessonVideoUploadUrlCommandHandler
             TimeSpan.FromHours(1),
             metadata);
 
-        return Result.Success(new UploadUrlDto(uploadUrl.Url, rawFileKey, uploadUrl.ExpiresAt));
+        return Result.Success(new UploadUrlDto(uploadUrl.Url, rawFileKey, uploadUrl.ExpiresAt, uploadUrl.Headers));
     }
 }

@@ -1,7 +1,5 @@
-﻿using System.Globalization;
-using CoursePlatform.Contracts.StorageEvent;
+﻿using CoursePlatform.Contracts.StorageEvent;
 using Courses.Application.Abstractions.Data;
-using Courses.Application.Abstractions.Storage;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
 using Courses.Domain.Lessons;
