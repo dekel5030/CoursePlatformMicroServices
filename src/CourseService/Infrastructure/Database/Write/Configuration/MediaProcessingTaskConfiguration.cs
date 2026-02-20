@@ -25,7 +25,10 @@ public sealed class MediaProcessingTaskConfiguration : IEntityTypeConfiguration<
             .HasConversion(id => id.Value, value => new LessonId(value));
 
         builder.Property(task => task.AssignedTo)
-            .HasConversion(id => id.Value, value => new UserId(value));
+            .HasConversion(
+                id => id == null ? (Guid?)null : id.Value,
+                value => value == null ? null : new UserId(value.Value)
+            );
 
         builder
             .HasOne<Lesson>()
@@ -35,7 +38,8 @@ public sealed class MediaProcessingTaskConfiguration : IEntityTypeConfiguration<
         builder
             .HasOne<User>()
             .WithMany()
-            .HasForeignKey(task => task.AssignedTo);
+            .HasForeignKey(task => task.AssignedTo)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.OwnsMany(task => task.InputRawResources, builder =>
         {

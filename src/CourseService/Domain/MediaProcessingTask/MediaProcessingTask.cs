@@ -31,10 +31,17 @@ public sealed class MediaProcessingTask : Entity<TaskId>, IAuditable
     public DateTimeOffset CreatedAtUtc { get; set; }
     public DateTimeOffset? UpdatedAtUtc { get; set; }
 
-    private MediaProcessingTask(LessonId originalLessonId, string message, IEnumerable<Url> resources)
+    private MediaProcessingTask(
+        LessonId originalLessonId,
+        string message)
     {
         OriginalLessonId = originalLessonId;
         Message = message;
+    }
+
+    private MediaProcessingTask(LessonId originalLessonId, string message, IEnumerable<Url> resources)
+        : this(originalLessonId, message)
+    {
         _inputRawResources.AddRange(resources);
     }
 

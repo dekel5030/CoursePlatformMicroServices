@@ -87,5 +87,10 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
         {
             attachmentBuilder.ToJson("attachments");
         });
+
+        builder.OwnsMany(lesson => lesson.RawResources, resourceBuilder =>
+        {
+            resourceBuilder.ToJson();
+        });
     }
 }
