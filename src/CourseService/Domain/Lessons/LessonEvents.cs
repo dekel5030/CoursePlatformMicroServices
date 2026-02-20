@@ -65,3 +65,9 @@ public record LessonMovedDomainEvent(
     ModuleId NewModuleId,
     CourseId CourseId,
     int NewIndex) : IDomainEvent;
+
+public sealed record LessonSentToMediaProcessingDomainEvent(
+    LessonId LessonId,
+    CourseId CourseId,
+    string Message,
+    IReadOnlyList<Url> RawResources) : IDomainEvent;

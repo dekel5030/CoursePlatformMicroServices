@@ -1,4 +1,4 @@
-﻿namespace Courses.Domain.EditingJob.Primitives;
+﻿namespace Courses.Domain.MediaProcessingTask.Primitives;
 
 public enum EditingJobStatus
 {

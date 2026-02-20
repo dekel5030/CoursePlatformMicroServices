@@ -24,11 +24,11 @@ internal sealed class GenerateCourseImageUploadUrl : IEndpoint
         {
             var courseId = new CourseId(id);
             var command = new GenerateCourseImageUploadUrlCommand(courseId, request.FileName, request.ContentType);
-            Result<GenerateUploadUrlDto> result = await mediator.Send(command);
+            Result<UploadUrlDto> result = await mediator.Send(command);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithMetadata<GenerateUploadUrlDto>(
+        .WithMetadata<UploadUrlDto>(
             nameof(GenerateCourseImageUploadUrl),
             Tags.Courses,
             "Generate Course Image Upload URL");

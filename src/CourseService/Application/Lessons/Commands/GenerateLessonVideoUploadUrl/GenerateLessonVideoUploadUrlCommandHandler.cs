@@ -10,7 +10,7 @@ using Kernel.Messaging.Abstractions;
 namespace Courses.Application.Lessons.Commands.GenerateLessonVideoUploadUrl;
 
 internal sealed class GenerateLessonVideoUploadUrlCommandHandler
-    : ICommandHandler<GenerateLessonVideoUploadUrlCommand, GenerateUploadUrlDto>
+    : ICommandHandler<GenerateLessonVideoUploadUrlCommand, UploadUrlDto>
 {
     private readonly IObjectStorageService _storageService;
     private readonly ILessonRepository _lessonRepository;
@@ -23,7 +23,7 @@ internal sealed class GenerateLessonVideoUploadUrlCommandHandler
         _lessonRepository = lessonRepository;
     }
 
-    public async Task<Result<GenerateUploadUrlDto>> Handle(
+    public async Task<Result<UploadUrlDto>> Handle(
         GenerateLessonVideoUploadUrlCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -31,7 +31,7 @@ internal sealed class GenerateLessonVideoUploadUrlCommandHandler
 
         if (lesson is null)
         {
-            return Result<GenerateUploadUrlDto>.Failure(LessonErrors.NotFound);
+            return Result<UploadUrlDto>.Failure(LessonErrors.NotFound);
         }
 
         string extension = Path.GetExtension(request.FileName).ToLowerInvariant();
@@ -42,7 +42,7 @@ internal sealed class GenerateLessonVideoUploadUrlCommandHandler
 
         if (imageUrlResult.IsFailure)
         {
-            return Result.Failure<GenerateUploadUrlDto>(imageUrlResult.Error);
+            return Result.Failure<UploadUrlDto>(imageUrlResult.Error);
         }
 
         string validatedFileKey = imageUrlResult.Value.Path;
@@ -54,7 +54,7 @@ internal sealed class GenerateLessonVideoUploadUrlCommandHandler
             "lessonvideo",
             TimeSpan.FromHours(1));
 
-        var response = new GenerateUploadUrlDto(uploadUrl.Url, validatedFileKey, uploadUrl.ExpiresAt);
+        var response = new UploadUrlDto(uploadUrl.Url, validatedFileKey, uploadUrl.ExpiresAt);
 
         return Result.Success(response);
     }

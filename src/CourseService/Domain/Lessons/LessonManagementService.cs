@@ -1,9 +1,9 @@
 using Courses.Domain.Abstractions.Repositories;
+using Courses.Domain.CaptureSessions.Primitives;
 using Courses.Domain.Courses.Primitives;
-using Courses.Domain.EditingJob.Primitives;
 using Courses.Domain.Lessons.Errors;
 using Courses.Domain.Lessons.Primitives;
-using Courses.Domain.MediaPackages.Primitives;
+using Courses.Domain.MediaProcessingTask.Primitives;
 using Courses.Domain.Modules;
 using Courses.Domain.Modules.Errors;
 using Courses.Domain.Modules.Primitives;
@@ -30,8 +30,8 @@ public sealed class LessonManagementService
         ModuleId moduleId,
         Title title,
         Description description,
-        EditingJobId? sourceJobId = null,
-        MediaPackageId? mediaPackageId = null,
+        MediaProcessingTask.Primitives.TaskId? sourceJobId = null,
+        CaptureSessionId? mediaPackageId = null,
         CancellationToken cancellationToken = default)
     {
         Module? module = await _moduleRepository.GetByIdAsync(moduleId, cancellationToken);

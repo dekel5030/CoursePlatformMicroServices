@@ -7,4 +7,4 @@ namespace Courses.Application.Courses.Commands.GenerateCourseImageUploadUrl;
 public record GenerateCourseImageUploadUrlCommand(
     CourseId Id,
     string FileName,
-    string ContentType) : ICommand<GenerateUploadUrlDto>;
+    string ContentType) : ICommand<UploadUrlDto>;

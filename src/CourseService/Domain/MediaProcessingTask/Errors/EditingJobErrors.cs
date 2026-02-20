@@ -1,6 +1,6 @@
 ﻿using Kernel;
 
-namespace Courses.Domain.EditingJob.Errors;
+namespace Courses.Domain.MediaProcessingTask.Errors;
 
 public static class EditingJobErrors
 {     
