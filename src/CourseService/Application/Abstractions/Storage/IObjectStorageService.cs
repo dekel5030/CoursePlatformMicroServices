@@ -7,7 +7,8 @@ public interface IObjectStorageService
         string fileKey,
         string referenceId,
         string referenceType,
-        TimeSpan? expiry = null);
+        TimeSpan? expiry = null,
+        Dictionary<string, string>? metadata = null);
 
     PresignedUrlResponse GenerateViewUrl(string fileKey, TimeSpan expiry);
 }

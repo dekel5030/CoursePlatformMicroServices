@@ -71,3 +71,8 @@ public sealed record LessonSentToMediaProcessingDomainEvent(
     CourseId CourseId,
     string Message,
     IReadOnlyList<Url> RawResources) : IDomainEvent;
+
+public sealed record LessonFinalVideoUpdatedDomainEvent(
+    LessonId LessonId,
+    CourseId CourseId,
+    VideoUrl VideoUrl) : IDomainEvent;

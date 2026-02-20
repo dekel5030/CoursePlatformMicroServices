@@ -24,8 +24,8 @@ internal sealed class GenerateLessonVideoUploadUrlCommandHandler
     }
 
     public async Task<Result<UploadUrlDto>> Handle(
-        GenerateLessonVideoUploadUrlCommand request,
-        CancellationToken cancellationToken = default)
+    GenerateLessonVideoUploadUrlCommand request,
+    CancellationToken cancellationToken = default)
     {
         Lesson? lesson = await _lessonRepository.GetByIdAsync(request.LessonId, cancellationToken);
 
@@ -34,28 +34,26 @@ internal sealed class GenerateLessonVideoUploadUrlCommandHandler
             return Result<UploadUrlDto>.Failure(LessonErrors.NotFound);
         }
 
+
         string extension = Path.GetExtension(request.FileName).ToLowerInvariant();
         string uniqueFileName = $"{Guid.NewGuid()}{extension}";
-        string rawFileKey = $"lessons/{lesson.Id}/video/{uniqueFileName}";
 
-        Result<VideoUrl> imageUrlResult = VideoUrl.Create(rawFileKey);
+        string rawFileKey = $"lessons/{lesson.Id}/raw/{uniqueFileName}";
 
-        if (imageUrlResult.IsFailure)
+        var metadata = new Dictionary<string, string>
         {
-            return Result.Failure<UploadUrlDto>(imageUrlResult.Error);
-        }
-
-        string validatedFileKey = imageUrlResult.Value.Path;
+            { "IsRaw", "true" },
+            { "OriginalFileName", request.FileName }
+        };
 
         PresignedUrlResponse uploadUrl = _storageService.GenerateUploadUrlAsync(
             StorageCategory.Public,
-            validatedFileKey,
+            rawFileKey,
             lesson.Id.ToString(),
             "lessonvideo",
-            TimeSpan.FromHours(1));
+            TimeSpan.FromHours(1),
+            metadata);
 
-        var response = new UploadUrlDto(uploadUrl.Url, validatedFileKey, uploadUrl.ExpiresAt);
-
-        return Result.Success(response);
+        return Result.Success(new UploadUrlDto(uploadUrl.Url, rawFileKey, uploadUrl.ExpiresAt));
     }
 }

@@ -156,30 +156,54 @@ public class Lesson : Entity<LessonId>
         return Result.Success();
     }
 
-    public Result UpdateMedia(VideoUrl? videoUrl, ImageUrl? thumbnailUrl, TimeSpan duration)
-    {
-        if (VideoUrl == videoUrl && ThumbnailImageUrl == thumbnailUrl && Duration == duration)
-        {
-            return Result.Success();
-        }
+    //public Result UpdateMedia(VideoUrl? videoUrl, ImageUrl? thumbnailUrl, TimeSpan duration)
+    //{
+    //    if (VideoUrl == videoUrl && ThumbnailImageUrl == thumbnailUrl && Duration == duration)
+    //    {
+    //        return Result.Success();
+    //    }
 
-        VideoUrl = videoUrl;
-        ThumbnailImageUrl = thumbnailUrl;
-        Duration = duration;
+    //    VideoUrl = videoUrl;
+    //    ThumbnailImageUrl = thumbnailUrl;
+    //    Duration = duration;
 
-        Raise(new LessonMediaChangedDomainEvent(Id, ModuleId, CourseId, VideoUrl, ThumbnailImageUrl, Duration));
-        return Result.Success();
-    }
+    //    Raise(new LessonMediaChangedDomainEvent(Id, ModuleId, CourseId, VideoUrl, ThumbnailImageUrl, Duration));
+    //    return Result.Success();
+    //}
 
     public void Delete()
     {
         Raise(new LessonDeletedDomainEvent(Id, ModuleId, CourseId));
     }
 
+    public Result SetRawResources(IEnumerable<Url> resources)
+    {
+        if (Status == LessonStatus.Final)
+        {
+            return Result.Failure(Error.Validation("Lesson.Immutable", "Cannot change raw resources of a published lesson."));
+        }
+
+        _rawResources.Clear();
+        _rawResources.AddRange(resources);
+
+        return Result.Success();
+    }
+
     public Result SendToMediaProcessing(string message)
     {
-        Status = LessonStatus.WaitingForMediaProcessing;
+        Status = LessonStatus.ReadyForMediaProcessing;
         Raise(new LessonSentToMediaProcessingDomainEvent(Id, CourseId, message, RawResources));
+
+        return Result.Success();
+    }
+
+    public Result SetFinalVideo(VideoUrl videoUrl)
+    {
+        VideoUrl = videoUrl;
+
+        Status = LessonStatus.ReadyForTechnicalProcessing;
+
+        Raise(new LessonFinalVideoUpdatedDomainEvent(Id, CourseId, VideoUrl));
 
         return Result.Success();
     }

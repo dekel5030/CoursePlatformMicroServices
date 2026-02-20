@@ -19,8 +19,8 @@ public sealed class MediaProcessingTask : Entity<TaskId>, IAuditable
     private readonly List<Url> _inputRawResources = [];
     public IReadOnlyList<Url> InputRawResources => _inputRawResources.AsReadOnly();
 
-    private readonly List<Url> _outputResources = [];
-    public IReadOnlyList<Url> OutputResources => _outputResources.AsReadOnly();
+    private readonly List<VideoUrl> _outputResources = [];
+    public IReadOnlyList<VideoUrl> OutputResources => _outputResources.AsReadOnly();
 
     public EditingJobStatus Status { get; private set; } = EditingJobStatus.Pending;
     public string Message { get; private set; }
@@ -57,7 +57,7 @@ public sealed class MediaProcessingTask : Entity<TaskId>, IAuditable
         return Result.Success();
     }
 
-    public Result AddOutputResource(Url outputResource)
+    public Result AddOutputResource(VideoUrl outputResource)
     {
         if (Status != EditingJobStatus.InProgress)
         {

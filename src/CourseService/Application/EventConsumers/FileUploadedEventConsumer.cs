@@ -17,8 +17,6 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 {
     private readonly IWriteDbContext _dbContext;
     private readonly ILogger<FileUploadedEventConsumer> _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IStorageUrlResolver _urlResolver;
 
     private const string CourseServiceName = "courseservice";
     private const string LessonImage = "lessonimage";
@@ -27,14 +25,10 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
 
     public FileUploadedEventConsumer(
         IWriteDbContext writeDbContext,
-        ILogger<FileUploadedEventConsumer> logger,
-        IHttpClientFactory httpClientFactory,
-        IStorageUrlResolver storageUrlResolver)
-    {
+        ILogger<FileUploadedEventConsumer> logger)
+    { 
         _dbContext = writeDbContext;
         _logger = logger;
-        _httpClientFactory = httpClientFactory;
-        _urlResolver = storageUrlResolver;
     }
 
     public async Task HandleAsync(FileUploadedEvent message, CancellationToken cancellationToken = default)
@@ -64,58 +58,33 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
     {
         if (!Guid.TryParse(message.ReferenceId, out Guid guidId))
         {
-            _logger.LogError("Invalid ReferenceId format: {ReferenceId}", message.ReferenceId);
             return;
         }
 
         var lessonId = new LessonId(guidId);
 
         Lesson? lesson = await _dbContext.Lessons
-            .FirstOrDefaultAsync(c => c.Id == lessonId, cancellationToken);
-
+            .FirstOrDefaultAsync(lesson => lesson.Id == lessonId, cancellationToken);
+        
         if (lesson is null)
         {
-            _logger.LogWarning("Lesson with ID {LessonId} not found for uploaded image", lessonId);
             return;
         }
 
-        var videoUrl = new VideoUrl(message.FileKey);
+        bool isRaw = message.Metadata.ContainsKey("IsRaw");
 
-        double durationSeconds =
-            message.Metadata.GetValueOrDefault("DurationSeconds") is string durationString
-            && double.TryParse(durationString, NumberStyles.Any, CultureInfo.InvariantCulture, out double result)
-            ? result : 0;
-
-        var duration = TimeSpan.FromSeconds(durationSeconds);
-
-        string? vttContent = null;
-        Url? transcriptUrl = null;
-
-        if (message.Metadata.TryGetValue("TranscriptKey", out string? transcriptFileKey) &&
-            !string.IsNullOrEmpty(transcriptFileKey))
+        if (isRaw)
         {
-            transcriptUrl = new Url(transcriptFileKey);
-
-            try
-            {
-                string fullUrl = _urlResolver.Resolve(StorageCategory.Public, transcriptFileKey).Value;
-
-                using HttpClient httpClient = _httpClientFactory.CreateClient();
-                vttContent = await httpClient.GetStringAsync(new Uri(fullUrl), cancellationToken);
-
-                _logger.LogInformation("Successfully downloaded transcript content for lesson {LessonId}", lessonId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to download transcript content from {Key}", transcriptFileKey);
-            }
+            var rawUrl = new Url(message.FileKey);
+            lesson.SetRawResources([rawUrl]);
+        }
+        else
+        {
+            var finalVideoUrl = new VideoUrl(message.FileKey);
+            lesson.SetFinalVideo(finalVideoUrl);
         }
 
-        lesson.UpdateMedia(videoUrl, thumbnailUrl: null, duration);
-        lesson.UpdateTranscript(transcriptUrl, vttContent);
-
         await _dbContext.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Updated video for lesson {LessonId}", lessonId);
     }
 
     private async Task HandleCourseImageAsync(

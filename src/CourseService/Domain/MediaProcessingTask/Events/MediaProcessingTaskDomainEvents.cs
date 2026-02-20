@@ -10,4 +10,4 @@ public sealed record MediaProcesingTaskCompletedDomainEvent(
     LessonId OriginalLessonId,
     string Message,
     IReadOnlyList<Url> RawResources,
-    IReadOnlyList<Url> OutputResources) : IDomainEvent;
+    IReadOnlyList<VideoUrl> OutputResources) : IDomainEvent;
