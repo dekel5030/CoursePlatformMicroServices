@@ -16,7 +16,7 @@ internal static class MassTransitExtensions
         services.AddMassTransit(config =>
         {
             config.SetKebabCaseEndpointNameFormatter();
-            config.AddConsumer<FileProcessingEventConsumer>();
+            config.AddConsumer<VideoProcessingRequestConsumer>();
             config.UsingRabbitMq((context, busConfig) =>
             {
                 string connectionString = configuration.GetConnectionString(SectionName)

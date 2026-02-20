@@ -11,7 +11,8 @@ internal interface IStorageProvider
         string fileKey,
         string contentType,
         long contentLength,
-        string bucket);
+        string bucket,
+        CancellationToken cancellationToken = default);
     Task<bool> DeleteFileAsync(string fileKey);
     Task<ObjectResponse> GetObjectAsync(string bucketName, string key, CancellationToken cancellationToken = default);
 
