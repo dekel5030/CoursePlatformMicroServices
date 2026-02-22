@@ -3,11 +3,11 @@ using Microsoft.Extensions.Options;
 
 namespace Courses.Infrastructure.Storage;
 
-internal sealed class StorageUrlResolver : IStorageUrlResolver, IObjectStorageService
+internal sealed class StorageService : IStorageUrlResolver, IObjectStorageService
 {
     private readonly StorageOptions _options;
 
-    public StorageUrlResolver(IOptions<StorageOptions> options)
+    public StorageService(IOptions<StorageOptions> options)
     {
         _options = options.Value;
     }
@@ -17,7 +17,8 @@ internal sealed class StorageUrlResolver : IStorageUrlResolver, IObjectStorageSe
         string fileKey,
         string referenceId,
         string referenceType,
-        TimeSpan? expiry = null)
+        TimeSpan? expiry = null,
+        Dictionary<string, string>? metadata = null)
     {
         if (!_options.BucketMapping.TryGetValue(category, out string? bucketName))
         {
@@ -27,15 +28,29 @@ internal sealed class StorageUrlResolver : IStorageUrlResolver, IObjectStorageSe
         string serviceName = "courseservice";
         string baseUrl = _options.BaseUrl.TrimEnd('/');
 
-        string url = $"{baseUrl}/upload/{serviceName}/{bucketName}/{referenceId}/{referenceType}/{fileKey}";
+        string url = $"{baseUrl}/upload/{bucketName}/{fileKey.TrimStart('/')}";
 
-        var response = new PresignedUrlResponse(
+        var headers = new Dictionary<string, string>
+        {
+            { "x-owner-service", serviceName },
+            { "x-ref-id", referenceId },
+            { "x-ref-type", referenceType }
+        };
+
+        if (metadata != null)
+        {
+            foreach (KeyValuePair<string, string> item in metadata)
+            {
+                headers[$"x-meta-{item.Key.ToLowerInvariant()}"] = item.Value;
+            }
+        }
+
+        return new PresignedUrlResponse(
             Url: url,
             FileKey: fileKey,
-            ExpiresAt: DateTime.UtcNow.Add(expiry ?? TimeSpan.FromMinutes(15))
+            ExpiresAt: DateTime.UtcNow.Add(expiry ?? TimeSpan.FromMinutes(15)),
+            Headers: headers
         );
-
-        return response;
     }
 
     public PresignedUrlResponse GenerateViewUrl(string fileKey, TimeSpan expiry)

@@ -7,4 +7,4 @@ namespace Courses.Application.Lessons.Commands.GenerateLessonVideoUploadUrl;
 public sealed record GenerateLessonVideoUploadUrlCommand(
     LessonId LessonId,
     string FileName,
-    string ContentType) : ICommand<GenerateUploadUrlDto>;
+    string ContentType) : ICommand<UploadUrlDto>;

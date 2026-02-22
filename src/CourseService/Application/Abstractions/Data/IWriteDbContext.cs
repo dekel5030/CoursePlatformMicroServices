@@ -4,6 +4,7 @@ using Courses.Domain.Courses;
 using Courses.Domain.CourseViews;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
+using Courses.Domain.MediaProcessingTask;
 using Courses.Domain.Modules;
 using Courses.Domain.Ratings;
 using Courses.Domain.Users;
@@ -22,6 +23,7 @@ public interface IWriteDbContext
     DbSet<User> Users { get; }
     DbSet<CourseView> CourseViews { get; }
     DbSet<CourseAnalytics> CourseAnalytics { get; }
+    DbSet<MediaProcessingTask> MediaProcessingTasks { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -25,11 +25,11 @@ internal sealed class GenerateLessonVideoUploadUrl : IEndpoint
             var command = new GenerateLessonVideoUploadUrlCommand(
                 lessonIdObj, request.FileName, request.ContentType);
 
-            Result<GenerateUploadUrlDto> result = await mediator.Send(command, cancellationToken);
+            Result<UploadUrlDto> result = await mediator.Send(command, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithMetadata<GenerateUploadUrlDto>(
+        .WithMetadata<UploadUrlDto>(
             nameof(GenerateLessonVideoUploadUrl),
             Tags.Lessons,
             "Generate Lesson Video Upload URL");

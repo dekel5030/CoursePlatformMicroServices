@@ -1,60 +1,71 @@
-﻿using CoursePlatform.ServiceDefaults.Endpoints;
-using Kernel;
-using Kernel.EventBus;
-using Microsoft.AspNetCore.Mvc;
-using StorageService.Abstractions;
-using StorageService.InternalContracts;
+﻿using CoursePlatform.Contracts.StorageEvent;
+using CoursePlatform.ServiceDefaults.Endpoints;
+    using Kernel;
+    using Kernel.EventBus;
+    using Microsoft.AspNetCore.Mvc;
+    using StorageService.Abstractions;
+    using StorageService.InternalContracts;
 
-namespace StorageService.Endpoints;
+    namespace StorageService.Endpoints;
 
-internal sealed class Upload : IEndpoint
-{
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    internal sealed class Upload : IEndpoint
     {
-        app.MapPut("storage/upload/{ownerService}/{bucket}/{referenceId}/{referenceType}/{*key}", async (
-            string key,
-            string ownerService,
-            string referenceId,
-            string bucket,
-            string referenceType,
-            HttpRequest request,
-            IStorageProvider storage,
-            IEventBus bus) =>
+        public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            if (!request.HasFormContentType && request.ContentLength == 0)
+            app.MapPut("storage/upload/{bucket}/{*key}", async (
+                string key,
+                string bucket,
+                HttpRequest request,
+                IStorageProvider storage,
+                IEventBus bus) =>
             {
-                return Results.BadRequest("No file content.");
-            }
+                var metadata = request.Headers
+                    .Where(header => header.Key.StartsWith("x-meta-", StringComparison.OrdinalIgnoreCase))
+                    .ToDictionary(
+                        h => h.Key.Replace("x-meta-", "", StringComparison.OrdinalIgnoreCase),
+                        h => h.Value.ToString()
+                    );
 
-            string contentType = request.ContentType ?? "application/octet-stream";
-            long contentLength = request.ContentLength ?? throw new ArgumentException("Content-Length is required");
+                string? ownerService = request.Headers["x-owner-service"];
+                string? referenceId = request.Headers["x-ref-id"];
+                string? referenceType = request.Headers["x-ref-type"];
 
-            Result<string> fileResult = await storage.UploadObjectAsync(
-                request.Body,
-                key,
-                contentType,
-                contentLength,
-                bucket);
+                if (string.IsNullOrEmpty(ownerService) || string.IsNullOrEmpty(referenceId))
+                {
+                    return Results.BadRequest("Missing mandatory metadata headers (owner, ref-id).");
+                }
 
-            if (fileResult.IsFailure)
-            {
-                return Results.Problem("Failed to upload file to storage.");
-            }
+                // 2. ביצוע ההעלאה
+                string contentType = request.ContentType ?? "application/octet-stream";
+                long contentLength = request.ContentLength ?? throw new ArgumentException("Content-Length required");
 
-            await bus.PublishAsync(new FileProcessingEvent
-            {
-                FileKey = fileResult.Value,
-                Bucket = bucket,
-                ContentType = contentType,
-                FileSize = contentLength,
-                OwnerService = ownerService,
-                ReferenceId = referenceId,
-                ReferenceType = referenceType,
-            });
+                Result<string> fileResult = await storage.UploadObjectAsync(
+                    request.Body,
+                    key,
+                    contentType,
+                    contentLength,
+                    bucket);
 
-            return Results.Ok(new { Key = fileResult.Value });
-        })
-        .WithMetadata(new DisableRequestSizeLimitAttribute());
+                if (fileResult.IsFailure)
+                {
+                    return Results.Problem("Upload failed.");
+                }
+
+                await bus.PublishAsync(new FileUploadedEvent
+                {
+                    FileKey = fileResult.Value,
+                    Bucket = bucket,
+                    Metadata = metadata,
+                    OwnerService = ownerService,
+                    ReferenceId = referenceId,
+                    ReferenceType = referenceType ?? "",
+                    FileSize = contentLength,
+                    ContentType = contentType
+                });
+
+                return Results.Ok(new { Key = fileResult.Value });
+            })
+            .WithMetadata(new DisableRequestSizeLimitAttribute());
+        }
     }
-}
 

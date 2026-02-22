@@ -37,13 +37,18 @@ public sealed class LessonManagementService
         }
 
         IReadOnlyList<Lesson> existingLessons = await _lessonRepository
-            .ListAsync(l => l.ModuleId == moduleId, cancellationToken);
+            .ListAsync(lesson => lesson.ModuleId == moduleId, cancellationToken);
 
         int nextIndex = existingLessons.Any()
-            ? existingLessons.Max(l => l.Index) + 1
+            ? existingLessons.Max(lesson => lesson.Index) + 1
             : 0;
 
-        Result<Lesson> lessonResult = Lesson.Create(courseId, moduleId, title, description, nextIndex);
+        Result<Lesson> lessonResult = Lesson.Create(
+            courseId,
+            moduleId,
+            title,
+            description,
+            nextIndex);
 
         if (lessonResult.IsSuccess)
         {
@@ -202,5 +207,65 @@ public sealed class LessonManagementService
         }
 
         return Result.Success();
+    }
+
+    public async Task<Result<List<Lesson>>> SplitLessonAsync(
+        LessonId originalLessonId,
+        IReadOnlyList<VideoUrl> outputResources,
+        CancellationToken cancellationToken = default)
+    {
+        Lesson? original = await _lessonRepository.GetByIdAsync(originalLessonId, cancellationToken);
+        if (original is null)
+        {
+            return Result.Failure<List<Lesson>>(LessonErrors.NotFound);
+        }
+
+        var newLessons = new List<Lesson>();
+        int startIndex = original.Index;
+        
+        for (int i = 0; i < outputResources.Count; i++)
+        {
+            var title = new Title($"{original.Title} - Part {i + 1}");
+
+            Result<Lesson> lessonResult = Lesson.Create(
+                original.CourseId,
+                original.ModuleId,
+                title,
+                original.Description,
+                startIndex + i);
+
+            if (lessonResult.IsFailure)
+            {
+                return Result.Failure<List<Lesson>>(lessonResult.Error);
+            }
+
+            Lesson newLesson = lessonResult.Value;
+            newLesson.CompletePostProduction(outputResources[i], TimeSpan.Zero);
+
+            newLessons.Add(newLesson);
+        }
+
+        int shiftAmount = outputResources.Count - 1;
+        if (shiftAmount != 0)
+        {
+            IReadOnlyList<Lesson> followingLessons = await _lessonRepository.ListAsync(
+                l => l.ModuleId == original.ModuleId && l.Index > original.Index,
+                cancellationToken);
+
+            foreach (Lesson l in followingLessons)
+            {
+                l.ChangeIndex(l.Index + shiftAmount);
+            }
+        }
+
+        foreach (Lesson nl in newLessons)
+        {
+            await _lessonRepository.AddAsync(nl, cancellationToken);
+        }
+
+        _lessonRepository.Remove(original);
+        original.Delete();
+
+        return Result.Success(newLessons);
     }
 }

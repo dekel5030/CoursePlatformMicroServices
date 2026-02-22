@@ -13,7 +13,7 @@ using Kernel.Messaging.Abstractions;
 namespace Courses.Application.Courses.Commands.GenerateCourseImageUploadUrl;
 
 internal sealed class GenerateCourseImageUploadUrlCommandHandler
-    : ICommandHandler<GenerateCourseImageUploadUrlCommand, GenerateUploadUrlDto>
+    : ICommandHandler<GenerateCourseImageUploadUrlCommand, UploadUrlDto>
 {
     private readonly ICourseRepository _courseRepository;
     private readonly IUserContext _userContext;
@@ -29,7 +29,7 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
         _storageService = storageService;
     }
 
-    public async Task<Result<GenerateUploadUrlDto>> Handle(
+    public async Task<Result<UploadUrlDto>> Handle(
         GenerateCourseImageUploadUrlCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -37,7 +37,7 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
 
         if (course is null)
         {
-            return Result.Failure<GenerateUploadUrlDto>(CourseErrors.NotFound);
+            return Result.Failure<UploadUrlDto>(CourseErrors.NotFound);
         }
 
         var resourceId = ResourceId.Create(course.Id.ToString());
@@ -46,7 +46,7 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
 
         if (course.InstructorId != currentUser && !hasPermission)
         {
-            return Result.Failure<GenerateUploadUrlDto>(CourseErrors.Unauthorized);
+            return Result.Failure<UploadUrlDto>(CourseErrors.Unauthorized);
         }
 
         string extension = Path.GetExtension(request.FileName).ToLowerInvariant();
@@ -57,7 +57,7 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
 
         if (imageUrlResult.IsFailure)
         {
-            return Result.Failure<GenerateUploadUrlDto>(imageUrlResult.Error);
+            return Result.Failure<UploadUrlDto>(imageUrlResult.Error);
         }
 
         string validatedFileKey = imageUrlResult.Value.Path;
@@ -70,10 +70,11 @@ internal sealed class GenerateCourseImageUploadUrlCommandHandler
             TimeSpan.FromMinutes(10)
         );
 
-        var response = new GenerateUploadUrlDto(
+        var response = new UploadUrlDto(
             result.Url,
             result.FileKey,
-            result.ExpiresAt
+            result.ExpiresAt,
+            result.Headers
         );
 
         return Result.Success(response);

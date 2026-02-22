@@ -5,6 +5,7 @@ using Courses.Domain.Courses;
 using Courses.Domain.CourseViews;
 using Courses.Domain.Enrollments;
 using Courses.Domain.Lessons;
+using Courses.Domain.MediaProcessingTask;
 using Courses.Domain.Modules;
 using Courses.Domain.Ratings;
 using Courses.Domain.Users;
@@ -24,6 +25,7 @@ public abstract class AppDbContextBase : DbContext, IUnitOfWork
     public DbSet<CourseRating> CourseRatings { get; set; }
     public DbSet<CourseView> CourseViews { get; set; }
     public DbSet<CourseAnalytics> CourseAnalytics { get; set; }
+    public DbSet<MediaProcessingTask> MediaProcessingTasks { get; set; }
 
     protected AppDbContextBase(DbContextOptions options) : base(options)
     {

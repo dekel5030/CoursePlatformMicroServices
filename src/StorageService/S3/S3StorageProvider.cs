@@ -48,7 +48,8 @@ internal sealed class S3StorageProvider : IStorageProvider
         string fileKey,
         string contentType,
         long contentLength,
-        string bucket)
+        string bucket,
+        CancellationToken cancellationToken = default)
     {
         string tempFilePath = Path.GetRandomFileName();
 
@@ -56,7 +57,7 @@ internal sealed class S3StorageProvider : IStorageProvider
         {
             using (var fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
             {
-                await stream.CopyToAsync(fileStream);
+                await stream.CopyToAsync(fileStream, cancellationToken);
             }
 
             using var uploadStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read);
@@ -69,7 +70,7 @@ internal sealed class S3StorageProvider : IStorageProvider
                 UseChunkEncoding = false,
             };
 
-            await _s3Client.PutObjectAsync(request);
+            await _s3Client.PutObjectAsync(request, cancellationToken);
         }
         catch (AmazonS3Exception)
         {
