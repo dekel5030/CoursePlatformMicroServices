@@ -8,4 +8,5 @@ internal static class Tags
     public const string Modules = "Modules";
     public const string Categories = "Categories";
     public const string Enrollments = "Enrollments";
+    public const string Tasks = "Tasks";
 }

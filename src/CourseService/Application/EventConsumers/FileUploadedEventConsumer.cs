@@ -1,4 +1,4 @@
-﻿using CoursePlatform.Contracts.StorageEvent;
+using CoursePlatform.Contracts.StorageEvent;
 using Courses.Application.Abstractions.Data;
 using Courses.Domain.Courses;
 using Courses.Domain.Courses.Primitives;
@@ -74,12 +74,12 @@ internal sealed class FileUploadedEventConsumer : IEventConsumer<FileUploadedEve
         if (isRaw)
         {
             var rawUrl = new Url(message.FileKey);
-            lesson.SetRawResources([rawUrl]);
+            lesson.AddRawResources([rawUrl]);
         }
         else
         {
             var finalVideoUrl = new VideoUrl(message.FileKey);
-            lesson.SetFinalVideo(finalVideoUrl);
+            lesson.CompletePostProduction(finalVideoUrl, TimeSpan.Zero);
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);

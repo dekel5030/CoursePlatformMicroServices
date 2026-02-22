@@ -11,6 +11,7 @@ internal static class StorageExtensions
         services.AddSingleton<IStorageUrlResolver, StorageService>();
 
         services.AddSingleton<IObjectStorageService>(sp => (StorageService)sp.GetRequiredService<IStorageUrlResolver>());
+        services.AddSingleton<IStorageBucketResolver, StorageBucketResolver>();
         services.AddScoped<ITranscriptFileService, TranscriptFileService>();
         return services;
     }

@@ -66,13 +66,13 @@ public record LessonMovedDomainEvent(
     CourseId CourseId,
     int NewIndex) : IDomainEvent;
 
-public sealed record LessonSentToMediaProcessingDomainEvent(
+public sealed record LessonSubmitPostProductionDomainEvent(
     LessonId LessonId,
     CourseId CourseId,
     string Message,
     IReadOnlyList<Url> RawResources) : IDomainEvent;
 
-public sealed record LessonFinalVideoUpdatedDomainEvent(
+public sealed record LessonPostProductionCompletedDomainEvent(
     LessonId LessonId,
     CourseId CourseId,
     VideoUrl VideoUrl) : IDomainEvent;

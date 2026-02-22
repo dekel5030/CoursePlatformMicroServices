@@ -33,6 +33,10 @@ public class Result
 
     public static Result<TValue> Failure<TValue>(Error error) =>
         Result<TValue>.Failure(error);
+
+#pragma warning disable CA2225 // Operator overloads have named alternates
+    public static implicit operator Result(Error error) => Failure(error);
+#pragma warning restore CA2225 // Operator overloads have named alternates
 }
 
 public sealed class Result<TValue> : Result

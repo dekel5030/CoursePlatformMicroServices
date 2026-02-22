@@ -210,9 +210,9 @@ public sealed class LessonManagementService
     }
 
     public async Task<Result<List<Lesson>>> SplitLessonAsync(
-    LessonId originalLessonId,
-    IReadOnlyList<VideoUrl> outputResources,
-    CancellationToken cancellationToken = default)
+        LessonId originalLessonId,
+        IReadOnlyList<VideoUrl> outputResources,
+        CancellationToken cancellationToken = default)
     {
         Lesson? original = await _lessonRepository.GetByIdAsync(originalLessonId, cancellationToken);
         if (original is null)
@@ -240,7 +240,7 @@ public sealed class LessonManagementService
             }
 
             Lesson newLesson = lessonResult.Value;
-            newLesson.SetFinalVideo(outputResources[i]);
+            newLesson.CompletePostProduction(outputResources[i], TimeSpan.Zero);
 
             newLessons.Add(newLesson);
         }
